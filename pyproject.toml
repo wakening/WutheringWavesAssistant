@@ -1,0 +1,107 @@
+[project]
+name = "wuthering-waves-assistant"
+version = "2.2.0"
+description = "Wuthering Waves Assistant"
+authors = [
+    { name = "wakening", email = "MzUwODA3OTg5Mw==@qq.com" }
+]
+license = { text = "AGPL-3.0" }
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "numpy (==1.26.4)",
+    "opencv-python (>=4.11.0.0)",
+    "rapidocr (==2.0.4)",
+    "onnxruntime (==1.20.0)", # rapidocr里依赖了，这里只是固定其版本号和安装顺序，保证被后面的覆盖
+    "onnxruntime-directml (==1.20.0) ; extra != 'cuda' and extra == 'dml'",
+    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda' and extra != 'dml'",
+    "pyside6-fluent-widgets[full] (==1.7.6)",
+    "pyside6 (>=6.8.0,<7.0.0)",
+    "dependency-injector (>=4.45.0,<5.0.0)",
+    "mss (>=10.0.0)",
+    "pywin32 (>=308)",
+    "pynput",
+    "pydirectinput",
+    "pillow",
+    "pydantic",
+    "psutil (>=7.0.0,<8.0.0)",
+    "colorlog",
+    "pycaw (==20240210)",
+    "gputil",
+    "omegaconf",
+] # https://python-poetry.org/docs/dependency-specification/#extra-environment-marker
+
+
+[project.optional-dependencies]
+cuda = [
+    "paddlepaddle-gpu (==2.6.2)",
+    #    "onnxruntime-gpu[cuda, cudnn] (==1.22.0)",
+    "onnxruntime-gpu (==1.20.0)",
+]
+dml = [
+    "onnxruntime-directml (==1.20.0)",
+]
+dev = [
+    "pytest",
+    "matplotlib",
+]
+
+
+[tool.poetry.dependencies]
+paddlepaddle-gpu = { source = "paddlepaddle-cu118" }
+onnxruntime-gpu = { source = "onnxruntime-cu118" }
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+package-mode = false
+
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+priority = "supplemental"
+
+
+[[tool.poetry.source]]
+name = "paddlepaddle-cu120"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu120/"
+priority = "explicit"
+
+
+[[tool.poetry.source]]
+name = "onnxruntime-cu120"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+priority = "explicit"
+
+
+[[tool.poetry.source]]
+name = "paddlepaddle-cu118"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu118/"
+priority = "explicit"
+
+
+[[tool.poetry.source]]
+name = "onnxruntime-cu118"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-11/pypi/simple/"
+priority = "explicit"
+
+
+[tool.mypy]
+ignore_missing_imports = true # 忽略未安装类型标注的库
+exclude = "tests/.*"

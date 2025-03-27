@@ -1,0 +1,88 @@
+name: Alpha Build
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  package:
+    runs-on: windows-latest  # 使用 Windows 环境
+
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+
+#      - name: 🛠️ 安装 Python 3.10
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.10'
+#
+#      - name: 🛠️ 安装 Poetry
+#        run: |
+#          # 使用 pip 安装指定版本的 Poetry（适用于 Windows）
+#          python -m pip install --upgrade poetry==2.1.1
+
+#      - name: 📦 安装 7z
+#        run: |
+#          choco install 7zip  # 使用 Chocolatey 安装 7zip
+
+      - name: 📖 获取 pyproject.toml 中的版本号
+        id: get_version
+        run: |
+          # 使用 PowerShell 正确设置环境变量
+          $version = (Select-String -Path "pyproject.toml" -Pattern 'version = "(.*)"').Matches.Groups[1].Value
+          $version = "$version"
+          Write-Output "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+
+#      - name: 🧑‍💻 创建并激活虚拟环境，并安装依赖
+#        run: |
+#          # 创建名为 venv 的虚拟环境，位于项目根目录
+#          python -m venv venv
+#          # 激活虚拟环境
+#          .\venv\Scripts\activate
+#          # 安装 Poetry 依赖
+#          poetry install
+
+#      - name: 🛠️ 创建便携式虚拟环境
+#        run: |
+#          # 使用 --copies 参数避免符号链接
+#          python -m venv venv --copies
+#
+#          # 激活时使用相对路径
+#          .\venv\Scripts\activate
+#
+#          # 修复激活脚本的路径
+#          (Get-Content .\venv\Scripts\activate) -replace 'VIRTUAL_ENV=.*', 'VIRTUAL_ENV="$(dirname "$(dirname "$(realpath "$0")")")"' | Set-Content .\venv\Scripts\activate
+#
+#          poetry install
+
+      - name: 🗜️ 创建 7z 压缩包（包含虚拟环境）
+        run: |
+          Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "assets/screenshot" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
+          7z a -mx=9 "wwa-${{ env.VERSION }}-alpha.7z" .
+
+      - name: 📂 上传 7z 文件作为 Workflow 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-7z
+          path: "wwa-${{ env.VERSION }}-alpha.7z"
+
+      - name: 🚀 发布 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ env.VERSION }}"
+          name: "Pre Release ${{ env.VERSION }} Alpha"
+          files: "wwa-${{ env.VERSION }}-alpha.7z"
+          body: |
+            Wuthering Waves Assistant Alpha
+          draft: false  # 是否为草稿
+          prerelease: true  # 设置为 Pre-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

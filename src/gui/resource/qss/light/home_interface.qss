@@ -1,0 +1,21 @@
+SettingInterface,
+#view {
+    background-color: transparent;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+
+BannerWidget > #galleryLabel {
+    font: 28px 'Segoe UI', 'Microsoft YaHei';
+    /*font: 25px 'Segoe UI SemiBold', 'Microsoft YaHei SemiBold';*/
+    /*font-weight: 600;*/
+    font-weight: 600;
+    color: black;
+    padding-left: 10px;
+}
+
+
