@@ -14,7 +14,7 @@
 
 ### 1️⃣ 安装 Conda
 
-前往 [Miniconda 官网](https://docs.conda.io/en/latest/miniconda.html) 下载 Miniconda，并按照默认设置安装。
+群文件(1039535103)里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载 Miniconda，并按照默认设置安装。
 
 ### 2️⃣ 安装 Git
 
@@ -33,12 +33,20 @@ git clone https://github.com/wakening/WutheringWavesAssistant.git
 
 ### 5️⃣ 安装依赖
 
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+设置允许执行脚本，输入 Y 确认
+
 ```powershell
 cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
 ```
 
-等待脚本执行完成，安装所需环境。
+等待脚本执行完成，安装所需环境，仅需执行一次  
+
 
 ### 6️⃣ 配置文件
 
@@ -50,7 +58,14 @@ cd WutheringWavesAssistant
 **务必以管理员身份运行**，否则部分功能可能无法正常工作。
 
 ```powershell
+conda activate WutheringWavesAssistant
 python main.py
+```
+
+### 8️⃣ 更新脚本
+
+```powershell
+git pull
 ```
 
 ---

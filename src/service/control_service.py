@@ -3,7 +3,6 @@ import time
 
 import numpy as np
 import win32con
-from poetry.console.commands import self
 
 from src.core.contexts import Context
 from src.core.interface import ControlService, WindowService, PlayerControlService, ExtendedControlService, \

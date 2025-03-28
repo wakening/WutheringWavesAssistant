@@ -17,6 +17,35 @@ from src.util.wrap_util import timeit
 logger = logging.getLogger(__name__)
 
 
+class DynamicFpsLimit:
+
+    def __init__(self):
+        self.key_press_time = None
+
+    def sleep(self, execute_use_seconds: float):
+        now = time.perf_counter_ns()
+        if self.key_press_time is None:
+            fps = 1
+        else:
+            idle_seconds = (now - self.key_press_time) / 1e9
+            if idle_seconds < 3:
+                # logger.warning("3秒")
+                fps = 1 / 3  # 按键3秒内有动过，可能不在剧情对话中，检测频率为3秒一次
+            elif idle_seconds < 5:
+                fps = 1 / 2  # 2秒一次
+            else:  # idle_seconds >= 5
+                fps = 1  # 超过5秒按键没有动过，可能进入剧情，检测频率为1秒一次
+        seconds = 1 / fps
+        # logger.info(f"seconds: {seconds:.2f}")
+        sleep_seconds = seconds - execute_use_seconds # 减去流程耗时
+        if sleep_seconds > 0.0001:
+            logger.debug("sleep: %s", sleep_seconds)
+            time.sleep(sleep_seconds)
+
+    def refresh(self):
+        self.key_press_time = time.perf_counter_ns()
+
+
 class AutoStoryServiceImpl(PageEventAbstractService):
     """自动过剧情"""
 
@@ -45,8 +74,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         self._listener_thread = None
 
         # fps limit
-        self._fps = 1
-        self._fps_seconds = 1 / self._fps
+        self._dynamic_fps_limit = DynamicFpsLimit()
 
     def execute(self, **kwargs):
         if not self._window_service.is_foreground_window():
@@ -62,10 +90,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         if use_time > 0.0:
             logger.debug(f"fps: {(1e9 / use_time)}")
         use_seconds = use_time / 1e9
-        if use_seconds + 0.0001 < self._fps_seconds:
-            sleep_seconds = self._fps_seconds - use_seconds
-            logger.debug("sleep: %s", sleep_seconds)
-            time.sleep(sleep_seconds)
+        self._dynamic_fps_limit.sleep(use_seconds)
         use_time = time.perf_counter_ns() - start_time
         if use_time > 0.0:
             logger.debug(f"final fps: {(1e9 / use_time)}")
@@ -114,7 +139,8 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                 # 打开自动播放
                 self.page_action(self._auto_play_page, src_img, img, ocr_results)
                 time.sleep(0.005)
-                self.page_action(self._auto_play_open_page, src_img, img, ocr_results)
+                if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
+                    self._is_auto_play_enabled = True
                 time.sleep(0.005)
             # 剧情对话框，不跳过，一句一句自动过剧情
             self.page_action(self._dialogue_page, src_img, img, ocr_results)
@@ -163,6 +189,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
     def _on_press(self, key):
         logger.debug(f"按键 {key} 被按下")
         self._mouse_last_check_time = time.perf_counter()
+        self._dynamic_fps_limit.refresh()
 
     def _listen_keys(self):
         with keyboard.Listener(on_press=self._on_press) as listener:
@@ -186,7 +213,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             targetTexts=[
                 TextMatch(
                     name="SKIP",
-                    text=r"^S?KI[PE].{0,3}$",
+                    text=r"^(跳过|S?KI[PE].{0,3})",
                     open_position=False,
                     position=DynamicPosition(
                         rate=(
@@ -291,7 +318,6 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         self._auto_play_page = auto_play_page
 
         def auto_play_open_page_action(positions: dict[str, Position]) -> bool:
-            self._is_auto_play_enabled = True
             return True
 
         auto_play_open_page = Page(
