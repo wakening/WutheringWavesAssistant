@@ -142,8 +142,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                 if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
                     self._is_auto_play_enabled = True
                 time.sleep(0.005)
+
             # 剧情对话框，不跳过，一句一句自动过剧情
-            self.page_action(self._dialogue_page, src_img, img, ocr_results)
+            if self.page_action(self._dialogue_page, src_img, img, ocr_results):
+                time.sleep(2)
 
         # NPC交互框
         if auto_npc_interact:

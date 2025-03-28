@@ -150,6 +150,8 @@ class AutoPickupServiceImpl(PageEventAbstractService):
             "菱果": "白花菱",  # 白花菱拾取后是菱果
             "地丁堇": "地丁.",
             "礼花蒴": "礼花.?",
+            # v2.2
+            "海浮棘": "海浮棘",
             # 补充药材
             "银环蜥": "银环蜥",
             "蓝棘蜥": "蓝棘蜥",

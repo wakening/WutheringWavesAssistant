@@ -21,9 +21,9 @@ jobs:
 #          # 使用 pip 安装指定版本的 Poetry（适用于 Windows）
 #          python -m pip install --upgrade poetry==2.1.1
 
-      - name: 📦 安装 7z
-        run: |
-          choco install 7zip  # 使用 Chocolatey 安装 7zip
+#      - name: 📦 安装 7z
+#        run: |
+#          choco install 7zip  # 使用 Chocolatey 安装 7zip
 
       - name: 📖 获取 pyproject.toml 中的版本号
         id: get_version
@@ -78,7 +78,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ env.VERSION }}"
-          name: "Pre release ${{ env.VERSION }}"
+          name: "Release ${{ env.VERSION }}"
           files: "wwa-${{ env.VERSION }}.7z"
           body: |
             Wuthering Waves Assistant
