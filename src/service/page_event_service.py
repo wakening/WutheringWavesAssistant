@@ -1855,7 +1855,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 # logger.debug("Match text: Fast Travel, %s", text_result)
                 time.sleep(0.3)
                 continue
-            text_result = self._ocr_service.search_text(results, "特征码|^特征.+\d{5,}")
+            text_result = self._ocr_service.search_text(results, r"特征码|^特征.+\d{5,}")
             if text_result:
                 text_result.confidence = text_result.confidence
                 # logger.debug("Match text: UID, %s", text_result)
