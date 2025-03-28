@@ -109,7 +109,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         # 跳过剧情
         if self.skip_is_open:
             skip_text_match = self._skip_page.targetTexts[0]
-            skip_pos = skip_text_match.position.position(img.shape[0], img.shape[1])
+            skip_pos = skip_text_match.position.to_position(img.shape[0], img.shape[1])
             skip_page_img = img[skip_pos.y1: skip_pos.y2, skip_pos.x1: skip_pos.x2]
             skip_ocr_results = self._ocr_service.ocr(skip_page_img)
             # logger.debug(skip_ocr_results)
