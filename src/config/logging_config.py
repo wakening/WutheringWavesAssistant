@@ -2,6 +2,8 @@ import logging.config
 import os
 import pprint
 import re
+from datetime import datetime
+from pathlib import Path
 
 from colorlog import ColoredFormatter
 
@@ -43,6 +45,32 @@ class CustomColoredFormatter(ColoredFormatter):
         return super().format(_custom_logging_format(self, record))
 
 
+def rotate_log(log_file, max_size=5 * 1024 * 1024):
+    # 主进程
+    if os.environ.get("WWA_LOG_LEADER") is None:
+        # 首次执行后标记，禁止子进程滚动日志文件
+        os.environ["WWA_LOG_LEADER"] = "True"
+    else: # 子进程
+        return log_file
+    log_path = Path(log_file)
+    if not log_path.exists():
+        return log_file
+    if log_path.stat().st_size > max_size:
+        backup_name = f"{log_file}.{datetime.now().strftime("%Y%m%d")}"
+        count = 1
+        while True:
+            backup_path = Path(backup_name)
+            if backup_path.exists():
+                backup_name = backup_name + "." + str(count)
+                count += 1
+                continue
+            logger.info("Backing up log file: %s", backup_path)
+            log_path.rename(backup_path)  # 重命名日志文件
+            log_path.touch()  # 重新创建一个空的日志文件
+            break
+    return log_file
+
+
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,  # 保留已有 logger
@@ -70,7 +98,7 @@ LOGGING_CONFIG = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'colored',  # 使用彩色 formatter
-            'level': 'DEBUG'
+            'level': 'INFO'
         },
         # 'file': {
         #     'class': 'logging.handlers.RotatingFileHandler',
@@ -82,12 +110,9 @@ LOGGING_CONFIG = {
         #     'level': 'DEBUG'
         # },
         'file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': file_util.get_log_file(),
-            'when': 'midnight',
-            'interval': 1,
-            'backupCount': 5,
+            'filename': rotate_log(file_util.get_log_file()),
             'encoding': 'utf-8',
             'level': 'INFO'
         },
@@ -121,6 +146,11 @@ LOGGING_CONFIG = {
         'tests': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'rapidocr': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
             'propagate': False,
         },
     },

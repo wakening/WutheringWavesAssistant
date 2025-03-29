@@ -147,11 +147,12 @@ class RunCard(CardWidget):
             else:
                 logger.info("没有要运行的任务")
         else: # stop
-            self.button.setIcon(FluentIcon.PLAY_SOLID)
             self.spinner.stop()
+            self.spinner.reset()
             if self.running_task_name:
                 application.GUI.on_run_clicked(self.running_task_name, "STOP")
                 self.running_task_name = None
+            self.button.setIcon(FluentIcon.PLAY_SOLID)
 
     def update_task(self, task_name: str):
         self.task_name = task_name

@@ -54,7 +54,10 @@ class ProcessTask(BaseModel, ABC):
 
     def stop(self, timeout=5):
         self.end_time = datetime.now()
-        logger.info(f"[{self.name}]任务结束，耗时: {(self.end_time - self.start_time).total_seconds():.2f}s")
+        elapsed_time = (self.end_time - self.start_time).total_seconds()
+        hours, remainder = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        logger.info(f"[{self.name}] 任务结束，已运行: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
         try:
             if not self.process.is_alive():
                 return self

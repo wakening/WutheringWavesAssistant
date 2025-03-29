@@ -2,7 +2,7 @@
 
 鸣潮自动化助手
 
-📢 **QQ群: 1039535103**
+**QQ群: 1039535103**
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### 1️⃣ 安装 Conda
 
-群文件(1039535103)里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载 Miniconda，并按照默认设置安装。
+群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载 Miniconda，并按照默认设置安装。
 
 ### 2️⃣ 安装 Git
 
@@ -29,23 +29,27 @@
 
 ```powershell
 git clone https://github.com/wakening/WutheringWavesAssistant.git
+
+或者使用免费的国内加速代理，任选其一：
+git clone https://ghproxy.net/https://github.com/wakening/WutheringWavesAssistant.git
+git clone https://ghfast.top/https://github.com/wakening/WutheringWavesAssistant.git
+git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 ```
 
 ### 5️⃣ 安装依赖
 
 
 ```powershell
+设置允许执行脚本，输入 Y 确认
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-
-设置允许执行脚本，输入 Y 确认
 
 ```powershell
 cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
 ```
 
-等待脚本执行完成，安装所需环境，仅需执行一次  
+等待脚本执行完成，安装所需环境，执行一次即可，若失败可以重跑  
 
 
 ### 6️⃣ 配置文件
