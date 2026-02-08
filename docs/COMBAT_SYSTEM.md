@@ -41,7 +41,7 @@ class CombatSystem:
 | phrolova | 弗洛洛 | Phrolova |
 | lynae | 琳奈 | Lynae |
 
-> **注意**：Phoebe（菲比）和 Mornye（莫宁）虽有类定义但尚未注册到 `resonator_map`。菲比的 `combo()` 方法为空实现（`pass`），莫宁在代码中存在 Bug（见 ISSUES.md）。
+> **注意**：Phoebe（菲比）和 Mornye（莫宁）虽有类定义但尚未注册到 `resonator_map`。菲比的 `combo()` 方法为空实现（`pass`），莫宁的 `energy_count()` 已在 v3.1.0 中修复实现。
 
 未注册定制连招的角色将使用 `GenericResonator` 通用连招。
 

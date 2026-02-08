@@ -156,7 +156,7 @@ WutheringWavesAssistant/
     ├── ARCH.md                # 系统架构
     ├── CONFIG.md              # 配置说明
     ├── COMBAT_SYSTEM.md       # 战斗系统
-    ├── ISSUES.md              # 问题清单
+    ├── CONTRIBUTING_COMBO.md   # 连招开发指南
     └── resonators/            # 角色连招文档
 ```
 
