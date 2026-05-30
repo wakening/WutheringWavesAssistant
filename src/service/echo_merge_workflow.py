@@ -4,8 +4,11 @@ import time
 from typing import Optional
 
 from src.core.geometry import AnchorBBox, Align, AnchorPoint
-from src.core.pages import I18nPage, I18nPageEchoMerge, I18nText, OcrQuery
-from src.core.workflow import node, WorkflowEngine, NodeContext, IWorkflow
+from src.core.i18n import I18nText
+from src.core.message import MsgType, MsgTaskStatus
+from src.core.pages import I18nPage, I18nPageEchoMerge, OcrQuery
+from src.core.task import TaskFSM
+from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +24,7 @@ def end_node(ctx: NodeContext, **kwargs) -> bool:
 
 
 @node()
-def navigateToValidPage(ctx: NodeContext, **kwargs) -> Optional[str]:
+def globalDispatcher(ctx: NodeContext, **kwargs) -> Optional[str]:
     logger.debug(inspect.currentframe().f_code.co_name)
     time.sleep(1)
 
@@ -33,10 +36,10 @@ def navigateToValidPage(ctx: NodeContext, **kwargs) -> Optional[str]:
         return None
 
     # 已在终端页
-    is_match = ctx.page_service.is_match(oq.results, I18nPage.UI_ESC_Terminal.PAGE)
+    is_match = ctx.page_service.is_match(oq.results, I18nPage.Terminal.PAGE)
     if is_match:
         logger.debug("已在终端")
-        return I18nPage.UI_ESC_Terminal.PAGE
+        return I18nPage.Terminal.PAGE
 
     # 未知页面，全局扫描，尝试回到主页
     global_result = ctx.page_service.global_page_action(oq.results)
@@ -66,9 +69,9 @@ def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
         return False
 
     # 终端
-    match_result = ctx.page_service.is_match(oq.results, I18nPage.UI_ESC_Terminal.PAGE)
+    match_result = ctx.page_service.is_match(oq.results, I18nPage.Terminal.PAGE)
     if not match_result:
-        logger.warning(f"Page not found: {I18nPage.UI_ESC_Terminal.PAGE}")
+        logger.warning(f"Page not found: {I18nPage.Terminal.PAGE}")
         return False
 
     # 点击进入数据坞
@@ -213,23 +216,35 @@ def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
     return False
 
 
-class EchoMergeWorkflow(IWorkflow):
+class EchoMergeWorkflow(AbstractWorkflow):
 
     def __init__(self, ctx: NodeContext):
-        self.ctx: NodeContext = ctx
+        super().__init__(ctx)
+
         self.engine = WorkflowEngine()
+        self.fsm = TaskFSM(name="EchoMergeWorkflow")
+
         self.__init_workflow()
 
     def __init_workflow(self):
         (
-            self.engine.source("navigateToValidPage", is_start=True)
-            .when(lambda ctx: ctx.shared.last_result == I18nPage.UI_ESC_Terminal.PAGE).to("navigateToDataMerge")
-            .always().to("navigateToValidPage")
+            self.engine.source("globalDispatcher", is_start=True)
+            .when(lambda ctx: ctx.shared.last_result == I18nPage.Terminal.PAGE).to("navigateToDataMerge")
+            .always().to("globalDispatcher")
         )
 
         self.engine.source("navigateToDataMerge").always().to("end_node")
 
     def execute(self, **kwargs):
-        self.ctx.control_service.activate()
-        time.sleep(0.1)
-        self.engine.run(self.ctx, self, **kwargs)
+        try:
+            logger.debug(f"task: {self.__class__.__name__}")
+            self.ctx.runtime.taskFSM = self.fsm
+            self.fsm.start()
+            self.ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.SUCCESS)
+            self.ctx.control_service.activate()
+            time.sleep(0.1)
+            self.engine.run(self, **kwargs)
+            self.fsm.complete()
+        except Exception as e:
+            self.fsm.fail()
+            raise e

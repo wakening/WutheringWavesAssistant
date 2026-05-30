@@ -191,7 +191,7 @@ def window_activate(hwnd, seconds: float = 0.0):
 
 
 def __sleep(seconds: float):
-    if seconds == 0.0:
+    if not seconds or seconds == 0.0:
         return
     if seconds > 0.0:
         time.sleep(seconds)

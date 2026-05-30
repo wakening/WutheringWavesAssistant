@@ -5,9 +5,9 @@ from typing import Optional, overload
 import numpy as np
 
 from src.core.boss import RouteStep, RestartParam
-from src.core.geometry import BBox, Scaler, TextBox
-from src.core.languages import Languages
-from src.core.pages import Page, ConditionalAction, OcrResult, I18nTr
+from src.core.geometry import BBox, Scaler, TextBox, Detection
+from src.core.i18n import I18nTr, Language
+from src.core.pages import Page, ConditionalAction, OcrResult
 from src.core.regions import Position, TextPosition, DynamicPosition
 
 
@@ -39,11 +39,19 @@ class WindowService(ABC):
         pass
 
     @abstractmethod
-    def get_lang(self) -> Languages:
+    def get_lang(self) -> Language:
+        pass
+
+    @abstractmethod
+    def set_lang(self, lang: Language):
         pass
 
     @abstractmethod
     def get_client_wh(self) -> tuple[int, int]:
+        pass
+
+    @abstractmethod
+    def window_bbox(self) -> BBox:
         pass
 
     @abstractmethod
@@ -130,11 +138,11 @@ class ODService(ABC):
     """Object Detection（目标检测）"""
 
     @abstractmethod
-    def search_echo(self, img: np.ndarray | None = None) -> tuple[int, int, int, int] | None:
+    def search_echo(self, img: np.ndarray | None = None, confidence: float = None) -> tuple[int, int, int, int] | None:
         pass
 
     @abstractmethod
-    def search_reward(self, img: np.ndarray | None = None) -> tuple[int, int, int, int] | None:
+    def search_reward(self, img: np.ndarray | None = None) -> Detection | None:
         pass
 
 
@@ -168,12 +176,22 @@ class OCRService(ABC):
     def query(
             self,
             img: np.ndarray,
-            bbox: BBox | None = None,
+            roi: BBox | None = None,
             det=True,
             rec=True,
             cls=False,
             resize=True,
     ) -> OcrResult:
+        """
+        找出图片指定区域内的所有文本
+        :param img:
+        :param roi:
+        :param det:
+        :param rec:
+        :param cls:
+        :param resize: 1280x720以上分辨率图片是否缩小，默认开启，牺牲精度提升识别速度，若需要识别小字，必须关闭，用原图识别以保证精度
+        :return:
+        """
         pass
 
     @abstractmethod
@@ -321,12 +339,32 @@ class GameControlService(ABC):
         pass
 
     @abstractmethod
-    def guide_book(self):
+    def guidebook(self):
         """索拉指南"""
         pass
 
     @abstractmethod
+    def mail(self):
+        """邮件"""
+        pass
+
+    @abstractmethod
+    def resonator(self):
+        """共鸣者"""
+        pass
+
+    @abstractmethod
+    def quests(self):
+        """任务"""
+        pass
+
+    @abstractmethod
     def esc(self):
+        pass
+
+    @abstractmethod
+    def team(self):
+        """编队"""
         pass
 
     @abstractmethod

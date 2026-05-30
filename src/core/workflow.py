@@ -2,20 +2,24 @@ import base64
 import logging
 import multiprocessing
 import queue
+import random
 import secrets
 import sys
 import time
-import uuid
 from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass, field
+from datetime import datetime
+from functools import singledispatchmethod
 from typing import Callable, Dict, Optional, Any, List, Tuple
 
 from src.config.gui_config import ParamConfig
+from src.core.exceptions import StopError
 from src.core.geometry import Scaler
+from src.core.i18n import I18nTr
 from src.core.interface import WindowService, ImgService, OCRService, ControlService, ODService, BossInfoService, \
     EchoMergeService, GlobalPageService, CombatService, PageEventService, GuidebookService
-from src.core.pages import I18nTr
+from src.core.runtime import RuntimeConfig
 from src.core.task import TaskFSM
 
 logger = logging.getLogger(__name__)
@@ -26,10 +30,13 @@ class RuntimeContext:
     start_time: float = field(default_factory=time.time)
     # 由workflow engine实时存入
     current_node: Optional[Tuple[str, str]] = None
+    last_node: Optional[Tuple[str, str]] = None
     # 由task启动后存入，type: threading.Event / multiprocessing.Event
     stop_event: Optional[Any] = None
     # 由task启动后存入， message.make_sender
     send: Optional[Callable[..., Any]] = None
+    # 配置文件
+    cfg: Optional[RuntimeConfig] = None
     # 由workflow启动后存入
     taskFSM: Optional[TaskFSM] = None
 
@@ -46,7 +53,10 @@ class SharedContext:
     fight_count: int = 0
     boss_name: Optional[str] = None
     last_result: Optional[Any] = None
-
+    # 角色编队
+    team_members: Optional[list[str | None]] = None
+    # 是否有角色失去意识
+    is_resonator_downed: bool = field(default=False)
     # 登录时是否移动窗口
     login_mv_window: bool = field(default=False)
 
@@ -112,9 +122,9 @@ class TaskSpec:
     """ Task Specification """
 
     # 节点唯一id
-    task_id: str = field(default_factory=lambda: uuid.uuid4().hex)
+    task_id: str = field(default_factory=lambda: TaskSpec.create_task_id())
     task_name: Optional[str] = None
-    trace_id: Optional[str] = None
+    trace_id: Optional[str] = field(default_factory=lambda: TaskSpec.create_trace_id())
     # 主进程id
     leader_pid: Optional[int] = None
     # gui窗口id
@@ -126,19 +136,30 @@ class TaskSpec:
     device: Optional[str] = None
     # 游戏路径，用于重启游戏
     game_path: Optional[str] = None
+    # 游戏文本语言
+    game_lang: Optional[str] = None
     # 配置文件
     param_config_path: Optional[str] = None
     param_config_snapshot: Optional[str] = None
     param_config: Optional[ParamConfig] = None
+    user_config: dict = field(default_factory=dict)
     # 是否开启自动跳过
     skip_is_open: Optional[bool] = None
     # ocr是否使用gpu
     ocr_use_gpu: Optional[bool] = None
 
-    def create_trace_id(self):
-        self.trace_id = base64.urlsafe_b64encode(secrets.token_bytes(12)).decode()
-        logger.debug(f"trace_id: {self.trace_id}")
-        return self.trace_id
+    @staticmethod
+    def create_task_id():
+        # task_id = uuid.uuid4().hex
+        task_id = f"{datetime.now().strftime('%y%m%d%H%M%S')}{random.randint(0, 9999):04d}"
+        logger.debug(f"task_id: {task_id}")
+        return task_id
+
+    @staticmethod
+    def create_trace_id():
+        trace_id = base64.urlsafe_b64encode(secrets.token_bytes(12)).decode()
+        logger.debug(f"trace_id: {trace_id}")
+        return trace_id
 
 
 @dataclass
@@ -306,7 +327,10 @@ def node(name: Optional[str] = None, namespace: Optional[str] = None, retry: int
     def decorator(func):
         _name = name or func.__name__
         _namespace = namespace or func.__module__
-        NODE_REGISTRY.setdefault(_namespace, {})[_name] = Node(
+        _node_map = NODE_REGISTRY.setdefault(_namespace, {})
+        if _name in _node_map:
+            raise KeyError(f"Node already registered: {(_namespace, _name)}")
+        _node_map[_name] = Node(
             func,
             _name,
             _namespace,
@@ -326,6 +350,13 @@ class IWorkflow(ABC):
         pass
 
 
+class AbstractWorkflow(IWorkflow, ABC):
+
+    def __init__(self, ctx: NodeContext, **kwargs):
+        self.ctx = ctx
+        self.start_node: Optional[str] = None
+
+
 class WorkflowEngine:
     """
     Workflow Engine
@@ -335,10 +366,11 @@ class WorkflowEngine:
         self.transitions = {}
         self.start_node = None
         self.history = deque(maxlen=666)
+        self.error = None
 
     def source(self, src: str, is_start: bool = False):
         if not src:
-            raise ValueError("src cannot be empty")
+            raise ValueError("node name cannot be empty")
         if is_start:
             if self.start_node:
                 raise ValueError(f"start node already exists: '{self.start_node}'")
@@ -346,15 +378,26 @@ class WorkflowEngine:
 
         return TransitionBuilder(self, src)
 
+    def exception(self, src: str):
+        """抑制异常，转到指定节点，不包括(KeyboardInterrupt, StopError)"""
+        if not src:
+            raise ValueError("node name cannot be empty")
+        self.error = src
+
     def add_transition(self, src, condition, dst, name=""):
         self.transitions.setdefault(src, []).append(
             Transition(condition, dst, name)
         )
 
-    def run(self, ctx: NodeContext, namespace: str | IWorkflow, start_node: Optional[str] = None, **kwargs):
+    @singledispatchmethod
+    def run(self, x):
+        raise NotImplementedError()
+
+    @run.register
+    def _(self, ctx: NodeContext, namespace: str, start_node: Optional[str] = None, **kwargs):
         current = start_node if start_node else self.start_node
-        if isinstance(namespace, IWorkflow):
-            namespace = namespace.__class__.__module__
+        if not namespace:
+            raise ValueError("namespace cannot be empty")
         if not current:
             raise ValueError("start node does not exist")
         while current:
@@ -362,12 +405,26 @@ class WorkflowEngine:
                 logger.debug("[ENGINE] stopped")
                 break
             node = NODE_REGISTRY[namespace][current]
+            ctx.runtime.last_node = ctx.runtime.current_node
             ctx.runtime.current_node = (namespace, current)
             node_runs = ctx.stats.node_runs.setdefault(namespace, {}).get(current, 0)
             ctx.stats.node_runs[namespace][current] = node_runs + 1
             self.history.append(ctx.runtime.current_node)
             logger.debug(f"[ENGINE] run: {ctx.runtime.current_node}")
-            result = node.run(ctx, **kwargs)
+
+            try:
+                result = node.run(ctx, **kwargs)
+            except (KeyboardInterrupt, StopError) as e:
+                raise e
+            except Exception as e:
+                ctx.shared.last_result = None
+                if self.error:
+                    logger.exception(f"[ENGINE] run error: {ctx.runtime.current_node}")
+                    current = self.error
+                    continue
+                logger.error(f"[ENGINE] run error: {ctx.runtime.current_node}")
+                raise e
+
             ctx.shared.last_result = result
             logger.debug(f"[ENGINE] result: {result}")
             next_node = None
@@ -380,6 +437,10 @@ class WorkflowEngine:
                 logger.debug("[ENGINE] workflow end")
                 break
             current = next_node
+
+    @run.register
+    def _(self, flow: AbstractWorkflow, **kwargs):
+        self.run(flow.ctx, flow.__class__.__module__, start_node=flow.start_node, **kwargs)
 
 
 class TransitionBuilder:
@@ -413,7 +474,14 @@ class TransitionBuilder:
 
     def to(self, dst: str):
         """目标状态"""
+        if dst is None:
+            raise ValueError("dst cannot be None")
         self.wf.add_transition(self.src, self._condition, dst, self._name)
+        return self
+
+    def emit(self, dst: str):
+        """目标状态"""
+        self.wf.add_transition(self.src, self._condition, None, self._name)
         return self
 
 

@@ -2,6 +2,7 @@ import logging
 
 from src.config import logging_config
 from src.core import environs
+from src.util import hwnd_util
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,7 @@ def pytest_configure(config):
     # option = config.option
     environs.load_env()
     logging_config.setup_logging_test()
+    hwnd_util.enable_dpi_awareness()
 
 #
 # @pytest.hookimpl(tryfirst=True)

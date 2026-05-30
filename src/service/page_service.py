@@ -4,10 +4,10 @@ from abc import ABC
 from typing import Optional
 
 from src.core.geometry import TextBox
+from src.core.i18n import I18N_PAGES, I18N_PAGES_ECHO_MERGE, I18N_TEXT, I18nText, I18N_PAGES_GUIDEBOOK
 from src.core.interface import WindowService, PageService, OCRService, ControlService, ImgService, ODService, \
     BossInfoService, EchoMergeService, GlobalPageService, GuidebookService
-from src.core.pages import I18nPage, OcrResult, I18N_PAGES, I18N_PAGES_ECHO_MERGE, I18N_TEXT, I18nPageX, I18nText, \
-    I18N_PAGES_GUIDEBOOK, OcrQuery
+from src.core.pages import I18nPage, OcrResult, I18nPageX, OcrQuery
 from src.core.workflow import NodeContext
 
 logger = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         self._login_reset_z_order = None
 
         self._global_action = {
-            I18nPage.UI_ESC_Terminal.PAGE: self._build_UI_ESC_Terminal,
+            I18nPage.Terminal.PAGE: self._build_UI_ESC_Terminal,
             I18nPage.Reward_LuniteSubscriptionReward.PAGE: self._build_Reward_LuniteSubscriptionReward,
             I18nPage.Reward_ReceiveRewards.PAGE: self._build_Reward_ReceiveRewards,
             # I18nPage.Boss_Crownless_ResonanceCord.PAGE: self._build_Boss_Crownless_ResonanceCord,
@@ -83,11 +83,13 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             # I18nPage.Boss_RecommendedLevel.PAGE: self._build_Boss_RecommendedLevel,
             # I18nPage.Boss_StartChallenge.PAGE: self._build_Boss_StartChallenge,
             # I18nPage.Fight_Fight.PAGE: self._build_Fight_Fight,
-            I18nPage.Fight_Absorption.PAGE: self._build_Fight_Absorption,
+            # I18nPage.Fight_Absorption.PAGE: self._build_Fight_Absorption,
             # I18nPage.Fight_ChallengeCompleted.PAGE: self._build_Fight_ChallengeCompleted,
             I18nPage.Fight_ClickAlternatelyToBreakFree.PAGE: self._build_Fight_ClickAlternatelyToBreakFree,
             I18nPage.UI_ESC_LeaveInstance.PAGE: self._build_UI_ESC_LeaveInstance,
-            I18nPage.Notice_LeaveInstance_NightmareHecate.PAGE: self._build_Notice_LeaveInstance_NightmareHecate,
+            I18nPage.Notice_LeaveInstance.PAGE: self._build_Notice_LeaveInstance,
+            I18nPage.Notice_ForgeryChallengeComplete.PAGE: self._build_Notice_ForgeryChallengeComplete,
+            I18nPage.Notice_TacetSuppression.PAGE: self._build_Notice_TacetSuppression,
             I18nPage.Notice_LoseConsciousness.PAGE: self._build_Notice_LoseConsciousness,
             I18nPage.Notice_SelectRevivalItem.PAGE: self._build_Notice_SelectRevivalItem,
             I18nPage.Notice_Replenish_Waveplate.PAGE: self._build_Notice_Replenish_Waveplate,
@@ -96,6 +98,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             I18nPage.Login_AccountLogin.PAGE: self._build_Login_AccountLogin,
             I18nPage.Login_Disconnected.PAGE: self._build_Login_Disconnected,
             I18nPage.SystemNotice_UpdateCompleteExit.PAGE: self._build_SystemNotice_UpdateCompleteExit,
+            I18nPage.SystemNotice_UpdateCompleteConfirm.PAGE: self._build_SystemNotice_UpdateCompleteConfirm,
             I18nPage.SystemNotice_Confirm_DriverVersion.PAGE: self._build_SystemNotice_Confirm_DriverVersion,
             I18nPage.SystemNotice_NetworkTimeout.PAGE: self._build_SystemNotice_NetworkTimeout,
         }
@@ -231,8 +234,19 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         self._control_service.click(textbox.center)
         return True
 
-    def _build_Notice_LeaveInstance_NightmareHecate(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
-        textbox = bbox_map.get(I18nPage.Notice_LeaveInstance_NightmareHecate.Confirm)
+    def _build_Notice_LeaveInstance(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.Notice_LeaveInstance.Confirm)
+        self._control_service.click(textbox.center)
+        return True
+
+    def _build_Notice_ForgeryChallengeComplete(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        time.sleep(0.3)
+        textbox = bbox_map.get(I18nPage.Notice_ForgeryChallengeComplete.Exit)
+        self._control_service.click(textbox.center)
+        return True
+
+    def _build_Notice_TacetSuppression(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.Notice_TacetSuppression.Confirm)
         self._control_service.click(textbox.center)
         return True
 
@@ -294,7 +308,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
                     self._control_service.activate_window(login_hwnd)
                     time.sleep(0.1)
                     img = self._img_service.screenshot_window(login_hwnd)
-                    oq = OcrQuery(self._ctx).grab(img).query()
+                    oq = OcrQuery(self._ctx).grab(img=img).query()
                     login_keywords = list(I18N_TEXT.get(I18nText.Login).values())
                     search_result = oq.search(login_keywords)
                     if not search_result:
@@ -308,7 +322,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
                             continue
                         child_img = self._img_service.screenshot_window(child_hwnd)
                         # img_util.save_img_in_temp(child_img)
-                        oq = OcrQuery(self._ctx).grab(child_img).query()
+                        oq = OcrQuery(self._ctx).grab(img=child_img).query()
                         logger.debug("child_ocr_result: %s", oq.results.results)
 
                         search_result = oq.search(login_keywords)
@@ -350,6 +364,11 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         return True
 
     def _build_SystemNotice_UpdateCompleteExit(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        self._window_service.close_window()
+        time.sleep(2)
+        return True
+
+    def _build_SystemNotice_UpdateCompleteConfirm(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
         self._window_service.close_window()
         time.sleep(2)
         return True

@@ -1,8 +1,9 @@
 import logging
 import random
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field, replace
 from enum import IntFlag, Enum
-from typing import Sequence, List, Optional, Tuple
+from typing import Sequence, List, Optional, Tuple, Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class Point:
         raise IndexError("Index out of range")
 
     def __str__(self):
-        return f"Point({self.x},{self.y})"
+        return f"Point({self.x}, {self.y})"
 
 
 @dataclass(frozen=True)
@@ -61,7 +62,7 @@ class AnchorPoint(Point):
         return self.x, self.y, self.align.value
 
     def __str__(self):
-        return f"AnchorPoint({self.x},{self.y},{self.align})"
+        return f"AnchorPoint({self.x}, {self.y}, {self.align})"
 
 
 @dataclass(frozen=True)
@@ -98,7 +99,7 @@ class AnchorBBox:
         )
 
     def __str__(self):
-        return f"AnchorBBox({self.p1},{self.p2})"
+        return f"AnchorBBox({self.p1}, {self.p2})"
 
 
 # ================= 运行态 BBox =================
@@ -144,7 +145,7 @@ class BBox:
 
     # ---------- 变换 ----------
     def copy(self) -> "BBox":
-        return BBox(self.x1, self.y1, self.x2, self.y2)
+        return replace(self)
 
     def move(self, dx: int, dy: int) -> "BBox":
         bbox = self.copy()
@@ -223,7 +224,7 @@ class BBox:
         return random.randint(x1, x2), random.randint(y1, y2)
 
     @property
-    def near(self, factor: float = 0.3) -> Tuple[int, int]:
+    def near(self, factor: float = 0.4) -> Tuple[int, int]:
         """以框中心为中心，生成宽高占原框 factor 的小框，返回随机点"""
         cx, cy = self.center
         w = max(1, int(self.width() * factor))
@@ -274,7 +275,7 @@ class BBox:
         return merged
 
     def __str__(self):
-        return f"BBox({self.x1},{self.y1},{self.x2},{self.y2})"
+        return f"BBox({self.x1}, {self.y1}, {self.x2}, {self.y2})"
 
 
 # ================= 文本框 =================
@@ -284,9 +285,6 @@ class TextBox(BBox):
     """带文本的矩形框"""
     text: str
     score: Optional[float] = None
-
-    def copy(self) -> "TextBox":
-        return TextBox(self.x1, self.y1, self.x2, self.y2, self.text, self.score)
 
     # ---------------- 置信度判断 ----------------
     def is_confident(self, threshold: float = 0.8) -> bool:
@@ -303,6 +301,9 @@ class TextBox(BBox):
     def is_inside(self, other: BBox) -> bool:
         return other.contains_bbox(self)
 
+    def __str__(self):
+        return f"TextBox({self.x1}, {self.y1}, {self.x2}, {self.y2}, text: '{self.text}')"
+
 
 # ================= OCR 适配 =================
 
@@ -310,7 +311,7 @@ class PaddleocrTextBox(TextBox):
     """PaddleOCR 输出转换为 TextBox 列表"""
 
     @classmethod
-    def format(cls, output: Sequence) -> List["PaddleocrTextBox"]:
+    def format(cls, output: Sequence, roi: BBox | None = None) -> List["PaddleocrTextBox"]:
         results = output[0]
         textboxes = []
         if not results:
@@ -320,7 +321,7 @@ class PaddleocrTextBox(TextBox):
             text, score = result[1]
             x1, y1 = coords[0]
             x2, y2 = coords[2]
-            textboxes.append(cls(x1, y1, x2, y2, text, score))
+            textboxes.append(cls(x1, y1, x2, y2, text.strip(), score))
         return textboxes
 
 
@@ -328,7 +329,7 @@ class RapidocrTextBox(TextBox):
     """RapidOCR 输出转换为 TextBox 列表"""
 
     @classmethod
-    def format(cls, output) -> List["RapidocrTextBox"]:
+    def format(cls, output, roi: BBox | None = None) -> List["RapidocrTextBox"]:
         # RapidOCROutput
         boxes, scores, texts = output.boxes, output.scores, output.txts
         textboxes = []
@@ -337,8 +338,85 @@ class RapidocrTextBox(TextBox):
         for coords, score, text in zip(boxes, scores, texts):
             x1, y1 = int(coords[0][0]), int(coords[0][1])
             x2, y2 = int(coords[2][0]), int(coords[2][1])
-            textboxes.append(cls(x1, y1, x2, y2, text, score))
+            textboxes.append(cls(x1, y1, x2, y2, text.strip(), score))
         return textboxes
+
+
+class RapidocrRecTextBox(TextBox):
+    """RapidOCR 输出转换为 TextBox 列表"""
+
+    @classmethod
+    def format(cls, output, roi: BBox | None = None) -> List["RapidocrRecTextBox"]:
+        # <class 'rapidocr.ch_ppocr_rec.typings.TextRecOutput'>
+        scores, texts = output.scores, output.txts
+        textboxes = []
+        if texts is None or len(texts) == 0:
+            return textboxes
+        for score, text in zip(scores, texts):
+            textboxes.append(cls(0, 0, 0, 0, text.strip(), score))
+        return textboxes
+
+
+@dataclass
+class Detection(BBox):
+    """目标检测结果"""
+    # 核心检测字段
+    score: float  # 置信度分数 (0~1)
+    class_id: Optional[int] = None  # 类别ID
+    class_name: Optional[str] = None  # 类别名称
+
+    # 可选扩展字段
+    track_id: Optional[int] = None  # 追踪ID（多目标追踪）
+    timestamp: float = field(default_factory=time.time)  # 检测时间戳
+
+    # 扩展数据（实例分割、姿态估计等）
+    mask: Optional[Any] = None  # 分割掩码
+    keypoints: Optional[List[Tuple[int, int, float]]] = None  # 关键点 (x, y, visibility)
+    feature: Optional[List[float]] = None  # ReID特征向量
+
+    # 元数据（存储额外属性）
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        """验证分数范围"""
+        if not 0 <= self.score <= 1:
+            raise ValueError(f"Score must be in [0, 1], got {self.score}")
+
+    @classmethod
+    def from_bbox(cls, bbox: BBox, score: float, **kwargs) -> 'Detection':
+        """从 BBox 对象创建 Detection"""
+        return cls(
+            x1=bbox.x1, y1=bbox.y1, x2=bbox.x2, y2=bbox.y2,
+            score=score, **kwargs
+        )
+
+    @classmethod
+    def from_xywh(cls, x: int, y: int, w: int, h: int, score: float, **kwargs) -> 'Detection':
+        """从 (x, y, width, height) 格式创建"""
+        return cls(
+            x1=x, y1=y, x2=x + w, y2=y + h,
+            score=score, **kwargs
+        )
+
+    def to_dict(self) -> dict:
+        """序列化为字典"""
+        return {
+            'bbox': (self.x1, self.y1, self.x2, self.y2),
+            'score': self.score,
+            'class_id': self.class_id,
+            'class_name': self.class_name,
+            'track_id': self.track_id,
+            'timestamp': self.timestamp,
+            'metadata': self.metadata
+        }
+
+    def __repr__(self) -> str:
+        class_info = f", class={self.class_name or self.class_id}" if self.class_id is not None else ""
+        track_info = f", track={self.track_id}" if self.track_id is not None else ""
+        return f"Detection(({self.x1},{self.y1},{self.x2},{self.y2}), score={self.score:.3f}{class_info}{track_info})"
+
+    def __str__(self):
+        return f"Detection({self.x1}, {self.y1}, {self.x2}, {self.y2}, score: '{self.score}', class_id: '{self.class_id}')"
 
 
 class AspectType(Enum):

@@ -13,13 +13,14 @@ logger = logging.getLogger(__name__)
 
 class Model:
     def __init__(self, name: str, path: str, confidence_thres: float, iou_thres: float, classes: dict[int, str],
-                 boss: list[str]):
+                 boss: list[str], half: bool = False):
         self.name = name
         self.path = path
         self.confidence_thres = confidence_thres
         self.iou_thres = iou_thres
         self.classes = classes
         self.boss = boss
+        self.half = half
 
     def __eq__(self, other: "Model"):
         return self.path == other.path
@@ -55,10 +56,11 @@ MODEL_BOSS_V20 = Model(
 MODEL_REWARD = Model(
     name="reward.onnx",
     path=file_util.get_assets_model_reward("reward.onnx"),
-    confidence_thres=0.65,
+    confidence_thres=0.70,
     iou_thres=0.5,
     classes={0: "reward"},
-    boss=[]
+    boss=[],
+    half=False
 )
 
 # 启动时默认加载的模型
@@ -113,13 +115,19 @@ def run_ort_session(session: InferenceSession, img: np.ndarray):
     return outputs
 
 
-def search_echo(session: InferenceSession, img: np.ndarray, confidence_thres=0.5, iou_thres=0.5):
+def search_echo(session: InferenceSession, img: np.ndarray, confidence_thres=0.5, iou_thres=0.5, half: bool=False):
     """YOLO RGB"""
     # img = img_util.bgr2rgb(img)
     input_shape = session.get_inputs()[0].shape
     logger.debug("Input shape: %s", input_shape)  # [1, 3, 640, 640] NCHW
     logger.debug("Image shape: %s", img.shape)  # (720, 1280, 3) HWC
     img_preprocess, ratio, pad = preprocess(img)
+
+    target_dtype = np.float16 if half else np.float32
+    if img.dtype != target_dtype:
+        logger.debug("Image dtype: %s", img.dtype)
+        img_preprocess = img_preprocess.astype(target_dtype)
+
     outputs = run_ort_session(session, img_preprocess)
     logger.debug("Image shape: %s", img_preprocess.shape)  # (640, 640, 3) HWC
     boxes, scores, class_ids = postprocess(input_shape, img.shape, outputs, confidence_thres, iou_thres, ratio, pad)

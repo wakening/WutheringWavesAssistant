@@ -127,14 +127,38 @@ class Win32GameControlServiceImpl(GameControlService, BaseControlService):
         keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
         return self
 
-    def guide_book(self):
+    def guidebook(self):
         """索拉指南"""
         key = self._get_mapping_key("F2", win32con.VK_F2)
         keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
         return self
 
+    def mail(self):
+        """邮件"""
+        key = self._get_mapping_key("N", "N")
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        return self
+
+    def resonator(self):
+        """共鸣者"""
+        key = self._get_mapping_key("C", "C")
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        return self
+
+    def quests(self):
+        """任务"""
+        key = self._get_mapping_key("J", "J")
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        return self
+
     def esc(self):
         keymouse_util.tap_key(self._window_service.window, win32con.VK_ESCAPE, seconds=0.05)
+        return self
+
+    def team(self):
+        """编队"""
+        key = self._get_mapping_key("L", "L")
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
         return self
 
     def team_member1(self):

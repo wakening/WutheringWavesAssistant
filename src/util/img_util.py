@@ -56,6 +56,7 @@ def save_img_in_temp(img_bgr: np.ndarray):
     """
     from src.util import file_util
     img_path = file_util.create_img_path()
+    logger.info(f"img_path: %s", img_path)
     save_img(img_bgr, img_path)
 
 
@@ -241,3 +242,274 @@ def hide_uid_blended(img: np.ndarray, x_ratio=0.88, y_ratio=0.975):
     blended = (top_exp * (1 - alpha) + left_exp * alpha).astype(np.uint8)
     img[y_start:, x_start:w] = blended
     return img
+
+
+def detect_hp_bar0(
+    img: np.ndarray,
+    roi: tuple[int, int, int, int] | None = None
+):
+    """
+    检测血条
+
+    参数:
+        img:
+            BGR np.ndarray
+
+        roi:
+            (x1, y1, x2, y2)
+            只检测该区域
+
+    返回:
+        boxes:
+            [(x, y, w, h)]
+
+        mask:
+            二值图
+    """
+
+    # ---------------------------
+    # ROI 裁剪
+    # ---------------------------
+    if roi is not None:
+        x1, y1, x2, y2 = roi
+        detect_img = img[y1:y2, x1:x2]
+    else:
+        x1 = y1 = 0
+        detect_img = img
+
+    # ---------------------------
+    # BGR -> HSV
+    # ---------------------------
+    hsv = cv2.cvtColor(detect_img, cv2.COLOR_BGR2HSV)
+
+    # 红色范围
+    # BGR(60, 75, 207) 大约对应 HSV(3, 181, 207)
+    lower1 = np.array([0, 120, 120])
+    upper1 = np.array([10, 255, 255])
+
+    lower2 = np.array([170, 120, 120])
+    upper2 = np.array([180, 255, 255])
+
+    mask1 = cv2.inRange(hsv, lower1, upper1)
+    mask2 = cv2.inRange(hsv, lower2, upper2)
+
+    mask = mask1 | mask2
+
+    # ---------------------------
+    # morphology
+    # ---------------------------
+    kernel_open = np.ones((3, 3), np.uint8)
+
+    mask = cv2.morphologyEx(
+        mask,
+        cv2.MORPH_OPEN,
+        kernel_open
+    )
+
+    kernel_close = np.ones((1, 7), np.uint8)
+
+    mask = cv2.morphologyEx(
+        mask,
+        cv2.MORPH_CLOSE,
+        kernel_close
+    )
+
+    # ---------------------------
+    # 连通域
+    # ---------------------------
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
+
+    boxes = []
+
+    for i in range(1, num_labels):
+
+        x = stats[i, cv2.CC_STAT_LEFT]
+        y = stats[i, cv2.CC_STAT_TOP]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
+        area = stats[i, cv2.CC_STAT_AREA]
+
+        ratio = w / max(h, 1)
+
+        if (
+            w >= 40 and
+            3 <= h <= 12 and
+            ratio >= 4 and
+            area >= 150
+        ):
+            # 转回原图坐标
+            boxes.append((
+                x + x1,
+                y + y1,
+                w,
+                h
+            ))
+
+    return boxes
+
+
+def detect_hp_bar(
+    img: np.ndarray,
+    roi: tuple[int, int, int, int] | None = None
+):
+    """
+    检测血条（强化版：加入颜色一致性 + 横向稳定性）
+
+    返回:
+        [(x, y, w, h)]
+    """
+
+    # =================================================
+    # ROI
+    # =================================================
+    if roi is not None:
+        x1, y1, x2, y2 = roi
+        detect_img = img[y1:y2, x1:x2]
+    else:
+        x1 = y1 = 0
+        detect_img = img
+
+    hsv = cv2.cvtColor(detect_img, cv2.COLOR_BGR2HSV)
+
+    # =================================================
+    # 红色 mask
+    # =================================================
+    lower1 = np.array([0, 120, 120])
+    upper1 = np.array([10, 255, 255])
+
+    lower2 = np.array([170, 120, 120])
+    upper2 = np.array([180, 255, 255])
+
+    mask = cv2.inRange(hsv, lower1, upper1) | cv2.inRange(hsv, lower2, upper2)
+
+    # =================================================
+    # morphology（去噪 + 连通）
+    # =================================================
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((1, 7), np.uint8))
+
+    # =================================================
+    # 连通域
+    # =================================================
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
+
+    boxes = []
+
+    for i in range(1, num_labels):
+
+        x = stats[i, cv2.CC_STAT_LEFT]
+        y = stats[i, cv2.CC_STAT_TOP]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
+        area = stats[i, cv2.CC_STAT_AREA]
+
+        # =================================================
+        # 基础几何过滤
+        # =================================================
+        if w < 40:
+            continue
+
+        if not (3 <= h <= 12):
+            continue
+
+        if w / max(h, 1) < 4:
+            continue
+
+        if area < 150:
+            continue
+
+        # =================================================
+        # 提取区域
+        # =================================================
+        roi_hsv = hsv[y:y+h, x:x+w]
+        roi_mask = labels[y:y+h, x:x+w] == i
+
+        pixels = roi_hsv[roi_mask]
+
+        if len(pixels) < 30:
+            continue
+
+        # =================================================
+        # 1. 颜色一致性（防特效/渐变）
+        # =================================================
+        h_std = pixels[:, 0].std()
+        s_std = pixels[:, 1].std()
+        v_std = pixels[:, 2].std()
+
+        if h_std > 3:
+            continue
+
+        if s_std > 25:
+            continue
+
+        if v_std > 25:
+            continue
+
+        # =================================================
+        # 2. 横向稳定性（核心增强）
+        # =================================================
+        xs = np.where(roi_mask)[1]
+        hue = roi_hsv[:, :, 0][roi_mask]
+
+        unique_x = np.unique(xs)
+
+        col_means = np.array([
+            hue[xs == x].mean()
+            for x in unique_x
+        ])
+
+        if len(col_means) < 5:
+            continue
+
+        # 横向波动（关键）
+        if col_means.std() > 2.5:
+            continue
+
+        # 防止“锯齿/闪烁条”
+        if np.abs(np.diff(col_means)).mean() > 1.5:
+            continue
+
+        # =================================================
+        # 3. 红色中心验证（防UI杂色）
+        # =================================================
+        mean_h = pixels[:, 0].mean()
+
+        if not (mean_h <= 10 or mean_h >= 170):
+            continue
+
+        # =================================================
+        # 输出
+        # =================================================
+        boxes.append((
+            x + x1,
+            y + y1,
+            w,
+            h
+        ))
+
+    return boxes
+
+
+def draw_detect_hp_bar(img, boxes):
+    draw = img.copy()
+
+    # 绘制检测框
+    for x, y, w, h in boxes:
+        cv2.rectangle(
+            draw,
+            (x, y),
+            (x + w, y + h),
+            (0, 255, 0),
+            2
+        )
+
+        cv2.putText(
+            draw,
+            f"{w}x{h}",
+            (x, y - 5),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 255, 0),
+            1
+        )
+    return draw

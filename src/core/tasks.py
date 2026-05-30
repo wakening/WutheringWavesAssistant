@@ -19,6 +19,7 @@ from src.core.exceptions import ScreenshotError
 from src.core.geometry import AnchorPoint, Align
 from src.core.interface import ImgService, OCRService, ControlService, PageEventService, WindowService
 from src.core.message import MsgSource, MsgTaskStatus, MsgType
+from src.core.runtime import RuntimeConfig
 from src.core.workflow import TaskSpec, IPCManager, NodeContext
 from src.util import hwnd_util, keymouse_util, file_util
 
@@ -243,7 +244,9 @@ def create_parent_monitor(event, pid: int):
 def create_mouse_reset_monitor(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 
     def run(**run_kwargs):
-        mouse_reset_task_run(event, spec, ipc, **run_kwargs)
+        # mouse_reset_task_run(event, spec, ipc, **run_kwargs)
+        from src.util import cursor_guard_util
+        return cursor_guard_util.run(event, spec=spec, ipc=ipc, **run_kwargs)
 
     monitor_thread = threading.Thread(target=run, kwargs=kwargs, name="MouseResetMonitorThread")
     monitor_thread.daemon = True
@@ -258,6 +261,7 @@ def mouse_reset_task_run(event, spec, ipc, **kwargs):
     mouse = Controller()
     last_position = mouse.position
     hwnd = None
+    hwnd_util.enable_dpi_awareness()
     try:
         while event.is_set():
             time.sleep(0.02)
@@ -402,7 +406,7 @@ def auto_pickup_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     # time.sleep(0.2)
     logger.debug(spec.game_path)
     create_parent_monitor(event, spec.leader_pid)
-    # create_mouse_reset_monitor(event, spec.leader_pid, **kwargs)
+    # create_mouse_reset_monitor(event, spec, ipc, **kwargs)
     clock_action = ClockAction(control_service.activate, 3.0)
 
     page_event_service: PageEventService = container.auto_pickup_service()
@@ -455,7 +459,7 @@ def auto_story_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     # time.sleep(0.2)
     logger.debug(spec.game_path)
     create_parent_monitor(event, spec.leader_pid)
-    # create_mouse_reset_monitor(event, spec.leader_pid, **kwargs)
+    # create_mouse_reset_monitor(event, spec, ipc, **kwargs)
     clock_action = ClockAction(control_service.activate, 3.0)
 
     page_event_service: PageEventService = container.auto_story_service()
@@ -511,7 +515,7 @@ def daily_activity_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     time.sleep(0.2)
     logger.debug(spec.game_path)
     create_parent_monitor(event, spec.leader_pid)
-    create_mouse_reset_monitor(event, spec.leader_pid, **kwargs)
+    create_mouse_reset_monitor(event, spec, ipc, **kwargs)
     # clock_action = ClockAction(control_service.activate, 3.0)
 
     page_event_service: PageEventService = container.daily_activity_service()
@@ -541,16 +545,21 @@ def task_init(event, spec: TaskSpec, ipc: IPCManager, is_thread=False, source=No
     if not is_thread:
         logging_config.setup_logging(ipc.log_queue)
     # logger.debug(f"spec: {json.dumps(spec.__dict__)}")
+    hwnd_util.enable_dpi_awareness()
 
     ctx = NodeContext()
     ctx.spec = spec
     ctx.ipc = ipc
     ctx.runtime.stop_event = event
+    ctx.runtime.cfg = RuntimeConfig(spec.user_config)
     ctx.runtime.send = message.make_sender(ipc.proc_queue, source, spec.task_id)
 
     container = Container.build(ctx)
     logger.debug("Create application context")
     logger.debug(spec.game_path)
+
+    if ctx.runtime.cfg and ctx.runtime.cfg.game:
+        ctx.window_service.set_lang(ctx.runtime.cfg.game.gameLanguage)
 
     return ctx, container
 
@@ -714,9 +723,27 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
         logger.info(f"每日任务开始运行, task_id: {spec.task_id}")
         ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
 
-        try:
+        # 1. 先获取当前鼠标位置
+        original_x, original_y = keymouse_util.get_mouse_position()
+        # 3. 取消游戏窗口的置顶状态
+        hwnd_util.set_window_not_topmost(ctx.window_service.window)
+        # 2. 释放鼠标限制（如果有）
+        keymouse_util.set_mouse_unlocked()
+        # # 4. 移动窗口
+        # gui_win_id = spec.gui_win_id
+        # hwnd_util.set_window_left_top_and_below_another(window_service.window, gui_win_id)
+        # hwnd_util.set_window_left_top(ctx.window_service.window)
+        # 5. 将鼠标移回原位
+        keymouse_util.set_mouse_position(original_x, original_y)
 
+        time.sleep(0.2)
+        logger.debug(spec.game_path)
+        create_parent_monitor(event, spec.leader_pid)
+        create_mouse_reset_monitor(event, spec, ipc, **kwargs)
+
+        try:
             from src.service.daily_workflow import DailyWorkflow
+
             wf = DailyWorkflow(ctx)
             wf.execute()
 
@@ -725,6 +752,11 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
         except Exception as e:
             logger.exception(e)
             ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
+
+            ctx.ipc.event_queue.put({
+                "task": {"DailyTask": ["failed"]}
+            }, block=True)
+            time.sleep(0.1)
         finally:
             logger.info(f"每日任务结束, task_id: {spec.task_id}")
             release_press_key(ctx)

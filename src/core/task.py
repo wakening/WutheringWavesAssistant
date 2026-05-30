@@ -1,4 +1,5 @@
 import logging
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, List, Set, Dict
@@ -121,7 +122,7 @@ class TaskStatus(Enum):
     @property
     def is_finished(self) -> bool:
         """是否成功完成"""
-        return self == TaskStatus.COMPLETED
+        return self == TaskStatus.COMPLETED or self == TaskStatus.NOT_REQUIRED
 
     @property
     def is_failed(self) -> bool:
@@ -204,27 +205,71 @@ class TaskStatus(Enum):
         return f"<TaskStatus.{self.name}: {self.display_name}>"
 
 
-class TaskFSM:
+class FSM(ABC):
+    """状态接口"""
+
+    @abstractmethod
+    def set_enabled(self, enabled: bool):
+        pass
+
+    @abstractmethod
+    def is_terminal(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_active(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_finished(self) -> bool:
+        pass
+
+    @abstractmethod
+    def is_failed(self) -> bool:
+        pass
+
+    def utility(self, ctx):
+        # score = self.BASE_SCORE
+        #
+        # score += self.stamina_weight(ctx)
+        # score += self.deadline_weight(ctx)
+        # score += self.material_weight(ctx)
+        #
+        # return score
+        pass
+
+
+class TaskFSM(FSM):
     """任务状态机"""
 
-    def __init__(self, name: str, task_id: str, status: TaskStatus = TaskStatus.PENDING):
+    def __init__(
+            self,
+            name: str | None = None,
+            task_id: str | None = None,
+            status: TaskStatus = TaskStatus.PENDING,
+    ):
         self.name = name
         self.task_id = task_id
         self.status = status
         self.history: List[TaskStatus] = [self.status]
 
-    @classmethod
-    def build(cls, ctx, status: TaskStatus = TaskStatus.PENDING) -> 'TaskFSM':
-        return cls(ctx.spec.task_name, ctx.spec.task_id, status)
+    # ------- 状态切换 -------
 
     def transition(self, new_status: TaskStatus):
         """安全地转换状态"""
+        if self.task_id:
+            task_id = f"[{self.task_id}] "
+        else:
+            task_id = ""
         try:
             self.status = self.status.transition_to(new_status, self.task_id)
             self.history.append(self.status)
-            logger.info(f"[{self.task_id}] {self.name}: {self.status}")
+            # logger.info(f"[{self.task_id}] {self.name}: {self.status}")
+
+            logger.info(f"{task_id}{self.name}: {self.status}")
         except ValueError as e:
-            logger.exception(f"[{self.task_id}] 转换失败: {e}")
+            logger.error(f"{task_id}{self.name}: 转换失败")
+            raise e
 
     def start(self):
         self.transition(TaskStatus.IN_PROGRESS)
@@ -247,6 +292,110 @@ class TaskFSM:
             self.transition(TaskStatus.PENDING)
         else:
             logger.info(f"无法重试: 当前状态 {self.status.name}")
+
+    def __str__(self) -> str:
+        return f"TaskFSM(name='{self.name}', status={self.status})"
+
+    # ------- 状态 -------
+
+    def set_enabled(self, enabled: bool):
+        if enabled:
+            self.status = TaskStatus.PENDING
+        else:
+            self.status = TaskStatus.NOT_REQUIRED
+
+    @property
+    def is_terminal(self) -> bool:
+        return self.status.is_terminal
+
+    @property
+    def is_active(self) -> bool:
+        return self.status.is_active
+
+    @property
+    def is_finished(self) -> bool:
+        return self.status.is_finished
+
+    @property
+    def is_failed(self) -> bool:
+        return self.status.is_failed
+
+
+class TaskFSMGroup(FSM):
+
+    def __init__(
+            self,
+            *children: FSM,
+            name: str | None = None,
+            enabled: bool = True,
+    ):
+        """
+        组合模式
+        自身的状态仅用于启动前设置任务是否需要执行，是一个开关，不参与运行时状态变化和判断任务是否完成，
+        任务的完成情况根据FSM接口的函数判断
+        :param children: 子状态机
+        :param name: 仅调试用，无实际作用
+        :param enabled: 自身状态，开关，控制当前任务树是否需要运行
+        :param parent: 父节点
+        """
+        self.children = list(children)
+        self.name = name
+        self.enabled = enabled
+
+    def __str__(self) -> str:
+        return f"TaskFSMGroup(name='{self.name}', enabled={self.enabled}, children={[child.name for child in self.children]})"
+
+    def set_enabled(self, enabled: bool):
+        self.enabled = enabled
+
+    @property
+    def is_terminal(self) -> bool:
+        if not self.enabled:
+            return True
+        # return all(child.is_terminal for child in self.children)
+        for child in self.children:
+            if not child.is_terminal:
+                logger.debug(f"❌ {self.name}.is_terminal=False")
+                logger.debug(f"   └─ 因为 {child.name}.is_terminal=False")
+                return False
+        return True
+
+    @property
+    def is_active(self) -> bool:
+        if not self.enabled:
+            return False
+        # return any(child.is_active for child in self.children)
+        for child in self.children:
+            if child.is_active:
+                return True
+
+        logger.debug(f"❌ {self.name}.is_active=False")
+        logger.debug(f"   └─ 子节点都不活跃: {[c.name for c in self.children]}")
+        return False
+
+    @property
+    def is_finished(self) -> bool:
+        if not self.enabled:
+            return True
+        # return all(child.is_finished for child in self.children)
+        for child in self.children:
+            if not child.is_finished:
+                logger.debug(f"❌ {self.name}.is_finished=False")
+                logger.debug(f"   └─ 因为 {child.name}.is_finished=False")
+                return False
+        return True
+
+    @property
+    def is_failed(self) -> bool:
+        if not self.enabled:
+            return False
+        # return any(child.is_failed for child in self.children)
+        for child in self.children:
+            if child.is_failed:
+                logger.debug(f"✅ {self.name}.is_failed=True")
+                logger.debug(f"   └─ 因为 {child.name}.is_failed=True")
+                return True
+        return False
 
 
 # ========== 使用示例 ==========
@@ -272,13 +421,13 @@ def demo():
         next_status = current.transition_to(TaskStatus.IN_PROGRESS)
         logger.info(f"✅ 转换成功: {current.name} -> {next_status.name}")
     except ValueError as e:
-        logger.exception(f"❌ {e}")
+        logger.error(f"❌ {e}")
 
     # 非法转换
     try:
         current.transition_to(TaskStatus.COMPLETED)  # PENDING 不能直接到 COMPLETED
     except ValueError as e:
-        logger.exception(f"❌ 非法转换: {e}")
+        logger.error(f"❌ 非法转换: {e}")
     logger.info("\n")
 
     # 3. 任务状态机（完整示例）

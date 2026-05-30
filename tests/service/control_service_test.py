@@ -29,7 +29,7 @@ def test_controls():
     control.resonance_skill().sleep(2)
     control.echo_skill().sleep(2)
     control.resonance_liberation().sleep(5)
-    control.guide_book().sleep(3).guide_book().sleep(3)
+    control.guidebook().sleep(3).guidebook().sleep(3)
     control.map().sleep(3).map().sleep(3)
     control.team_member1().sleep(1).team_member2().sleep(1).team_member3().sleep(1)
     control.events().sleep(3).events().sleep(3)

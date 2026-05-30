@@ -6,7 +6,7 @@ from typing import Optional
 import cv2
 import numpy as np
 
-from src.core.geometry import Scaler, AnchorPoint
+from src.core.geometry import Scaler, AnchorPoint, Point
 
 
 class RuleMode(Enum):
@@ -53,7 +53,7 @@ class Color:
 
 class ColorRule:
     def __init__(self):
-        self._points: Sequence[AnchorPoint] | Sequence[tuple[int, int]] = []
+        self._points: Sequence[AnchorPoint | Point] | Sequence[tuple[int, int]] = []
         self._groups = []  # (compiled_colors, mode)
 
     def points(self, pts):
@@ -62,7 +62,7 @@ class ColorRule:
 
     def colors(
             self, colors: Color | list[Color],
-            tol: int | tuple[Optional[int], Optional[int], Optional[int]] = 10,
+            tol: int | tuple[Optional[int], Optional[int], Optional[int]] = 30,
             mode: RuleMode = RuleMode.ANY,
     ):
         if isinstance(colors, Color):
@@ -176,5 +176,14 @@ class ColorMatch:
             self._rules.append(r)
         return self
 
-    def match(self, img: np.ndarray, scaler: Scaler = None) -> bool:
-        return all(r.match(img, scaler if scaler else self._scaler) for r in self._rules)
+    def match(self, img: np.ndarray, scaler: Scaler = None, rules: ColorRule | list[ColorRule] = None) -> bool:
+        if not rules:
+            rules = self._rules
+        elif isinstance(rules, ColorRule):
+            rules = [rules]
+        if not scaler:
+            scaler = self._scaler
+        return all(r.match(img, scaler) for r in rules)
+
+
+

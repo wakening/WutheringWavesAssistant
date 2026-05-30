@@ -6,8 +6,8 @@ import numpy as np
 from pynput import keyboard
 
 from src.core.contexts import Context
+from src.core.i18n import Language
 from src.core.interface import ControlService, OCRService, ImgService, WindowService, ODService, BossInfoService
-from src.core.languages import Languages
 from src.core.pages import Page, Position, TextMatch, ConditionalAction, ImageMatch
 from src.core.regions import DynamicPosition, TextPosition
 from src.service.page_event_service import PageEventAbstractService
@@ -318,10 +318,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         auto_play_page = Page(
             name="自动播放|AutoPlay",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Dialogue_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[
@@ -346,10 +346,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         auto_play_2_page = Page(
             name="自动播放|AutoPlay-2",  # 电影黑边
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Dialogue_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[
@@ -382,10 +382,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         auto_play_open_page = Page(
             name="自动播放已开启|AutoPlayEnabled",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[
@@ -410,10 +410,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         auto_play_open2_page = Page(
             name="自动播放已开启|AutoPlayEnabled-2",  # 电影黑边
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[
@@ -452,10 +452,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         dialogue_page = Page(
             name="对话框|Dialogue",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Dialogue_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[
@@ -479,10 +479,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         dialogue2_page = Page(
             name="对话框|Dialogue-2",  # 电影黑边
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Dialogue_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetImages=[

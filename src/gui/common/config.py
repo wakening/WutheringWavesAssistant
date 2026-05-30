@@ -153,20 +153,6 @@ class ParamConfig(QConfig):
     bossLevel = OptionsConfigItem(
         "BossRush", "BossLevel", "Auto", OptionsValidator(["40", "50", "60", "70", "80", "90", "Auto"]))
 
-    # defaultComboSequence = [
-    #     ["Jinhsi", "q~0.1,e,r,e,a,a,a,a,a,e,a,a,a,a,a,e", True],
-    #     ["Changli", "r,q~0.1,e,a,a,a,a~,e", True],
-    #     ["Shorekeeper", "q~0.1,e~0.1,a", True],
-    #     ["Verina", "r,e,q~0.1,s,a(0.1),a", True],
-    # ]
-    # defaultComboSequence = [
-    #     ["Jinhsi"],
-    #     ["Changli"],
-    #     ["Shorekeeper"],
-    #     ["Verina"],
-    # ]
-    # comboSequence = ConfigItem("BossRush", "ComboSequence", defaultComboSequence)
-
     autoCombat = ConfigItem("BossRush", "AutoCombatBetaV2", True, BoolValidator())
 
     autoRestartPeriod = ConfigItem("BossRush", "AutoRestartPeriod", 'Close')
@@ -176,9 +162,28 @@ class ParamConfig(QConfig):
     soarToTheBeat_UserTemplate = ConfigItem("SoarToTheBeat", "UserTemplate", None)
     soarToTheBeat_UseUserTemplate = ConfigItem("SoarToTheBeat", "UseUserTemplate", False, BoolValidator())
 
-    # macroRecordSoarToTheBeat = ConfigItem("MacroRecordSoarToTheBeat", "user")
+    # Daily
+    weeklyChallenge = ConfigItem("Daily", "WeeklyChallenge", None)
+    weeklyChallengeOpen = ConfigItem("Daily", "WeeklyChallengeOpen", False, BoolValidator())
+    tacetSuppression = ConfigItem("Daily", "TacetSuppression", None)
+    tacetSuppressionOpen = ConfigItem("Daily", "TacetSuppressionOpen", False, BoolValidator())
+    forgeryChallenge = ConfigItem("Daily", "ForgeryChallenge", None)
+    forgeryChallengeOpen = ConfigItem("Daily", "ForgeryChallengeOpen", False, BoolValidator())
+    bossChallenge = ConfigItem("Daily", "BossChallenge", None)
+    bossChallengeOpen = ConfigItem("Daily", "BossChallengeOpen", False, BoolValidator())
+    nightmarePurification = ConfigItem("Daily", "NightmarePurification", None)
+    nightmarePurificationOpen = ConfigItem("Daily", "NightmarePurificationOpen", False, BoolValidator())
+    tacetDiscordNest = ConfigItem("Daily", "TacetDiscordNest", None)
+    tacetDiscordNestOpen = ConfigItem("Daily", "TacetDiscordNestOpen", False, BoolValidator())
+    activity = ConfigItem("Daily", "Activity", "Auto")
+    activityOpen = ConfigItem("Daily", "ActivityOpen", False, BoolValidator())
+    mail = ConfigItem("Daily", "Mail", "Auto")
+    mailOpen = ConfigItem("Daily", "MailOpen", False, BoolValidator())
+    pioneerPodcast = ConfigItem("Daily", "PioneerPodcast", "Auto")
+    pioneerPodcastOpen = ConfigItem("Daily", "PioneerPodcastOpen", False, BoolValidator())
 
     # Game
+    gameLanguage = ConfigItem("Game", "GameLanguage", None)
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
 
 

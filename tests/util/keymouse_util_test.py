@@ -140,3 +140,17 @@ def test_post_text():
     time.sleep(0.3)
 
 
+def test_print_mouse_position():
+    logger.debug("\n")
+    hwnd = hwnd_util.get_hwnd()
+    client_rect_on_screen = hwnd_util.get_client_rect_on_screen(hwnd)
+    logger.debug(f"client_rect_on_screen: {client_rect_on_screen}")
+    x1, y1, x2, y2 = client_rect_on_screen
+    logger.debug(f"client_center_on_screen: {((x1 + x2) // 2, (y1 + y2) // 2)}")
+    try:
+        while True:
+            logger.debug(f"mouse_position: {keymouse_util.get_mouse_position()}")
+            time.sleep(0.2)
+    except KeyboardInterrupt:
+        logger.debug(f"client_rect_on_screen: {client_rect_on_screen}")
+        logger.debug(f"client_center_on_screen: {((x1 + x2) // 2, (y1 + y2) // 2)}")

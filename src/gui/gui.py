@@ -40,8 +40,27 @@ def is_exist():
     return False
 
 
+def show_traceback(is_debug: bool = False):
+    """显示Qt异常信息，仅调试用"""
+    if not is_debug:
+        return
+
+    from PySide6.QtCore import qInstallMessageHandler
+    import traceback
+
+    def qt_message_handler(mode, context, message):
+        print("\n===== Qt Warning =====")
+        print(message)
+
+        if "QLayout" in message:
+            print("".join(traceback.format_stack()))
+
+    qInstallMessageHandler(qt_message_handler)
+
+
 def wwa():
     is_exist()
+    show_traceback()
 
     # enable dpi scale
     if cfg.get(cfg.dpiScale) != "Auto":

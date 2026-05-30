@@ -54,6 +54,11 @@ def get_temp_screenshot(file_name: str | None = None):
     return get_path("temp/screenshot", file_name)
 
 
+def get_temp_config(file_name: str | None = None):
+    """ 配置 """
+    return get_path("temp/config", file_name)
+
+
 def get_assets(file_name: str | None = None):
     return get_path("assets", file_name)
 
@@ -88,6 +93,14 @@ def get_assets_macro_SoarToTheBeat(file_name: str | None = None):
 
 def get_assets_macro_SoarToTheBeat_template(file_name: str | None = None):
     return get_path(r"assets/macro/Soar to the Beat/template", file_name)
+
+
+def get_assets_map(file_name: str | None = None):
+    return get_path(r"assets/map", file_name)
+
+
+def get_assets_map_huanglong(file_name: str | None = None):
+    return get_path(r"assets/map/Huanglong", file_name)
 
 
 def get_ico():

@@ -79,7 +79,7 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.NamelessExplorer.value: [
         RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=4),
         RouteStep(direction=Direction.LEFT, mode=MoveMode.RUN, duration=1.4)],  # 3.2
-    # BossNameEnum.SeedOfLllusoryOrigin.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
+    # BossNameEnum.SeedOfIllusoryOrigin.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
     BossNameEnum.Denia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
 }
 
@@ -136,7 +136,7 @@ RESTART_PARAMS: dict[str, RestartParam] = {
     # BossNameEnum.Sigillum.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.NamelessExplorer.value: RestartParam(
         check_text=None, direction=Direction.LEFT, cycle=10, step=2, check_health_bar=True),
-    # BossNameEnum.SeedOfLllusoryOrigin.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.SeedOfIllusoryOrigin.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.Denia.value: RestartParam(
         check_text=None, direction=None, cycle=8, step=1, restart_text=r"^进入声之"),
 }

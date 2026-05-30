@@ -3,6 +3,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from src.core.i18n import I18nText
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,8 +46,54 @@ class BossNameEnum(Enum):
     ReactorHusk = "炉芯机骸"
     Sigillum = "辛吉勒姆"
     NamelessExplorer = "无铭探索者"
-    SeedOfLllusoryOrigin = "虚妄诞生之种（限时提前开放）"
+    SeedOfIllusoryOrigin = "虚妄诞生之种（限时提前开放）"
     Denia = "达妮娅"
+
+
+    @staticmethod
+    def enemies():
+        """所有敌人"""
+        return [
+            I18nText.EnemyDreamless,
+            I18nText.EnemyFallacyOfNoReturn,
+            I18nText.EnemyLampylumenMyriad,
+            I18nText.EnemyBellBorneGeochelone,
+            I18nText.EnemyInfernoRider,
+            I18nText.EnemyImpermanenceHeron,
+            I18nText.EnemyMechAbomination,
+            I18nText.EnemyMourningAix,
+            I18nText.EnemyThunderingMephis,
+            I18nText.EnemyTempestMephis,
+            I18nText.EnemyFeilianBeringal,
+            I18nText.EnemyCrownless,
+            I18nText.EnemyJue,
+            I18nText.EnemySentryConstruct,
+            I18nText.EnemyHecate,
+            I18nText.EnemyLorelei,
+            I18nText.EnemyDragonOfDirge,
+            I18nText.EnemyNightmareFeilianBeringal,
+            I18nText.EnemyNightmareImpermanenceHeron,
+            I18nText.EnemyNightmareTempestMephis,
+            I18nText.EnemyNightmareThunderingMephis,
+            I18nText.EnemyNightmareCrownless,
+            I18nText.EnemyNightmareInfernoRider,
+            I18nText.EnemyNightmareMourningAix,
+            I18nText.EnemyNightmareLampylumenMyriad,
+            I18nText.EnemyFleurdelys,
+            I18nText.EnemyNightmareKelpie,
+            I18nText.EnemyLionessOfGlory,
+            I18nText.EnemyNightmareHecate,
+            I18nText.EnemyFenrico,
+            I18nText.EnemyLadyOfTheSea,
+            I18nText.EnemyTheFalseSovereign,
+            I18nText.EnemyThrenodianLeviathan,
+            I18nText.EnemyHyvatia,
+            I18nText.EnemyReactorHusk,
+            I18nText.EnemySigillum,
+            I18nText.EnemyNamelessExplorer,
+            I18nText.SeedOfIllusoryOrigin,  # 限时提前挑战
+            I18nText.EnemyDenia,
+        ]
 
 
 class MoveMode(Enum):

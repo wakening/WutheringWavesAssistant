@@ -200,9 +200,9 @@ class HomeInterface(ScrollArea):
         )
         basicInputView.addSampleCard(
             icon=":/gallery/images/controls/Checkbox.png",
-            title="施工中...",
+            title="每日任务beta",
             content=self.tr(
-                ""),
+                "测试中，仅开放部分关卡"),
             routeKey="basicInputInterface",
             index=16,
             task_name="DailyTask",

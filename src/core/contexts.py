@@ -6,7 +6,7 @@ from typing import Any
 from pydantic import BaseModel, Field, PrivateAttr
 
 from src.config.app_config import AppConfig
-from src.config.config import Config
+from src.config.config import ConfigV1
 from src.config.gui_config import ParamConfig
 from src.core.workflow import TaskSpec
 
@@ -76,7 +76,7 @@ class EchoContext:
 
 class Context(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
-    config: Config = Field(default_factory=Config, title="所有配置文件")
+    config: ConfigV1 = Field(default_factory=ConfigV1, title="所有配置文件")
     boss_task_ctx: BossTaskContext = Field(default_factory=BossTaskContext, title="刷boss声骸上下文")
     spec: TaskSpec = None
     _container: Any = PrivateAttr()

@@ -9,6 +9,7 @@ import time
 from enum import Enum
 from typing import Sequence, Dict
 
+from src.config.config import Config
 from src.config.gui_config import ParamConfig
 from src.core import environs
 from src.core.contexts import Context
@@ -68,16 +69,16 @@ class TaskMonitor:
     def run(self):
         # TODO 多任务运行管理
         if "EchoMergeProcessTask" in self.running_tasks:
-            self._run_EchoMergeProcessTask()
+            self._run_EchoMergeProcessTask(task_name = "EchoMergeProcessTask")
+            return
+        if "DailyTask" in self.running_tasks:
+            self._run_EchoMergeProcessTask(task_name = "DailyTask")
             return
         elif "SoarToTheBeatMacroReplayTask" in self.running_tasks:
             self._run_SoarToTheBeatTask("SoarToTheBeatMacroReplayTask")
             return
         elif "SoarToTheBeatMacroRecordTask" in self.running_tasks:
             self._run_SoarToTheBeatTask("SoarToTheBeatMacroRecordTask")
-            return
-        elif "DailyTask" in self.running_tasks:
-            # self._run_SoarToTheBeatTask("SoarToTheBeatMacroRecordTask")
             return
         self._run_restart()
 
@@ -128,9 +129,12 @@ class TaskMonitor:
             logger.debug("任务监控线程已停止")
         return
 
-    def _run_EchoMergeProcessTask(self):
+    def _run_EchoMergeProcessTask(self, task_name: str):
         logger.info("任务监控线程开始运行")
-        task_name = "EchoMergeProcessTask"
+        notice = {
+            "DailyTask": "Daily Task",
+            "EchoMergeProcessTask": "Data Merge",
+        }
         try:
             sleep_seconds = 3
             from src.gui.common.globals import globalSignal
@@ -144,7 +148,7 @@ class TaskMonitor:
                     task_msg = msg.get("task", {}).get(task_name)
                     if task_msg in ["finished", "failed"]:
                         self.parent.stop_task_in_monitor(task_name)
-                        globalSignal.taskInfoBarSignal.emit("Data Merge: ", task_msg, 3000)
+                        globalSignal.taskInfoBarSignal.emit(f"{notice.get(task_name)}: ", task_msg, 3000)
                         break
                 except queue.Empty:
                     pass
@@ -443,12 +447,13 @@ class MainController:
         spec.param_config_snapshot = ParamConfig.snapshot(self.param_config_path)
         spec.param_config = ParamConfig.build(content=spec.param_config_snapshot)
         spec.param_config.gamePath = spec.game_path  # 旧版
+        spec.user_config = Config.load_user_config().to_dict()
         if task_name == "AutoStorySkipProcessTask":
             spec.skip_is_open = True
         elif task_name == "AutoStoryEnjoyProcessTask":
             spec.skip_is_open = False
         # if task_name in ["AutoBossProcessTask", "AutoPickupProcessTask"]:
-        if task_name in ["AutoBossProcessTask", "EchoMergeProcessTask"]:
+        if task_name in ["AutoBossProcessTask", "EchoMergeProcessTask", "DailyTask"]:
             spec.ocr_use_gpu = True
         else:
             spec.ocr_use_gpu = False

@@ -84,6 +84,7 @@ class CombatSystem:
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
 
         self.auto_pickup: bool = False
+        self.check_boss_hp: bool = True
 
     # def get_resonators(self) -> list[BaseResonator]:
     #     resonators = []
@@ -195,6 +196,7 @@ class CombatSystem:
 
             resonator.event = event
             resonator.auto_pickup = self.auto_pickup
+            resonator.check_boss_hp = self.check_boss_hp
             try:
                 # logger.debug(f"combo: {resonator.resonator_name().value}")
                 resonator.combo()
@@ -230,18 +232,26 @@ class CombatSystem:
             self.event.set()
             self.run(self.event)
 
-    def stop(self):
+    def stop(self, join: bool = False):
         with self._lock:
             self.event.clear()
+            t = self._thread
             if self.is_async:
                 self._thread = None
+            if not join:
+                return
+            deadline = time.monotonic() + 3
+            while time.monotonic() < deadline:
+                t.join(0.1)
+                if not t.is_alive():
+                    break
 
     def pause(self):
         with self._lock:
             self.event.clear()
             # logger.debug("combat pause")
 
-    def set_resonators(self, resonator_names_zh: list[str]):
+    def set_resonators(self, resonator_names_zh: list[str | None]):
         resonators: list[BaseResonator] = []
         _resonators_names_en = []
         for name_zh in resonator_names_zh:

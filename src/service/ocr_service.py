@@ -7,7 +7,7 @@ from abc import ABC
 import numpy as np
 
 from src.core.contexts import Context
-from src.core.geometry import TextBox, BBox, RapidocrTextBox, PaddleocrTextBox
+from src.core.geometry import TextBox, BBox, RapidocrTextBox, PaddleocrTextBox, RapidocrRecTextBox
 from src.core.interface import OCRService, ImgService, WindowService
 from src.core.pages import OcrResult
 from src.core.regions import Position, RapidocrPosition, TextPosition, DynamicPosition, PaddleocrPosition
@@ -29,7 +29,7 @@ class AbstractOcrService(OCRService, ABC):
 
     def is_ocr_use_gpu(self) -> bool:
         ocr_use_gpu = None
-        if self._context.spec.ocr_use_gpu is True:
+        if self._context.spec and self._context.spec.ocr_use_gpu is True:
             if importlib.util.find_spec("paddle") and importlib.util.find_spec("onnxruntime"):
                 import paddle
                 import onnxruntime
@@ -152,14 +152,14 @@ class RapidOcrServiceImpl(AbstractOcrService):
     def query(
             self,
             img: np.ndarray,
-            bbox: BBox | None = None,
+            roi: BBox | None = None,
             det=True,
             rec=True,
             cls=False,
             resize=True,
     ) -> OcrResult:
-        if bbox:
-            img = img[bbox.as_slice()]
+        if roi:
+            img = img[roi.as_slice()]
         ratio = None
         if resize:
             img, ratio = self._resize_img(img)
@@ -168,7 +168,7 @@ class RapidOcrServiceImpl(AbstractOcrService):
             result = RapidocrTextBox.format(output)
         elif det is False and rec is True and cls is False:
             output = self._engine(img, use_det=False, use_rec=True, use_cls=False)
-            result = RapidocrTextBox.format(output)
+            result = RapidocrRecTextBox.format(output)
         else:
             raise NotImplementedError("不支持的识别方式")
         if resize:
@@ -262,23 +262,23 @@ class PaddleOcrServiceImpl(AbstractOcrService):
     def query(
             self,
             img: np.ndarray,
-            bbox: BBox | None = None,
+            roi: BBox | None = None,
             det=True,
             rec=True,
             cls=False,
             resize=True,
     ) -> OcrResult:
-        if bbox:
-            img = img[bbox.as_slice()]
+        if roi:
+            img = img[roi.as_slice()]
         ratio = None
         if resize:
             img, ratio = self._resize_img(img)
         if det is True and rec is True and cls is False:
             output = self._engine(img, use_det=True, use_rec=True, use_cls=False)
-            result = PaddleocrTextBox.format(output)
+            result = PaddleocrTextBox.format(output, roi)
         elif det is False and rec is True and cls is False:
             output = self._engine(img, use_det=False, use_rec=True, use_cls=False)
-            result = PaddleocrTextBox.format(output)
+            result = PaddleocrTextBox.format(output, roi)
         else:
             raise NotImplementedError("不支持的识别方式")
         if resize:

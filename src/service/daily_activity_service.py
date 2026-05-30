@@ -540,7 +540,7 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
     def _run_conditional_actions(self):
         if self._ctx.first_action:
             self._ctx.first_action = False
-            self._control_service.guide_book()
+            self._control_service.guidebook()
             time.sleep(2)
 
         if (
@@ -566,7 +566,7 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
             logger.debug("大世界-战斗结束后10s-传送去往下一个boss")
             self._ctx.fight_status = Status.idle
             # return self.transfer()
-            self._control_service.guide_book()
+            self._control_service.guidebook()
             time.sleep(2)
             return True
 
@@ -579,7 +579,7 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
             self._ctx.fight_status = Status.idle
             self._ctx.fight_start_time = datetime.now()  # 重置开始战斗时间
             # return self.transfer()
-            self._control_service.guide_book()
+            self._control_service.guidebook()
             time.sleep(2)
             return True
 

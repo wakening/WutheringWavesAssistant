@@ -13,7 +13,7 @@ from ..common.config import paramConfig
 from ..common.globals import globalSignal
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
-from ..view.param_interface import AutoBossParamSettingCard, MacroParamSettingCard
+from ..view.param_interface import AutoBossParamSettingCard, MacroParamSettingCard, DailyTaskSettingCard
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class SampleCard(CardWidget):
             self.switchButton.setChecked(True)
 
     def onCheckedChanged(self, isChecked: bool):
-        if self.group_index > 6:
+        if self.group_index > 7:
             if isChecked:
                 self.switchButton.setChecked(False)
                 self.createTopRightInfoBar()
@@ -326,6 +326,8 @@ class SimpleExpandWidget(QWidget):
             self.card = AutoBossParamSettingCard(self)
         elif index == 4:
             self.card = MacroParamSettingCard(self)
+        elif index == 7:
+            self.card = DailyTaskSettingCard(self)
 
         self.layout.addWidget(self.card)
 
@@ -365,6 +367,8 @@ class SampleCardView(QWidget):
         self.autoBoss.setVisible(False)
         self.macro = SimpleExpandWidget(self, 4)
         self.macro.setVisible(False)
+        self.daily = SimpleExpandWidget(self, 7)
+        self.daily.setVisible(False)
 
         self.is_init = False
 
@@ -400,6 +404,7 @@ class SampleCardView(QWidget):
             self.is_init = True
             self.flowLayout.setExpandWidget(0, self.autoBoss)
             self.flowLayout.setExpandWidget(4, self.macro)
+            self.flowLayout.setExpandWidget(7, self.daily)
 
         # if index not in [0, 4]:
         #     for cache_index in self.cache_expand:

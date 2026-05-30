@@ -13,9 +13,9 @@ from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, Scenar
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
 from src.core.geometry import AnchorPoint, Align, AnchorBBox
+from src.core.i18n import Language
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
     BossInfoService
-from src.core.languages import Languages
 from src.core.pages import ConditionalAction, TextMatch, Page
 from src.core.regions import TextPosition, DynamicPosition, Position, DynamicPointTransformer, AlignEnum
 
@@ -107,13 +107,13 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-F2-索拉指南-活跃度|Activity",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_F2_Guidebook_Activity_001.png",
                     "UI_F2_Guidebook_Activity_002.png",
                     "UI_F2_Guidebook_Activity_003.png",
                     "UI_F2_Guidebook_Activity_004.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_F2_Guidebook_Activity_001_EN.png",
                 ],
             },
@@ -155,10 +155,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-F2-索拉指南-周期挑战|RecurringChallenges",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_F2_Guidebook_RecurringChallenges_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_F2_Guidebook_RecurringChallenges_001_EN.png",
                 ],
             },
@@ -231,10 +231,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-F2-索拉指南-强者之路|PathOfGrowth",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_F2_Guidebook_PathOfGrowth_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetTexts=[
@@ -270,10 +270,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-F2-索拉指南-残象探寻|EchoHunting",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_F2_Guidebook_EchoHunting_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetTexts=[
@@ -313,10 +313,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-F2-索拉指南-漂泊日志|Milestones",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_F2_Guidebook_Milestones_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetTexts=[
@@ -376,10 +376,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-终端|Terminal",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "UI_ESC_Terminal_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_ESC_Terminal_001_EN.png",
                 ],
             },
@@ -426,10 +426,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="奖励|Reward-TapTheBlankAreaToClose",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Reward_LuniteSubscriptionReward_001.png"
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_F2_Guidebook_Activity_Reward_001_EN.png",
                 ],
             },
@@ -490,10 +490,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-离开副本|LeaveInstance",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     # "UI_ESC_LeaveInstance_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_ESC_LeaveInstance_001_EN.png",
                 ],
             },
@@ -538,10 +538,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="UI-离开副本|LeaveInstance-NightmareHecate",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     # "UI_ESC_LeaveInstance_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     # "UI_ESC_LeaveInstance_001_EN.png",
                 ],
             },
@@ -579,10 +579,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="F-进入凝素领域|EnterForgeryChallenge",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "F_EnterForgeryChallenge_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "F_EnterForgeryChallenge_001_EN.png",
                 ],
             },
@@ -609,10 +609,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="F-进入凝素领域|EnterForgeryChallenge",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "F_EnterForgeryChallenge_001.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "F_EnterForgeryChallenge_001_EN.png",
                 ],
             },
@@ -653,11 +653,11 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="Reward-领取奖励|ClaimRewards-凝素领域|ForgeryChallenge",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Reward_ClaimRewards_001.png",
                     "Reward_ClaimRewards_002.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "Reward_ClaimRewards_001_EN.png",
                 ],
             },
@@ -694,11 +694,11 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="Reward-领取奖励|ClaimRewards-无音清剿|TacetSuppression",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "Reward_ClaimRewards_001.png",
                     "Reward_ClaimRewards_002.png",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "Reward_ClaimRewards_001_EN.png",
                 ],
             },
@@ -732,9 +732,9 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="Reward-领取奖励|ClaimRewards-Boss",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                 ],
-                Languages.EN: [
+                Language.EN: [
                 ],
             },
             targetTexts=[
@@ -767,10 +767,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="失去意识",
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "",
                 ],
             },
@@ -1358,10 +1358,10 @@ class PageEventAbstractService(PageEventService, ABC):
         return Page(
             name="开启挑战|StartChallenge",  # 副本选完刷取等级后，点击单人挑战后弹出的队伍选择页面
             screenshot={
-                Languages.ZH: [
+                Language.ZH: [
                     "",
                 ],
-                Languages.EN: [
+                Language.EN: [
                     "UI_Boss_StartChallenge_001_EN.png",
                 ],
             },
@@ -1578,7 +1578,7 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if self._info.lastBossName in [
             BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value,
-            BossNameEnum.SeedOfLllusoryOrigin.value,
+            BossNameEnum.SeedOfIllusoryOrigin.value,
             BossNameEnum.Denia.value
         ]:
             self.absorption_action_fleurdelys()
@@ -2130,7 +2130,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._info.waitBoss = True
                 return True
 
-        self._control_service.guide_book()
+        self._control_service.guidebook()
         time.sleep(1)
         if not self._ocr_service.wait_text(["日志", "活跃", "挑战", "强者", "残象", "周期", "探寻", "漂泊", "素材获取"],
                                            timeout=7):
@@ -2303,7 +2303,7 @@ class PageEventAbstractService(PageEventService, ABC):
         enemyTracingSidebar = [scaler.as_point(p) for p in self.enemyTracingSidebar]
         milestonesSidebar = scaler.as_point(self.milestonesSidebar)
 
-        if bossName == BossNameEnum.SeedOfLllusoryOrigin.value:
+        if bossName == BossNameEnum.SeedOfIllusoryOrigin.value:
             self._control_service.click(*materialsSpotsSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^(战歌重奏)$")
@@ -2653,7 +2653,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     BossNameEnum.Fleurdelys.value,
                     BossNameEnum.ThrenodianLeviathan.value,
                     BossNameEnum.Sigillum.value,
-                    BossNameEnum.SeedOfLllusoryOrigin.value,
+                    BossNameEnum.SeedOfIllusoryOrigin.value,
                     BossNameEnum.Denia.value,
                 ]
                 )

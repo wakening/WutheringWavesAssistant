@@ -10,11 +10,11 @@ from typing import Callable, Dict, List, Optional, Any
 import numpy as np
 from pydantic import BaseModel, Field, PrivateAttr
 
-from src.core.boss import MoveMode, Direction
 from src.core.color import ColorRule, ColorMatch, Color, RuleMode
 from src.core.exceptions import StopError
 from src.core.geometry import TextBox, BBox, Scaler, AnchorBBox, AnchorPoint, Align, PointKind, Point
-from src.core.languages import Languages
+from src.core.i18n import I18nPage, I18nPageEchoMerge, Language
+from src.core.movement import RouteExecutor, MoveStep
 from src.core.regions import Position, DynamicPosition, TextPosition, Pos
 from src.util import img_util, file_util
 
@@ -96,7 +96,7 @@ class Page(BaseModel):
 
     matchPositions: Dict[str, Position] = Field(default_factory=dict, title="匹配位置")
 
-    screenshot: dict[Languages, list[str]] = Field(
+    screenshot: dict[Language, list[str]] = Field(
         default_factory=dict,
         title="页面截图，默认1280x720",
         description="页面匹配了哪些页面，截图放到assets/screenshot，方便调试与排查问题，无任何运行时作用",
@@ -315,11 +315,6 @@ def match_with_index(
     raise RuntimeError("不应该出现")  # 理论上不会触发
 
 
-def flex_ws(text: str):
-    """将字符串内的空白字符 替换为 任意空白正则字符串"""
-    return re.sub(r"\s+", r"\\s*?", text)
-
-
 class IMatch(ABC):
 
     @abstractmethod
@@ -428,1079 +423,11 @@ class RegexPage(IMatch):
         raise NotImplementedError("Page callback function not implemented")
 
 
-class I18nPage:
-    """语义key"""
-    Name = "name"
-    Include = "include"
-    Exclude = "exclude"
-    Assets = "assets"
-    # sub key
-    Text = "text"
-    Limit = "limit"
-
-
-    class UI_ESC_Terminal:
-        PAGE = "UI_ESC_Terminal"
-        Terminal = "Terminal"
-        Team = "Team"
-        Events = "Events"
-        DataBank = "DataBank"
-
-    class Reward_LuniteSubscriptionReward:
-        PAGE = "Reward_LuniteSubscriptionReward"
-        Reward = "Reward"
-
-    class Reward_ReceiveRewards:
-        PAGE = "Reward_ReceiveRewards"
-        ClaimRewards = "ClaimRewards"
-        Confirm = "Confirm"
-        Cancel = "Cancel"
-
-    class Boss_Crownless_ResonanceCord:
-        PAGE = "Boss_Crownless_ResonanceCord"
-        ResonanceCord = "ResonanceCord"
-
-    class Boss_Dreamless_Enter:
-        PAGE = "Boss_Dreamless_Enter"
-        Dreamless = "Dreamless"
-        Heart = "Heart"
-        Enter = "Enter"
-        Confirm = "Confirm"
-        FastTravel = "FastTravel"
-
-    class Boss_Jue_Enter:
-        PAGE = "Boss_Jue_Enter"
-        Enter = "Enter"
-        Confirm = "Confirm"
-
-    class Boss_Hecate_Enter:
-        PAGE = "Boss_Hecate_Enter"
-        Enter = "Enter"
-        Confirm = "Confirm"
-
-    class Boss_RecommendedLevel:
-        PAGE = "Boss_RecommendedLevel"
-        RecommendedLevel = "RecommendedLevel"
-        SoloChallenge = "SoloChallenge"
-        ClaimsRemaining = "ClaimsRemaining"
-
-    class Boss_StartChallenge:
-        PAGE = "Boss_StartChallenge"
-        QuickSetup = "QuickSetup"
-        StartChallenge = "StartChallenge"
-
-    class Fight_Fight:
-        PAGE = "Fight_Fight"
-        Fight = "Fight"
-        Activity = "Activity"
-        ChallengeCompleted = "ChallengeCompleted"
-
-    class Fight_Absorption:
-        PAGE = "Fight_Absorption"
-        Absorb = "Absorb"
-        ClaimRewards = "ClaimRewards"
-
-    class Fight_ChallengeCompleted:
-        PAGE = "Fight_ChallengeCompleted"
-        ChallengeCompleted = "ChallengeCompleted"
-
-    class Fight_ClickAlternatelyToBreakFree:
-        PAGE = "Fight_ClickAlternatelyToBreakFree"
-        ClickAlternatelyToBreakFree = "ClickAlternatelyToBreakFree"
-
-    class UI_ESC_LeaveInstance:
-        PAGE = "UI_ESC_LeaveInstance"
-        Note = "Note"
-        Confirm = "Confirm"
-        Restart = "Restart"
-
-    class Notice_LeaveInstance_NightmareHecate:
-        PAGE = "Notice_LeaveInstance_NightmareHecate"
-        Notice = "Notice"
-        Leave = "Leave"
-        Confirm = "Confirm"
-        Cancel = "Cancel"
-
-    class Notice_LoseConsciousness:
-        PAGE = "Notice_LoseConsciousness"
-        LoseConsciousness = "LoseConsciousness"
-        Revive = "Revive"
-
-    class Notice_SelectRevivalItem:
-        PAGE = "Notice_SelectRevivalItem"
-        SelectRevivalItem = "SelectRevivalItem"
-
-    class Notice_Replenish_Waveplate:
-        PAGE = "Notice_Replenish_Waveplate"
-        ReplenishWaveplate = "Replenish_Waveplate"
-
-    class Notice_BlankArea:
-        PAGE = "Notice_BlankArea"
-        BlankArea = "BlankArea"
-
-    class Login_ClickLink:
-        PAGE = "Login_ClickLink"
-        ClickLink = "ClickLink"
-
-    class Login_AccountLogin:
-        PAGE = "Login_AccountLogin"
-        Text = "Text"
-        Login = "Login"
-        ClickLink = "ClickLink"
-
-    class Login_Disconnected:
-        PAGE = "Login_Disconnected"
-        Disconnected = "Disconnected"
-        LoginTimeout = "LoginTimeout"
-        Confirm = "Confirm"
-
-    class SystemNotice_UpdateCompleteExit:
-        PAGE = "SystemNotice_UpdateCompleteExit"
-        UpdateComplete = "UpdateComplete"
-        Exit = "Exit"
-
-    class SystemNotice_Confirm_DriverVersion:
-        PAGE = "SystemNotice_Confirm_DriverVersion"
-        DriverVersion = "DriverVersion"
-        Confirm = "Confirm"
-
-    class SystemNotice_NetworkTimeout:
-        PAGE = "SystemNotice_NetworkTimeout"
-        SystemNotice = "SystemNotice"
-        NetworkTimeout = "NetworkTimeout"
-        Confirm = "Confirm"
-
-
-# ------------- Global Page --------------
-
-I18N_PAGES = {
-
-    # ----------- UI -----------
-
-    I18nPage.UI_ESC_Terminal.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "UI-终端",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_Terminal.Terminal: {
-                    I18nPage.Text: r"^终端$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.UI_ESC_Terminal.Team: r"^编队$",
-                I18nPage.UI_ESC_Terminal.Events: r"^活动$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001.png"],
-        },
-        Languages.EN: {
-            I18nPage.Name: "UI-Terminal",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_Terminal.Terminal: {
-                    I18nPage.Text: r"^Terminal$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.UI_ESC_Terminal.Team: r"^Team$",
-                I18nPage.UI_ESC_Terminal.Events: r"^Events$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-
-    # ----------- Reward -----------
-
-    I18nPage.Reward_LuniteSubscriptionReward.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "每日月卡奖励",
-            I18nPage.Include: {
-                I18nPage.Reward_LuniteSubscriptionReward.Reward: r"点击领取今日月相观测卡奖励",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["Reward_LuniteSubscriptionReward_001.png"],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Lunite Subscription reward",
-            I18nPage.Include: {
-                # I18nPage.Reward_LuniteSubscriptionReward.Reward: flex_ws(r"claim today's Lunite Subscription reward"),
-                I18nPage.Reward_LuniteSubscriptionReward.Reward: flex_ws(r"claim today.*Lunite Subscription reward"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-
-    I18nPage.Reward_ReceiveRewards.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "领取奖励",
-            I18nPage.Include: {
-                I18nPage.Reward_ReceiveRewards.ClaimRewards: r"^领取奖励$",
-                I18nPage.Reward_ReceiveRewards.Confirm: r"^确认$",
-                I18nPage.Reward_ReceiveRewards.Cancel: r"^取消$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Boss -----------
-
-    I18nPage.Boss_Crownless_ResonanceCord.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "无冠者-声弦",
-            I18nPage.Include: {
-                I18nPage.Boss_Crownless_ResonanceCord.ResonanceCord: r"^声弦$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Crownless-ResonanceCord",
-            I18nPage.Include: {
-                I18nPage.Boss_Crownless_ResonanceCord.ResonanceCord: flex_ws(r"^Resonance Cord$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Dreamless_Enter.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "无冠者之像·心脏",
-            I18nPage.Include: {
-                I18nPage.Boss_Dreamless_Enter.Dreamless: r"无冠者之像",
-                I18nPage.Boss_Dreamless_Enter.Heart: r"心脏",
-                I18nPage.Boss_Dreamless_Enter.Enter: r"进入",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Boss_Dreamless_Enter.Confirm: r"^确认$",
-                I18nPage.Boss_Dreamless_Enter.FastTravel: r"快速旅行",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Jue_Enter.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "角-时序之寰",
-            I18nPage.Include: {
-                I18nPage.Boss_Jue_Enter.Enter: r"进入时序之",
-                I18nPage.Boss_Jue_Enter.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Hecate_Enter.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "声之领域|梦魇领域|最终章",
-            I18nPage.Include: {
-                I18nPage.Boss_Hecate_Enter.Enter: r"^(进入声之领域|进入梦.?领域|进入.*最终章.*)$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Boss_Hecate_Enter.Confirm: r"^确认$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_RecommendedLevel.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "推荐等级",
-            I18nPage.Include: {
-                I18nPage.Boss_RecommendedLevel.RecommendedLevel: r"推荐等级",
-                I18nPage.Boss_RecommendedLevel.SoloChallenge: r"单人挑战",
-                I18nPage.Boss_RecommendedLevel.ClaimsRemaining: r"可收取次数",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_StartChallenge.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "开启挑战",
-            I18nPage.Include: {
-                I18nPage.Boss_StartChallenge.QuickSetup: r"^快速编队$",
-                I18nPage.Boss_StartChallenge.StartChallenge: r"^开启挑战$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "StartChallenge",
-            I18nPage.Include: {
-                I18nPage.Boss_StartChallenge.QuickSetup: r"^QuickSetup$",
-                I18nPage.Boss_StartChallenge.StartChallenge: r"^StartChallenge$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Fight -----------
-
-    I18nPage.Fight_Fight.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "战斗画面",
-            I18nPage.Include: {
-                I18nPage.Fight_Fight.Fight: r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Fight_Fight.Activity: r"^活跃度$",
-                I18nPage.Fight_Fight.ChallengeCompleted: r"^挑战成功$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_Absorption.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "吸收",
-            I18nPage.Include: {
-                I18nPage.Fight_Absorption.Absorb: r"^吸收$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Fight_Absorption.ClaimRewards: r"^领取奖励$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_ChallengeCompleted.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "挑战成功",
-            I18nPage.Include: {
-                I18nPage.Fight_ChallengeCompleted.ChallengeCompleted: r"^挑战成功$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_ClickAlternatelyToBreakFree.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "交替点击进行挣脱",
-            I18nPage.Include: {
-                I18nPage.Fight_ClickAlternatelyToBreakFree.ClickAlternatelyToBreakFree: r"^交替点击进行挣脱$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Click alternately to break free",
-            I18nPage.Include: {
-                I18nPage.Fight_ClickAlternatelyToBreakFree.ClickAlternatelyToBreakFree: flex_ws(r"^Click alternately to break free$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Notice -----------
-
-    I18nPage.UI_ESC_LeaveInstance.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "UI-离开副本",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_LeaveInstance.Note: r"^提示$",
-                I18nPage.UI_ESC_LeaveInstance.Confirm: r"^确认$",
-                I18nPage.UI_ESC_LeaveInstance.Restart: r"^重新挑战$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "UI-LeaveInstance",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_LeaveInstance.Note: r"^Note$",
-                I18nPage.UI_ESC_LeaveInstance.Confirm: r"^Confirm$",
-                I18nPage.UI_ESC_LeaveInstance.Restart: r"^Restart$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_LeaveInstance_001_EN.png"],
-        },
-    },
-
-    I18nPage.Notice_LeaveInstance_NightmareHecate.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "Notice-离开副本-梦魇赫卡忒",
-            I18nPage.Include: {
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Notice: r"^提示$",
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Leave: r"^确认离开$",
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Confirm: r"^确认$",
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Cancel: r"^取消$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Notice-LeaveInstance-NightmareHecate",
-            I18nPage.Include: {
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Notice: r"^Notice$",
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Leave: flex_ws(r"Leave this domain"),
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Confirm: r"^Confirm$",
-                I18nPage.Notice_LeaveInstance_NightmareHecate.Cancel: r"^Cancel$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_LoseConsciousness.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "失去意识",
-            I18nPage.Include: {
-                I18nPage.Notice_LoseConsciousness.LoseConsciousness: r"失去意识",
-                I18nPage.Notice_LoseConsciousness.Revive: r"复苏",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_SelectRevivalItem.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "选择复苏物品",
-            I18nPage.Include: {
-                I18nPage.Notice_SelectRevivalItem.SelectRevivalItem: r"选择复苏物品",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_Replenish_Waveplate.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "补充结晶波片",
-            I18nPage.Include: {
-                I18nPage.Notice_Replenish_Waveplate.ReplenishWaveplate: r"补充结晶波片",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_BlankArea.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "空白区域",
-            I18nPage.Include: {
-                I18nPage.Notice_BlankArea.BlankArea: r"空白区域",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Login -----------
-
-    I18nPage.Login_ClickLink.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "点击连接",
-            I18nPage.Include: {
-                I18nPage.Login_ClickLink.ClickLink: r"^点击连接$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Tap to land in Solaris-3",
-            I18nPage.Include: {
-                # I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"Tap to land in Solaris-3"),
-                I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"^Tap to land in Solaris*"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Login_AccountLogin.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "账户登录",
-            I18nPage.Include: {
-                I18nPage.Login_AccountLogin.Text: r"^(退出|公告|修复)$",
-                I18nPage.Login_AccountLogin.Login: r"^登入$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Login_AccountLogin.ClickLink: r"点击连接",
-            },
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "AccountLogin",
-            I18nPage.Include: {
-                I18nPage.Login_AccountLogin.Text: r"^(Exit|Notice|Repair)$",
-                I18nPage.Login_AccountLogin.Login: r"^Login$",
-            },
-            I18nPage.Exclude: {
-                # I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"Tap to land in Solaris-3"),
-                I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"^Tap to land in Solaris*"),
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Login_Disconnected.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "连接已断开",
-            I18nPage.Include: {
-                I18nPage.Login_Disconnected.Disconnected: r"连接已断开",
-                I18nPage.Login_Disconnected.LoginTimeout: r"登录超时",
-                I18nPage.Login_Disconnected.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- System Notice -----------
-
-    I18nPage.SystemNotice_UpdateCompleteExit.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "更新完成，请重新启动游戏",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_UpdateCompleteExit.UpdateComplete: r"更新完成.*请重新启动游戏",
-                I18nPage.SystemNotice_UpdateCompleteExit.Exit: r"^退出$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.SystemNotice_Confirm_DriverVersion.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "检测到设备显卡驱动版本过旧",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_Confirm_DriverVersion.DriverVersion: r"显卡驱动版本过旧",
-                I18nPage.SystemNotice_Confirm_DriverVersion.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.SystemNotice_NetworkTimeout.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "系统提示-网络请求超时",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_NetworkTimeout.SystemNotice: r"系统提示",
-                I18nPage.SystemNotice_NetworkTimeout.NetworkTimeout: r"网络请求超时",
-                I18nPage.SystemNotice_NetworkTimeout.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-}
-
-# ------------- Echo Merge 声骸融合 --------------
-
-class I18nPageEchoMerge(I18nPage):
-
-    class DataBank:
-        PAGE = "DataBank"
-        DataBankInfo = "DataBankInfo"
-        Rewards = "Rewards"
-
-    # class DataBank_EchoGallery:
-    #     PAGE = "DataBank_EchoGallery"
-    #     EchoGallery = "EchoGallery"
-    #
-    # class DataBank_SonataGallery:
-    #     PAGE = "DataBank_SonataGallery"
-    #     SonataGallery = "SonataGallery"
-
-    class DataMerge:
-        PAGE = "DataMerge"
-        DataMerge = "DataMerge"
-        TargetedMerge = "TargetedMerge"
-        StandardMerge = "StandardMerge"
-
-    class StandardMerge_SelectAll:
-        PAGE = "DataMerge_SelectAll"
-        SelectAll = "SelectAll"
-        DataMergeCount = "DataMergeCount"
-        StandardMerge = "StandardMerge"
-
-    class Notice_IncludesHighRarity:
-        PAGE = "Notice_High_Rarity"
-        Notice = "Notice"
-        HighRarity = "HighRarity"
-        DoNotShowAgain = "DoNotShowAgain"
-        Confirm = "Confirm"
-
-    class NewEcho:
-        PAGE = "NewEcho"
-        NewEcho = "NewEcho"
-
-    # class DataBank_DataModify:
-    #     PAGE = "DataBank_DataModify"
-    #     DataModify = "DataModify"
-    #
-    # class DataBank_EchoManagement:
-    #     PAGE = "DataBank_EchoManagement"
-    #     EchoManagement = "EchoManagement"
-
-
-I18N_PAGES_ECHO_MERGE = {
-    I18nPage.UI_ESC_Terminal.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "UI-终端",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_Terminal.Terminal: {
-                    I18nPage.Text: r"^终端$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.UI_ESC_Terminal.Team: r"^编队$",
-                I18nPage.UI_ESC_Terminal.Events: r"^活动$",
-                I18nPage.UI_ESC_Terminal.DataBank: r"^数据坞$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001.png"],
-        },
-        Languages.EN: {
-            I18nPage.Name: "UI-Terminal",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_Terminal.Terminal: {
-                    I18nPage.Text: r"^Terminal$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.UI_ESC_Terminal.Team: r"^Team$",
-                I18nPage.UI_ESC_Terminal.Events: r"^Events$",
-                I18nPage.UI_ESC_Terminal.DataBank: flex_ws(r"^Data Bank$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-    I18nPageEchoMerge.DataBank.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "数据坞",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataBank.DataBankInfo: r"^数据坞信息$",
-                I18nPageEchoMerge.DataBank.Rewards: r"^奖励$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "DataBank",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataBank.DataBankInfo: flex_ws(r"^Data Bank Info$"),
-                I18nPageEchoMerge.DataBank.Rewards: r"^Rewards$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-
-    },
-    I18nPageEchoMerge.DataMerge.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "数据坞-数据融合",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataMerge.TargetedMerge: r"定向融合$",
-                I18nPageEchoMerge.DataMerge.StandardMerge: r"标准融合$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "DataBank-DataMerge",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataMerge.TargetedMerge: flex_ws(r"Targeted Merge$"),
-                I18nPageEchoMerge.DataMerge.StandardMerge: flex_ws(r"Standard Merge$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.StandardMerge_SelectAll.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "标准融合-全选",
-            I18nPage.Include: {
-                I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll: r"^全选",
-                I18nPageEchoMerge.StandardMerge_SelectAll.StandardMerge: r"^标准融合$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "StandardMerge-SelectAll",
-            I18nPage.Include: {
-                I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll: flex_ws(r"^Select All"),
-                # I18nPageEchoMerge.StandardMerge_SelectAll.DataMergeCount: flex_ws(r"Data Merge Count"),
-                I18nPageEchoMerge.StandardMerge_SelectAll.StandardMerge: flex_ws(r"^Standard Merge$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.Notice_IncludesHighRarity.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "提示-包含品质较高的声骸",
-            I18nPage.Include: {
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Notice: r"^提示$",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.HighRarity: r"包含品质较高",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain: r"本次登录不再提示",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Notice-IncludesHighRarity",
-            I18nPage.Include: {
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Notice: flex_ws(r"^Notice$"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.HighRarity: flex_ws(r"High Rarity"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain: flex_ws(r"Do not show again"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm: flex_ws(r"^Confirm$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.NewEcho.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "获得声骸",
-            I18nPage.Include: {
-                I18nPageEchoMerge.NewEcho.NewEcho: r"获得声骸",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "NewEcho",
-            I18nPage.Include: {
-                I18nPageEchoMerge.NewEcho.NewEcho: flex_ws(r"New Echo"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-
-}
-
-# ------------- Guidebook --------------
-
-class I18nPageGuidebook(I18nPage):
-
-    class Activity:
-        pass
-
-    class MaterialsSpots:
-        PAGE = "MaterialsSpots"
-        ForgeryChallenge = "ForgeryChallenge"
-        SimulationChallenge = "SimulationChallenge"
-        BossChallenge = "BossChallenge"
-        TacetSuppression = "TacetSuppression"
-        WeeklyChallenge = "WeeklyChallenge"
-        NightmarePurification = "NightmarePurification"
-        TacetDiscordNest = "TacetDiscordNest"
-
-    class RecurringChallenges:
-        pass
-
-    class PathOfGrowth:
-        pass
-
-    class EnemyTracing:
-        pass
-
-    class Milestones:
-        pass
-
-
-I18N_PAGES_GUIDEBOOK = {
-    I18nPageGuidebook.MaterialsSpots.PAGE: {
-        Languages.ZH: {
-            I18nPage.Name: "素材获取",
-            I18nPage.Include: {
-                # 产出武器及技能材料
-                I18nPageGuidebook.MaterialsSpots.ForgeryChallenge: r"^凝素领域$",
-                # 产出经验材料
-                I18nPageGuidebook.MaterialsSpots.SimulationChallenge: r"^模拟领域$",
-                # 产出共鸣者突破材料
-                I18nPageGuidebook.MaterialsSpots.BossChallenge: r"^讨伐强敌$",
-                # 产出声骸材料
-                I18nPageGuidebook.MaterialsSpots.TacetSuppression: r"^无音清剿$",
-                # 产出高级技能材料
-                I18nPageGuidebook.MaterialsSpots.WeeklyChallenge: r"^战歌重奏$",
-                # 产出梦魇声骸
-                I18nPageGuidebook.MaterialsSpots.NightmarePurification: r"^梦魇祓除$",
-                # 产出声骸套件
-                I18nPageGuidebook.MaterialsSpots.TacetDiscordNest: r"^残像聚落$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Languages.EN: {
-            I18nPage.Name: "Materials Spots",
-            I18nPage.Include: {
-                I18nPageGuidebook.MaterialsSpots.ForgeryChallenge: flex_ws(r"^Forgery Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.SimulationChallenge: flex_ws(r"^Simulation Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.BossChallenge: flex_ws(r"^Boss Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.TacetSuppression: flex_ws(r"^Tacet Suppression$"),
-                I18nPageGuidebook.MaterialsSpots.WeeklyChallenge: flex_ws(r"^Weekly Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.NightmarePurification: flex_ws(r"^Nightmare Purification$"),
-                I18nPageGuidebook.MaterialsSpots.TacetDiscordNest: flex_ws(r"^Tacet Discord Nest$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-
-    },
-
-}
-
-
-class I18nText:
-    # ------- game window title -------
-    WutheringWaves = "WutheringWaves"
-
-    # ------- login -------
-    Login = "Login"
-
-    # ------- map -------
-    FastTravel = "FastTravel"
-
-    # ------- combat -------
-    Absorb = "Absorb"
-
-    # ------- terminal -------
-    DataBank = "DataBank"
-    Guidebook = "Guidebook"
-
-    # ------- data bank -------
-    TargetedMerge = "TargetedMerge"
-    StandardMerge = "StandardMerge"
-    PleaseSelectAtLeast5Echoes = "PleaseSelectAtLeast5Echoes"
-    DataMergeCount = "DataMergeCount"
-
-    # ------- Guidebook -------
-    Activity = "Activity"
-    MaterialsSpots = "MaterialsSpots"
-    RecurringChallenges = "RecurringChallenges"
-    PathOfGrowth = "PathOfGrowth"
-    EnemyTracing = "EnemyTracing"
-    Milestones = "Milestones"
-
-    ## ------- Guidebook MaterialsSpots -------
-    ForgeryChallenge = "ForgeryChallenge"
-    SimulationChallenge = "SimulationChallenge"
-    BossChallenge = "BossChallenge"
-    TacetSuppression = "TacetSuppression"
-    WeeklyChallenge = "WeeklyChallenge"
-    NightmarePurification = "NightmarePurification"
-    TacetDiscordNest = "TacetDiscordNest"
-
-    ### ------- Guidebook MaterialsSpots tacetDiscordNest -------
-    # LahaiRoi = "LahaiRoi"
-    StarblindCrashsiteTacetDiscordNest = "StarblindCrashsiteTacetDiscordNest"
-    RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
-    StagnantRunTacetDiscordNest = "StagnantRunTacetDiscordNest"
-    # TacetDiscordNest = "TacetDiscordNest"
-    TacetDiscordDefeated = "TacetDiscordDefeated"
-    Go = "Go"
-
-    # ------- Home TacetDiscordNest -------
-    ClearTheTacetDiscordNest = "ClearTheTacetDiscordNest"
-    TacetDiscordNestCleared = "TacetDiscordNestCleared"
-
-
-I18N_TEXT = {
-    # ------- game window title -------
-    I18nText.WutheringWaves: {
-        Languages.ZH: "鸣潮  ",
-        Languages.EN: "Wuthering Waves  ",
-    },
-
-    # ------- login -------
-    I18nText.Login: {
-        Languages.ZH: r"^登录$",
-        Languages.EN: flex_ws(r"^Login$"),
-    },
-
-    # ------- map -------
-    I18nText.FastTravel: {
-        Languages.ZH: r"^快速旅行$",
-        Languages.EN: flex_ws(r"^Fast Travel$"),
-    },
-
-    # ------- combat -------
-    I18nText.Absorb: {
-        Languages.ZH: r"^吸收$",
-        Languages.EN: flex_ws(r"^Absorb$"),
-    },
-
-    # ------- terminal -------
-    I18nText.DataBank: {
-        Languages.ZH: r"^数据坞$",
-        Languages.EN: flex_ws(r"^Data Bank$"),
-    },
-    I18nText.Guidebook: {
-        Languages.ZH: r"^索拉指南$",
-        Languages.EN: flex_ws(r"^Guidebook$"),
-    },
-
-    # ------- data bank -------
-    I18nText.TargetedMerge: {
-        Languages.ZH: r"^定向融合$",
-        Languages.EN: flex_ws(r"^Targeted Merge$"),
-    },
-    I18nText.StandardMerge: {
-        Languages.ZH: r"^标准融合$",
-        Languages.EN: flex_ws(r"^Standard Merge$"),
-    },
-    I18nText.PleaseSelectAtLeast5Echoes: {
-        # Languages.ZH: r"^请至少放入5个声骸",
-        Languages.ZH: r"^请至少放入",
-        # Languages.EN: flex_ws(r"^Please select at least 5 Echoes"),
-        Languages.EN: flex_ws(r"^Please select at least"),
-    },
-    I18nText.DataMergeCount: {
-        Languages.ZH: r"^数据融合次数",
-        Languages.EN: flex_ws(r"^Data Merge Count"),
-    },
-
-    # ------- Guidebook -------
-    I18nText.Activity: {
-        Languages.ZH: r"^活跃度$",
-        Languages.EN: flex_ws(r"^Activity$"),
-    },
-    I18nText.MaterialsSpots: {
-        Languages.ZH: r"^素材获取$",
-        Languages.EN: flex_ws(r"^Materials Spots$"),
-    },
-    I18nText.RecurringChallenges: {
-        Languages.ZH: r"^周期挑战$",
-        Languages.EN: flex_ws(r"^Recurring Challenges$"),
-    },
-    I18nText.PathOfGrowth: {
-        Languages.ZH: r"^强者之路$",
-        Languages.EN: flex_ws(r"^Path of Growth$"),
-    },
-    I18nText.EnemyTracing: {
-        Languages.ZH: r"^敌迹探寻$",
-        Languages.EN: flex_ws(r"^Enemy Tracing$"),
-    },
-    I18nText.Milestones: {
-        Languages.ZH: r"^漂泊日志$",
-        Languages.EN: flex_ws(r"^Milestones$"),
-    },
-
-    ## ------- Guidebook MaterialsSpots -------
-    # 产出武器及技能材料
-    I18nText.ForgeryChallenge: {
-        Languages.ZH: r"^凝素领域$",
-        Languages.EN: flex_ws(r"^Forgery Challenge$"),
-    },
-    # 产出经验材料
-    I18nText.SimulationChallenge: {
-        Languages.ZH: r"^模拟领域$",
-        Languages.EN: flex_ws(r"^Simulation Challenge$"),
-    },
-    # 产出共鸣者突破材料
-    I18nText.BossChallenge: {
-        Languages.ZH: r"^讨伐强敌$",
-        Languages.EN: flex_ws(r"^Boss Challenge$"),
-    },
-    # 产出声骸材料
-    I18nText.TacetSuppression: {
-        Languages.ZH: r"^无音清剿$",
-        Languages.EN: flex_ws(r"^Tacet Suppression$"),
-    },
-    # 产出高级技能材料
-    I18nText.WeeklyChallenge: {
-        Languages.ZH: r"^战歌重奏$",
-        Languages.EN: flex_ws(r"^Weekly Challenge$"),
-    },
-    # 产出梦魇声骸
-    I18nText.NightmarePurification: {
-        Languages.ZH: r"^梦魇祓除$",
-        Languages.EN: flex_ws(r"^Nightmare Purification$"),
-    },
-    # 产出声骸套件
-    I18nText.TacetDiscordNest: {
-        Languages.ZH: r"^残象聚落$",
-        Languages.EN: flex_ws(r"^Tacet Discord Nest$"),
-    },
-
-    ### ------- Guidebook MaterialsSpots tacetDiscordNest -------
-    # I18nText.LahaiRoi: {
-    #     Languages.ZH: r"^拉海洛$",
-    #     Languages.EN: flex_ws(r"^Lahai-Roi$"),
-    # },
-    I18nText.StarblindCrashsiteTacetDiscordNest: {
-        Languages.ZH: r"^盲望之塌残象聚落$",
-        # Languages.EN: flex_ws(r"^Starblind Crashsite Tacet Discord Nest"),
-        Languages.EN: flex_ws(r"^Starblind Crashsite"),
-    },
-    I18nText.RebirthUplandsTacetDiscordNest: {
-        Languages.ZH: r"^复生丘原残象聚落$",
-        # Languages.EN: flex_ws(r"^Rebirth Uplands Tacet Discord Nest"),
-        Languages.EN: flex_ws(r"^Rebirth Uplands"),
-    },
-    I18nText.StagnantRunTacetDiscordNest: {
-        Languages.ZH: r"^陷足流川残象聚落$",
-        # Languages.EN: flex_ws(r"^Stagnant RunTacet Discord Nest"),
-        Languages.EN: flex_ws(r"^Stagnant Run"),
-    },
-    I18nText.TacetDiscordDefeated: {
-        # 已击败残象:0/48
-        Languages.ZH: r"^已击败残象.*\d.*",
-        # TDs defeated: 0/48
-        Languages.EN: flex_ws(r"^TDs defeated.*\d.*"),
-    },
-    I18nText.Go: {
-        Languages.ZH: r"^前往$",
-        Languages.EN: flex_ws(r"^Go$"),
-    },
-
-    # ------- Home TacetDiscordNest -------
-    I18nText.ClearTheTacetDiscordNest: {
-        Languages.ZH: r"^清理聚落中的残象$",
-        Languages.EN: flex_ws(r"^Clear the Tacet Discord Nest$"),
-    },
-    I18nText.TacetDiscordNestCleared: {
-        Languages.ZH: r"^残象聚落已清理$",
-        Languages.EN: flex_ws(r"^Tacet Discord Nest Cleared$"),
-    },
-
-
-
-}
-
-
-class I18nTr:
-
-    def __init__(self, lang: Languages):
-        self._lang = lang
-
-    def __call__(self, text_key: str):
-        return self.t(text_key)
-
-    def t(self, text_key: str):
-        return I18N_TEXT.get(text_key).get(self._lang)
-
-
 class I18nPageX:
 
     def __init__(self, data: dict | str):
         self.data: dict = json.loads(data) if isinstance(data, str) else data
-        self.i18n_regex_pages: dict[Languages, dict[str, RegexPage]] = {}
+        self.i18n_regex_pages: dict[Language, dict[str, RegexPage]] = {}
         for page_key, k_lang_v_page in self.data.items():
             for k_lang, v_page in k_lang_v_page.items():
                 self.i18n_regex_pages.setdefault(k_lang, {})[page_key] = RegexPage(page_key, v_page)
@@ -1547,7 +474,7 @@ class OcrResult:
         :return:
         """
         if not regex_str:
-            raise ValueError()
+            raise ValueError("Text cannot be empty")
         if not self.has_results():
             return None
         found_boxes = []
@@ -1555,10 +482,10 @@ class OcrResult:
         patterns = [_cached_compile_regex(i, flags) for i in regex_str]
         for text_box in self.results:
             for index, pattern in enumerate(patterns):
+                if roi and not roi.contains_bbox(text_box):
+                    continue
                 match = pattern.search(text_box.text)
                 if not match:
-                    continue
-                if roi and not roi.contains_bbox(text_box):
                     continue
                 if with_index:
                     found_boxes.append((index, text_box))
@@ -1591,14 +518,17 @@ class OcrResult:
 
 class Wait:
 
-    def __init__(self, timeout: float, interval: float):
+    def __init__(self, timeout: float, interval: float, event = None):
         self.timeout = timeout  # 单位都是秒
         self.interval = interval
+        self.event = event
 
-    def until(self, fn, *, predicate=bool):
+    def until(self, fn: Callable, *, predicate=bool):
         deadline = time.monotonic() + self.timeout
 
         while time.monotonic() < deadline:
+            if self.event and not self.event.is_set():
+                raise StopError()
             res = fn()
             if predicate(res):
                 return res
@@ -1617,34 +547,49 @@ class OcrQuery:
         # 保证每张图只查一次，及时抛出异常提醒
         self._is_query = False
 
-    def grab(self, img: Optional[np.ndarray] = None) -> "OcrQuery":
+    def grab(self, roi: Optional[BBox | AnchorBBox] = None, img: Optional[np.ndarray] = None) -> "OcrQuery":
         if img is None:
-            self.img = self.ctx.img_service.screenshot()
-        else:
-            self.img = img
+            img = self.ctx.img_service.screenshot()
+        if roi and img is not None:
+            if isinstance(roi, AnchorBBox):
+                roi = self.ctx.scaler.as_bbox(roi)
+            img = img[roi.as_slice()]
+        self.img = img
         self._is_query = False
         return self
 
-    def query(self) -> "OcrQuery":
+    def query(self, roi: BBox | None = None, resize: bool = True) -> "OcrQuery":
         if self._is_query:
             raise Exception("OcrQuery is already query")
-        self.results = self.ctx.ocr_service.query(self.img)
+        if not self.ctx.runtime.stop_event.is_set():
+            raise StopError()
+        self.results = self.ctx.ocr_service.query(self.img, roi=roi, resize=resize)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"ocr result: {self.results.results}")
         self._is_query = True
+        if not self.ctx.runtime.stop_event.is_set():
+            raise StopError()
+        return self
+
+    def snapshot(self, roi: Optional[BBox | AnchorBBox] = None, img: Optional[np.ndarray] = None, resize: bool = True) -> "OcrQuery":
+        self.grab(img=img).query(roi=roi, resize=resize)
         return self
 
     def has_results(self) -> bool:
         return bool(self.results) and self.results.has_results()
 
-    def search(self, regex_str: str | list[str], roi: Optional[BBox] = None, flags=re.I) -> Optional[list[TextBox]]:
+    def search(self, regex_str: str | list[str], roi: Optional[BBox | AnchorBBox] = None, flags=re.I) -> Optional[list[TextBox]]:
         if not self.results:
             return None
+        if roi and isinstance(roi, AnchorBBox):
+            roi = self.ctx.scaler.as_bbox(roi)
         return self.results.search(regex_str, roi, flags)
 
-    def search_with_index(self, regex_str: str | list[str], roi: Optional[BBox] = None, flags=re.I) -> Optional[list[tuple[int, TextBox]]]:
+    def search_with_index(self, regex_str: str | list[str], roi: Optional[BBox | AnchorBBox] = None, flags=re.I) -> Optional[list[tuple[int, TextBox]]]:
         if not self.results:
             return None
+        if roi and isinstance(roi, AnchorBBox):
+            roi = self.ctx.scaler.as_bbox(roi)
         return self.results.search_with_index(regex_str, roi, flags)
 
     def poll(self, func, timeout: float = 3.0, interval: float = 0.1):
@@ -1658,8 +603,8 @@ class OcrQuery:
                 return None
             time.sleep(interval)
 
-    def wait(self, timeout: float = 3.0, interval: float = 0.1):
-        return Wait(timeout, interval)
+    def wait(self, timeout: float = 5.0, interval: float = 0.3):
+        return Wait(timeout, interval, self.ctx.runtime.stop_event)
 
 
 class UIOp:
@@ -1668,44 +613,117 @@ class UIOp:
     整合一些常用的ui操作，减少重复代码
     """
 
+    HOME_COLOR_POINT = [
+        # 任务
+        AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 153, Align.Top | Align.Left),
+        # 背包
+        AnchorPoint(212, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
+        # 飞讯
+        AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
+        # # 先约电台
+        # AnchorPoint(1114, 24, Align.Top | Align.Right),
+        # 共鸣者
+        AnchorPoint(1156, 28, Align.Top | Align.Right), AnchorPoint(1160, 30, Align.Top | Align.Right),
+        # 终端
+        AnchorPoint(1221, 34, Align.Top | Align.Right), AnchorPoint(1222, 35, Align.Top | Align.Right),
+    ]
+
     def __init__(self, ctx, page_service=None):
         self.ctx = ctx
-        self.oq = OcrQuery(self.ctx)
+        self.oq: OcrQuery = OcrQuery(self.ctx)
         # 绑定页面，在指定页面内搜索，默认为全局公共页面
         self.page_service = page_service if page_service else self.ctx.page_service
 
         # runtime
-        self.__color_match = None
 
-    def grap(self):
+        # 主页（大世界）
+        self.__home_color_match = None
+        self._route_executor = RouteExecutor(self.ctx)
+
+    # --------- ocr相关 ---------
+
+    @property
+    def lang(self):
+        return self.ctx.window_service.get_lang()
+
+    @property
+    def img(self):
+        return self.oq.img
+
+    @property
+    def bbox_result(self):
+        return self.oq.results.results
+
+    @property
+    def ocr_result(self):
+        return self.oq.results
+
+    def grap(self) -> np.ndarray:
+        """截图"""
         return self.ctx.img_service.screenshot()
 
-    def snapshot(self, img: Optional[np.ndarray] = None):
-        self.oq = OcrQuery(self.ctx).grab(img).query()
+    def snapshot(self, roi: Optional[BBox | AnchorBBox] = None, img: Optional[np.ndarray] = None, resize: bool = True):
+        """
+        截图并查询
+        :param img: 指定图片，默认重新截图
+        :param roi: 裁剪出图片指定区域
+        :param resize: 1280x720以上分辨率图片是否缩小，默认开启，牺牲精度提升识别速度，若需要识别小字，必须关闭，用原图识别以保证精度
+        :return:
+        """
+        self.oq = OcrQuery(self.ctx).snapshot(roi, img, resize)
         return self
 
-    def is_match(self, page: str):
-        return self.page_service.is_match(self.oq.results, page)
+    def match_page(self, page: str):
+        """
+        根据页面key匹配页面是否命中
+        :param page: 如：I18nPage.Terminal.PAGE
+        :return:
+        """
+        return self.page_service.is_match(self.ocr_result, page)
 
-    def search(self, regex_str: str | list[str], roi: Optional[BBox] = None, flags=re.I) -> Optional[list[TextBox]]:
+    def match_key(self, key: str, text: str):
+        """
+        根据文本key匹配文本
+        :param key: 如：I18nText.Terminal
+        :param text:
+        :return:
+        """
+        match = self.__compile_pattern(self.ctx.tr(key), re.I).match(text)
+        # logger.debug(f"match: {match}")
+        return match
+
+    @staticmethod
+    @lru_cache(maxsize=666)
+    def __compile_pattern(pattern: str, flags: int):
+        return re.compile(pattern, flags)
+
+    def search(self, regex_str: str | list[str], roi: Optional[BBox | AnchorBBox] = None, flags=re.I) -> Optional[list[TextBox]]:
+        """
+        在页面内查询文本
+        :param regex_str: 文本正则
+        :param roi: 文本所在区域，可选。用于过滤结果，不会裁剪图片
+        :param flags: 默认忽略大小写，0为区分大小写
+        :return:
+        """
         return self.oq.search(regex_str, roi, flags)
 
-    def search_by_key(
-            self, i18n_text: str | list[str], roi: Optional[BBox] = None, flags=re.I) -> Optional[list[TextBox]]:
-        i18n_text = i18n_text if isinstance(i18n_text, list) else [i18n_text]
-        return self.oq.search([self.ctx.tr(i) for i in i18n_text], roi, flags)
+    # def search_by_key(
+    #         self, i18n_text: str | list[str], roi: Optional[BBox | AnchorBBox] = None, flags=re.I) -> Optional[list[TextBox]]:
+    #     """跟据文本标识查询页面内查询文本"""
+    #     return self.search(self.ctx.tr(i18n_text), roi, flags)
+    #
+    # def search_with_index(
+    #         self, regex_str: str | list[str], roi: Optional[BBox | AnchorBBox] = None, flags=re.I
+    # ) -> Optional[list[tuple[int, TextBox]]]:
+    #     return self.oq.search_with_index(regex_str, roi, flags)
 
-    def search_with_index(
-            self, regex_str: str | list[str], roi: Optional[BBox] = None, flags=re.I
-    ) -> Optional[list[tuple[int, TextBox]]]:
-        return self.oq.search_with_index(regex_str, roi, flags)
+    # --------- 点击页面相关 ---------
 
-    def wait(self, timeout: float = 3.0, interval: float = 0.1):
-        return self.oq.wait(timeout, interval)
-
-    def __click(self, x: int, y: int, times: int = 1, interval: float = 0.0):
+    def click(self, x: int, y: int, times: int = 1, interval: float = 0.0):
+        """点击点"""
         if times < 1 or interval < 0:
             raise ValueError(f"Invalid value: {times} / {interval}")
+        logger.debug(f"click: ({x}, {y}), {times}")
         for i in range(times):
             self.ctx.control_service.click(x, y)
             if times > 1:
@@ -1713,12 +731,14 @@ class UIOp:
         return self
 
     def click_point(self, point: Point, times: int = 1, interval: float = 0.0):
+        """点击点/逻辑点"""
         if isinstance(point, AnchorPoint):
             point = self.ctx.scaler.as_point(point)
-        self.__click(point.x, point.y, times, interval)
+        self.click(point.x, point.y, times, interval)
         return self
 
-    def click_bbox(self, bbox: BBox, pk: PointKind = PointKind.CENTER, times: int = 1, interval: float = 0.0):
+    def click_bbox(self, bbox: BBox | AnchorBBox, pk: PointKind = PointKind.CENTER, times: int = 1, interval: float = 0.0):
+        """点击指定框内的点"""
         if isinstance(bbox, AnchorBBox):
             bbox = self.ctx.scaler.as_bbox(bbox)
         if pk == PointKind.CENTER:
@@ -1729,112 +749,118 @@ class UIOp:
             point = bbox.random
         else:
             raise ValueError("Unsupported PointKind")
-        self.__click(point[0], point[1], times, interval)
+        self.click(point[0], point[1], times, interval)
         return self
 
-    def click_key(self, match, key, pk: PointKind = PointKind.CENTER):
+    def click_key(self, match: dict[str, BBox], key: str, pk: PointKind = PointKind.CENTER):
+        """根据页面中的文本key，点击key对应文本框内的点"""
         bbox = match.get(key)
+        if not bbox:
+            raise ValueError(f"Invalid key: {key}")
         self.click_bbox(bbox, pk)
         return self
 
     def click_text(
         self,
         regex_str: str | list[str],
-        roi: Optional[BBox] = None,
-        index: int = 0,
+        roi: Optional[BBox | AnchorBBox] = None,
         pk: PointKind = PointKind.CENTER,
+        delay: float = 0.0,
         times: int = 1,
         interval: float = 0.0,
     ) -> bool:
+        """
+        点击页面内某个文本，有这个文本才点击
+        :param regex_str: 文本正则
+        :param roi: 文本所在区域，可选。避免有相同文本时点错
+        :param pk: 取文本框内的哪个点，默认中心点。增加随机性，避免固定点击同一个点
+        :param delay: 找到文本后延迟多少秒开始点击。用于解决已识别到，但游戏弹窗动画还未播完无法点击，等一会再点即可
+        :param times: 点击文本几次，默认一次。用于解决延迟等原因导致有时只点一次不一定成功，多点几次保证覆盖
+        :param interval: 每次点击后间隔多少秒再点下一次
+        :return: 返回是否找到文本
+        """
         res = self.search(regex_str, roi)
-        if not res or len(res) <= index:
+        if not res:
             return False
-        self.click_bbox(res[index], pk, times, interval)
+        if delay > 0:
+            self.sleep(delay)
+        logger.debug(f"click: {regex_str}")
+        self.click_bbox(res[0], pk, times, interval)
         return True
 
-    def sleep(self, t):
+    # --------- 等待相关 ---------
+
+    def sleep(self, seconds: float):
+        """等待"""
+        t = 0.1
+        while seconds > t:
+            if not self.ctx.runtime.stop_event.is_set():
+                raise StopError()
+            time.sleep(t)
+            seconds -= t
         if not self.ctx.runtime.stop_event.is_set():
             raise StopError()
-        time.sleep(t)
-        if not self.ctx.runtime.stop_event.is_set():
-            raise StopError()
+        if seconds > 0:
+            time.sleep(seconds)
         return self
 
-    def esc(self):
-        self.ctx.control_service.esc()
-        return self
+    def wait(self, timeout: float = 5.0, interval: float = 0.3):
+        """条件等待"""
+        return self.oq.wait(timeout, interval)
 
-    def activate(self):
-        self.ctx.control_service.activate()
-        return self
+    def __init_home_color_match(self):
+        rule = ColorRule().points(self.HOME_COLOR_POINT).colors(Color.bgr(255, 255, 255), 12, RuleMode.ALL)
+        self.__home_color_match = ColorMatch(self.ctx.scaler).rules(rule)
 
-    def trs(self, texts: list[str]) -> list[str]:
-        """批量翻译"""
-        return [self.ctx.tr(text) for text in texts]
-
-    def __init_color_match(self):
-        points = [
-            # 任务
-            AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 152, Align.Top | Align.Left),
-            # 背包
-            AnchorPoint(214, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
-            # 飞讯
-            AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
-            # # 先约电台
-            # AnchorPoint(1114, 24, Align.Top | Align.Right),
-            # 共鸣者
-            AnchorPoint(1156, 28, Align.Top | Align.Right), AnchorPoint(1160, 30, Align.Top | Align.Right),
-            # 终端
-            AnchorPoint(1221, 34, Align.Top | Align.Right), AnchorPoint(1222, 35, Align.Top | Align.Right),
-        ]
-        rule = ColorRule().points(points).colors(Color.bgr(255, 255, 255), 10, RuleMode.ALL)
-        self.__color_match = ColorMatch(self.ctx.scaler).rules(rule)
+    def is_on_homepage(self, img: Optional[np.ndarray] = None) -> bool:
+        """是否在主界面"""
+        if not self.__home_color_match:
+            self.__init_home_color_match()
+        return self.__home_color_match.match(img if img is not None else self.grap())
 
     def wait_back_home(self, timeout: int = 60, interval: float = 1.0):
-        """ 循环等待回到主界面 """
-        if not self.__color_match:
-            self.__init_color_match()
+        """循环等待回到主界面"""
+        if not self.__home_color_match:
+            self.__init_home_color_match()
 
+        self.activate()
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            self.activate().sleep(0.1)
-            img = self.grap()
-            if self.__color_match.match(img):
+            if self.is_on_homepage():
+                self.activate()
                 return self
             self.sleep(interval)
-
         # 卡在加载，强制关闭
         self.ctx.control_service.close_window()
         raise Exception("等待回到主界面超时")
 
-    def execute_route(self, route_steps):
-        """执行路线步骤"""
-        for step in route_steps:
-            if step.mode == MoveMode.WALK:
-                self._execute_walk_step(step)
-            elif step.mode == MoveMode.RUN:
-                self._execute_run_step(step)
+    # --------- 按键相关 ---------
 
-    def _execute_walk_step(self, step):
-        """执行行走步骤"""
-        if step.steps and step.steps > 0:
-            self.ctx.control_service.forward_walk(
-                step.steps, Direction.get_key(step.direction)
-            )
-        elif step.duration and step.duration > 0:
-            # 行走模式按时间移动（待实现）
-            pass
+    def activate(self):
+        """窗口激活"""
+        self.ctx.control_service.activate()
+        return self
 
-    def _execute_run_step(self, step):
-        """执行跑步步骤"""
-        if step.steps and step.steps > 0:
-            # 跑步模式按步数移动（待实现）
-            pass
-        elif step.duration and step.duration > 0:
-            self.ctx.control_service.forward_run(
-                step.duration, Direction.get_key(step.direction)
-            )
+    def esc(self):
+        """按esc"""
+        self.ctx.control_service.esc()
+        return self
 
+    def pick_up(self, times: int = 1, interval: float = 0.0):
+        """拾取"""
+        for _ in range(times):
+            self.ctx.control_service.pick_up()
+            self.sleep(interval)
+        return self
+
+    def camera_reset(self):
+        """重置"""
+        self.ctx.control_service.camera_reset()
+        return self
+
+    def move(self, route: list[MoveStep]):
+        """执行人物移动路线"""
+        self._route_executor.execute(route)
 
 
 if __name__ == '__main__':

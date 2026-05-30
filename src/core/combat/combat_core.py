@@ -486,6 +486,7 @@ class BaseResonator(BaseCombo):
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service)
         self.img_service = img_service
+        self.check_boss_hp = True
 
     def resonator_name(self) -> ResonatorNameEnum:
         """ 角色名 """
@@ -559,22 +560,24 @@ class BaseResonator(BaseCombo):
         # logger.debug("is_avatar_grey: %s", is_avatar_grey)
         return is_avatar_grey
 
-    @classmethod
-    def boss_hp(cls, img: np.ndarray) -> float:
+    # @classmethod
+    def boss_hp(self, img: np.ndarray) -> float:
         """ boss剩余血条比例，归一 """
+        if not self.check_boss_hp:
+            return 1.00
         health = 0.0
-        if cls._health_01_color_checker.check(img):
+        if self._health_01_color_checker.check(img):
             health = 0.01  # 血量1%
-        if cls._health_20_color_checker.check(img):
+        if self._health_20_color_checker.check(img):
             health = 0.20
             # logger.debug("boss_hp: %s", health)
-        if cls._health_30_color_checker.check(img):
+        if self._health_30_color_checker.check(img):
             health = 0.30
             # logger.debug("boss_hp: %s", health)
-        if cls._health_50_color_checker.check(img):
+        if self._health_50_color_checker.check(img):
             health = 0.50
             # logger.debug("boss_hp: %s", health)
-        if cls._health_100_color_checker.check(img):
+        if self._health_100_color_checker.check(img):
             health = 1.00
 
         logger.debug("boss_hp: %s", health)
