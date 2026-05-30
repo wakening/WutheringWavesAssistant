@@ -18,7 +18,7 @@ from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
     absorb_around_variant, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
-    match_remaining_attempts, linear_spacing, query_waveplate, object_detection, bbox_hp_bar
+    match_remaining_attempts, linear_spacing, query_waveplate, object_detection, bbox_hp_bar, bbox_guidebook_item
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -686,10 +686,10 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ]
     tacets_route = [
         [Run.forward(1.0)],
-        [Run.forward(0.8)],
-        [Run.forward(1.0)],
-        [Run.forward(1.0)],
-        [Run.forward(1.0)],
+        [Run.forward(0.5)],
+        [Run.forward(0.5)],
+        [Run.forward(0.5)],
+        [Run.forward(0.5)],
         [Run.forward(1.0)],
         [Run.forward(1.0)],
         [Run.forward(1.0)],
@@ -731,10 +731,16 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return False
 
     # 点击凝素领域
-    if not ui.snapshot().search(ctx.tr(tacets)):
-        if not ui.sleep(0.2).click_text(ctx.tr(I18nText.ForgeryChallenge), pk=PointKind.RANDOM, times=2, interval=0.2):
-            return _fail_return()
-        ui.sleep(0.2)
+    def _wait_content():
+        if ui.snapshot().search(ctx.tr(weapons), bbox_guidebook_content(ctx)):
+            return True
+        ui.click_text(
+            ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+        return False
+
+    # 确认已进入残像聚落
+    if not ui.wait().until(_wait_content):
+        return _fail_return()
 
     # 检查体力
     cur_waveplate, waveplate_crystal = query_waveplate(ctx)
@@ -812,7 +818,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     for i in range(6):
         # 确认已进入副本
-        if not ui.sleep(5 if i > 0 else 0.1).wait(10, 0.5).until(
+        if not ui.sleep(5 if i > 0 else 0.1).wait(15, 0.5).until(
                 lambda: ui.is_on_homepage() and ui.snapshot().search(ctx.tr(I18nText.StartChallenge), quest_roi)):
             return _fail_return()
 
@@ -961,7 +967,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ]
     tacets_route = [
         [[Walk.forward(7), Walk.right(1), Run.forward(1.2)], [Run.forward(1.8)]],
-        [[Walk.left(1), Run.forward(1.2)], [Run.forward(1.0)]],
+        [[Walk.left(1), Run.forward(1.2)], [Run.forward(0.8)]],
         [[Run.forward(5.5)], [Run.forward(1.5)]],
         [[Run.forward(5.5)], [Run.forward(1.5)]],
         [[Run.forward(5.5)], [Run.forward(1.5)]],
@@ -991,8 +997,16 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     try:
         # 点击无音清剿
-        ui.snapshot().click_text(ctx.tr(I18nText.TacetSuppression), pk=PointKind.RANDOM, times=2, interval=0.2)
-        ui.sleep(0.2)
+        def _wait_content():
+            if ui.snapshot().search(ctx.tr(I18nText.EchoSet), bbox_guidebook_content(ctx)):
+                return True
+            ui.click_text(
+                ctx.tr(I18nText.TacetSuppression), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+            return False
+
+        # 确认已进入无音清剿
+        if not ui.wait().until(_wait_content):
+            return _fail_return()
 
         # 检查体力
         cur_waveplate, waveplate_crystal = query_waveplate(ctx)
@@ -1291,9 +1305,9 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ]
     tacets_route = [
         [Run.forward(0.4)],
-        [Run.forward(0.5)],
-        [Run.forward(0.5)],
-        [Run.forward(0.5)],
+        [Walk.forward(3)],
+        [Walk.forward(3)],
+        [],
         [Run.forward(0.5)],
         [Run.forward(0.5)],
         [Run.forward(0.5)],
@@ -1324,7 +1338,15 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return False
 
     # 点击战歌重奏
-    if not ui.snapshot().click_text(ctx.tr(I18nText.WeeklyChallenge), pk=PointKind.RANDOM, times=2, interval=0.2):
+    def _wait_content():
+        if ui.snapshot().search(ctx.tr(I18nText.WeeklyChallengeWeeklyChallenge), bbox_guidebook_content(ctx)):
+            return True
+        ui.click_text(
+            ctx.tr(I18nText.WeeklyChallenge), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+        return False
+
+    # 确认已进入战歌重奏
+    if not ui.wait().until(_wait_content):
         return _fail_return()
 
     # 本周剩余可收取次数: 3/3
@@ -1392,7 +1414,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if not move_and_scan_dialogue(ctx, ctx.tr(I18nText.EnterTheSonoroSphere), 10):
             return _fail_return()
         logger.debug("# 进入副本")
-        if not ui.pick_up(2, 0.2).sleep(0.5).wait(5, 0.5).until(
+        if not ui.pick_up(2, 0.2).sleep(0.5).wait(15, 1.0).until(
                 lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklySoloChallenge), delay=0.3)):
             return _fail_return()
     if not ui.sleep(0.2).wait(5, 0.5).until(
@@ -1615,8 +1637,23 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     try:
         # 点击残像聚落
-        ui.snapshot().click_text(ctx.tr(I18nText.TacetDiscordNest), pk=PointKind.RANDOM)
-        ui.sleep(0.3)
+        def _wait_content():
+            if ui.snapshot().search(
+                ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
+                return True
+            ui.click_text(
+                ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+            return False
+
+        # 确认已进入残像聚落
+        if not ui.wait().until(_wait_content):
+            for fsm in tacets_fsm:
+                if fsm.status == TaskStatus.PENDING:
+                    fsm.start()
+                    fsm.fail()
+                elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
+                    fsm.fail()
+            return False
 
         progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
         keywords = ctx.tr([*tacets, I18nText.Go]) + [progress_pattern]

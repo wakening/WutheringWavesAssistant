@@ -1520,10 +1520,11 @@ class DailyTaskSettingCard(ScrollArea):
             "Deutsch",
             "ภาษาไทย",
         ]
-        try:
-            self.curLang = Language(paramConfig.get(paramConfig.gameLanguage))
-        except Exception:
-            self.curLang = Language.ZH
+        # try:
+        #     self.curLang = Language(paramConfig.get(paramConfig.gameLanguage))
+        # except Exception:
+        #     self.curLang = Language.ZH
+        self.curLang = Language.ZH
 
         self.i18ntr = I18nTr(self.curLang)
 

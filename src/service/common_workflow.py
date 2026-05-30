@@ -29,6 +29,14 @@ def bbox_dialogue(ctx: NodeContext) -> BBox:
     ))
 
 
+def bbox_guidebook_item(ctx: NodeContext) -> BBox:
+    """索拉指南左侧选项区"""
+    return ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Left | Align.Top),
+        AnchorPoint(454, 720, Align.Left | Align.Bottom),
+    ))
+
+
 def bbox_guidebook_content(ctx: NodeContext) -> BBox:
     """索拉指南右侧内容区，不包含上面的体力值和下面的uid"""
     return ctx.scaler.as_bbox(AnchorBBox(
@@ -234,7 +242,7 @@ def object_detection(
         ctx: NodeContext,
         search_echo: bool = False,
         search_reward: bool = False,
-        timeout: float = 15.0
+        timeout: float = 20.0
 ):
     if not search_echo and not search_reward:
         raise ValueError("Must choose one: search_echo or search_reward")

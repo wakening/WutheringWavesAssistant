@@ -158,9 +158,9 @@ class DailyRuntimeConfig:
         _all = "All"
         self.starblindCrashsiteTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
             _all, I18nText.StarblindCrashsiteTacetDiscordNest]
-        self.rebirthUplandsTacetDiscordNest: bool = self.tacetDiscordNest in [
+        self.rebirthUplandsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
             _all, I18nText.RebirthUplandsTacetDiscordNest]
-        self.stagnantRunTacetDiscordNest: bool = self.tacetDiscordNest in [
+        self.stagnantRunTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
             _all, I18nText.StagnantRunTacetDiscordNest]
 
     def __repr__(self):

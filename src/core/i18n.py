@@ -297,6 +297,7 @@ class I18nText:
     TacetFieldConfirm = "TacetFieldConfirm"
 
     ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+    WeeklyChallengeWeeklyChallenge = "WeeklyChallengeWeeklyChallenge"
     RemainingWeeklyAttempts = "RemainingWeeklyAttempts"
     LimitedTimeEarlyAccess = "LimitedTimeEarlyAccess"
     ArrivingAtTheDestination = "ArrivingAtTheDestination"
@@ -335,6 +336,7 @@ class I18nText:
     YouHaveReachedTheChallengeLimit = "YouHaveReachedTheChallengeLimit"
 
     ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+    TacetDiscordNestTacetDiscordNest = "TacetDiscordNestTacetDiscordNest"
     # LahaiRoi = "LahaiRoi"
     StarblindCrashsiteTacetDiscordNest = "StarblindCrashsiteTacetDiscordNest"
     RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
@@ -1010,7 +1012,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Lesson in Void$"), raw=r"Lesson in Void"),
     },
     I18nText.LessonInEmbers: {
-        Language.ZH: RegexStr(r"^余烬终课$", raw="余烬终课"),
+        Language.ZH: RegexStr(r"^余.终课$", raw="余烬终课"),
         Language.EN: RegexStr(flex_ws(r"^Lesson in Embers$"), raw=r"Lesson in Embers"),
     },
     I18nText.GardenOfSalvation: {
@@ -1173,6 +1175,13 @@ I18N_TEXT = {
 
 
     ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+    I18nText.WeeklyChallengeWeeklyChallenge: {
+        Language.ZH: RegexStr(r"战歌重奏", raw="战歌重奏", desc="xxxx·战歌重奏"),
+        Language.EN: RegexStr(
+            flex_ws(r"Weekly Challenge"),
+            raw=r"Weekly Challenge",
+            desc=r"Weekly Challenge: xxxx"),
+    },
     I18nText.RemainingWeeklyAttempts: {
         Language.ZH: RegexStr(r"^本周剩余可收取次数", raw="本周剩余可收取次数", desc="本周剩余可收取次数: 3/3"),
         Language.EN: RegexStr(
@@ -1200,7 +1209,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"the Lost Star$"), raw=r"Weekly Challenge: Gate of the Lost Star"),
     },
     I18nText.CinderniteApocalypse: {
-        Language.ZH: RegexStr(r"^烬夜天启之章", raw="烬夜天启之章", desc="烬夜天启之章·战歌重奏"),
+        Language.ZH: RegexStr(r"^.夜天启之章", raw="烬夜天启之章", desc="烬夜天启之章·战歌重奏"),
         Language.EN: RegexStr(flex_ws(r"Cindernite Apocalypse$"), raw=r"Weekly Challenge: Cindernite Apocalypse"),
     },
     I18nText.TheWheelOfBrokenFate: {
@@ -1289,12 +1298,13 @@ I18N_TEXT = {
             raw=r"Your current SOL3 Phase is significantly higher than the recommended level for this Sonoro Sphere"),
     },
     I18nText.WeeklyDefeatTheEnemy: {
-        Language.ZH: RegexStr(r"击败敌人$", raw="击败敌人"),
-        Language.EN: RegexStr(flex_ws(r"eat the enemy$"), raw=r"Defeat the enemy"),
+        Language.ZH: RegexStr(r"击败", raw="击败", desc="击败敌人|击败辛吉勒姆"),
+        Language.EN: RegexStr(
+            flex_ws(r"eat the enemy|feat Sig"), raw=r"Defeat", desc=r"Defeat the enemy|Defeat Sigillum"),
     },
     I18nText.WeeklyClaimRewards: {
         Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
-        Language.EN: RegexStr(flex_ws(r"^Claim Rewards$"), raw=r"Claim Rewards"),
+        Language.EN: RegexStr(flex_ws(r"^Claim Rewards|Claim the rewards$"), raw=r"Claim Rewards"),
     },
     # F领取奖励弹出页面
     I18nText.WeeklyConfirm: {
@@ -1322,6 +1332,10 @@ I18N_TEXT = {
     },
 
     ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+    I18nText.TacetDiscordNestTacetDiscordNest: {
+        Language.ZH: RegexStr(r"残象聚落", raw="残象聚落"),
+        Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest"), raw="Tacet Discord Nest"),
+    },
     # I18nText.LahaiRoi: {
     #     Language.ZH: r"^拉海洛$",
     #     Language.EN: flex_ws(r"^Lahai-Roi$"),
