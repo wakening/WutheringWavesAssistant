@@ -211,11 +211,14 @@ def query_waveplate(ctx: NodeContext):
         ui.snapshot(resize=False)
 
         result = ui.search(waveplate_crystal_regex, waveplate_crystal_roi)
-        if not result:
-            logger.warning("waveplate crystal number not found")
-            return None, None
-        logger.debug(f"waveplate crystal: {result[0].text}")
-        waveplate_crystal = int(result[0].text)
+        if result:
+            logger.debug(f"waveplate crystal: {result[0].text}")
+            waveplate_crystal = int(result[0].text)
+        else:
+            # 0无法识别
+            logger.debug(f"ocr result: {ui.bbox_result}")
+            logger.debug("waveplate crystal number not found")
+            waveplate_crystal = 0
 
         result = ui.search(total_waveplate_regex, total_waveplate_roi)
         if not result:
