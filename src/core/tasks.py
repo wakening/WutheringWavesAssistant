@@ -569,6 +569,9 @@ def release_press_key(ctx):
         keymouse_util.mouse_left_up(ctx.window_service.window, 0, 0)
         keymouse_util.mouse_right_up(ctx.window_service.window, 0, 0)
         keymouse_util.key_up(ctx.window_service.window, "W")
+        keymouse_util.key_up(ctx.window_service.window, "A")
+        keymouse_util.key_up(ctx.window_service.window, "S")
+        keymouse_util.key_up(ctx.window_service.window, "D")
     except Exception:
         pass
 

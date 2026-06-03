@@ -294,20 +294,62 @@ class Lynae(BaseLynae):
         ]
 
     @combat_cache
-    def a2(self):
+    def a3(self):
         return [
-            # 2a
-            ["a", 0.05, 0.33],
-            # ["a", 0.05, 0.82],  # 拆分
-            ["a", 0.05, 0.33],
-            ["a", 0.05, 0.34],  # kaleidoscopic_parade_a2
-            ["a", 0.05, 0.15],  # optical_sampling_stage_a2
+            # a
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
         ]
+
+    # @combat_cache
+    # def a2(self):
+    #     return [
+    #         # 2a
+    #         ["a", 0.05, 0.33],
+    #         # ["a", 0.05, 0.82],  # 拆分
+    #         ["a", 0.05, 0.33],
+    #         ["a", 0.05, 0.34],  # kaleidoscopic_parade_a2
+    #         ["a", 0.05, 0.15],  # optical_sampling_stage_a2
+    #     ]
 
     @combat_cache
     def optical_sampling_stage_z(self):
         return [
             ["z", 2.26, 0.70],
+        ]
+
+    @combat_cache
+    def optical_sampling_stage_RprezQ(self):
+        # 预输入重击
+        return [
+            # ["R", 0.05, 4.70],
+            ["R", 0.05, 0.30],
+            ["R", 0.05, 3.65],
+
+            # ["z", 2.26, 0.70],
+            ["z_down", 0.00, 0.80],
+            ["Q", 0.00, 0.00],
+            ["w", 0.00, 1.40],
+            ["Q", 0.00, 0.00],
+            ["w", 0.00, 0.76],
+            ["z_up", 0.00, 0.20],
+            ["w", 0.00, 0.50],
+        ]
+
+    @combat_cache
+    def optical_sampling_stage_EprezQ(self):
+        # 预输入重击
+        return [
+            # ["E", 0.05, 0.88],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.00],
+
+            # ["z", 2.26, 0.70],
+            ["z_down", 1.20 + 0.63, 0.00],
+            ["Q", 0.00, 0.00],
+            ["z_up", 1.06, 0.20],
+            ["w", 0.00, 0.50],
         ]
 
     @combat_cache
@@ -344,8 +386,24 @@ class Lynae(BaseLynae):
             ["j", 0.05, 0.50],
             # ["a", 0.05, 1.22],  # 拆分
             ["a", 0.05, 0.20],
-            ["E", 0.05, 0.20],
-            ["w", 0.00, 0.77],
+            ["a", 0.05, 0.20],
+            ["a", 0.00, 0.20],
+            ["a", 0.00, 0.20],
+            ["w", 0.00, 0.37],
+        ]
+
+    @combat_cache
+    def kaleidoscopic_parade_3ja(self):
+        return [
+            ["j", 0.05, 0.50],
+            ["j", 0.05, 0.50],
+            ["j", 0.05, 0.50],
+            # ["a", 0.05, 1.22],  # 拆分
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.00, 0.20],
+            ["a", 0.00, 0.20],
+            ["w", 0.00, 0.37],
         ]
 
     @combat_cache
@@ -418,7 +476,8 @@ class Lynae(BaseLynae):
     @combat_cache
     def R(self):
         return [
-            ["R", 0.05, 4.70],
+            ["R", 0.05, 4.00],
+            ["w", 0.00, 0.70],
         ]
 
     def full_combo(self):
@@ -440,13 +499,13 @@ class Lynae(BaseLynae):
 
         # E后从普攻第二段开始
 
-        self.combo_action(self.Q(), False)
+        self.combo_action(self.a3(), True)
 
         img = self.img_service.screenshot()
 
         # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
         is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-        # is_echo_skill_ready = self.is_echo_skill_ready(img)
+        is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
         is_basic_attack_spark_collision_ready = self.is_basic_attack_spark_collision_ready(img)
         # is_max_lumiflow = self.is_max_lumiflow(img)
@@ -458,32 +517,49 @@ class Lynae(BaseLynae):
         is_optical_sampling_stage_z = False
         # 光学取样阶段
         if not is_kaleidoscopic_parade_basic_attack_ready:
-            # 溢彩能量没满，先攒能量
-            if not is_basic_attack_spark_collision_ready:
-                # 有E打Ea，没有打普攻
-                if is_resonance_skill_ready:
-                    self.combo_action(self.optical_sampling_stage_E2a(), True)
-                else:
-                    self.combo_action(self.optical_sampling_stage_a3(), True)
-                # 有大开大
-                if is_resonance_liberation_ready:
-                    self.combo_action(self.R(), True)
-            # 再检查溢彩能量
-            img = self.img_service.screenshot()
-            is_basic_attack_spark_collision_ready = self.is_basic_attack_spark_collision_ready(img)
-            if not is_basic_attack_spark_collision_ready:
-                return
             # 溢彩能量满，进入绮彩巡游状态
-            self.combo_action(self.optical_sampling_stage_z(), True)
-            is_optical_sampling_stage_z = True
+            if is_basic_attack_spark_collision_ready:
+                # 开大预输入重击
+                if is_resonance_liberation_ready:
+                    self.combo_action(self.optical_sampling_stage_RprezQ(), True)
+                else:
+                    self.combo_action(self.optical_sampling_stage_z(), True)
+                is_optical_sampling_stage_z = True
+            else:
+                # 溢彩能量没满
+                if is_resonance_liberation_ready and is_resonance_skill_ready:
+                    self.combo_action(self.E(), True)
+                    self.combo_action(self.R(), True)
+                    return
+                # 有大开大
+                elif is_resonance_liberation_ready:
+                    self.combo_action(self.R(), True)
+                    self.combo_action(self.E(), False)
+                    return
+                # 有E打E合轴
+                elif is_resonance_skill_ready:
+                    if self.random_float() > 0.6:
+                        self.combo_action(self.E(), False)
+                    else:
+                        self.combo_action(self.optical_sampling_stage_E2a(), True)
+                    time.sleep(0.1)
+                    return
 
         # 绮彩巡游状态
         if is_kaleidoscopic_parade_basic_attack_ready or is_optical_sampling_stage_z:
             if is_optical_sampling_stage_z:
+                # 检查流光能量
                 img = self.img_service.screenshot()
                 is_resonance_skill_ready = self.is_resonance_skill_ready(img)
                 is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-                true_color_count = self.true_color_count(img)
+                is_max_lumiflow = self.is_max_lumiflow(img)
+                # 流光能量满，三跳下砸
+                if is_max_lumiflow:
+                    if self.random_float() < 0.5:
+                        self.combo_action(self.kaleidoscopic_parade_2jzja(), True)
+                    else:
+                        self.combo_action(self.kaleidoscopic_parade_3ja(), True)
+                    return
 
             # 想要什么颜色
             if is_resonance_skill_ready:
@@ -494,6 +570,8 @@ class Lynae(BaseLynae):
             if is_resonance_liberation_ready:
                 self.combo_action(self.R(), True)
 
+            img = self.img_service.screenshot()
+            true_color_count = self.true_color_count(img)
             # 本色能量满
             if true_color_count == 3:
                 self.combo_action(self.kaleidoscopic_parade_j(), True)
@@ -516,7 +594,10 @@ class Lynae(BaseLynae):
             is_basic_attack_polychrome_leap_ready = self.is_basic_attack_polychrome_leap_ready(img)
             # 流光能量满，三跳下砸
             if is_max_lumiflow:
-                self.combo_action(self.kaleidoscopic_parade_2jzja(), True)
+                if self.random_float() < 0.5:
+                    self.combo_action(self.kaleidoscopic_parade_2jzja(), True)
+                else:
+                    self.combo_action(self.kaleidoscopic_parade_3ja(), True)
                 return
             if not is_basic_attack_polychrome_leap_ready:
                 return
@@ -543,10 +624,10 @@ class Lynae(BaseLynae):
             time.sleep(0.5 - 0.2)
             # 流光能量满 或 流光能量不足1/3，下砸结束
             if is_max_lumiflow or not is_basic_attack_polychrome_leap_ready:
-                self.combo_action(self.aQ(), True)
+                self.combo_action(self.a3(), True)
                 return
             self.combo_action(self.kaleidoscopic_parade_j(), True)
-            self.combo_action(self.aQ(), True)
+            self.combo_action(self.a3(), True)
             return
 
         # 兜底

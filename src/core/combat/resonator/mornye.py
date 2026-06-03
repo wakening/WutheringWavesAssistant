@@ -182,26 +182,131 @@ class Mornye(BaseMornye):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
     COMBO_SEQ = [
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
+        # 基准模式
+        # 4a
+        ["a", 0.05, 0.42],
+        ["a", 0.05, 0.70],
+        ["a", 0.05, 0.86],
+        ["a", 0.05, 1.20],
+        ["j", 0.05, 1.50],
 
-        ["z", 0.50, 0.50],
-        ["R", 0.05, 0.50],
-        ["Q", 0.05, 0.50],
+        # E
+        ["E", 0.05, 1.45],
+        ["j", 0.05, 1.50],
+
+        # 3az
+        ["a", 0.05, 0.42],
+        ["a", 0.05, 0.70],
+        ["a", 0.05, 0.30],
+        ["z", 0.80, 1.00],
+        # ["d", 0.05, 0.30],
+        ["j", 0.05, 1.80],
+        ["j", 0.05, 1.50],
+
+        # 2aEaz
+        ["a", 0.05, 0.42],
+        ["a", 0.05, 0.10],
+        ["E", 0.05, 0.10],
+        ["a", 0.05, 0.30],
+        ["z", 0.80, 1.00],
+        # ["j", 0.05, 2.00],
+        # ["j", 0.05, 1.50],
+
+        ## 广域观测模式
+        ["a", 0.05, 0.50],
+        ["a", 0.05, 0.70],
+        ["a", 0.05, 0.72],
+        ["a", 0.05, 0.86],
+
+        ["d", 0.05, 0.30],
+
     ]
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
     @combat_cache
-    def a4(self):
+    def a3z(self):
         return [
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            # 3az
+            # ["a", 0.05, 0.42],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.17],
+            # ["a", 0.05, 0.70],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.30],
+            ["a", 0.05, 0.13],
+            ["a", 0.05, 0.12],
+            ["z", 0.80, 0.20],
+            ["w", 0.00, 0.80],
+        ]
+
+    def a3z_a3(self):
+        return [
+            # 3az
+            # ["a", 0.05, 0.42],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.17],
+            # ["a", 0.05, 0.70],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.30],
+            ["a", 0.05, 0.13],
+            ["a", 0.05, 0.12],
+            # ["z", 0.80, 0.20],
+            # ["w", 0.00, 0.80],
+        ]
+
+    def a3z_z(self):
+        return [
+            # 3az
+            # # ["a", 0.05, 0.42],
+            # ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.17],
+            # # ["a", 0.05, 0.70],
+            # ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.20],
+            # # ["a", 0.05, 0.30],
+            # ["a", 0.05, 0.13],
+            # ["a", 0.05, 0.12],
+            ["z", 1.00, 0.20],
+            ["w", 0.00, 0.80],
+        ]
+
+    @combat_cache
+    def a3(self):
+        return [
+            # 3az
+            # ["a", 0.05, 0.42],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.17],
+            # ["a", 0.05, 0.70],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.30],
+            ["a", 0.05, 0.13],
+            ["a", 0.05, 0.12],
+            # ["z", 0.80, 0.20],
+            # ["w", 0.00, 0.80],
+        ]
+
+    @combat_cache
+    def Eaaaz(self):
+        return [
+            ["E", 0.05, 0.50],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["z", 1.20, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.20],
+            ["z", 0.50, 0.20],
         ]
 
     @combat_cache
@@ -222,7 +327,7 @@ class Mornye(BaseMornye):
     @combat_cache
     def z(self):
         return [
-            ["z", 0.50, 0.50],
+            ["z", 1.00, 0.50]
         ]
 
     @combat_cache
@@ -234,7 +339,7 @@ class Mornye(BaseMornye):
     @combat_cache
     def R(self):
         return [
-            ["R", 0.05, 0.50],
+            ["R", 0.05, 5.64],
         ]
 
     def full_combo(self):
@@ -254,9 +359,66 @@ class Mornye(BaseMornye):
         self.combo_action(quit_seq, True, ignore_event=True)
 
     def combo(self):
-        self.combo_action(self.a4(), False)
+        self.combo_action(self.a3z_a3(), True)
 
-        combo_list = [self.Eaa(), self.R(), self.z()]
+        img = self.img_service.screenshot()
+        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
+        # rest_mass_energy_count = self.rest_mass_energy_count(img)
+        is_heavy_attack_geopotential_shift_ready = self.is_heavy_attack_geopotential_shift_ready(img)
+        is_wide_field_observation_mode_ready = self.is_wide_field_observation_mode_ready(img)
+        # relative_momentum_count = self.relative_momentum_count(img)
+        is_resonance_skill_optimal_solution_ready = self.is_resonance_skill_optimal_solution_ready(img)
+        # is_heavy_attack_inversion_ready = self.is_heavy_attack_inversion_ready(img)
+        # is_echo_skill_ready = self.is_echo_skill_ready(img)
+        is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+        is_resonance_liberation_2_ready = self.is_resonance_liberation_2_ready(img)
+
+        # 不在广域观测模式
+        if not is_wide_field_observation_mode_ready:
+            if is_heavy_attack_geopotential_shift_ready:
+                self.combo_action(self.a3z_z(), True)
+
+                img = self.img_service.screenshot()
+                is_wide_field_observation_mode_ready = self.is_wide_field_observation_mode_ready(img)
+                is_resonance_skill_optimal_solution_ready = self.is_resonance_skill_optimal_solution_ready(img)
+                is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+                is_resonance_liberation_2_ready = self.is_resonance_liberation_2_ready(img)
+            else:
+                if is_resonance_liberation_ready:
+                    self.combo_action(self.R(), True)
+                self.combo_action(self.R(), False)
+                self.combo_action(self.E(), False)
+                self.combo_action(self.Q(), False)
+                return
+
+        # 广域观测模式
+        if is_wide_field_observation_mode_ready:
+            if is_resonance_liberation_ready or is_resonance_liberation_2_ready:
+                self.combo_action(self.R(), True)
+
+                img = self.img_service.screenshot()
+                is_resonance_skill_optimal_solution_ready = self.is_resonance_skill_optimal_solution_ready(img)
+
+
+            if is_resonance_skill_optimal_solution_ready:
+                if self.random_float() > 0.6:
+                    self.combo_action(self.Eaaaz(), True)
+                else:
+                    self.combo_action(self.E(), True)
+                    self.combo_action(self.Q(), False)
+                    return
+
+            img = self.img_service.screenshot()
+            is_heavy_attack_inversion_ready = self.is_heavy_attack_inversion_ready(img)
+            if is_heavy_attack_inversion_ready:
+                self.combo_action(self.z(), False)
+                return
+
+            self.combo_action(self.R(), False)
+            self.combo_action(self.Q(), False)
+            return
+
+        combo_list = [self.a3z(), self.R(), self.z()]
         random.shuffle(combo_list)
         for i in combo_list:
             self.combo_action(i, False)
