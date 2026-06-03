@@ -305,6 +305,31 @@ class TextBox(BBox):
         return f"TextBox({self.x1}, {self.y1}, {self.x2}, {self.y2}, text: '{self.text}')"
 
 
+@dataclass
+class IconBox(BBox):
+    """图标的矩形框"""
+    scale: Optional[float] = None
+    score: Optional[float] = None
+
+    # ---------------- 置信度判断 ----------------
+    def is_confident(self, threshold: float = 0.8) -> bool:
+        return self.score is not None and self.score >= threshold
+
+    def as_dict(self):
+        return {
+            "bbox": self.as_tuple(),
+            "scale": self.scale,
+            "score": self.score,
+        }
+
+    # ---------------- 框判断 ----------------
+    def is_inside(self, other: BBox) -> bool:
+        return other.contains_bbox(self)
+
+    def __str__(self):
+        return f"IconBox({self.x1}, {self.y1}, {self.x2}, {self.y2}, scale: '{self.scale}', score: '{self.score}')"
+
+
 # ================= OCR 适配 =================
 
 class PaddleocrTextBox(TextBox):

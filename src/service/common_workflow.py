@@ -9,6 +9,7 @@ from src.core.i18n import I18nText
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp
 from src.core.workflow import NodeContext
+from src.util import img_util, file_util, img_template_util
 
 logger = logging.getLogger(__name__)
 
@@ -394,3 +395,25 @@ def linear_spacing(start: int, end: int, num_points: int, offset=None):
         positions = [p + offset for p in positions]
 
     return positions
+
+
+def search_icon_materials_spots(ctx: NodeContext):
+    atlas = img_util.read_img(
+        file_util.get_assets_template("Guidebook_Sidebar.png"))
+    icon = atlas[BBox(252, 28, 321, 105).as_slice()]
+    roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 85, Align.Left | Align.Top),
+        AnchorPoint(99, 720, Align.Left | Align.Top),
+    )).as_tuple()
+    img = ctx.img_service.screenshot()
+    bbox = img_template_util.find_icon_in_roi_accelerated(
+        img,
+        icon,
+        roi=roi,
+        scale_min=0.4,
+        scale_max=2.0,
+        scale_step=0.03,
+    )
+    if bbox is None or bbox.score < 0.7:
+        return None
+    return bbox.center

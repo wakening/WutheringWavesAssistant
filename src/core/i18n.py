@@ -211,7 +211,13 @@ class I18nText:
     ChallengeAgain = "ChallengeAgain"
 
     # ------- Terminal -------
+    # sidebar
     Terminal = "Terminal"
+    Birthday = "Birthday"
+    SOL3Phase = "SOL3Phase"
+    UnionLevel = "UnionLevel"
+    UnionEXP = "UnionEXP"
+    # item
     TerminalPioneerPodcast = "TerminalPioneerPodcast"
     Team = "Team"
     DataBank = "DataBank"
@@ -839,6 +845,22 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^终端$", raw="终端"),
         Language.EN: RegexStr(flex_ws(r"^Terminal$"), raw="Terminal"),
     },
+    I18nText.Birthday: {
+        Language.ZH: RegexStr(r"^生日$", raw="生日"),
+        Language.EN: RegexStr(flex_ws(r"^Birthday$"), raw="Birthday"),
+    },
+    I18nText.SOL3Phase: {
+        Language.ZH: RegexStr(r"^索拉等级$", raw="索拉等级"),
+        Language.EN: RegexStr(flex_ws(r"^SOL3 Phase$"), raw="SOL3 Phase"),
+    },
+    I18nText.UnionLevel: {
+        Language.ZH: RegexStr(r"^联觉等级$", raw="联觉等级"),
+        Language.EN: RegexStr(flex_ws(r"^Union Level$"), raw="Union Level"),
+    },
+    I18nText.UnionEXP: {
+        Language.ZH: RegexStr(r"^联觉经验$", raw="联觉经验"),
+        Language.EN: RegexStr(flex_ws(r"^Union EXP$"), raw="Union EXP"),
+    },
     I18nText.TerminalPioneerPodcast: {
         Language.ZH: RegexStr(r"^先约电台$", raw="先约电台"),
         # 特殊，太长文字换行了
@@ -1416,6 +1438,11 @@ class I18nPage:
     class Terminal:
         PAGE = "Terminal"
         Terminal = "Terminal"
+        Birthday = "Birthday"
+        SOL3Phase = "SOL3Phase"
+        UnionLevel = "UnionLevel"
+        UnionEXP = "UnionEXP"
+
         Team = "Team"
         Events = "Events"
         DataBank = "DataBank"
@@ -1574,15 +1601,11 @@ I18N_PAGES = {
         Language.ZH: {
             I18nPage.Name: "UI-终端",
             I18nPage.Include: {
-                I18nPage.Terminal.Terminal: {
-                    I18nPage.Text: r"^终端$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.Terminal.Team: r"^编队$",
                 I18nPage.Terminal.Events: r"^活动$",
+                # I18nPage.Terminal.Birthday: r"^生日$",
+                I18nPage.Terminal.SOL3Phase: r"^索拉等级$",
+                I18nPage.Terminal.UnionLevel: r"^联觉等级$",
+                I18nPage.Terminal.UnionEXP: r"^联觉经验$",
             },
             I18nPage.Exclude: {},
             I18nPage.Assets: ["UI_ESC_Terminal_001.png"],
@@ -1590,15 +1613,11 @@ I18N_PAGES = {
         Language.EN: {
             I18nPage.Name: "UI-Terminal",
             I18nPage.Include: {
-                I18nPage.Terminal.Terminal: {
-                    I18nPage.Text: r"^Terminal$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.Terminal.Team: r"^Team$",
-                I18nPage.Terminal.Events: r"^Events$",
+                I18nPage.Terminal.Events: flex_ws(r"^Events$"),
+                # I18nPage.Terminal.Birthday: flex_ws(r"^Birthday$"),
+                I18nPage.Terminal.SOL3Phase: flex_ws(r"^S[O0]L3 Phase$"),
+                I18nPage.Terminal.UnionLevel: flex_ws(r"^Union Level$"),
+                I18nPage.Terminal.UnionEXP: flex_ws(r"^Union EXP$"),
             },
             I18nPage.Exclude: {},
             I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
