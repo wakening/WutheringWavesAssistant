@@ -124,7 +124,7 @@ RESTART_PARAMS: dict[str, RestartParam] = {
     # BossNameEnum.NightmareHecate.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.Fenrico.value: RestartParam(check_text=None, direction=None, cycle=14, step=2),
     BossNameEnum.LadyOfTheSea.value: RestartParam(
-        check_text=None, direction=None, cycle=8, step=1, restart_text=r"^^进入.*最终章.*$"),
+        check_text=None, direction=None, cycle=8, step=1, restart_text=r"^进入.*最终章.*$"),
     BossNameEnum.TheFalseSovereign.value: RestartParam(
         check_text=None, direction=None, cycle=12, step=2, check_health_bar=True),
     # BossNameEnum.ThrenodianLeviathan.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),

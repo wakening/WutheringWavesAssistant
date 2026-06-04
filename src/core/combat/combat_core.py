@@ -201,9 +201,9 @@ def combat_cache(func):
                     cls_name = obj.__name__  # 类方法
 
             if cls_name:
-                logger.debug(f"{cls_name}.{func.__name__}")
+                logger.debug(f"{cls_name}.{func.__name__}", stacklevel=2)
             else:
-                logger.debug(func.__name__)
+                logger.debug(func.__name__, stacklevel=2)
 
         if key not in storage:
             storage[key] = func(*args, **kwargs)

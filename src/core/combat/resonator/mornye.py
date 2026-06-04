@@ -1,12 +1,9 @@
 import logging
-import random
-import time
 
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
     ScenarioEnum, combat_cache
-from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -273,7 +270,7 @@ class Mornye(BaseMornye):
             # # ["a", 0.05, 0.30],
             # ["a", 0.05, 0.13],
             # ["a", 0.05, 0.12],
-            ["z", 1.00, 0.20],
+            ["z", 1.20, 0.00],
             ["w", 0.00, 0.80],
         ]
 
@@ -312,22 +309,32 @@ class Mornye(BaseMornye):
     @combat_cache
     def Eaa(self):
         return [
-            ["E", 0.05, 0.50],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            # 共鸣技能 E
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
         ]
 
     @combat_cache
     def E(self):
         return [
             # 共鸣技能 E
-            ["E", 0.05, 0.50],
+            ["E", 0.05, 0.20],
         ]
 
     @combat_cache
     def z(self):
         return [
             ["z", 1.00, 0.50]
+        ]
+
+    @combat_cache
+    def zaa(self):
+        return [
+            ["z", 1.00, 0.10],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
         ]
 
     @combat_cache
@@ -339,7 +346,8 @@ class Mornye(BaseMornye):
     @combat_cache
     def R(self):
         return [
-            ["R", 0.05, 5.64],
+            ["R", 0.05, 0.00],
+            ["w", 0.00, 5.64],
         ]
 
     def full_combo(self):
@@ -376,7 +384,11 @@ class Mornye(BaseMornye):
         # 不在广域观测模式
         if not is_wide_field_observation_mode_ready:
             if is_heavy_attack_geopotential_shift_ready:
+                self.combo_action(self.E(), False)
                 self.combo_action(self.a3z_z(), True)
+                if self.random_float() < 0.25:
+                    self.combo_action(self.E(), False)
+                    return
 
                 img = self.img_service.screenshot()
                 is_wide_field_observation_mode_ready = self.is_wide_field_observation_mode_ready(img)
@@ -384,10 +396,8 @@ class Mornye(BaseMornye):
                 is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
                 is_resonance_liberation_2_ready = self.is_resonance_liberation_2_ready(img)
             else:
-                if is_resonance_liberation_ready:
-                    self.combo_action(self.R(), True)
-                self.combo_action(self.R(), False)
                 self.combo_action(self.E(), False)
+                self.combo_action(self.R(), is_resonance_liberation_ready)
                 self.combo_action(self.Q(), False)
                 return
 
@@ -395,33 +405,26 @@ class Mornye(BaseMornye):
         if is_wide_field_observation_mode_ready:
             if is_resonance_liberation_ready or is_resonance_liberation_2_ready:
                 self.combo_action(self.R(), True)
-
                 img = self.img_service.screenshot()
                 is_resonance_skill_optimal_solution_ready = self.is_resonance_skill_optimal_solution_ready(img)
 
-
             if is_resonance_skill_optimal_solution_ready:
-                if self.random_float() > 0.6:
+                if self.random_float() > 0.65:
                     self.combo_action(self.Eaaaz(), True)
                 else:
-                    self.combo_action(self.E(), True)
+                    self.combo_action(self.Eaa(), True)
                     self.combo_action(self.Q(), False)
                     return
 
             img = self.img_service.screenshot()
             is_heavy_attack_inversion_ready = self.is_heavy_attack_inversion_ready(img)
             if is_heavy_attack_inversion_ready:
-                self.combo_action(self.z(), False)
-                return
-
-            self.combo_action(self.R(), False)
+                self.combo_action(self.zaa(), False)
             self.combo_action(self.Q(), False)
             return
 
-        combo_list = [self.a3z(), self.R(), self.z()]
-        random.shuffle(combo_list)
-        for i in combo_list:
-            self.combo_action(i, False)
-            time.sleep(0.15)
-
+        if is_resonance_liberation_ready or is_resonance_liberation_2_ready:
+            self.combo_action(self.R(), False)
+        # self.combo_action(self.zaa(), False)
         self.combo_action(self.Q(), False)
+        return

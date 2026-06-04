@@ -2504,7 +2504,9 @@ class PageEventAbstractService(PageEventService, ABC):
                             if not restart:
                                 self._control_service.forward_walk(2)
                                 i += 1
+                                time.sleep(0.2)
                                 continue
+                            break
 
                         # 吸收与奖励重叠时
                         results = self._ocr_service.ocr(img, search_region)

@@ -287,6 +287,14 @@ class Lynae(BaseLynae):
         ]
 
     @combat_cache
+    def ER(self):
+        return [
+            ["E", 0.05, 0.30],
+            ["R", 0.05, 0.30],
+            ["R", 0.05, 3.65],
+        ]
+
+    @combat_cache
     def a(self):
         return [
             # 2a
@@ -314,13 +322,28 @@ class Lynae(BaseLynae):
     #     ]
 
     @combat_cache
-    def optical_sampling_stage_z(self):
+    def optical_sampling_stage_zQ(self):
         return [
-            ["z", 2.26, 0.70],
+            # ["z", 2.26, 0.70],
+            ["a_down", 1.20, 0.00],
+            ["Q", 0.00, 1.06],
+            ["a_up", 0.00, 0.20],
+            ["w", 0.00, 0.50],
         ]
 
     @combat_cache
-    def optical_sampling_stage_RprezQ(self):
+    def optical_sampling_stage_EzQ(self):
+        return [
+            ["E", 0.05, 0.30],
+            # ["z", 2.26, 0.70],
+            ["a_down", 1.20, 0.00],
+            ["Q", 0.00, 1.06],
+            ["a_up", 0.00, 0.20],
+            ["w", 0.00, 0.50],
+        ]
+
+    @combat_cache
+    def optical_sampling_stage_RzQ(self):
         # 预输入重击
         return [
             # ["R", 0.05, 4.70],
@@ -328,12 +351,12 @@ class Lynae(BaseLynae):
             ["R", 0.05, 3.65],
 
             # ["z", 2.26, 0.70],
-            ["z_down", 0.00, 0.80],
+            ["a_down", 0.00, 0.80],
             ["Q", 0.00, 0.00],
             ["w", 0.00, 1.40],
             ["Q", 0.00, 0.00],
             ["w", 0.00, 0.76],
-            ["z_up", 0.00, 0.20],
+            ["a_up", 0.00, 0.20],
             ["w", 0.00, 0.50],
         ]
 
@@ -521,9 +544,9 @@ class Lynae(BaseLynae):
             if is_basic_attack_spark_collision_ready:
                 # 开大预输入重击
                 if is_resonance_liberation_ready:
-                    self.combo_action(self.optical_sampling_stage_RprezQ(), True)
+                    self.combo_action(self.optical_sampling_stage_RzQ(), True)
                 else:
-                    self.combo_action(self.optical_sampling_stage_z(), True)
+                    self.combo_action(self.optical_sampling_stage_zQ(), True)
                 is_optical_sampling_stage_z = True
             else:
                 # 溢彩能量没满
@@ -604,7 +627,8 @@ class Lynae(BaseLynae):
 
             # 折跃
             self.combo_action(self.kaleidoscopic_parade_j(), True)
-            self.combo_action(self.kaleidoscopic_parade_z(), False)
+            if self.random_float() < 0.25:
+                self.combo_action(self.kaleidoscopic_parade_z(), False)
 
             # 喷涂
             img = self.img_service.screenshot()
