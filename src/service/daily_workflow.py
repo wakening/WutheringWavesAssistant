@@ -846,7 +846,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         combat_system.set_resonators(ctx.shared.team_members)
         combat_system.is_async = True
         combat_system.check_boss_hp = False
-        combat_system.auto_pickup = True
+        combat_system.auto_pickup = False
 
         timeout = 10 * 60
         no_text_count = 3
@@ -1151,7 +1151,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             combat_system.set_resonators(ctx.shared.team_members)
             combat_system.is_async = True
             combat_system.check_boss_hp = False
-            combat_system.auto_pickup = True
+            combat_system.auto_pickup = False
             combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
 
             if not det:
@@ -1563,7 +1563,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     combat_system.set_resonators(ctx.shared.team_members)
     combat_system.is_async = True
     combat_system.check_boss_hp = True
-    combat_system.auto_pickup = True
+    combat_system.auto_pickup = False
     combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
 
     for i in range(8):
