@@ -181,6 +181,8 @@ class BossInfoServiceImpl(BossInfoService):
             BossNameEnum.ReactorHusk.value,
             BossNameEnum.Sigillum.value,
             BossNameEnum.NamelessExplorer.value,
+            BossNameEnum.SeedOfIllusoryOrigin.value,
+            BossNameEnum.Denia.value,
         ]:
             return True
         return self.is_nightmare(boss_name)
