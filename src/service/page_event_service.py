@@ -1577,9 +1577,12 @@ class PageEventAbstractService(PageEventService, ABC):
             return
 
         if self._info.lastBossName in [
-            BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value,
+            BossNameEnum.Fleurdelys.value,
+            BossNameEnum.ThrenodianLeviathan.value,
             BossNameEnum.SeedOfIllusoryOrigin.value,
-            BossNameEnum.Denia.value
+            BossNameEnum.Denia.value,
+            BossNameEnum.NightmareAdamSmasherLimitedTime.value,
+            BossNameEnum.NightmareAdamSmasher.value,
         ]:
             self.absorption_action_fleurdelys()
             return
@@ -2338,6 +2341,42 @@ class PageEventAbstractService(PageEventService, ABC):
             logger.warning("未找到：虚妄诞生之种（限时提前开放）")
             self._control_service.esc()
             return False
+        elif bossName == BossNameEnum.NightmareAdamSmasherLimitedTime.value:
+            self._control_service.click(*materialsSpotsSidebar)
+            time.sleep(0.6)
+            weeklyChallenge = self._ocr_service.wait_text(r"^讨伐强敌$")
+            if weeklyChallenge:
+                self._control_service.click(*weeklyChallenge.center)
+                time.sleep(0.2)
+                self._control_service.click(*weeklyChallenge.center)
+                time.sleep(0.6)
+            img = self._img_service.screenshot()
+            result = self._ocr_service.query(img)
+            if result:
+                go_list = result.search(r"^(前往)$")
+                if go_list:
+                    go_list.sort(key=lambda x: x.y1)
+                    self._control_service.click(*go_list[0].center)
+                    time.sleep(0.3)
+                    story = self._ocr_service.wait_text(r"^确认$", timeout=2)
+                    if story:
+                        self._control_service.click(*story.center)
+                        time.sleep(0.1)
+                        self._control_service.click(*story.center)
+                        time.sleep(0.3)
+
+                    now = datetime.now()
+                    self._info.idleTime = now  # 重置空闲时间
+                    self._info.lastFightTime = now  # 重置最近检测到战斗时间
+                    self._info.fightTime = now  # 重置战斗时间
+                    self._info.lastBossName = bossName
+                    self._info.waitBoss = True
+                    return True
+
+            logger.warning("未找到：梦魇亚当·重锤（限时提前开放）")
+            self._control_service.esc()
+            return False
+
 
 
         is_enemy_tracing = False
@@ -2656,6 +2695,8 @@ class PageEventAbstractService(PageEventService, ABC):
                     BossNameEnum.Sigillum.value,
                     BossNameEnum.SeedOfIllusoryOrigin.value,
                     BossNameEnum.Denia.value,
+                    BossNameEnum.NightmareAdamSmasherLimitedTime.value,
+                    BossNameEnum.NightmareAdamSmasher.value,
                 ]
                 )
 

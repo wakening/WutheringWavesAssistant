@@ -762,7 +762,7 @@ class BossNameOptionsSettingCard(FlowExpandSettingCard):
         # TODO 搜索框 筛选条件
 
         # for boss in BossNameEnum:
-        new_boss = 2  # TODO 增加boss参数，根据版本区最新版本boss数量
+        new_boss = 1  # TODO 增加boss参数，根据版本区最新版本boss数量
         for i, boss in enumerate(reversed(list(BossNameEnum))):
             button = CheckBox(boss.value, self.view)  # 按钮上展示枚举的value，即描述，可国际化
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)

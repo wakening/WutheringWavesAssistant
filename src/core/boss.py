@@ -48,7 +48,8 @@ class BossNameEnum(Enum):
     NamelessExplorer = "无铭探索者"
     SeedOfIllusoryOrigin = "虚妄诞生之种（限时提前开放）"
     Denia = "达妮娅"
-
+    NightmareAdamSmasherLimitedTime = "梦魇亚当·重锤（限时提前开放）"
+    NightmareAdamSmasher = "梦魇亚当·重锤"
 
     @staticmethod
     def enemies():
