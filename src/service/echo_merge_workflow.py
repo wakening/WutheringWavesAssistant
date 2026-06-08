@@ -147,7 +147,7 @@ def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
             return False
 
         # 点击全选 合成
-        time.sleep(0.1)
+        time.sleep(0.2)
         bbox = match_result.get(I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll)
         ctx.control_service.click(bbox.center)
         time.sleep(0.2)
@@ -161,8 +161,9 @@ def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
             match_result = ctx.echo_merge_service.is_match(oq.results, I18nPageEchoMerge.Notice_IncludesHighRarity.PAGE)
             if match_result:
                 bbox = match_result.get(I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain)
+                time.sleep(0.3)
                 ctx.control_service.click(bbox.center)
-                time.sleep(0.2)
+                time.sleep(0.3)
                 bbox = match_result.get(I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm)
                 ctx.control_service.click(bbox.center)
                 time.sleep(0.5)

@@ -18,8 +18,8 @@ from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
     absorb_around_variant, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
-    match_remaining_attempts, linear_spacing, query_waveplate, object_detection, bbox_hp_bar, bbox_guidebook_item,
-    search_icon_materials_spots, bbox_dialogue
+    match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
+    object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_materials_spots, bbox_dialogue
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -557,6 +557,17 @@ def doActivity(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return True
         return False
 
+    roi_daily_weekly = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Top | Align.Left), AnchorPoint(610, 130, Align.Top | Align.Left)))
+    if not ui.click_text(ctx.tr(I18nText.ActivityDaily), roi_daily_weekly, delay=0.2, times=2, interval=0.1):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.ActivityDaily).raw}")
+        if in_progress:
+            local.activityFSM.fail()
+            return True
+        return False
+
+    ui.sleep(0.35).snapshot()
+
     # 0-100两端对齐等分布局
     # 331 502 673 844 1015 1186
     pts0 = ctx.scaler.as_point(AnchorPoint(331, 639, Align.Left | Align.Bottom))
@@ -743,15 +754,15 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if ui.snapshot().search(ctx.tr(weapons), bbox_guidebook_content(ctx)):
             return True
         ui.click_text(
-            ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+            ctx.tr(I18nText.ForgeryChallenge), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
         return False
 
-    # 确认已进入残像聚落
+    # 确认已进入凝素领域
     if not ui.wait().until(_wait_content):
         return _fail_return()
 
     # 检查体力
-    cur_waveplate, waveplate_crystal = query_waveplate(ctx)
+    cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
     if cur_waveplate is None or waveplate_crystal is None:
         return False
     cost = 40
@@ -904,7 +915,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         # 获取体力值
         cost = 40
-        cur_waveplate, waveplate_crystal = query_waveplate(ctx)
+        cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
 
         if cur_waveplate is None or waveplate_crystal is None:
             return _fail_return()
@@ -1023,7 +1034,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return _fail_return()
 
         # 检查体力
-        cur_waveplate, waveplate_crystal = query_waveplate(ctx)
+        cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
         if cur_waveplate is None or waveplate_crystal is None:
             return False
         cost = 60
@@ -1281,7 +1292,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
             # 获取体力值
             cost = 60
-            cur_waveplate, waveplate_crystal = query_waveplate(ctx)
+            cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
 
             if cur_waveplate is None or waveplate_crystal is None:
                 return _fail_return()
@@ -1662,7 +1673,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return True
 
         cost = 60
-        cur_waveplate, waveplate_crystal = query_waveplate(ctx)
+        cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
 
         if cur_waveplate is None or waveplate_crystal is None:
             return _fail_return()
@@ -1727,13 +1738,20 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ]
 
     try:
+        roi_guidebook_item = bbox_guidebook_item(ctx)
+        scroll_x, scroll_y = roi_guidebook_item.center
+
         # 点击残像聚落
         def _wait_content():
             if ui.snapshot().search(
                 ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
                 return True
-            ui.click_text(
-                ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+            if not ui.click_text(
+                ctx.tr(I18nText.TacetDiscordNest), roi_guidebook_item, pk=PointKind.RANDOM, times=2, interval=0.1):
+                if ui.click_text(ctx.tr(I18nText.ForgeryChallenge), delay=0.1, times=2, interval=0.1):
+                    ui.sleep(0.2)
+                ctx.control_service.scroll_mouse(-20, scroll_x, scroll_y)
+                ui.sleep(0.3)
             return False
 
         # 确认已进入残像聚落

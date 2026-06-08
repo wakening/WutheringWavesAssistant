@@ -243,6 +243,7 @@ class I18nText:
     DoubleDropChancesToday = "DoubleDropChancesToday"
 
     ## ------- Guidebook Activity -------
+    ActivityDaily = "ActivityDaily"
     ActivityClaim = "ActivityClaim"
 
     ## ------- Guidebook MaterialsSpots -------
@@ -929,7 +930,7 @@ I18N_TEXT = {
 
     # ------- Guidebook -------
     I18nText.Activity: {
-        Language.ZH: RegexStr(r"^活跃度$", raw="活跃度"),
+        Language.ZH: RegexStr(r"^活跃行迹$", raw="活跃行迹"),
         Language.EN: RegexStr(flex_ws(r"^Activity$"), raw="Activity"),
     },
     I18nText.MaterialsSpots: {
@@ -968,6 +969,10 @@ I18N_TEXT = {
     },
 
     ## ------- Guidebook Activity -------
+    I18nText.ActivityDaily: {
+        Language.ZH: RegexStr(r"^活跃度$", raw="活跃度"),
+        Language.EN: RegexStr(flex_ws(r"^Daily$"), raw="Daily"),
+    },
     I18nText.ActivityClaim: {
         Language.ZH: RegexStr(r"^领取$", raw="领取"),
         Language.EN: RegexStr(flex_ws(r"^Claim$"), raw="Claim"),
@@ -1766,7 +1771,7 @@ I18N_PAGES = {
                 I18nPage.Fight_Fight.Fight: r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)",
             },
             I18nPage.Exclude: {
-                I18nPage.Fight_Fight.Activity: r"^活跃度$",
+                I18nPage.Fight_Fight.Activity: r"^(活跃度|活跃行迹)$",
                 I18nPage.Fight_Fight.ChallengeCompleted: r"^挑战成功$",
             },
             I18nPage.Assets: [],

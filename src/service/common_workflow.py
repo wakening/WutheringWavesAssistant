@@ -192,20 +192,46 @@ def move_and_scan_dialogue(ctx: NodeContext, regex_str: str | list[str], loop: i
     return False
 
 
-def query_waveplate(ctx: NodeContext):
+def query_waveplate_guidebook(ctx: NodeContext):
+    """找出体力值，在索拉指南页面的体力区域"""
+    # 结晶单质
+    waveplate_crystal_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(656, 0, Align.Right | Align.Top), AnchorPoint(798, 80, Align.Right | Align.Top)))
+
+    # 结晶波片
+    total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(798, 0, Align.Right | Align.Top), AnchorPoint(984, 80, Align.Right | Align.Top)))
+    
+    return _query_waveplate(ctx, waveplate_crystal_roi, total_waveplate_roi)
+
+
+def query_waveplate_claim_rewards(ctx: NodeContext):
+    """找出体力值，副本内，点F领取奖励后弹出的页面里的体力区域"""
+    # 结晶单质
+    waveplate_crystal_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(723, 0, Align.Right | Align.Top), AnchorPoint(865, 80, Align.Right | Align.Top)))
+
+    # 结晶波片
+    total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(865, 0, Align.Right | Align.Top), AnchorPoint(1048, 80, Align.Right | Align.Top)))
+    
+    return _query_waveplate(ctx, waveplate_crystal_roi, total_waveplate_roi)
+
+
+def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_roi):
     try:
         ui = UIOp(ctx)
         max_waveplate = 240
         # 结晶单质
         waveplate_crystal_regex = r"^\d+$"
-        waveplate_crystal_roi = ctx.scaler.as_bbox(AnchorBBox(
-            AnchorPoint(730, 0, Align.Right | Align.Top), AnchorPoint(870, 80, Align.Right | Align.Top)))
+        # waveplate_crystal_roi = ctx.scaler.as_bbox(AnchorBBox(
+        #     AnchorPoint(730, 0, Align.Right | Align.Top), AnchorPoint(870, 80, Align.Right | Align.Top)))
 
         # 结晶波片
         total_waveplate_regex = r"^\d+/\d+$"
         total_waveplate_pattern = re.compile(r"^(\d+)/(\d+)$", flags=re.I)
-        total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
-            AnchorPoint(865, 0, Align.Right | Align.Top), AnchorPoint(1058, 80, Align.Right | Align.Top)))
+        # total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
+        #     AnchorPoint(865, 0, Align.Right | Align.Top), AnchorPoint(1058, 80, Align.Right | Align.Top)))
 
         # merge_roi = waveplate_crystal_roi.merge(total_waveplate_roi)
         # ui.snapshot(roi=merge_roi, resize=False)
