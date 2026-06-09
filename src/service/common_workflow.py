@@ -223,19 +223,23 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
         ui = UIOp(ctx)
         max_waveplate = 240
         # 结晶单质
-        waveplate_crystal_regex = r"^\d+$"
+        # waveplate_crystal_regex = r"^\d+$"
+        waveplate_crystal_regex = r"^[0-9oO]+$"
         # waveplate_crystal_roi = ctx.scaler.as_bbox(AnchorBBox(
         #     AnchorPoint(730, 0, Align.Right | Align.Top), AnchorPoint(870, 80, Align.Right | Align.Top)))
 
         # 结晶波片
-        total_waveplate_regex = r"^\d+/\d+$"
-        total_waveplate_pattern = re.compile(r"^(\d+)/(\d+)$", flags=re.I)
+        # total_waveplate_regex = r"^\d+/\d+$"
+        total_waveplate_regex = r"^[0-9oO]+/[0-9oO]+$"
+        # total_waveplate_pattern = re.compile(r"^(\d+)/(\d+)$", flags=re.I)
+        total_waveplate_pattern = re.compile(r"^([0-9oO]+)/([0-9oO]+)$", flags=re.I)
         # total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
         #     AnchorPoint(865, 0, Align.Right | Align.Top), AnchorPoint(1058, 80, Align.Right | Align.Top)))
 
         # merge_roi = waveplate_crystal_roi.merge(total_waveplate_roi)
-        # ui.snapshot(roi=merge_roi, resize=False)
-        ui.snapshot(resize=False)
+        # ui.snapshot(roi=merge_roi)
+        # ui.snapshot(resize=False)
+        ui.snapshot()
 
         result = ui.search(waveplate_crystal_regex, waveplate_crystal_roi)
         if result:
@@ -253,10 +257,11 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
             return None, None
         logger.debug(f"total waveplate: {result[0].text}")
 
+        zero_pattern = re.compile(r"[oO]")
         match = total_waveplate_pattern.search(result[0].text)
         logger.debug(f"match: {match.group(0)}")
-        cur_waveplate = int(match.group(1))
-        total_waveplate = int(match.group(2))
+        cur_waveplate = int(zero_pattern.sub("0", match.group(1)))
+        total_waveplate = int(zero_pattern.sub("0", match.group(2)))
         if total_waveplate != max_waveplate:
             return None, None
         logger.info(f"waveplate: {waveplate_crystal}, {cur_waveplate}/{total_waveplate}")

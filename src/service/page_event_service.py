@@ -1227,7 +1227,7 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="声之领域|梦魇领域|最终章",
-                    text=r"^(进入声之领域|进入梦.?领域|进入.*最终章.*)$",
+                    text=r"^(进入声之领域|进入梦.?领域|进入.*最终章.*|进入)$",
                 ),
             ],
             excludeTexts=[
@@ -2377,8 +2377,6 @@ class PageEventAbstractService(PageEventService, ABC):
             self._control_service.esc()
             return False
 
-
-
         is_enemy_tracing = False
         for enemyTracingPoint in enemyTracingSidebar:
             self._control_service.click(*enemyTracingPoint)  # 进入残像探寻
@@ -2416,6 +2414,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇凯尔匹": "梦.*凯尔匹",
             "梦魇赫卡忒": "梦.*赫卡.?",
             "鸣式利维亚坦": "鸣式.*利维亚坦",
+            "梦魇亚当·重锤": "梦.*?亚当.*?重.",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         # findBoss = None
@@ -2621,7 +2620,7 @@ class PageEventAbstractService(PageEventService, ABC):
         logger.info("罗蕾莱不在家，等她")
         self._control_service.esc()
         time.sleep(2)
-        if not self._ocr_service.wait_text(r"^(终端|Terminal|教程百科|Tutorials)$", timeout=5):
+        if not self._ocr_service.wait_text(r"^(终端|Terminal|商城|教程百科|Tutorials)$", timeout=5):
             self._control_service.esc()
             return
         # 进入时钟
@@ -2653,7 +2652,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._ocr_service.wait_text("时间", timeout=10)
         time.sleep(1)
         self._control_service.esc()
-        self._ocr_service.wait_text(r"^(终端|Terminal|教程百科|Tutorials)$", timeout=5)
+        self._ocr_service.wait_text(r"^(终端|Terminal|商城|教程百科|Tutorials)$", timeout=5)
         time.sleep(1)
         self._control_service.esc()
         time.sleep(0.5)

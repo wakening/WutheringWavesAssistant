@@ -80,8 +80,8 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
         RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=1.0)],  # 3.2
     # BossNameEnum.SeedOfIllusoryOrigin.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
     BossNameEnum.Denia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
-    # BossNameEnum.NightmareAdamSmasherLimitedTime.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
-    # BossNameEnum.NightmareAdamSmasher.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareAdamSmasherLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
+    BossNameEnum.NightmareAdamSmasher.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
 }
 
 # RouteStep后的移动方式配置，没有的也留痕注释掉，方便后续排查
@@ -141,7 +141,8 @@ RESTART_PARAMS: dict[str, RestartParam] = {
     BossNameEnum.Denia.value: RestartParam(
         check_text=None, direction=None, cycle=8, step=1, restart_text=r"^进入声之"),
     # BossNameEnum.NightmareAdamSmasherLimitedTime.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
-    # BossNameEnum.NightmareAdamSmasher.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.NightmareAdamSmasher.value: RestartParam(
+        check_text=None, direction=None, cycle=8, step=1, restart_text=r"进入"),
 }
 
 # 点击重新挑战后的移动方式配置，适用于个别boss刷新位置离重新挑战点较远的情况，有才写

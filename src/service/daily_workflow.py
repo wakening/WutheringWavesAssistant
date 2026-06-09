@@ -350,7 +350,8 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         AnchorPoint(1280, 720, Align.Right | Align.Bottom)
     ))
     if not ui.sleep(0.8).wait(5, 0.5).until(
-        lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.QuickSetup), roi)):
+        lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi)):
+        # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.QuickSetup), roi)):
         logger.info(f"编队已锁定，离开战斗区域")
         return False
 
@@ -790,7 +791,8 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     # 获取这页的副本
     keywords = ctx.tr([*tacets, I18nText.Go])
-    textboxes = ui.sleep(0.1).snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+    # textboxes = ui.sleep(0.1).snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+    textboxes = ui.sleep(0.1).snapshot().search(keywords, bbox_guidebook_content(ctx))
     if not textboxes:
         return _fail_return()
     textboxes.sort(key=lambda p: p.y1)
@@ -1062,7 +1064,8 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         keywords = ctx.tr([*tacets, I18nText.Go, I18nText.EchoSet])
         # 获取无音区
-        textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+        # textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+        textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
         if not textboxes:
             return _fail_return()
         textboxes.sort(key=lambda p: p.y1)
@@ -1427,7 +1430,8 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     # 本周剩余可收取次数: 3/3
     result = ui.sleep(0.2).wait().until(
-        lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
+        lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
+        # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
     remain, max_remain = match_remaining_attempts(result)
     if remain is None or not max_remain:
         return _fail_return()
@@ -1738,19 +1742,16 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ]
 
     try:
-        roi_guidebook_item = bbox_guidebook_item(ctx)
-        scroll_x, scroll_y = roi_guidebook_item.center
-
+        scroll_point = ctx.scaler.as_point(AnchorPoint(280, 205, Align.Top | Align.Left))
         # 点击残像聚落
         def _wait_content():
             if ui.snapshot().search(
                 ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
                 return True
             if not ui.click_text(
-                ctx.tr(I18nText.TacetDiscordNest), roi_guidebook_item, pk=PointKind.RANDOM, times=2, interval=0.1):
-                if ui.click_text(ctx.tr(I18nText.ForgeryChallenge), delay=0.1, times=2, interval=0.1):
-                    ui.sleep(0.2)
-                ctx.control_service.scroll_mouse(-20, scroll_x, scroll_y)
+                ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1):
+                ui.sleep(0.2).click_point(scroll_point, times=2, interval=0.1).sleep(0.2)
+                ctx.control_service.scroll_mouse(-20, *scroll_point, 0.1)
                 ui.sleep(0.3)
             return False
 
@@ -1767,7 +1768,8 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
         keywords = ctx.tr([*tacets, I18nText.Go]) + [progress_pattern]
         # 获取聚落列表
-        textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+        # textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+        textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
         textboxes.sort(key=lambda p: p.y1)
         logger.debug(f"textboxes: {textboxes}")
 

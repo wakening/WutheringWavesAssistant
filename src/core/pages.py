@@ -618,8 +618,8 @@ class UIOp:
         AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 153, Align.Top | Align.Left),
         # 背包
         AnchorPoint(212, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
-        # 飞讯
-        AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
+        # # 飞讯
+        # AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
         # # 先约电台
         # AnchorPoint(1114, 24, Align.Top | Align.Right),
         # 共鸣者
