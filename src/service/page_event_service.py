@@ -1227,7 +1227,7 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="声之领域|梦魇领域|最终章",
-                    text=r"^(进入声之领域|进入梦.?领域|进入.*最终章.*|进入)$",
+                    text=r"^(进入声之领域|进入梦.?领域|进入.*最终章.*)$",
                 ),
             ],
             excludeTexts=[
@@ -2598,6 +2598,13 @@ class PageEventAbstractService(PageEventService, ABC):
                 # 3 走向boss刷新点
                 after_restart_routes = self._boss_info_service.get_after_restart_routes()
                 route_step_action(after_restart_routes.get(bossName))
+
+            if bossName == BossNameEnum.NightmareAdamSmasher.value:
+                if self._ocr_service.find_text("^进入$"):
+                    self._control_service.pick_up()
+                    self._info.in_dungeon = True
+                else:
+                    return False
 
             now = datetime.now()
             self._info.idleTime = now  # 重置空闲时间
