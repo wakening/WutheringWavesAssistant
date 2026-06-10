@@ -937,11 +937,6 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 此处仅打印日志用，打印剩余次数
         match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
 
-        # 点击确认弹窗
-        if not ui.sleep(0.5).wait().until(
-                lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetFieldConfirm), delay=0.3)):
-            return _fail_return()
-
         # 消耗体力后，判断是继续还是离开
         if cur_waveplate >= cost:
             if ui.sleep(1).wait(5, 0.5).until(
@@ -2112,8 +2107,13 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if not ui.click_text(ctx.tr(I18nText.TerminalPioneerPodcast),
                          roi=bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
         return False
-    if not ui.sleep(1.2).wait().until(lambda: ui.snapshot().search(pioneerPodcast)):
+    if not ui.sleep(1.2).wait().until(
+            lambda: ui.snapshot().search([pioneerPodcast, ctx.tr(I18nText.PioneerPodcastUnavailable)])):
         return False
+    if ui.search(ctx.tr(I18nText.PioneerPodcastUnavailable)):
+        local.pioneerPodcastFSM.complete()
+        ui.sleep(0.3).esc().sleep(1)
+        return True
 
     sidebarsPioneerPodcast = ctx.scaler.as_point(AnchorPoint(50, 126, Align.Left | Align.Top))
     sidebarsPodcastTasks = ctx.scaler.as_point(AnchorPoint(50, 213, Align.Left | Align.Top))

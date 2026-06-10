@@ -365,6 +365,7 @@ class I18nText:
 
     # ------- Pioneer Podcast -------
     PioneerPodcast = "PioneerPodcast"
+    PioneerPodcastUnavailable = "PioneerPodcastUnavailable"
     PodcastTasks = "PodcastTasks"
     PioneerPodcastClaimAll = "PioneerPodcastClaimAll"
     PioneerPodcastConfirm = "PioneerPodcastConfirm"
@@ -892,6 +893,12 @@ I18N_TEXT = {
     I18nText.PioneerPodcast: {
         Language.ZH: RegexStr(r"^先约电台$", raw="先约电台"),
         Language.EN: RegexStr(flex_ws(r"^Pioneer Podcast$"), raw="Pioneer Podcast"),
+    },
+    I18nText.PioneerPodcastUnavailable: {
+        Language.ZH: RegexStr(r"先约电台.*?暂未开播", raw="当前先约电台各频道暂未开播"),
+        Language.EN: RegexStr(
+            flex_ws(r"Pioneer Podcast.*?unavailable"),
+            raw="All channels on the Pioneer Podcast are currently unavailable"),
     },
     I18nText.PodcastTasks: {
         Language.ZH: RegexStr(r"^电台任务$", raw="电台任务"),

@@ -371,6 +371,20 @@ def set_window_left_top(hwnd=None):
                           win32con.SWP_NOSIZE | win32con.SWP_NOZORDER | win32con.SWP_SHOWWINDOW)
 
 
+def set_window_below_another(hwnd, hwnd_another):
+    logger.debug("将窗口移动到左上角，并置于指定窗口下方")
+    # 同时移动和改变Z序
+    win32gui.SetWindowPos(
+        hwnd,  # 当前窗口
+        hwnd_another,  # 放在这个窗口后面
+        0, 0,  # 新的位置
+        0, 0,  # 大小（保持不变）
+        win32con.SWP_NOSIZE |  # 保持大小不变
+        win32con.SWP_NOMOVE |   # 保持位置不变
+        win32con.SWP_SHOWWINDOW  # 显示窗口
+    )
+
+
 def set_window_left_top_and_below_another(hwnd, hwnd_another):
     logger.debug("将窗口移动到左上角，并置于指定窗口下方")
     # 同时移动和改变Z序
