@@ -244,6 +244,9 @@ class I18nText:
 
     ## ------- Guidebook Activity -------
     ActivityDaily = "ActivityDaily"
+    ActivityWeekly = "ActivityWeekly"
+    ActivityPts = "ActivityPts"
+    WeeklyActivityPts = "WeeklyActivityPts"
     ActivityClaim = "ActivityClaim"
 
     ## ------- Guidebook MaterialsSpots -------
@@ -877,7 +880,7 @@ I18N_TEXT = {
         Language.EN: flex_ws(r"^Data Bank$"),
     },
     I18nText.Guidebook: {
-        Language.ZH: RegexStr(r"^索拉指南$", raw="索拉指南$"),
+        Language.ZH: RegexStr(r"^索拉指南$", raw="索拉指南"),
         Language.EN: RegexStr(flex_ws(r"^Guidebook$"), raw="Guidebook$"),
     },
     I18nText.Map: {
@@ -979,6 +982,18 @@ I18N_TEXT = {
     I18nText.ActivityDaily: {
         Language.ZH: RegexStr(r"^活跃度$", raw="活跃度"),
         Language.EN: RegexStr(flex_ws(r"^Daily$"), raw="Daily"),
+    },
+    I18nText.ActivityWeekly: {
+        Language.ZH: RegexStr(r"^周度游历$", raw="周度游历"),
+        Language.EN: RegexStr(flex_ws(r"^Weekly$"), raw="Weekly"),
+    },
+    I18nText.ActivityPts: {
+        Language.ZH: RegexStr(r"^活跃度$", raw="活跃度"),
+        Language.EN: RegexStr(flex_ws(r"^Activity Pts$"), raw="Activity Pts"),
+    },
+    I18nText.WeeklyActivityPts: {
+        Language.ZH: RegexStr(r"^游历值$", raw="游历值"),
+        Language.EN: RegexStr(flex_ws(r"^Weekly Activity Pts$"), raw="Weekly Activity Pts"),
     },
     I18nText.ActivityClaim: {
         Language.ZH: RegexStr(r"^领取$", raw="领取"),

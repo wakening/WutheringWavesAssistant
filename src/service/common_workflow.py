@@ -30,6 +30,14 @@ def bbox_dialogue(ctx: NodeContext) -> BBox:
     ))
 
 
+def bbox_guidebook_title(ctx: NodeContext) -> BBox:
+    """索拉指南左上角小标题"""
+    return ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Top | Align.Left),
+        AnchorPoint(300, 100, Align.Top | Align.Left),
+    ))
+
+
 def bbox_guidebook_item(ctx: NodeContext) -> BBox:
     """索拉指南左侧选项区"""
     return ctx.scaler.as_bbox(AnchorBBox(

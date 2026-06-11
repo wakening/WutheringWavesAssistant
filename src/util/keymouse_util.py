@@ -175,6 +175,8 @@ def scroll_mouse(hwnd, count: int, x: int | float = 0, y: int | float = 0, secon
     :param x: 鼠标 X 坐标
     :param y: 鼠标 Y 坐标
     """
+    x = int(x)
+    y = int(y)
     logger.debug("Mouse scroll: %d, %d, %d", count, x, y)
     w_param = win32api.MAKELONG(0, win32con.WHEEL_DELTA * count)
     l_param = win32api.MAKELONG(x, y) # 鼠标位置，相对于窗口

@@ -324,6 +324,14 @@ def get_screen_wh():
     return width, height
 
 
+def client_to_screen(hwnd, client_point: tuple[int, int]) -> tuple[int, int]:
+    """电脑屏幕的宽高px（分辨率）"""
+    # noinspection PyUnresolvedReferences
+    screen_point = win32gui.ClientToScreen(hwnd, client_point)
+    logger.debug(f"client_to_screen: {client_point} -> {screen_point}")
+    return screen_point
+
+
 def get_client_rect_on_screen(hwnd) -> tuple[int, int, int, int]:
     left, top, right, bottom = win32gui.GetClientRect(hwnd)
     # 将客户区左上角 (0, 0) 转换为屏幕坐标
