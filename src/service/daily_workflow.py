@@ -329,7 +329,8 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
             lambda: ui.snapshot().click_text(ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
         return False
 
-    ui.sleep(2).wait_back_home().sleep(1.0)
+    ui.sleep(2).wait_back_home()
+    ui.sleep(1.0)
     return True
 
 
@@ -373,7 +374,8 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     result = ui.search(ctx.tr(I18nText.ResonatorDowned), roi)
     if result:
         logger.info(f"resonator downed: {len(result)}")
-        ui.esc().sleep(0.5).wait_back_home().sleep(0.3)
+        if ui.esc().sleep(0.5).wait_back_home():
+            ui.sleep(0.3)
         return False
 
     # 匹配编队角色名
@@ -900,7 +902,10 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)):
             return _fail_return()
 
-    ui.sleep(2).wait_back_home().sleep(1.0)
+    if ui.sleep(2).wait_back_home():
+        ui.sleep(1.0)
+    else:
+        return _fail_return()
 
     # 走到副本门口
     ui.move(route)
@@ -1185,17 +1190,25 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 点击快速旅行
         ui.click_text(ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)
 
-        ui.sleep(2).wait_back_home().sleep(1.0)
+        if ui.sleep(2).wait_back_home():
+            ui.sleep(1.0)
+        else:
+            return _fail_return()
 
         def _move():
             # 前往战斗区域
             ui.move(route[0])
             # 进门加载
             if not ui.is_on_homepage():
-                ui.wait_back_home().sleep(0.8)
+                if ui.wait_back_home():
+                    ui.sleep(0.8)
+                else:
+                    return False
             ui.move(route[1])
+            return True
 
-        _move()
+        if not _move():
+            return _fail_return()
 
         if cur_instance == I18nText.TacetFieldSolisiaLanding:
             # 落日堤屿
@@ -1342,7 +1355,10 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             ui.esc().sleep(1)
                             return False
 
-                    ui.sleep(0.5).wait_back_home().sleep(0.7)
+                    if ui.sleep(0.5).wait_back_home():
+                        ui.sleep(0.7)
+                    else:
+                        return _fail_return()
                     return True
 
                 # 领取奖励
@@ -1351,7 +1367,8 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     pass
                 # 不在旁边，可能离得很远，重传重置位置
                 elif _map_fast_travel():
-                    _move()
+                    if not _move():
+                        return _fail_return()
                     ui.sleep(0.3)
 
                 # 寻找领取奖励交互点
@@ -1564,7 +1581,10 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return _fail_return()
     # 点击快速旅行
     elif ui.click_text(ctx.tr(I18nText.FastTravel), pk=PointKind.NEAR, delay=0.2, times=2, interval=0.3):
-        ui.sleep(2).wait_back_home().sleep(1.0)
+        if ui.sleep(2).wait_back_home():
+            ui.sleep(1.0)
+        else:
+            return _fail_return()
 
         # 走到副本门口
         ui.move(route)
@@ -1741,7 +1761,10 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info(f"{ctx.tr(I18nText.YouHaveReachedTheChallengeLimit).raw}")
             cur_fsm.complete()
             if ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4):
-                ui.sleep(2).wait_back_home().sleep(0.5)
+                if ui.sleep(2).wait_back_home():
+                    ui.sleep(0.5)
+                else:
+                    return _fail_return()
             else:
                 logger.warning(f"Text not found: {ctx.tr(I18nText.WeeklyExit).raw}")
             return True
@@ -1776,7 +1799,8 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         ui.wait().until(
             lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2))
         cur_fsm.complete()
-        ui.sleep(2).wait_back_home().sleep(0.5)
+        if ui.sleep(2).wait_back_home():
+            ui.sleep(0.5)
         return True
 
     if not cur_fsm.is_terminal:
@@ -1931,7 +1955,10 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 点击快速旅行
             ui.click_text(ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)
 
-            ui.sleep(2).wait_back_home().sleep(1.0)
+            if ui.sleep(2).wait_back_home():
+                ui.sleep(1.0)
+            else:
+                return False
 
             # 前往战斗区域
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
@@ -2071,7 +2098,9 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         ui.esc().sleep(1)
                         return False
 
-                ui.sleep(0.5).wait_back_home().sleep(0.7)
+                if not ui.sleep(0.5).wait_back_home():
+                    return False
+                ui.sleep(0.7)
                 return True
 
             if ui.snapshot().search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):

@@ -70,7 +70,8 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
 
         self._i18n_page_global = I18nPageX(I18N_PAGES)
 
-        self._login_reset_z_order = None
+        # self._login_reset_z_order = None
+        self._login_reset_time = time.perf_counter()
 
         self._global_action = {
             I18nPage.Terminal.PAGE: self._build_UI_ESC_Terminal,
@@ -273,9 +274,9 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         return True
 
     def _build_Login_ClickLink(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
-        if self._ctx.shared.login_mv_window and not self._login_reset_z_order:
-            from src.util import hwnd_util
-            from src.util import keymouse_util
+        # if self._ctx.shared.login_mv_window and not self._login_reset_z_order:
+        if time.perf_counter() - self._login_reset_time > 3:
+            from src.util import hwnd_util, keymouse_util
             # 1. 先获取当前鼠标位置
             original_x, original_y = keymouse_util.get_mouse_position()
             # 2. 释放鼠标限制（如果有）
@@ -283,10 +284,11 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             # 3. 取消游戏窗口的置顶状态
             hwnd_util.set_window_not_topmost(self._window_service.window)
             # 4. 移动窗口
-            hwnd_util.set_window_left_top_and_below_another(self._window_service.window, self._ctx.spec.gui_win_id)
+            hwnd_util.set_window_below_another(self._window_service.window, self._ctx.spec.gui_win_id)
+            # hwnd_util.set_window_left_top_and_below_another(self._window_service.window, self._ctx.spec.gui_win_id)
             # 5. 将鼠标移回原位
             keymouse_util.set_mouse_position(original_x, original_y)
-            self._login_reset_z_order = True
+            # self._login_reset_z_order = True
 
         textbox = bbox_map.get(I18nPage.Login_ClickLink.ClickLink)
         self._control_service.click(textbox.center)

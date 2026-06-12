@@ -757,7 +757,7 @@ class UIOp:
         bbox = match.get(key)
         if not bbox:
             raise ValueError(f"Invalid key: {key}")
-        self.click_bbox(bbox, pk)
+        self.click_bbox(bbox, pk=pk)
         return self
 
     def click_text(
@@ -785,7 +785,7 @@ class UIOp:
         if delay > 0:
             self.sleep(delay)
         logger.debug(f"click: {regex_str}")
-        self.click_bbox(res[0], pk, times, interval)
+        self.click_bbox(res[0], pk=pk, times=times, interval=interval)
         return True
 
     # --------- 等待相关 ---------
@@ -818,7 +818,7 @@ class UIOp:
             self.__init_home_color_match()
         return self.__home_color_match.match(img if img is not None else self.grap())
 
-    def wait_back_home(self, timeout: int = 60, interval: float = 1.0):
+    def wait_back_home(self, timeout: int = 20, interval: float = 1.0, close_window: bool = False):
         """循环等待回到主界面"""
         if not self.__home_color_match:
             self.__init_home_color_match()
@@ -828,11 +828,14 @@ class UIOp:
         while time.monotonic() < deadline:
             if self.is_on_homepage():
                 self.activate()
-                return self
+                return True
             self.sleep(interval)
-        # 卡在加载，强制关闭
-        self.ctx.control_service.close_window()
-        raise Exception("等待回到主界面超时")
+
+        if close_window:
+            # 卡在加载，强制关闭
+            self.ctx.control_service.close_window()
+            raise Exception("等待回到主界面超时")
+        return False
 
     # --------- 按键相关 ---------
 
