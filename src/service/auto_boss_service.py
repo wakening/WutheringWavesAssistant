@@ -130,6 +130,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
         )
         self._general_pages.append(update_game_exit_page)
 
+        login__confirm__update_finished = self.build_Login_Confirm_UpdateFinished()
+        self._general_pages.append(login__confirm__update_finished)
+
         # def driver_version_is_too_old_action(positions: dict[str, Position]) -> bool:
         #     """
         #     更新完成，请重新启动游戏。

@@ -440,6 +440,11 @@ def set_hwnd_center(hwnd=None):
                           win32con.SWP_NOSIZE | win32con.SWP_NOZORDER | win32con.SWP_SHOWWINDOW)
 
 
+def set_foreground_window(hwnd):
+    """窗口置顶一次"""
+    win32gui.SetForegroundWindow(hwnd)
+
+
 def is_foreground_window(hwnd):
     """判断窗口是否为前台窗口"""
     if hwnd is None:
@@ -448,3 +453,4 @@ def is_foreground_window(hwnd):
     foreground_hwnd = win32gui.GetForegroundWindow()
     # 判断目标窗口句柄是否与前台窗口句柄相同
     return hwnd == foreground_hwnd
+

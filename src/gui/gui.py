@@ -58,6 +58,35 @@ def show_traceback(is_debug: bool = False):
     qInstallMessageHandler(qt_message_handler)
 
 
+def set_foreground_window(w):
+    if sys.platform == "win32":
+        def _set_foreground_window():
+            try:
+                import win32gui, win32con
+                hwnd = int(w.winId())
+                # win32gui.SetForegroundWindow(hwnd)
+                win32gui.SetWindowPos(
+                    hwnd,
+                    win32con.HWND_TOPMOST,
+                    0, 0, 0, 0,
+                    win32con.SWP_NOMOVE | win32con.SWP_NOSIZE
+                )
+
+                win32gui.SetWindowPos(
+                    hwnd,
+                    win32con.HWND_NOTOPMOST,
+                    0, 0, 0, 0,
+                    win32con.SWP_NOMOVE | win32con.SWP_NOSIZE
+                )
+            except Exception:
+                pass
+
+        _set_foreground_window()
+    else:
+        w.raise_()
+        w.activateWindow()
+
+
 def wwa():
     is_exist()
     show_traceback()
@@ -83,6 +112,8 @@ def wwa():
     # create main window
     w = MainWindow()
     w.show()
+
+    set_foreground_window(w)
 
     app.exec()
 

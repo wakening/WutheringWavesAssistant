@@ -1,5 +1,6 @@
 import logging
 import re
+import threading
 import time
 from typing import Optional
 
@@ -90,6 +91,53 @@ def absorb_around_variant(ctx: NodeContext):
     return False
 
 
+def absorb_around_variant_blind(ctx: NodeContext):
+    """
+    路线为：环绕吸收变体
+    识别：只有执行前会识别一次，防止刚好就在脚下，及时结束。后续不识别吸收盲捡
+    :param ctx:
+    :return:
+    """
+    roi = bbox_dialogue(ctx)
+    ui = UIOp(ctx)
+
+    if ui.snapshot(roi=roi).search(ctx.tr(I18nText.Absorb)):
+        return absorb_and_claim_rewards(ctx)
+
+    route = [
+        Run.forward(0.22), Run.forward(0.23), Run.left(0.22), Run.backward(0.27), Run.backward(0.27),
+        Run.right(0.22), Run.forward(0.27), Run.right(0.22), Run.forward(0.23), Run.backward(0.53)
+    ]
+
+    def _pickup(_event):
+        t = 0.05
+        while _event.is_set():
+            ctx.control_service.pick_up()
+            time.sleep(t)
+
+    executor = RouteExecutor(ctx)
+    event = threading.Event()
+    event.set()
+    thread = threading.Thread(target=_pickup, args=(event,))
+    thread.daemon = True
+    thread.start()
+
+    try:
+        for i, step in enumerate(route):
+            key = step.direction.get_key()
+            # 点按停顿
+            if i > 0:
+                ctx.control_service.fight_tap(key, 0.05)
+                ctx.control_service.fight_tap(key, 0.05)
+
+            executor.execute([step])
+            time.sleep(0.1)
+    finally:
+        event.clear()
+        thread.join(timeout=1)
+    return True
+
+
 def absorb_and_claim_rewards(ctx: NodeContext) -> bool:
     """
     吸收和领取奖励重合
@@ -152,36 +200,6 @@ def absorb_and_claim_rewards(ctx: NodeContext) -> bool:
     logger.info("吸收声骸")
 
     return True
-
-
-# def claim_rewards_around(ctx: NodeContext):
-#     """环绕领取奖励，如无音区"""
-#     roi = bbox_dialogue(ctx)
-#     ui = UIOp(ctx)
-#
-#     if ui.snapshot(roi).search(ctx.tr(I18nText.ClaimRewards)):
-#         logger.info("发现领取奖励")
-#         return True
-#
-#     route = [
-#         Run.forward(0.22), Run.forward(0.23), Run.left(0.22), Run.backward(0.27), Run.backward(0.27),
-#         Run.right(0.22), Run.forward(0.27), Run.right(0.22), Run.forward(0.23), Run.backward(0.53)
-#     ]
-#
-#     for i, step in enumerate(route):
-#         key = step.direction.get_key()
-#         # 点按停顿
-#         if i > 0:
-#             ctx.control_service.fight_tap(key, 0.05)
-#             ctx.control_service.fight_tap(key, 0.05)
-#         ctx.control_service.forward_run(step.duration, key)
-#         # 等待惯性停止
-#         time.sleep(0.75)
-#         if ui.snapshot(roi=roi).search(ctx.tr(I18nText.ClaimRewards)):
-#             logger.info("发现领取奖励")
-#             return True
-#
-#     return False
 
 
 def move_and_scan_dialogue(ctx: NodeContext, regex_str: str | list[str], loop: int, steps: int = 2):

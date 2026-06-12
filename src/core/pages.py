@@ -861,6 +861,7 @@ class UIOp:
     def move(self, route: list[MoveStep]):
         """执行人物移动路线"""
         self._route_executor.execute(route)
+        return self
 
 
 if __name__ == '__main__':

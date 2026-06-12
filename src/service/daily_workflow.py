@@ -17,7 +17,7 @@ from src.core.resonator import Resonator
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
-    absorb_around_variant, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
+    absorb_around_variant_blind, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
     match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
     object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_materials_spots, bbox_dialogue,
     bbox_guidebook_title,
@@ -1934,7 +1934,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             ui.sleep(2).wait_back_home().sleep(1.0)
 
             # 前往战斗区域
-            ui.move(tacets_route[_tacets_idx])
+            ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
             if cur_instance == I18nText.StarblindCrashsiteTacetDiscordNest:
                 # 盲望之塌
@@ -1961,7 +1961,8 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 raise NotImplementedError()
 
             # 没刷就打
-            if not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared)):
+            is_combat = not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared))
+            if is_combat:
                 combat_system = CombatSystem(ctx.control_service, ctx.img_service)
                 combat_system.set_resonators(ctx.shared.team_members)
                 combat_system.is_async = True
@@ -2078,23 +2079,25 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 cur_fsm.complete()
                 return True
 
-            if not _map_fast_travel():
-                if in_progress:
-                    # 没找到吸收，再次来不管怎样都结束掉
-                    cur_fsm.complete()
-                return True
-            # 前往战斗区域
-            ui.move(tacets_route[_tacets_idx])
+            # 触发过战斗才需要重置位置
+            if is_combat:
+                if not _map_fast_travel():
+                    # 原地传送失败就结束
+                    if in_progress:
+                        # 没找到吸收，再次来不管怎样都结束掉
+                        cur_fsm.complete()
+                    return True
+                # 前往战斗区域
+                ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
-            if ui.snapshot().search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
-                ui.pick_up(2, 0.2)
-                cur_fsm.complete()
-                return True
-            if absorb_around_variant(ctx):
-                cur_fsm.complete()
-            elif in_progress:
-                # 没找到吸收，再次来不管怎样都结束掉
-                cur_fsm.complete()
+                if ui.snapshot().search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
+                    ui.pick_up(2, 0.2)
+                    cur_fsm.complete()
+                    return True
+
+            absorb_around_variant_blind(ctx)
+            # 不管怎样都结束掉
+            cur_fsm.complete()
             return True
 
         # 标记剩余待完成的任务为失败

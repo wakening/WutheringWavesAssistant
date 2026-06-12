@@ -2040,8 +2040,9 @@ I18N_PAGES = {
         Language.ZH: {
             I18nPage.Name: "连接已断开",
             I18nPage.Include: {
+                # 已与服务器断开连接，请尝试重新登录，如有疑问请联系客服
                 I18nPage.Login_Disconnected.Disconnected: r"连接已断开",
-                I18nPage.Login_Disconnected.LoginTimeout: r"登录超时",
+                # I18nPage.Login_Disconnected.LoginTimeout: r"登录超时",
                 I18nPage.Login_Disconnected.Confirm: r"^确认$",
             },
             I18nPage.Exclude: {},

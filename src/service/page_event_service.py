@@ -837,8 +837,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
-                position = positions["确认"]
-                self._control_service.click(*position.center)
+                # position = positions["确认|Confirm"]
+                # self._control_service.click(*position.center)
+                self._window_service.close_window()
                 time.sleep(2)
                 return True
 
