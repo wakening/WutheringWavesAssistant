@@ -974,6 +974,10 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #         img_util.save_img_in_temp(img_draw)
                 #     continue
                 no_text_count -= 1
+            # 断开连接
+            if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                combat_system.stop(join=True)
+                return False
             if ctx.page_service.global_page_action(ui.ocr_result):
                 logger.debug("global_page_action")
 
@@ -1287,6 +1291,10 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         #         img_util.save_img_in_temp(img_draw)
                         #     continue
                         no_text_count -= 1
+                    # 断开连接
+                    if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                        combat_system.stop(join=True)
+                        return False
                     if ctx.page_service.global_page_action(ui.ocr_result):
                         logger.debug("global_page_action")
 
@@ -1718,6 +1726,10 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #         img_util.save_img_in_temp(img_draw)
                 #     continue
                 no_text_count -= 1
+            # 断开连接
+            if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                combat_system.stop(join=True)
+                return False
             if ctx.page_service.global_page_action(ui.ocr_result):
                 logger.debug("global_page_action")
 
@@ -2032,6 +2044,11 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         #         img_util.save_img_in_temp(img_draw)
                         #     continue
                         no_text_count -= 1
+
+                    # 断开连接
+                    if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                        combat_system.stop(join=True)
+                        return False
                     if ctx.page_service.global_page_action(ui.ocr_result):
                         logger.debug("global_page_action")
 
