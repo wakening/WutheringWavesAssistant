@@ -532,10 +532,10 @@ class AutoBossServiceImpl(PageEventAbstractService):
                     name="连接已断开",
                     text="连接已断开",
                 ),
-                TextMatch(
-                    name="登录超时，请重新尝试",
-                    text="登录超时",
-                ),
+                # TextMatch(
+                #     name="登录超时，请重新尝试",
+                #     text="登录超时",
+                # ),
                 TextMatch(
                     name="确认",
                     text="^确认$",
