@@ -866,24 +866,36 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         else:
             local.doubleDropForgeryChallengeFSM.complete()
 
-    # 获取这页的副本
     keywords = ctx.tr([*tacets, I18nText.Go])
-    # textboxes = ui.sleep(0.1).snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
-    textboxes = ui.sleep(0.1).snapshot().search(keywords, bbox_guidebook_content(ctx))
-    if not textboxes:
-        return _fail_return()
-    textboxes.sort(key=lambda p: p.y1)
-    logger.debug(f"textboxes: {textboxes}")
 
     # 两个一组分组
     card = None
-    for textbox in textboxes:
-        if re.search(ctx.tr(tacets[index]), textbox.text, re.I):
-            card = [textbox, None]
-            continue
-        if card is not None and re.search(ctx.tr(I18nText.Go), textbox.text, re.I):
-            card[1] = textbox
-            break
+    for i in range(2):
+        # 下一页
+        if i > 0:
+            if card and len(card) > 1 and card[1]:
+                break
+            card = None
+            scroll_point = ctx.scaler.as_point(AnchorPoint(1245, 427, Align.Top | Align.Right))
+            logger.debug(f"scroll_point: {scroll_point}")
+            ui.sleep(0.2).click_point(scroll_point, times=2, interval=0.2).sleep(0.2)
+
+        # 获取这页的副本
+        # textboxes = ui.sleep(0.1).snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
+        textboxes = ui.sleep(0.1).snapshot().search(keywords, bbox_guidebook_content(ctx))
+        if not textboxes:
+            return _fail_return()
+        textboxes.sort(key=lambda p: p.y1)
+        logger.debug(f"textboxes: {textboxes}")
+
+        # 找出指定副本
+        for textbox in textboxes:
+            if re.search(ctx.tr(tacets[index]), textbox.text, re.I):
+                card = [textbox, None]
+                continue
+            if card is not None and re.search(ctx.tr(I18nText.Go), textbox.text, re.I):
+                card[1] = textbox
+                break
     logger.debug(f"card: {card}")
     if not card or any(i is None for i in card):
         logger.debug(f"result: {ui.bbox_result}")
@@ -1522,6 +1534,16 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 确认已进入战歌重奏
     if not ui.wait().until(_wait_content):
         return _fail_return()
+
+    # 检查体力
+    cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
+    if cur_waveplate is None or waveplate_crystal is None:
+        return False
+    cost = 60
+    if cur_waveplate < cost:
+        logger.info(f"⏭️ skip because: waveplate &lt; {cost}")
+        cur_fsm.complete()
+        return True
 
     # 本周剩余可收取次数: 3/3
     result = ui.sleep(0.2).wait().until(
