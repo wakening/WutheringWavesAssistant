@@ -2698,6 +2698,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     BossNameEnum.Jue.value,
                     BossNameEnum.Hecate.value,
                     BossNameEnum.Fleurdelys.value,
+                    BossNameEnum.LadyOfTheSea.value,
                     BossNameEnum.ThrenodianLeviathan.value,
                     BossNameEnum.Sigillum.value,
                     BossNameEnum.SeedOfIllusoryOrigin.value,
