@@ -730,14 +730,21 @@ class UIOp:
                 self.sleep(interval)
         return self
 
-    def click_point(self, point: Point, times: int = 1, interval: float = 0.0):
+    def click_point(self, point: Point, *, times: int = 1, interval: float = 0.0):
         """点击点/逻辑点"""
         if isinstance(point, AnchorPoint):
             point = self.ctx.scaler.as_point(point)
         self.click(point.x, point.y, times, interval)
         return self
 
-    def click_bbox(self, bbox: BBox | AnchorBBox, pk: PointKind = PointKind.CENTER, times: int = 1, interval: float = 0.0):
+    def click_bbox(
+            self,
+            bbox: BBox | AnchorBBox,
+            *,
+            pk: PointKind = PointKind.CENTER,
+            times: int = 1,
+            interval: float = 0.0
+    ):
         """点击指定框内的点"""
         if isinstance(bbox, AnchorBBox):
             bbox = self.ctx.scaler.as_bbox(bbox)
@@ -764,6 +771,7 @@ class UIOp:
         self,
         regex_str: str | list[str],
         roi: Optional[BBox | AnchorBBox] = None,
+        *,
         pk: PointKind = PointKind.CENTER,
         delay: float = 0.0,
         times: int = 1,

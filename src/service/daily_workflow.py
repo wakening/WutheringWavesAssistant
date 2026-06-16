@@ -514,13 +514,15 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         return None
 
     # 根据任务的开启状态分发任务
-    # TODO 动态
     if local.materialsSpotsFSM.is_active:
         # 素材获取
         if not ui.search(materialsSpots, title_roi):
             ui.sleep(0.2)
             for i in range(2):
                 icon_point = search_icon_materials_spots(ctx)
+                if not icon_point:
+                    logger.warning(f"materialsSpots icon not found")
+                    return None
                 ui.click(*icon_point, times=2, interval=0.3)
                 if ui.sleep(0.2).wait(2, 0.3).until(lambda: ui.snapshot().search(materialsSpots, title_roi)):
                     break
