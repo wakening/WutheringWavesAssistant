@@ -18,3 +18,14 @@ BannerWidget > #galleryLabel {
     color: black;
     padding-left: 10px;
 }
+
+QLabel {
+    font: 14px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
+    color: black;
+}
+
+/*CheckBox#titleCheckBox {*/
+/*    font: 40px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';*/
+/*    font-weight: 600;*/
+/*    color: white;*/
+/*}*/

@@ -107,10 +107,18 @@ class ResonatorNameEnum(Enum):
     hiyuki = "绯雪"
     denia = "达妮娅"
 
-    # v3.x
+    # v3.4
     lucy = "露西"
     rebecca = "丽贝卡"
     lucilla = "洛瑟菈"
+
+    # v3.x
+    yangyangxuanling = "秧秧玄翎"
+    suisui = "穗穗"
+    suoming = "锁暝"
+    jingran = "景燃"
+    qingxiao = "清宵"
+    hsin = "心"
 
     # 缓存
     __value_map = None

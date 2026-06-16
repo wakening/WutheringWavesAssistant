@@ -184,6 +184,67 @@ def scroll_mouse(hwnd, count: int, x: int | float = 0, y: int | float = 0, secon
     __sleep(seconds)
 
 
+# noinspection PyUnresolvedReferences
+def mouse_drag(hwnd,
+               p1: tuple[int | float, int | float], p2: tuple[int | float, int | float], seconds: float = 0.0):
+    """
+    拖动鼠标，从一个点到另一个点
+
+    :param seconds:
+    :param hwnd: 目标窗口句柄
+    :param count: 一次滚动多少个单位（正数=向上滚，负数=向下滚）
+    :param p1: 起始坐标
+    :param p2: 结束坐标
+    """
+    start_x = int(p1[0])
+    start_y = int(p1[1])
+    end_x = int(p2[0])
+    end_y = int(p2[1])
+    logger.warning(f"Mouse drag: {p1}, {p2}")
+
+    # 鼠标按下
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, win32api.MAKELONG(start_x, start_y))
+
+    # # 拖动
+    # for x in range(start_x, end_x, 5):
+    #     win32gui.PostMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, win32api.MAKELONG(x, start_y))
+    #     time.sleep(0.01)  # 控件可能需要时间处理
+
+    # 鼠标直接到终点
+    win32gui.PostMessage(hwnd, win32con.WM_MOUSEMOVE, win32con.MK_LBUTTON, win32api.MAKELONG(end_x, end_y))
+    # __sleep(seconds)
+
+    # 鼠标松开
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, win32api.MAKELONG(end_x, end_y))
+
+    __sleep(seconds)
+
+
+def mouse_drag2(hwnd, count: int, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+    """
+    拖动鼠标，从一个点到另一个点
+
+    :param seconds:
+    :param hwnd: 目标窗口句柄
+    :param count: 一次滚动多少个单位（正数=向上滚，负数=向下滚）
+    :param x: 鼠标 X 坐标
+    :param y: 鼠标 Y 坐标
+    """
+    x = int(x)
+    y = int(y)
+
+    # 鼠标按下
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, win32api.MAKELONG(x, y))
+    logger.debug("Mouse click: (%s, %s), seconds: %s", x, y, seconds)
+
+    scroll_mouse(hwnd, count, x, y, seconds)
+
+    l_param = win32api.MAKELONG(x, y)
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
+
+    __sleep(seconds)
+
+
 ###### Other ######
 
 

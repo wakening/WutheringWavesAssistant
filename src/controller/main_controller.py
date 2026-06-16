@@ -9,6 +9,7 @@ import time
 from enum import Enum
 from typing import Sequence, Dict
 
+from src import __version__
 from src.config.config import Config
 from src.config.gui_config import ParamConfig
 from src.core import environs
@@ -69,10 +70,10 @@ class TaskMonitor:
     def run(self):
         # TODO 多任务运行管理
         if "EchoMergeProcessTask" in self.running_tasks:
-            self._run_EchoMergeProcessTask(task_name = "EchoMergeProcessTask")
+            self._run_EchoMergeProcessTask(task_name="EchoMergeProcessTask")
             return
         if "DailyTask" in self.running_tasks:
-            self._run_EchoMergeProcessTask(task_name = "DailyTask")
+            self._run_EchoMergeProcessTask(task_name="DailyTask")
             return
         elif "SoarToTheBeatMacroReplayTask" in self.running_tasks:
             self._run_SoarToTheBeatTask("SoarToTheBeatMacroReplayTask")
@@ -104,12 +105,15 @@ class TaskMonitor:
                             if task_name == "SoarToTheBeatMacroRecordTask":
                                 self.parent.stop_task_in_monitor(task_name)
                                 if status == "finished" and content:
-                                    globalSignal.taskInfoBarSignal.emit("Macro Record: ", content if content else status, 6000)
+                                    globalSignal.taskInfoBarSignal.emit("Macro Record: ",
+                                                                        content if content else status, 6000)
                                 else:
-                                    globalSignal.taskInfoBarSignal.emit("Macro Record: ", content if content else status, 3000)
+                                    globalSignal.taskInfoBarSignal.emit("Macro Record: ",
+                                                                        content if content else status, 3000)
                             elif task_name == "SoarToTheBeatMacroReplayTask":
                                 self.parent.stop_task_in_monitor(task_name)
-                                globalSignal.taskInfoBarSignal.emit("Macro Replay: ", content if content else status, 3000)
+                                globalSignal.taskInfoBarSignal.emit("Macro Replay: ", content if content else status,
+                                                                    3000)
                             else:
                                 self.parent.stop_task_in_monitor(task_name)
                             break
@@ -361,7 +365,6 @@ class MainController:
             AutoStoryProcessTask, DailyActivityProcessTask, ProcessTask, SoarToTheBeatMacroReplayTask, \
             SoarToTheBeatMacroRecordTask, DailyTask
 
-
         self.tasks = {
             "MouseResetProcessTask": MouseResetProcessTask,
             "AutoBossProcessTask": AutoBossProcessTask,
@@ -398,7 +401,7 @@ class MainController:
 
                 self._run_task(task_name)
 
-                logger.info("任务已提交: %s", task_name)
+                logger.info(f"ver.{__version__}, 任务已提交: {task_name}")
                 return True, "任务已提交"
             elif task_ops == TaskOpsEnum.STOP.value:
                 logger.info("准备关闭任务: %s", task_name)
@@ -408,7 +411,7 @@ class MainController:
 
                 self._stop_task(task_name)
 
-                logger.info("任务已停止: %s", task_name)
+                logger.info(f"ver.{__version__}, 任务已停止: {task_name}")
                 return True, "任务已停止"
             else:
                 raise NotImplementedError(f"不支持的类型{task_ops}")
@@ -417,7 +420,8 @@ class MainController:
         spec = TaskSpec()
         ipc = IPCManager()
 
-        if task_name in ["SoarToTheBeatMacroReplayTask", "SoarToTheBeatMacroRecordTask"]:
+        # if task_name in ["SoarToTheBeatMacroReplayTask", "SoarToTheBeatMacroRecordTask"]:
+        if task_name in []:
             ipc.log_queue = None
             ipc.event_queue = queue.Queue(maxsize=200)
 
@@ -504,7 +508,6 @@ class MainController:
     def set_gui_win_id(self, gui_win_id: int):
         logger.debug("gui_win_id: %s", gui_win_id)
         self.gui_win_id = gui_win_id
-
 
 # if __name__ == '__main__':
 #     from src.config import logging_config

@@ -7,8 +7,8 @@ from PySide6.QtGui import Qt
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from qfluentwidgets import InfoBar, InfoBarPosition
 
-from .signal_bus import signalBus
-from .config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION, VERSION_URLS
+from src.gui.common.signal_bus import signalBus
+from src.gui.common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION, VERSION_URLS
 
 logger = logging.getLogger(__name__)
 

@@ -639,9 +639,15 @@ class Resonator(Enum):
     # v3.4
     Lucy = create_tmp_resonator(I18nText.Lucy)
     Rebecca = create_tmp_resonator(I18nText.Rebecca)
+    Lucilla = create_tmp_resonator(I18nText.Lucilla)
 
     # v3.x
-    Lucilla = create_tmp_resonator(I18nText.Lucilla)
+    YangyangXuanling = create_tmp_resonator(I18nText.YangyangXuanling)
+    Suisui = create_tmp_resonator(I18nText.Suisui)
+    Suoming = create_tmp_resonator(I18nText.Suoming)
+    Jingran = create_tmp_resonator(I18nText.Jingran)
+    Qingxiao = create_tmp_resonator(I18nText.Qingxiao)
+    Hsin = create_tmp_resonator(I18nText.Hsin)
 
     __value_map = None
 
@@ -710,6 +716,12 @@ class Resonator(Enum):
             I18nText.Lucy,
             I18nText.Rebecca,
             I18nText.Lucilla,
+            I18nText.YangyangXuanling,
+            I18nText.Suisui,
+            I18nText.Suoming,
+            I18nText.Jingran,
+            I18nText.Qingxiao,
+            I18nText.Hsin,
         ]
 
 

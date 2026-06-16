@@ -122,12 +122,12 @@ class BossNameListSerializer(ConfigSerializer):
 
     def serialize(self, values: list[Enum]):
         enumList = [value.name for value in values]
-        logger.debug(enumList)
+        # logger.debug(enumList)
         return enumList
 
     def deserialize(self, values: list[str]):
         enumList = [self.enumClass[value] for value in values]
-        logger.debug(enumList)
+        # logger.debug(enumList)
         return enumList
 
 class GameFolderValidator(ConfigValidator):

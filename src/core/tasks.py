@@ -171,12 +171,12 @@ class EchoMergeProcessTask(ProcessTask):
         return echo_merge_task_run
 
 
-class SoarToTheBeatMacroReplayTask(ThreadTask):
+class SoarToTheBeatMacroReplayTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
         return soar_to_the_beat_macro_replay_task
 
 
-class SoarToTheBeatMacroRecordTask(ThreadTask):
+class SoarToTheBeatMacroRecordTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
         return soar_to_the_beat_macro_record_task
 
@@ -215,7 +215,6 @@ class ClockAction:
 
 
 def create_parent_monitor(event, pid: int):
-
     def run():
         try:
             # 获取父进程
@@ -242,7 +241,6 @@ def create_parent_monitor(event, pid: int):
 
 
 def create_mouse_reset_monitor(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
-
     def run(**run_kwargs):
         # mouse_reset_task_run(event, spec, ipc, **run_kwargs)
         from src.util import cursor_guard_util

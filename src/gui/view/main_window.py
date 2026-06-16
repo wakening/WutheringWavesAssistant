@@ -8,22 +8,22 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkRe
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget
 
 from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
-                            SplashScreen, SystemThemeListener, isDarkTheme, InfoBarPosition, InfoBar)
-from qfluentwidgets import FluentIcon as FIF
+                            SplashScreen, SystemThemeListener, isDarkTheme, InfoBarPosition, InfoBar,
+                            FluentIcon as FIF)
 
-from .notice_interface import NoticeInterface
-from .gallery_interface import GalleryInterface
-from .home_interface import HomeInterface
-from .param_interface import ParamInterface
-from .setting_interface import SettingInterface
-from .terminal_interface import TerminalInterface
-from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION, VERSION_URLS
-from ..common.globals import globalSignal
-from ..common.icon import Icon
-from ..common.signal_bus import signalBus
-from ..common.translator import Translator
-from ..common import resource  # noqa: F401
-from ..common.version_control import RemoteVersion
+from src.gui.view.notice_interface import NoticeInterface
+from src.gui.view.gallery_interface import GalleryInterface
+from src.gui.view.home_interface import HomeInterface, HomeV2Interface
+from src.gui.view.param_interface import ParamInterface
+from src.gui.view.setting_interface import SettingInterface
+from src.gui.view.terminal_interface import TerminalInterface
+from src.gui.common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION, VERSION_URLS
+from src.gui.common.globals import globalSignal
+from src.gui.common.icon import Icon
+from src.gui.common.signal_bus import signalBus
+from src.gui.common.translator import Translator
+from src.gui.common import resource  # noqa: F401
+from src.gui.common.version_control import RemoteVersion
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +39,11 @@ class MainWindow(FluentWindow):
         # create system theme listener
         self.themeListener = SystemThemeListener(self)
 
+        # self.setStyleSheet("border: 2px solid red;")
+
         # create sub interface
-        self.homeInterface = HomeInterface(self)
+        # self.homeInterface = HomeInterface(self)
+        self.homeInterface = HomeV2Interface(self)
         self.paramInterface = ParamInterface(self)
         self.noticeInterface = NoticeInterface(self)
         self.terminalInterface = TerminalInterface(self)

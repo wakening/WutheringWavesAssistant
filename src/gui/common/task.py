@@ -1,0 +1,52 @@
+import logging
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from typing import Optional, Any
+
+from PySide6.QtCore import QObject, Signal
+
+from src.gui.common.globals import globalSignal
+
+logger = logging.getLogger(__name__)
+
+
+class TaskId(str, Enum):
+    DailyTask = "DailyTask"
+    AutoBossProcessTask = "AutoBossProcessTask"
+    AutoPickupProcessTask = "AutoPickupProcessTask"
+    AutoStorySkipProcessTask = "AutoStorySkipProcessTask"
+    AutoStoryEnjoyProcessTask = "AutoStoryEnjoyProcessTask"
+    DailyActivityProcessTask = "DailyActivityProcessTask"
+    EchoMergeProcessTask = "EchoMergeProcessTask"
+    SoarToTheBeatMacroReplayTask = "SoarToTheBeatMacroReplayTask"
+    SoarToTheBeatMacroRecordTask = "SoarToTheBeatMacroRecordTask"
+
+
+@dataclass
+class ValidationResult:
+    success: bool
+    message: str = ""
+    code: Optional[str] = None
+    detail: Optional[Any] = None
+
+
+class BaseTask(QObject):
+    taskSignal = Signal(object)
+
+    def __init__(self, id: str, name: str):
+        super().__init__()
+        self.id: str = id
+        self.name: str = name
+        self.create_time: datetime = datetime.now()
+
+    def validate(self, **kwargs) -> ValidationResult:
+        raise NotImplementedError()
+
+    def submit(self, start: bool):
+        logger.debug(f"Submitting {self.id}")
+        if start:
+            # json_string = json.dumps(self.config, ensure_ascii=False, indent=4)
+            globalSignal.executeTaskSignal.emit(self.id, "START")
+            return
+        globalSignal.executeTaskSignal.emit(self.id, "STOP")

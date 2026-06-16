@@ -16,10 +16,10 @@ from qfluentwidgets import (SettingCardGroup, ScrollArea,
                             LineEdit, SettingCard, ComboBox, ConfigItem,
                             PushButton, ToolButton, MessageBox)
 
-from ..common.config import paramConfig, BossNameEnum
-from ..common.globals import globalParam, globalSignal
-from ..common.style_sheet import StyleSheet
-from ..components.my_expand_setting_card import FlowExpandSettingCard
+from src.gui.common.config import paramConfig, BossNameEnum
+from src.gui.common.globals import globalParam, globalSignal
+from src.gui.common.style_sheet import StyleSheet
+from src.gui.components.my_expand_setting_card import FlowExpandSettingCard
 
 logger = logging.getLogger(__name__)
 
@@ -994,16 +994,16 @@ class ParamInterface(ScrollArea):
         self.bossGroup = SettingCardGroup(
             self.tr('Boss Rush Parameters'), self.scrollWidget)
 
-        self.bossNameCard = BossNameOptionsSettingCard(
-            paramConfig.bossName,
-            FIF.LABEL,
-            # self.tr('选择刷哪些boss'),
-            self.tr('Target Boss Names'),
-            self.tr("可任选。日常可刷梦魇哀声鸷来合成1c3c。梦魇或副本内boss建议单刷。"),
-            # self.tr("Choose any bosses, suggested: one for instances and nightmare, three for open world"),
-            texts=None,
-            parent=self.bossGroup
-        )
+        # self.bossNameCard = BossNameOptionsSettingCard(
+        #     paramConfig.bossName,
+        #     FIF.LABEL,
+        #     # self.tr('选择刷哪些boss'),
+        #     self.tr('Target Boss Names'),
+        #     self.tr("可任选。日常可刷梦魇哀声鸷来合成1c3c。梦魇或副本内boss建议单刷。"),
+        #     # self.tr("Choose any bosses, suggested: one for instances and nightmare, three for open world"),
+        #     texts=None,
+        #     parent=self.bossGroup
+        # )
 
         # self.bossLevelCard = ParamComboBoxSettingCard(
         #     paramConfig.bossLevel,
@@ -1088,7 +1088,7 @@ class ParamInterface(ScrollArea):
         # add cards to group
         self.gameGroup.addSettingCard(self.gamePathCard)
 
-        self.bossGroup.addSettingCard(self.bossNameCard)
+        # self.bossGroup.addSettingCard(self.bossNameCard)
         self.bossGroup.addSettingCard(self.bossLevelCard)
         # self.bossGroup.addSettingCard(self.comboSequenceCard)
         self.bossGroup.addSettingCard(self.autoCombatCard)

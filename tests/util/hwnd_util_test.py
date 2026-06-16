@@ -133,3 +133,39 @@ def test_get_wwg_path():
 def test_get_hwnds():
     hwnds = hwnd_util.get_hwnds()
     logger.debug(hwnds)
+
+
+def test_listen_click():
+    import win32api
+    import win32con
+    import win32gui
+    import ctypes
+    from ctypes import wintypes
+
+    # 目标窗口句柄
+    TARGET_HWND = hwnd_util.get_hwnd()
+
+    last_state = False
+
+    while True:
+        # 鼠标左键状态（按下瞬间）
+        state = win32api.GetAsyncKeyState(0x01)
+
+        # 高位为1表示当前按下
+        pressed = (state & 0x8000) != 0
+
+        # 只在“按下瞬间”触发一次
+        if pressed and not last_state:
+
+            x, y = win32api.GetCursorPos()
+
+            if TARGET_HWND:
+                cx, cy = win32gui.ScreenToClient(TARGET_HWND, (x, y))
+            else:
+                cx, cy = -1, -1
+
+            print(f"screen=({x},{y}) client=({cx},{cy})")
+
+        last_state = pressed
+
+        time.sleep(0.005)  # 5ms 足够实时了

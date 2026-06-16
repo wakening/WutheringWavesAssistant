@@ -83,6 +83,8 @@ class RegexStr(str):
 
 
 class I18nText:
+    """国际化key，唯一，kv必须一样，不然无法保证唯一性，有冲突就加功能前缀"""
+
     # ------- game window title -------
     WutheringWaves = "WutheringWaves"
 
@@ -140,6 +142,21 @@ class I18nText:
     Lucy = "Lucy"
     Rebecca = "Rebecca"
     Lucilla = "Lucilla"
+    YangyangXuanling = "YangyangXuanling"
+    Suisui = "Suisui"
+    Suoming = "Suoming"
+    Jingran = "Jingran"
+    Qingxiao = "Qingxiao"
+    Hsin = "Hsin"
+
+    # ------- Task -------
+    DailyTask = "DailyTask"
+    BossRushTask = "BossRushTask"
+    EchoMergeTask = "EchoMergeTask"
+    StoryTask = "StoryTask"
+    PickupTask = "PickupTask"
+    SoarToTheBeatMacroReplayTask = "SoarToTheBeatMacroReplayTask"
+    SoarToTheBeatMacroRecordTask = "SoarToTheBeatMacroRecordTask"
 
     # ------- Enemy Tracing -------
     # 加前缀是因为boss名、角色名有相同的，达妮娅
@@ -597,6 +614,60 @@ I18N_TEXT = {
     I18nText.Lucilla: {
         Language.ZH: RegexStr(r"^洛瑟菈$", raw="洛瑟菈"),
         Language.EN: RegexStr(flex_ws(r"^Lucilla$"), raw="Lucilla"),
+    },
+    I18nText.YangyangXuanling: {
+        Language.ZH: RegexStr(r"^秧秧.*?玄翎$", raw="秧秧·玄翎"),
+        Language.EN: RegexStr(flex_ws(r"^YangyangXuanling$"), raw="YangyangXuanling"),
+    },
+    I18nText.Suisui: {
+        Language.ZH: RegexStr(r"^穗穗$", raw="穗穗"),
+        Language.EN: RegexStr(flex_ws(r"^Suisui$"), raw="Suisui"),
+    },
+    I18nText.Suoming: {
+        Language.ZH: RegexStr(r"^锁暝$", raw="锁暝"),
+        Language.EN: RegexStr(flex_ws(r"^Suoming$"), raw="Suoming"),
+    },
+    I18nText.Jingran: {
+        Language.ZH: RegexStr(r"^景燃$", raw="景燃"),
+        Language.EN: RegexStr(flex_ws(r"^Jingran$"), raw="Jingran"),
+    },
+    I18nText.Qingxiao: {
+        Language.ZH: RegexStr(r"^清宵$", raw="清宵"),
+        Language.EN: RegexStr(flex_ws(r"^Qingxiao$"), raw="Qingxiao"),
+    },
+    I18nText.Hsin: {
+        Language.ZH: RegexStr(r"^心$", raw="心"),
+        Language.EN: RegexStr(flex_ws(r"^Hsin$"), raw="Hsin"),
+    },
+
+    # ------- Task -------
+    I18nText.DailyTask: {
+        Language.ZH: RegexStr(r"DailyTask", raw="DailyTask"),
+        Language.EN: RegexStr(r"DailyTask", raw="DailyTask"),
+    },
+    I18nText.BossRushTask: {
+        Language.ZH: RegexStr(r"BossRushTask", raw="BossRushTask"),
+        Language.EN: RegexStr(r"BossRushTask", raw="BossRushTask"),
+    },
+    I18nText.EchoMergeTask: {
+        Language.ZH: RegexStr(r"EchoMergeTask", raw="EchoMergeTask"),
+        Language.EN: RegexStr(r"EchoMergeTask", raw="EchoMergeTask"),
+    },
+    I18nText.StoryTask: {
+        Language.ZH: RegexStr(r"StoryTask", raw="StoryTask"),
+        Language.EN: RegexStr(r"StoryTask", raw="StoryTask"),
+    },
+    I18nText.PickupTask: {
+        Language.ZH: RegexStr(r"PickupTask", raw="PickupTask"),
+        Language.EN: RegexStr(r"PickupTask", raw="PickupTask"),
+    },
+    I18nText.SoarToTheBeatMacroReplayTask: {
+        Language.ZH: RegexStr(r"SoarToTheBeatMacroReplayTask", raw="SoarToTheBeatMacroReplayTask"),
+        Language.EN: RegexStr(r"SoarToTheBeatMacroReplayTask", raw="SoarToTheBeatMacroReplayTask"),
+    },
+    I18nText.SoarToTheBeatMacroRecordTask: {
+        Language.ZH: RegexStr(r"SoarToTheBeatMacroRecordTask", raw="SoarToTheBeatMacroRecordTask"),
+        Language.EN: RegexStr(r"SoarToTheBeatMacroRecordTask", raw="SoarToTheBeatMacroRecordTask"),
     },
 
     # ------- Enemy Tracing -------
