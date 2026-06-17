@@ -353,8 +353,8 @@ class TriggerController:
 
             if check:
                 logger.info("发现点位，开始回放")
-                from src.util import img_util
-                img_util.save_img_in_temp(img)
+                # from src.util import img_util
+                # img_util.save_img_in_temp(img)
                 break
 
             time.sleep(0.01)
