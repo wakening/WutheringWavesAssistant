@@ -165,6 +165,8 @@ class ResonatorNameEnum(Enum):
                 return cls.chisa
             if len(ocr_text) >= 3 and ocr_text.startswith(cls.luukherssen.value[0]) and ocr_text.endswith(cls.luukherssen.value[-2:]):
                 return cls.luukherssen
+            if len(ocr_text) == 3 and ocr_text.startswith(cls.lucilla.value[:2]):
+                return cls.lucilla
         return None
 
 
@@ -440,13 +442,13 @@ class BaseResonator(BaseCombo):
     _health_01_color = [(68, 179, 255)]  # BGR
 
     _health_20_point = [(528, 41)]
-    _health_20_color = [(62, 164, 255)]  # BGR
+    _health_20_color = [(62, 164, 255), (206, 237, 255)]  # BGR
 
     _health_30_point = [(565, 41)]
     _health_30_color = [(55, 148, 255)]  # BGR
 
     _health_50_point = [(641, 41)]
-    _health_50_color = [(38, 109, 255)]  # BGR
+    _health_50_color = [(38, 109, 255), (56, 124, 255)]  # BGR
 
     _health_100_point = [(830, 41)]
     _health_100_color = [(8, 37, 255)]  # BGR
@@ -456,6 +458,20 @@ class BaseResonator(BaseCombo):
     _health_30_color_checker = ColorChecker(_health_30_point, _health_30_color, align=AlignEnum.TOP_CENTER)
     _health_50_color_checker = ColorChecker(_health_50_point, _health_50_color, align=AlignEnum.TOP_CENTER)
     _health_100_color_checker = ColorChecker(_health_100_point, _health_100_color, align=AlignEnum.TOP_CENTER)
+
+
+    _immobilized_20_point = [(528, 52)]
+    _immobilized_20_color = [(255, 255, 255)]  # BGR
+
+    _immobilized_30_point = [(565, 52)]
+    _immobilized_30_color = [(255, 255, 255)]  # BGR
+
+    _immobilized_50_point = [(641, 52)]
+    _immobilized_50_color = [(255, 255, 255)]  # BGR
+
+    _immobilized_20_color_checker = ColorChecker(_immobilized_20_point, _immobilized_20_color, align=AlignEnum.TOP_CENTER)
+    _immobilized_30_color_checker = ColorChecker(_immobilized_30_point, _immobilized_30_color, align=AlignEnum.TOP_CENTER)
+    _immobilized_50_color_checker = ColorChecker(_immobilized_50_point, _immobilized_50_color, align=AlignEnum.TOP_CENTER)
 
     ## is_boss_health_bar_exist
     _tolerance = 20
@@ -592,7 +608,17 @@ class BaseResonator(BaseCombo):
         return health
 
     @classmethod
-    def is_boss_health_bar_exist(cls, img: np.ndarray) -> float:
+    def boss_immobilized_bar_exist(cls, img: np.ndarray) -> bool:
+        """ boss剩余白条比例，归一 """
+        immobilized = (cls._immobilized_20_color_checker.check(img)
+                       and cls._immobilized_30_color_checker.check(img)
+                       and cls._immobilized_50_color_checker.check(img))
+
+        logger.debug("boss_immobilized: %s", immobilized)
+        return immobilized
+
+    @classmethod
+    def is_boss_health_bar_exist(cls, img: np.ndarray) -> bool:
         """ boss剩余血条比例，归一 """
         if (cls._a_health_02_checker.check(img)
                 or cls._a_health_01_checker.check(img)

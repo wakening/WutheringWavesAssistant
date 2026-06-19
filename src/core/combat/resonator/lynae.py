@@ -384,7 +384,8 @@ class Lynae(BaseLynae):
     @combat_cache
     def kaleidoscopic_parade_j(self):
         return [
-            ["j", 0.05, 0.50],
+            ["j", 0.05, 0.10],
+            ["j", 0.05, 0.35],
         ]
 
     @combat_cache
@@ -603,11 +604,11 @@ class Lynae(BaseLynae):
                 self.combo_action(self.a(), False)
                 return
 
-            # 重击打太多会缺体力
-            if self.random_float() < 0.5:
-                self.combo_action(self.kaleidoscopic_parade_z(), True)
-            else:
-                self.combo_action(self.optical_sampling_stage_a3(), True)
+            # # 重击打太多会缺体力
+            # if self.random_float() < 0.5:
+            #     self.combo_action(self.kaleidoscopic_parade_z(), True)
+            # else:
+            #     self.combo_action(self.optical_sampling_stage_a3(), True)
 
             ## 空中攻击
 

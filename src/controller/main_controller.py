@@ -401,7 +401,7 @@ class MainController:
 
                 self._run_task(task_name)
 
-                logger.info(f"ver.{__version__}, 任务已提交: {task_name}")
+                logger.info(f"v{__version__}, 任务已提交: {task_name}")
                 return True, "任务已提交"
             elif task_ops == TaskOpsEnum.STOP.value:
                 logger.info("准备关闭任务: %s", task_name)
@@ -411,7 +411,7 @@ class MainController:
 
                 self._stop_task(task_name)
 
-                logger.info(f"ver.{__version__}, 任务已停止: {task_name}")
+                logger.info(f"v{__version__}, 任务已停止: {task_name}")
                 return True, "任务已停止"
             else:
                 raise NotImplementedError(f"不支持的类型{task_ops}")

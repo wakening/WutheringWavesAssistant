@@ -612,7 +612,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Rebecca$"), raw="Rebecca"),
     },
     I18nText.Lucilla: {
-        Language.ZH: RegexStr(r"^洛瑟菈$", raw="洛瑟菈"),
+        Language.ZH: RegexStr(r"^洛瑟[菈拉]$", raw="洛瑟菈"),
         Language.EN: RegexStr(flex_ws(r"^Lucilla$"), raw="Lucilla"),
     },
     I18nText.YangyangXuanling: {
@@ -624,7 +624,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Suisui$"), raw="Suisui"),
     },
     I18nText.Suoming: {
-        Language.ZH: RegexStr(r"^锁暝$", raw="锁暝"),
+        Language.ZH: RegexStr(r"^锁[暝冥]$", raw="锁暝"),
         Language.EN: RegexStr(flex_ws(r"^Suoming$"), raw="Suoming"),
     },
     I18nText.Jingran: {

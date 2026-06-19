@@ -77,7 +77,7 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.ReactorHusk.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.8)],
     BossNameEnum.Sigillum.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
     BossNameEnum.NamelessExplorer.value: [
-        RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=1.0)],  # 3.2
+        RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=1.4)],  # 3.2
     # BossNameEnum.SeedOfIllusoryOrigin.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
     BossNameEnum.Denia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
     # BossNameEnum.NightmareAdamSmasherLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
@@ -149,7 +149,7 @@ RESTART_PARAMS: dict[str, RestartParam] = {
 AFTER_RESTART_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.Fenrico.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=(3.4 - 1.5))],
     BossNameEnum.NamelessExplorer.value: [
-        RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=1.2)],
+        RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.7)],
 }
 
 

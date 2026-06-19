@@ -12,6 +12,7 @@ from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.ciaccona import Ciaccona
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.generic import GenericResonator
+from src.core.combat.resonator.hiyuki import Hiyuki
 from src.core.combat.resonator.jinhsi import Jinhsi
 from src.core.combat.resonator.lynae import Lynae
 from src.core.combat.resonator.mornye import Mornye
@@ -62,6 +63,7 @@ class CombatSystem:
         self.mornye = Mornye(self.control_service, self.img_service)
         self.cantarella = Cantarella(self.control_service, self.img_service)
         self.aemeath = Aemeath(self.control_service, self.img_service)
+        self.hiyuki = Hiyuki(self.control_service, self.img_service)
 
         self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
             ResonatorNameEnum.jinhsi: self.jinhsi,
@@ -79,6 +81,7 @@ class CombatSystem:
             ResonatorNameEnum.mornye: self.mornye,
             ResonatorNameEnum.cantarella: self.cantarella,
             ResonatorNameEnum.aemeath: self.aemeath,
+            ResonatorNameEnum.hiyuki: self.hiyuki,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
@@ -277,8 +280,15 @@ class CombatSystem:
         logger.info(f"编队: {resonator_names_zh}")
         self.resonators = resonators
 
-    def is_boss_health_bar_exist(self):
-        return BaseResonator.is_boss_health_bar_exist(self.img_service.screenshot())
+    def is_boss_health_bar_exist(self, img=None):
+        if img is None:
+            img = self.img_service.screenshot()
+        return BaseResonator.is_boss_health_bar_exist(img)
+
+    def boss_immobilized_bar_exist(self, img=None):
+        if img is None:
+            img = self.img_service.screenshot()
+        return BaseResonator.boss_immobilized_bar_exist(img)
 
     def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
         if self.resonators is None:

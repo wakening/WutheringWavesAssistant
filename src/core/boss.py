@@ -135,7 +135,7 @@ class RouteStep(BaseModel):
     )
 
 
-_DEFAULT_RESTART_TEXT = r"^(重新挑战|Restart)$"
+DEFAULT_RESTART_TEXT = r"^(重新挑战|Restart)$"
 
 
 class RestartParam(BaseModel):
@@ -153,4 +153,4 @@ class RestartParam(BaseModel):
     cycle: int | None = Field(None, description="循环次数")
     step: int | None = Field(None, description="循环中每次前进步数")
     check_health_bar: bool = Field(default=False, description="循环中每次检测boss血条，用于没有文本可识别的boss，通过血条判断是否存在")
-    restart_text: str | None = Field(default=_DEFAULT_RESTART_TEXT, description="循环中识别的重新挑战等文本")
+    restart_text: str | None = Field(default=None, description="循环中识别的重新挑战等文本")

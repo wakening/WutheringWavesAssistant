@@ -7,7 +7,7 @@ from typing import Callable
 
 import numpy as np
 
-from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep
+from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep, DEFAULT_RESTART_TEXT
 from src.core.color import ColorRule, Color, ColorMatch
 from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, ScenarioEnum
 from src.core.combat.combat_system import CombatSystem
@@ -982,7 +982,8 @@ class PageEventAbstractService(PageEventService, ABC):
                     if self.combat_system.resonators is None:
                         self.team_members_ocr()
                         return True
-                    if self.combat_system.is_boss_health_bar_exist():
+                    img = self._img_service.screenshot()
+                    if self.combat_system.is_boss_health_bar_exist(img) or self.combat_system.boss_immobilized_bar_exist(img):
                         self.combat_system.auto_pickup = self._boss_info_service.is_auto_pickup(self._info.lastBossName)
                         self.combat_system.start(3.5)
                         time.sleep(1.5)
@@ -2538,13 +2539,15 @@ class PageEventAbstractService(PageEventService, ABC):
                         if restart_param.check_health_bar is True and BaseResonator.is_boss_health_bar_exist(img):
                             break
 
+                        # 默认是None，即重新挑战，自定义是进入副本等
+                        restart_text = restart_param.restart_text if restart_param.restart_text else DEFAULT_RESTART_TEXT
+                        restart = self._ocr_service.find_text(restart_text, None, search_region)
+                        if not restart:
+                            self._control_service.forward_walk(2)
+                            i += 1
+                            time.sleep(0.2)
+                            continue
                         if restart_param.restart_text:
-                            restart = self._ocr_service.find_text(restart_param.restart_text, None, search_region)
-                            if not restart:
-                                self._control_service.forward_walk(2)
-                                i += 1
-                                time.sleep(0.2)
-                                continue
                             break
 
                         # 吸收与奖励重叠时

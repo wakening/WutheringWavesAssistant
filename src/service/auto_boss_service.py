@@ -273,6 +273,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
             if position is None:
                 return False
             logger.debug("点击退出副本: %s", position)
+            self._info.in_dungeon = False
             self._control_service.click(*position.center)
             return True
 
