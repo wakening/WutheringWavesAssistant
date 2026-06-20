@@ -1001,7 +1001,7 @@ class PageEventAbstractService(PageEventService, ABC):
                             self.combat_skip_count = 3
                             self.combat_skip_time = time.monotonic()
 
-                    logger.info(f"do_combat: {do_combat}")
+                    logger.debug(f"do_combat: {do_combat}")
                     if do_combat:
                         self.combat_system.auto_pickup = self._boss_info_service.is_auto_pickup(self._info.lastBossName)
                         self.combat_system.start(3.5)
