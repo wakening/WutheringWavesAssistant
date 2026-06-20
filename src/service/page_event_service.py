@@ -8,7 +8,7 @@ from typing import Callable
 import numpy as np
 
 from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep, DEFAULT_RESTART_TEXT
-from src.core.color import ColorRule, Color, ColorMatch
+from src.core.color import ColorRule, Color, ColorMatch, RuleMode
 from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, ScenarioEnum
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
@@ -54,6 +54,8 @@ class PageEventAbstractService(PageEventService, ABC):
 
         self.combat_system = CombatSystem(control_service, img_service)
         self.combat_system.is_async = True
+        self.combat_skip_count = 3
+        self.combat_skip_time = time.monotonic()
 
         # param
         self._echo_hunting_pos_1280_list = [(50, 487), (50, 578), (50, 396)]
@@ -983,7 +985,24 @@ class PageEventAbstractService(PageEventService, ABC):
                         self.team_members_ocr()
                         return True
                     img = self._img_service.screenshot()
-                    if self.combat_system.is_boss_health_bar_exist(img) or self.combat_system.boss_immobilized_bar_exist(img):
+                    is_boss_health_bar_exist = self.combat_system.is_boss_health_bar_exist(img)
+
+                    if is_boss_health_bar_exist:
+                        do_combat = True
+                    else:
+                        if time.monotonic() - self.combat_skip_time > 5:
+                            self.combat_skip_count = 3
+                            self.combat_skip_time = time.monotonic()
+                        if self.combat_skip_count > 0:
+                            do_combat = False
+                            self.combat_skip_count -= 1
+                        else:
+                            do_combat = True
+                            self.combat_skip_count = 3
+                            self.combat_skip_time = time.monotonic()
+
+                    logger.info(f"do_combat: {do_combat}")
+                    if do_combat:
                         self.combat_system.auto_pickup = self._boss_info_service.is_auto_pickup(self._info.lastBossName)
                         self.combat_system.start(3.5)
                         time.sleep(1.5)
@@ -2711,7 +2730,40 @@ class PageEventAbstractService(PageEventService, ABC):
                 ]
                 )
 
-    def wait_home(self, timeout=120) -> bool:
+    def wait_home(self, timeout: int = 30, interval: float = 1.0):
+        """循环等待回到主界面"""
+        HOME_COLOR_POINT = [
+            # 任务
+            AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 153, Align.Top | Align.Left),
+            # 背包
+            AnchorPoint(212, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
+            # # 飞讯
+            # AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
+            # # 先约电台
+            # AnchorPoint(1114, 24, Align.Top | Align.Right),
+            # 共鸣者
+            AnchorPoint(1156, 28, Align.Top | Align.Right), AnchorPoint(1160, 30, Align.Top | Align.Right),
+            # 终端
+            AnchorPoint(1221, 34, Align.Top | Align.Right), AnchorPoint(1222, 35, Align.Top | Align.Right),
+        ]
+        rule = ColorRule().points(HOME_COLOR_POINT).colors(Color.bgr(255, 255, 255), 12, RuleMode.ALL)
+        _home_color_match = ColorMatch(self._window_service.scaler).rules(rule)
+
+        self._control_service.activate()
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            img = self._img_service.screenshot()
+            if _home_color_match.match(img):
+                self._control_service.activate()
+                return True
+            time.sleep(interval)
+
+        # 卡在加载，强制关闭
+        self._window_service.close_window()
+        raise Exception("等待回到主界面超时")
+        return False
+
+    def __wait_home(self, timeout=120) -> bool:
         """
         等待回到主界面
         :param timeout:  超时时间

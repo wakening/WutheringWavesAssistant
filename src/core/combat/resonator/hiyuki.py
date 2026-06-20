@@ -74,15 +74,15 @@ class BaseHiyuki(BaseResonator):
         )
 
         # 寒意100
-        self._frostheart_color = [(233, 65, 89), (232, 52, 78), (236, 95, 117), (231, 152, 149)]  # BGR
+        self._frostheart_color = [(230, 45, 71), (232, 60, 84), (230, 153, 150), (227, 141, 137)]  # BGR
         self._frostheart100_checker = ColorChecker(
-            [(561, 664), (561, 663), (562, 665)], self._frostheart_color)
+            [(560, 659), (563, 659), (563, 661)], self._frostheart_color, logic=LogicEnum.AND)
         # 寒意200
         self._frostheart200_checker = ColorChecker(
-            [(634, 667), (635, 667), (635, 666)], self._frostheart_color)
+            [(633, 661), (635, 661), (636, 662)], self._frostheart_color, logic=LogicEnum.AND)
         # 寒意300
         self._frostheart300_checker = ColorChecker(
-            [(707, 665), (706, 665), (708, 665)], self._frostheart_color)
+            [(704, 660), (706, 660), (708, 661)], self._frostheart_color, logic=LogicEnum.AND)
 
         # 重击·枯霜·预求身
         self._heavy_attack_bitterfrost_foreclaimed_self_checker = ColorChecker(
@@ -361,8 +361,8 @@ class Hiyuki(BaseHiyuki):
             ["a", 0.05, 0.31],
             # ["a", 0.05, 0.95],
             ["a", 0.05, 0.25],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.35],
+            ["a", 0.05, 0.25],
         ]
 
     @combat_cache
@@ -417,7 +417,8 @@ class Hiyuki(BaseHiyuki):
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
-            ["a", 0.05, 0.35],
+            ["a", 0.05, 0.00],
+            ["w", 0.00, 0.45],
         ]
 
     @combat_cache
@@ -509,7 +510,9 @@ class Hiyuki(BaseHiyuki):
             # ["d_up", 0.00, 0.00],
             # ["a", 0.05, 0.65],
             # ["a", 0.05, 0.30],
-            ["z", 0.85 + 0.35, 2.50],
+            # ["z", 0.85 + 0.35, 2.50],
+            ["z", 0.85 + 0.35, 1.70],
+            ["w", 0.00, 0.80],
         ]
 
     @combat_cache
@@ -555,7 +558,7 @@ class Hiyuki(BaseHiyuki):
         self.combo_action(self.Q(), False)
 
         img = self.img_service.screenshot()
-        dedication = self.dedication(img)
+        # dedication = self.dedication(img)
         # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
         is_basic_attack_present_self_ready = self.is_basic_attack_present_self_ready(img)
         is_heavy_attack_frost_splinter_present_self_ready = self.is_heavy_attack_frost_splinter_present_self_ready(img)
@@ -566,7 +569,7 @@ class Hiyuki(BaseHiyuki):
         frostheart = self.frostheart(img)
         is_heavy_attack_bitterfrost_foreclaimed_self_ready = self.is_heavy_attack_bitterfrost_foreclaimed_self_ready(
             img)
-        # is_resonance_skill_foreclaimed_self_ready = self.is_resonance_skill_foreclaimed_self_ready(img)
+        is_resonance_skill_foreclaimed_self_ready = self.is_resonance_skill_foreclaimed_self_ready(img)
         is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
 
         # 是否是常世身
@@ -602,16 +605,13 @@ class Hiyuki(BaseHiyuki):
                     is_hp_1_4 = self.is_hp_1_4(img)
                     if not is_hp_1_4:
                         return
-                    boss_hp = self.boss_hp(img)
-                    if boss_hp <= 0.01:
-                        return
 
                 # 检查重击，没解锁继续尝试打满心念
                 if not is_heavy_attack_frost_splinter_present_self_ready:
                     if is_resonance_skill_present_self_ready:
-                        self.combo_action(self.Ea_present_self(), True)
+                        self.combo_action(self.Ea_present_self(), False)
                     elif self.random_float() < 0.5:
-                        self.combo_action(self.a3_present_self(), True)
+                        self.combo_action(self.a3_present_self(), False)
 
                     img = self.img_service.screenshot()
                     is_heavy_attack_frost_splinter_present_self_ready = self.is_heavy_attack_frost_splinter_present_self_ready(
@@ -630,16 +630,22 @@ class Hiyuki(BaseHiyuki):
                         return
 
                 # 打重击解锁一段大
-                self.combo_action(self.z_present_self(), True)
-                img = self.img_service.screenshot()
-                is_foreclaiming_inward_vision_ready = self.is_foreclaiming_inward_vision_ready(img)
-                is_hp_1_4 = self.is_hp_1_4(img)
-                if not is_hp_1_4:
-                    return
-                boss_hp = self.boss_hp(img)
-                if boss_hp <= 0.01:
-                    return
-                if not is_foreclaiming_inward_vision_ready:
+                self.combo_action(self.z_present_self(), False)
+
+                for i in range(2):
+                    img = self.img_service.screenshot()
+                    is_foreclaiming_inward_vision_ready = self.is_foreclaiming_inward_vision_ready(img)
+                    is_hp_1_4 = self.is_hp_1_4(img)
+                    if not is_hp_1_4:
+                        return
+                    # boss_hp = self.boss_hp(img)
+                    # if boss_hp <= 0.01:
+                    #     return
+                    if is_foreclaiming_inward_vision_ready:
+                        break
+                    if i == 0:
+                        time.sleep(0.25)
+                        continue
                     return
 
             # 开大
@@ -648,25 +654,8 @@ class Hiyuki(BaseHiyuki):
 
         # 预求身
         if not is_present_self or is_present_self_to_foreclaimed_self:
-            # 入场时是预求身，打完剩余普攻连段
-            if not is_present_self:
-                self.combo_action(self.a_foreclaimed_self(), True)
-
-            img = self.img_service.screenshot()
-            frostheart = self.frostheart(img)
-            is_heavy_attack_bitterfrost_foreclaimed_self_ready = self.is_heavy_attack_bitterfrost_foreclaimed_self_ready(
-                img)
-            is_resonance_skill_foreclaimed_self_ready = self.is_resonance_skill_foreclaimed_self_ready(img)
-            is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
-            is_hp_1_4 = self.is_hp_1_4(img)
-            if not is_hp_1_4:
-                return
-            boss_hp = self.boss_hp(img)
-            if boss_hp <= 0.01:
-                return
-
-            if frostheart < 100:
-                self.combo_action(self.a3_foreclaimed_self(), False)
+            if frostheart <= 100:
+                self.combo_action(self.a3_foreclaimed_self(), True)
                 img = self.img_service.screenshot()
                 frostheart = self.frostheart(img)
                 is_heavy_attack_bitterfrost_foreclaimed_self_ready = self.is_heavy_attack_bitterfrost_foreclaimed_self_ready(
@@ -689,8 +678,8 @@ class Hiyuki(BaseHiyuki):
                     img)
                 is_resonance_skill_foreclaimed_self_ready = self.is_resonance_skill_foreclaimed_self_ready(img)
                 is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
-                # E还在，可能挨打了，轴较长，切人回血，防止暴毙
-                if is_resonance_skill_foreclaimed_self_ready and self.random_float() < 0.5:
+                is_hp_1_4 = self.is_hp_1_4(img)
+                if not is_hp_1_4 or is_resonance_skill_foreclaimed_self_ready:
                     return
             elif frostheart <= 100:
                 self.combo_action(self.a3_foreclaimed_self(), True)
@@ -707,22 +696,24 @@ class Hiyuki(BaseHiyuki):
                 frostheart = self.frostheart(img)
                 is_heavy_attack_bitterfrost_foreclaimed_self_ready = self.is_heavy_attack_bitterfrost_foreclaimed_self_ready(
                     img)
-                is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
+                if not is_foreclaiming_blade_liberation_ready:
+                    is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
                 is_hp_1_4 = self.is_hp_1_4(img)
                 if not is_hp_1_4:
                     return
-                boss_hp = self.boss_hp(img)
-                if boss_hp <= 0.01:
-                    return
+                # boss_hp = self.boss_hp(img)
+                # if boss_hp <= 0.01:
+                #     return
                 # 打完一套还有2豆，可能被打了，切人回血
                 if frostheart >= 200:
                     return
 
             if is_heavy_attack_bitterfrost_foreclaimed_self_ready:
                 # 有重击打重击
-                self.combo_action(self.z_foreclaimed_self(), True)
+                self.combo_action(self.z_foreclaimed_self(), not is_foreclaiming_blade_liberation_ready)  # 预输入
                 img = self.img_service.screenshot()
-                is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
+                if not is_foreclaiming_blade_liberation_ready:
+                    is_foreclaiming_blade_liberation_ready = self.is_foreclaiming_blade_liberation_ready(img)
                 is_hp_1_4 = self.is_hp_1_4(img)
                 if not is_hp_1_4:
                     return
