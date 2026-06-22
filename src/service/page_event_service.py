@@ -54,7 +54,7 @@ class PageEventAbstractService(PageEventService, ABC):
 
         self.combat_system = CombatSystem(control_service, img_service)
         self.combat_system.is_async = True
-        self.combat_skip_count = 3
+        self.combat_skip_count = 2
         self.combat_skip_time = time.monotonic()
 
         # param
@@ -991,14 +991,14 @@ class PageEventAbstractService(PageEventService, ABC):
                         do_combat = True
                     else:
                         if time.monotonic() - self.combat_skip_time > 5:
-                            self.combat_skip_count = 3
+                            self.combat_skip_count = 2
                             self.combat_skip_time = time.monotonic()
                         if self.combat_skip_count > 0:
                             do_combat = False
                             self.combat_skip_count -= 1
                         else:
                             do_combat = True
-                            self.combat_skip_count = 3
+                            self.combat_skip_count = 2
                             self.combat_skip_time = time.monotonic()
 
                     logger.debug(f"do_combat: {do_combat}")

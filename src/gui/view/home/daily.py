@@ -165,6 +165,13 @@ class DailyWidget(ScrollArea):
             I18nText.TacetFieldMawburrowDesert,
             I18nText.TacetFieldStagnantRun,
         ]
+        self.tacetSuppressionTips = [
+            [I18nText.WishesOfQuietSnowfall, I18nText.ReelOfSplicedMemories],
+            [I18nText.TrailblazingStar, I18nText.SoundOfTrueName],
+            [I18nText.TrailblazingStar, I18nText.ChromaticFoam],
+            [I18nText.RiteOfGildedRevelation, I18nText.PactOfNeonlightLeap],
+            [I18nText.RiteOfGildedRevelation, I18nText.HaloOfStarryRadiance],
+        ]
         self.nightmarePurification = [
         ]
         self.tacetDiscordNest = [
@@ -194,7 +201,7 @@ class DailyWidget(ScrollArea):
         for i in range(len(self.tacetSuppression)):
             text = self.tr(self.i18ntr(self.tacetSuppression[i]).raw)
             self.tacetSuppressionComboBox.addItem(text, userData=self.tacetSuppression[i])
-            if i > 1:
+            if i > 2:
                 self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, False)
         # self.tacetSuppressionSettingButton = ToggleToolButton(FIF.SETTING, self)
 
@@ -304,6 +311,13 @@ class DailyWidget(ScrollArea):
             text = self.tr("{challenge} - {boss}").format(
                 challenge=self.i18ntr(self.tacetSuppression[i]).raw, boss=self.i18ntr(self.tacetSuppression[i]).raw)
             self.tacetSuppressionComboBox.setItemText(idx, text)
+            # _tipsList = self.tacetSuppressionTips[i]
+            # _tips = ""
+            # for x in range(len(_tipsList)):
+            #     _tips += self.i18ntr(_tipsList[x])
+            #     if x < len(_tipsList) - 1:
+            #         _tips += "\n"
+            # self.tacetSuppressionComboBox.setToolTip(_tips)
 
         for idx in range(self.forgeryChallengeComboBox.count()):
             try:

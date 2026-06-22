@@ -14,6 +14,7 @@ from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.generic import GenericResonator
 from src.core.combat.resonator.hiyuki import Hiyuki
 from src.core.combat.resonator.jinhsi import Jinhsi
+from src.core.combat.resonator.lucilla import Lucilla
 from src.core.combat.resonator.lynae import Lynae
 from src.core.combat.resonator.mornye import Mornye
 from src.core.combat.resonator.phoebe import Phoebe
@@ -64,6 +65,7 @@ class CombatSystem:
         self.cantarella = Cantarella(self.control_service, self.img_service)
         self.aemeath = Aemeath(self.control_service, self.img_service)
         self.hiyuki = Hiyuki(self.control_service, self.img_service)
+        self.lucilla = Lucilla(self.control_service, self.img_service)
 
         self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
             ResonatorNameEnum.jinhsi: self.jinhsi,
@@ -82,6 +84,7 @@ class CombatSystem:
             ResonatorNameEnum.cantarella: self.cantarella,
             ResonatorNameEnum.aemeath: self.aemeath,
             ResonatorNameEnum.hiyuki: self.hiyuki,
+            ResonatorNameEnum.lucilla: self.lucilla,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None

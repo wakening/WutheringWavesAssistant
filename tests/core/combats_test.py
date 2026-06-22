@@ -1333,13 +1333,107 @@ def test_combo_hiyuki_AdvancedCombo(control_service):
         ["R", 3.10, 5.15],
         ["j", 0.05, 1.50],
 
+        # 3a取消
+        # 3ad
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.53],
+        ["a", 0.05, 0.30],
+        ["d", 0.05, 0.25],
+        # 3ajEaa
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.53],
+        ["a", 0.05, 0.30],
+        ["j", 0.05, 0.15],
+        ["E", 1.10, 0.00],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.65],
+        ["j", 0.05, 1.50],
+
     ]
     try:
-        combo_action(control_service, seq, 0.5, cycle=10)
+        combo_action(control_service, seq, 0.5, cycle=1)
     finally:
         control_service.key_up("R")
         control_service.mouse_left_up()
         control_service.mouse_right_up()
+
+
+def test_combo_lucilla_AdvancedCombo(control_service):
+    # 洛瑟菈
+    seq = [
+        ["a", 0.05, 0.36],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.74],
+        ["j", 0.05, 1.50],
+
+        ["E", 1.86, 0.85],
+        ["j", 0.05, 1.50],
+
+        ["z", 2.81, 0.55],
+        ["j", 0.05, 1.50],
+
+        ["z", 2.81, 0.55],
+        ["j", 0.05, 1.50],
+
+        ["R", 0.05, 4.50],
+        ["j", 0.05, 1.50],
+
+        ["z", 4.35, 0.72],
+        ["j", 0.05, 1.50],
+    ]
+    try:
+        combo_action(control_service, seq, 0.5, cycle=1)
+    finally:
+        control_service.mouse_left_up()
+
+
+def test_combo_aemeath_AdvancedCombo(control_service):
+    # 爱弥斯
+    seq = [
+        # 爱弥斯
+        # # 4a
+        # ["a", 0.05, 0.40],
+        # ["a", 0.05, 0.73],
+        # ["a", 0.05, 0.65],
+        # ["a", 0.05, 1.00],
+        # ["j", 0.05, 1.50],
+        #
+        # # 4aE
+        # ["a", 0.05, 0.40],
+        # ["a", 0.05, 0.73],
+        # ["a", 0.05, 0.65],
+        # ["a", 0.05, 1.00],
+        # ["E", 0.05, 3.12],
+        # ["j", 0.05, 1.50],
+
+        ["R", 0.05, 4.92],
+        # ["j", 0.05, 1.50],
+
+        ["z", 1.15, 0.00],
+
+        ["R", 0.05, 5.56],
+        ["j", 0.05, 1.50],
+
+        # 机兵
+
+        # # 4a
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.73],
+        # ["a", 0.05, 0.96],
+        # ["a", 0.05, 1.09],
+        # ["j", 0.05, 1.50],
+
+        # # 4aE
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.73],
+        # ["a", 0.05, 0.96],
+        # ["a", 0.05, 1.09],
+        # ["E", 0.05, 2.80],
+        # ["j", 0.05, 1.50],
+
+
+    ]
+    combo_action(control_service, seq, 0.5, cycle=10)
 
 
 def test_combat(container, control_service):

@@ -199,6 +199,39 @@ class I18nText:
     EnemyNamelessExplorer = "EnemyNamelessExplorer"
     EnemyDenia = "EnemyDenia"
 
+    # ------- Sonata -------
+    FreezingFrost = "FreezingFrost"
+    MoltenRift = "MoltenRift"
+    VoidThunder = "VoidThunder"
+    SierraGale = "SierraGale"
+    CelestialLight = "CelestialLight"
+    HavocEclipse = "HavocEclipse"
+    RejuvenatingGlow = "RejuvenatingGlow"
+    MoonlitClouds = "MoonlitClouds"
+    LingeringTunes = "LingeringTunes"
+    FrostyResolve = "FrostyResolve"
+    EternalRadiance = "EternalRadiance"
+    MidnightVeil = "MidnightVeil"
+    EmpyreanAnthem = "EmpyreanAnthem"
+    TidebreakingCourage = "TidebreakingCourage"
+    GustsOfWelkin = "GustsOfWelkin"
+    WindwardPilgrimage = "WindwardPilgrimage"
+    FlamingClawprint = "FlamingClawprint"
+    DreamOfTheLost = "DreamOfTheLost"
+    CrownOfValor = "CrownOfValor"
+    LawOfHarmony = "LawOfHarmony"
+    FlamewingsShadow = "FlamewingsShadow"
+    ThreadOfSeveredFate = "ThreadOfSeveredFate"
+    PactOfNeonlightLeap = "PactOfNeonlightLeap"
+    HaloOfStarryRadiance = "HaloOfStarryRadiance"
+    RiteOfGildedRevelation = "RiteOfGildedRevelation"
+    TrailblazingStar = "TrailblazingStar"
+    ChromaticFoam = "ChromaticFoam"
+    SoundOfTrueName = "SoundOfTrueName"
+    WishesOfQuietSnowfall = "WishesOfQuietSnowfall"
+    ReelOfSplicedMemories = "ReelOfSplicedMemories"
+    ShadowOfShatteredDreams = "ShadowOfShatteredDreams"
+
     # ------- Login -------
     Login = "Login"
 
@@ -822,6 +855,132 @@ I18N_TEXT = {
     I18nText.EnemyDenia: {
         Language.ZH: RegexStr(r"^达妮娅$", raw="达妮娅"),
         Language.EN: RegexStr(flex_ws(r"^Denia$"), raw="Denia"),
+    },
+
+    # ------- Sonata -------
+    I18nText.FreezingFrost: {
+        Language.ZH: RegexStr(r"^凝夜白霜$", raw="凝夜白霜"),
+        Language.EN: RegexStr(flex_ws(r"^Freezing Frost$"), raw="Freezing Frost"),
+    },
+    I18nText.MoltenRift: {
+        Language.ZH: RegexStr(r"^熔山裂谷$", raw="熔山裂谷"),
+        Language.EN: RegexStr(flex_ws(r"^Molten Rift$"), raw="Molten Rift"),
+    },
+    I18nText.VoidThunder: {
+        Language.ZH: RegexStr(r"^彻空冥雷$", raw="彻空冥雷"),
+        Language.EN: RegexStr(flex_ws(r"^Void Thunder$"), raw="Void Thunder"),
+    },
+    I18nText.SierraGale: {
+        Language.ZH: RegexStr(r"^啸谷长风$", raw="啸谷长风"),
+        Language.EN: RegexStr(flex_ws(r"^Sierra Gale$"), raw="Sierra Gale"),
+    },
+    I18nText.CelestialLight: {
+        Language.ZH: RegexStr(r"^浮星祛暗$", raw="浮星祛暗"),
+        Language.EN: RegexStr(flex_ws(r"^Celestial Light$"), raw="Celestial Light"),
+    },
+    I18nText.HavocEclipse: {
+        Language.ZH: RegexStr(r"^沉日劫明$", raw="沉日劫明"),
+        Language.EN: RegexStr(flex_ws(r"^Havoc Eclipse$"), raw="Havoc Eclipse"),
+    },
+    I18nText.RejuvenatingGlow: {
+        Language.ZH: RegexStr(r"^隐世回光$", raw="隐世回光"),
+        Language.EN: RegexStr(flex_ws(r"^Rejuvenating Glow$"), raw="Rejuvenating Glow"),
+    },
+    I18nText.MoonlitClouds: {
+        Language.ZH: RegexStr(r"^轻云出月$", raw="轻云出月"),
+        Language.EN: RegexStr(flex_ws(r"^Moonlit Clouds$"), raw="Moonlit Clouds"),
+    },
+    I18nText.LingeringTunes: {
+        Language.ZH: RegexStr(r"^不绝余音$", raw="不绝余音"),
+        Language.EN: RegexStr(flex_ws(r"^Lingering Tunes$"), raw="Lingering Tunes"),
+    },
+    I18nText.FrostyResolve: {
+        Language.ZH: RegexStr(r"^凌冽决断之心$", raw="凌冽决断之心"),
+        Language.EN: RegexStr(flex_ws(r"^Frosty Resolve$"), raw="Frosty Resolve"),
+    },
+    I18nText.EternalRadiance: {
+        Language.ZH: RegexStr(r"^此间永驻之光$", raw="此间永驻之光"),
+        Language.EN: RegexStr(flex_ws(r"^Eternal Radiance$"), raw="Eternal Radiance"),
+    },
+    I18nText.MidnightVeil: {
+        Language.ZH: RegexStr(r"^幽夜隐匿之帷$", raw="幽夜隐匿之帷"),
+        Language.EN: RegexStr(flex_ws(r"^Midnight Veil$"), raw="Midnight Veil"),
+    },
+    I18nText.EmpyreanAnthem: {
+        Language.ZH: RegexStr(r"^高天共奏之曲$", raw="高天共奏之曲"),
+        Language.EN: RegexStr(flex_ws(r"^Empyrean Anthem$"), raw="Empyrean Anthem"),
+    },
+    I18nText.TidebreakingCourage: {
+        Language.ZH: RegexStr(r"^无惧浪涛之勇$", raw="无惧浪涛之勇"),
+        Language.EN: RegexStr(flex_ws(r"^Tidebreaking Courage$"), raw="Tidebreaking Courage"),
+    },
+    I18nText.GustsOfWelkin: {
+        Language.ZH: RegexStr(r"^流云逝尽之空$", raw="流云逝尽之空"),
+        Language.EN: RegexStr(flex_ws(r"^Gusts of Welkin$"), raw="Gusts of Welkin"),
+    },
+    I18nText.WindwardPilgrimage: {
+        Language.ZH: RegexStr(r"^愿戴荣光之旅$", raw="愿戴荣光之旅"),
+        Language.EN: RegexStr(flex_ws(r"^Windward Pilgrimage$"), raw="Windward Pilgrimage"),
+    },
+    I18nText.FlamingClawprint: {
+        Language.ZH: RegexStr(r"^奔狼燎原之焰$", raw="奔狼燎原之焰"),
+        Language.EN: RegexStr(flex_ws(r"^Flaming Clawprint$"), raw="Flaming Clawprint"),
+    },
+    I18nText.DreamOfTheLost: {
+        Language.ZH: RegexStr(r"^失序彼岸之梦$", raw="失序彼岸之梦"),
+        Language.EN: RegexStr(flex_ws(r"^Dream of the Lost$"), raw="Dream of the Lost"),
+    },
+    I18nText.CrownOfValor: {
+        Language.ZH: RegexStr(r"^荣斗铸锋之冠$", raw="荣斗铸锋之冠"),
+        Language.EN: RegexStr(flex_ws(r"^Crown of Valor$"), raw="Crown of Valor"),
+    },
+    I18nText.LawOfHarmony: {
+        Language.ZH: RegexStr(r"^息界同调之律$", raw="息界同调之律"),
+        Language.EN: RegexStr(flex_ws(r"^Law of Harmony$"), raw="Law of Harmony"),
+    },
+    I18nText.FlamewingsShadow: {
+        Language.ZH: RegexStr(r"^焚羽猎魔之影$", raw="焚羽猎魔之影"),
+        Language.EN: RegexStr(flex_ws(r"^Flamewing's Shadow$"), raw="Flamewing's Shadow"),
+    },
+    I18nText.ThreadOfSeveredFate: {
+        Language.ZH: RegexStr(r"^命理崩毁之弦$", raw="命理崩毁之弦"),
+        Language.EN: RegexStr(flex_ws(r"^Thread of Severed Fate$"), raw="Thread of Severed Fate"),
+    },
+    I18nText.PactOfNeonlightLeap: {
+        Language.ZH: RegexStr(r"^逆光跃彩之约$", raw="逆光跃彩之约"),
+        Language.EN: RegexStr(flex_ws(r"^Pact of Neonlight Leap$"), raw="Pact of Neonlight Leap"),
+    },
+    I18nText.HaloOfStarryRadiance: {
+        Language.ZH: RegexStr(r"^星构寻辉之环$", raw="星构寻辉之环"),
+        Language.EN: RegexStr(flex_ws(r"^Halo of Starry Radiance$"), raw="Halo of Starry Radiance"),
+    },
+    I18nText.RiteOfGildedRevelation: {
+        Language.ZH: RegexStr(r"^流金溯真之式$", raw="流金溯真之式"),
+        Language.EN: RegexStr(flex_ws(r"^Rite of Gilded Revelation$"), raw="Rite of Gilded Revelation"),
+    },
+    I18nText.TrailblazingStar: {
+        Language.ZH: RegexStr(r"^长路启航之星$", raw="长路启航之星"),
+        Language.EN: RegexStr(flex_ws(r"^Trailblazing Star$"), raw="Trailblazing Star"),
+    },
+    I18nText.ChromaticFoam: {
+        Language.ZH: RegexStr(r"^斑驳粉饰之沫$", raw="斑驳粉饰之沫"),
+        Language.EN: RegexStr(flex_ws(r"^Chromatic Foam$"), raw="Chromatic Foam"),
+    },
+    I18nText.SoundOfTrueName: {
+        Language.ZH: RegexStr(r"^听唤语义之愿$", raw="听唤语义之愿"),
+        Language.EN: RegexStr(flex_ws(r"^Sound of True Name$"), raw="Sound of True Name"),
+    },
+    I18nText.WishesOfQuietSnowfall: {
+        Language.ZH: RegexStr(r"^雪落无声之愿$", raw="雪落无声之愿"),
+        Language.EN: RegexStr(flex_ws(r"^Wishes of Quiet Snowfall$"), raw="Wishes of Quiet Snowfall"),
+    },
+    I18nText.ReelOfSplicedMemories: {
+        Language.ZH: RegexStr(r"^剪心辑梦之影$", raw="剪心辑梦之影"),
+        Language.EN: RegexStr(flex_ws(r"^Reel of Spliced Memories$"), raw="Reel of Spliced Memories"),
+    },
+    I18nText.ShadowOfShatteredDreams: {
+        Language.ZH: RegexStr(r"^碎梦亡鬼之魇$", raw="碎梦亡鬼之魇"),
+        Language.EN: RegexStr(flex_ws(r"^Shadow of Shattered Dreams$"), raw="Shadow of Shattered Dreams"),
     },
 
     # ------- Login -------

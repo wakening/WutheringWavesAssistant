@@ -1086,11 +1086,11 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         local.tacetFieldStagnantRunFSM,
     ]
     tacets_route = [
-        [[Walk.forward(7), Walk.right(1), Run.forward(1.2)], [Run.forward(1.6)]],
-        [[Walk.left(1), Run.forward(1.2)], [Run.forward(0.8)]],
-        [[Run.forward(5.5)], [Run.forward(1.5)]],
-        [[Run.forward(5.5)], [Run.forward(1.5)]],
-        [[Run.forward(5.5)], [Run.forward(1.5)]],
+        [[Walk.forward(7), Walk.right(1), Run.forward(1.5)], [Run.forward(1.6)]],
+        [[Walk.left(1), Run.forward(1.5)], [Run.forward(1.0)]],
+        [[Run.forward(1.5)], [Run.forward(1.6)]],
+        [[Run.forward(1.5)], [Run.forward(1.6)]],
+        [[Run.forward(1.5)], [Run.forward(1.6)]],
     ]
 
     # 任务选中的副本
@@ -1222,7 +1222,8 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.sleep(0.8)
                 else:
                     return False
-            ui.move(route[1])
+            if len(route) >= 2:
+                ui.move(route[1])
             return True
 
         if not _move():
@@ -1230,29 +1231,49 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         if cur_instance == I18nText.TacetFieldSolisiaLanding:
             # 落日堤屿
-            MAP_PATH_909_2_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_0.png"))
-            MAP_PATH_909_3_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_0.png"))
-            MAP_PATH_909_2__1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_-1.png"))
-            MAP_PATH_909_3__1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_-1.png"))
+            # 00 10
+            # 01 11
+            MAP_PATH_0_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_0.png"))
+            MAP_PATH_1_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_0.png"))
+            MAP_PATH_0_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_-1.png"))
+            MAP_PATH_1_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_-1.png"))
 
             grid = TileGrid()
-            grid.add_tile(0, 0, MAP_PATH_909_2_0)
-            grid.add_tile(1, 0, MAP_PATH_909_3_0)
-            grid.add_tile(0, 1, MAP_PATH_909_2__1)
-            grid.add_tile(1, 1, MAP_PATH_909_3__1)
+            grid.add_tile(0, 0, MAP_PATH_0_0)
+            grid.add_tile(1, 0, MAP_PATH_1_0)
+            grid.add_tile(0, 1, MAP_PATH_0_1)
+            grid.add_tile(1, 1, MAP_PATH_1_1)
             composite = grid.composite_region(min_x=0, min_y=0, max_x=1, max_y=1)
-            tmpl_name = "909"
+            tmpl_name = str(int(time.monotonic()))
             tmpl_img = composite.image
             matcher = SIFTFeatureMatcher()
             feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
-            point = Point(1026, 905)
+            point = Point(1024 + 2, 905)
         elif cur_instance == I18nText.TacetFieldFrostlandsTransitPort:
             # 冰原运输港
-            tmpl_name = "8_-1_7.png"
+            tmpl_name = str(int(time.monotonic()))
             tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_-1_7.png"))
             matcher = SIFTFeatureMatcher()
             feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
             point = Point(373, 891)
+        elif cur_instance == I18nText.TacetFieldMountGjallar:
+            # 加拉尔冠阶
+            MAP_PATH_0_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_8.png"))
+            MAP_PATH_1_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_8.png"))
+            MAP_PATH_0_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_7.png"))
+            MAP_PATH_1_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_7.png"))
+
+            grid = TileGrid()
+            grid.add_tile(0, 0, MAP_PATH_0_0)
+            grid.add_tile(1, 0, MAP_PATH_1_0)
+            grid.add_tile(0, 1, MAP_PATH_0_1)
+            grid.add_tile(1, 1, MAP_PATH_1_1)
+            composite = grid.composite_region(min_x=0, min_y=0, max_x=1, max_y=1)
+            tmpl_name = str(int(time.monotonic()))
+            tmpl_img = composite.image
+            matcher = SIFTFeatureMatcher()
+            feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
+            point = Point(1024 + 270, 1024 + 247)
         else:
             raise NotImplementedError()
 

@@ -604,7 +604,7 @@ class BaseResonator(BaseCombo):
         if self._health_100_color_checker.check(img):
             health = 1.00
 
-        logger.debug("boss_hp: %s", health)
+        logger.debug(f"boss_hp: {health}", stacklevel=2)
         return health
 
     @classmethod

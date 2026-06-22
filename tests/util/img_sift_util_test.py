@@ -137,11 +137,11 @@ def test_SIFT():
 
 
 def test_tile():
-    SCREENSHOT_PATH = file_util.get_temp_screenshot("screenshot_1778428516_74228928.png")
-    MAP_PATH_909_2_0 = file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_0.png")
-    MAP_PATH_909_3_0 = file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_0.png")
-    MAP_PATH_909_2__1 = file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_-1.png")
-    MAP_PATH_909_3__1 = file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_-1.png")
+    SCREENSHOT_PATH = file_util.get_temp_screenshot("screenshot_1782024620_19912247.png")
+    MAP_PATH_0_0 = file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_8.png")
+    MAP_PATH_1_0 = file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_8.png")
+    MAP_PATH_0_1 = file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_7.png")
+    MAP_PATH_1_1 = file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_7.png")
 
     # =========================================================
     # 1. 创建 TileGrid
@@ -157,28 +157,28 @@ def test_tile():
         0,
         0,
         # cv2.imread("tile_0_0.png"),
-        cv2.imread(MAP_PATH_909_2_0),
+        cv2.imread(MAP_PATH_0_0),
     )
 
     grid.add_tile(
         1,
         0,
         # cv2.imread("tile_1_0.png"),
-        cv2.imread(MAP_PATH_909_3_0),
+        cv2.imread(MAP_PATH_1_0),
     )
 
     grid.add_tile(
         0,
         1,
         # cv2.imread("tile_0_1.png"),
-        cv2.imread(MAP_PATH_909_2__1),
+        cv2.imread(MAP_PATH_0_1),
     )
 
     grid.add_tile(
         1,
         1,
         # cv2.imread("tile_1_1.png"),
-        cv2.imread(MAP_PATH_909_3__1),
+        cv2.imread(MAP_PATH_1_1),
     )
 
     # =========================================================

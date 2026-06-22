@@ -375,8 +375,37 @@ def set_window_left_top(hwnd=None):
     logger.debug("将窗口移动至左上角")
     if hwnd is None:
         hwnd = get_hwnd()
-    win32gui.SetWindowPos(hwnd, 0, 0, 0, 0, 0,
-                          win32con.SWP_NOSIZE | win32con.SWP_NOZORDER | win32con.SWP_SHOWWINDOW)
+
+    # 1. 客户区左上角（屏幕坐标）
+    cx, cy = win32gui.ClientToScreen(hwnd, (0, 0))
+
+    # 2. 窗口外框左上角
+    wx, wy = win32gui.GetWindowRect(hwnd)[:2]
+
+    # 3. 计算偏移（核心）
+    dx = cx - wx
+    dy = cy - wy
+
+    # 4. 目标：让 client 对齐到 (0,0)
+    target_x = -dx
+    target_y = -dy
+
+    # 5. 获取窗口大小
+    _, _, r, b = win32gui.GetWindowRect(hwnd)
+    w = r - wx
+    h = b - wy
+    logger.debug(f"target_x: {target_x}, target_y: {target_y}, h: {h}, w: {w}")
+
+    # 4. 移动窗口外框
+    win32gui.SetWindowPos(
+        hwnd,
+        win32con.HWND_TOP,
+        target_x,
+        0,
+        w,
+        0,
+        win32con.SWP_NOSIZE | win32con.SWP_NOZORDER | win32con.SWP_SHOWWINDOW
+    )
 
 
 def set_window_below_another(hwnd, hwnd_another):
@@ -389,21 +418,57 @@ def set_window_below_another(hwnd, hwnd_another):
         0, 0,  # 大小（保持不变）
         win32con.SWP_NOSIZE |  # 保持大小不变
         win32con.SWP_NOMOVE |   # 保持位置不变
-        win32con.SWP_SHOWWINDOW  # 显示窗口
+        win32con.SWP_SHOWWINDOW |  # 显示窗口
+        win32con.SWP_NOACTIVATE  # 显示窗口
     )
 
 
 def set_window_left_top_and_below_another(hwnd, hwnd_another):
-    logger.debug("将窗口移动到左上角，并置于指定窗口下方")
-    # 同时移动和改变Z序
+    """
+    UE风格窗口移动：
+    以“客户区左上角”为基准进行定位（自动补偿DWM/边框偏移）
+    """
+    # 1. 客户区左上角（屏幕坐标）
+    cx, cy = win32gui.ClientToScreen(hwnd, (0, 0))
+
+    # 2. 窗口外框左上角
+    wx, wy = win32gui.GetWindowRect(hwnd)[:2]
+
+    # 3. 计算偏移（核心）
+    dx = cx - wx
+    dy = cy - wy
+
+    # 4. 目标：让 client 对齐到 (0,0)
+    target_x = -dx
+    target_y = -dy
+
+    # 5. 获取窗口大小
+    _, _, r, b = win32gui.GetWindowRect(hwnd)
+    w = r - wx
+    h = b - wy
+    logger.debug(f"target_x: {target_x}, target_y: {target_y}, h: {h}, w: {w}")
+
+    # 4. 移动窗口外框
     win32gui.SetWindowPos(
-        hwnd,  # 当前窗口
-        hwnd_another,  # 放在这个窗口后面
-        0, 0,  # 新的位置
-        0, 0,  # 大小（保持不变）
+        hwnd,
+        hwnd_another,
+        target_x,
+        0,
+        w,
+        0,
         win32con.SWP_NOSIZE |  # 保持大小不变
         win32con.SWP_SHOWWINDOW  # 显示窗口
     )
+
+    # # 同时移动和改变Z序
+    # win32gui.SetWindowPos(
+    #     hwnd,  # 当前窗口
+    #     hwnd_another,  # 放在这个窗口后面
+    #     0, 0,  # 新的位置
+    #     0, 0,  # 大小（保持不变）
+    #     win32con.SWP_NOSIZE |  # 保持大小不变
+    #     win32con.SWP_SHOWWINDOW  # 显示窗口
+    # )
 
 
 def set_window_not_topmost(hwnd):
