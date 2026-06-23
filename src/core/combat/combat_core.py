@@ -165,7 +165,7 @@ class ResonatorNameEnum(Enum):
                 return cls.chisa
             if len(ocr_text) >= 3 and ocr_text.startswith(cls.luukherssen.value[0]) and ocr_text.endswith(cls.luukherssen.value[-2:]):
                 return cls.luukherssen
-            if len(ocr_text) == 3 and ocr_text.startswith(cls.lucilla.value[:2]):
+            if len(ocr_text) >= 2 and ocr_text.startswith(cls.lucilla.value[:2]):
                 return cls.lucilla
         return None
 
