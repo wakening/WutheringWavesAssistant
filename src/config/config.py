@@ -109,6 +109,7 @@ class DailyConfig(ConfigBase):
 class GameConfig(ConfigBase):
     gameLanguage: str | None = None
     gamePath: str | None = None
+    device: str | None = None
 
 
 class SoarToTheBeatConfig(ConfigBase):

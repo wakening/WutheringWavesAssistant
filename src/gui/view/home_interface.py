@@ -322,6 +322,16 @@ class BasicSettingWidget(QWidget):
             "Deutsch",
             "ภาษาไทย",
         ]
+        self.device = [
+            "Auto",
+            "CUDA",
+            "CPU",
+        ]
+        self.deviceDesc = [
+            "自动",
+            "GPU-CUDA",
+            "CPU",
+        ]
 
         self.mainLayout = QVBoxLayout(self)
 
@@ -339,6 +349,15 @@ class BasicSettingWidget(QWidget):
             self.langComboBox.addItem(self.tr("{text}").format(text=self.langDesc[i]), userData=self.lang[i].value)
             if i > 1:
                 self.langComboBox.setItemEnabled(self.langComboBox.count() - 1, False)
+
+        self.deviceLayout = QHBoxLayout()
+        self.deviceLabel = QLabel(self.tr("运行设备:"), self)
+        self.deviceComboBox = ComboBox(self)
+        self.deviceComboBox.setPlaceholderText(self.tr("{text}").format(text=self.deviceDesc[0]))
+        for i in range(len(self.device)):
+            self.deviceComboBox.addItem(self.tr("{text}").format(text=self.deviceDesc[i]), userData=self.device[i])
+            if i == 1:
+                self.deviceComboBox.setItemEnabled(self.deviceComboBox.count() - 1, False)
 
         # self.gamePathHLayout = QHBoxLayout()
         # self.gamePathLabel = QLabel(self.tr("游戏路径:"), self.scrollWidget)
@@ -368,25 +387,34 @@ class BasicSettingWidget(QWidget):
     def __initLayout(self):
         self.langLayout.addWidget(self.langLabel)
         self.langLayout.addWidget(self.langComboBox, 1)
+        self.deviceLayout.addWidget(self.deviceLabel)
+        self.deviceLayout.addWidget(self.deviceComboBox, 1)
         # self.langLayout.setContentsMargins(0, 0, 0, 0)
         # self.langLayout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         self.mainLayout.addWidget(self.titleLabel)
         self.mainLayout.addLayout(self.langLayout)
+        self.mainLayout.addLayout(self.deviceLayout)
         self.mainLayout.addWidget(self.messageEdit, 1)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         # self.mainLayout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
     def __connectSignalToSlot(self):
-        def _onLangComboBoxChanged(index):
-            paramConfig.set(paramConfig.gameLanguage, self.langComboBox.currentData())
-            # self.__refreshGridLayout(index)
+        self.langComboBox.currentIndexChanged.connect(self.__onLangComboBoxChanged)
+        self.deviceComboBox.currentIndexChanged.connect(self.__onDeviceComboBoxChanged)
 
-        self.langComboBox.currentIndexChanged.connect(_onLangComboBoxChanged)
+    def __onLangComboBoxChanged(self, index):
+        paramConfig.set(paramConfig.gameLanguage, self.langComboBox.currentData())
+        # self.__refreshGridLayout(index)
+
+    def __onDeviceComboBoxChanged(self, index):
+        paramConfig.set(paramConfig.device, self.deviceComboBox.currentData())
 
     def __loadConfig(self):
         self.langComboBox.setCurrentIndex(
             self.langComboBox.findData(paramConfig.get(paramConfig.gameLanguage)))
+        self.deviceComboBox.setCurrentIndex(
+            self.deviceComboBox.findData(paramConfig.get(paramConfig.device)))
 
 
 class ContentWidget(QWidget):

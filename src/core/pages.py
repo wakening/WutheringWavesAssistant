@@ -670,7 +670,11 @@ class UIOp:
         :param resize: 1280x720以上分辨率图片是否缩小，默认开启，牺牲精度提升识别速度，若需要识别小字，必须关闭，用原图识别以保证精度
         :return:
         """
+        # st = time.monotonic()
+        # logger.info(f"snapshot, resize: {resize}", stacklevel=2)
         self.oq = OcrQuery(self.ctx).snapshot(roi, img, resize)
+        # elapsed = time.monotonic() - st
+        # logger.info(f"snapshot, 耗时: {elapsed:.4f}", stacklevel=2)
         return self
 
     def match_page(self, page: str):

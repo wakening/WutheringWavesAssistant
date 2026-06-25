@@ -94,6 +94,12 @@ def get_ort_providers() -> list[str]:
     return ort_providers
 
 
+def get_ort_providers_cpu() -> list[str]:
+    providers = onnxruntime.get_available_providers()
+    logger.debug("ONNX Runtime available providers: %s", providers)
+    return ["CPUExecutionProvider"]
+
+
 def create_ort_session(model_path: str, providers: list[str] | None = None,
                        sess_options: SessionOptions | None = None) -> InferenceSession:
     session = InferenceSession(

@@ -11,6 +11,7 @@ from src.core.geometry import TextBox, BBox, RapidocrTextBox, PaddleocrTextBox, 
 from src.core.interface import OCRService, ImgService, WindowService
 from src.core.pages import OcrResult
 from src.core.regions import Position, RapidocrPosition, TextPosition, DynamicPosition, PaddleocrPosition
+from src.core.runtime import Device
 from src.util import rapidocr_util
 from src.util.wrap_util import timeit
 
@@ -25,24 +26,46 @@ class AbstractOcrService(OCRService, ABC):
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
 
-        self.ocr_use_gpu = self.is_ocr_use_gpu()
+        try:
+            self._device = context.runtime.cfg.game.device
+        except Exception:
+            self._device = Device.Auto
+        logger.debug(f"device: {self._device}")
 
-    def is_ocr_use_gpu(self) -> bool:
+        self._device: Device = self.resolve_device()
+        self.ocr_use_gpu = self._device.is_gpu()
+
+    def resolve_device(self) -> Device:
         ocr_use_gpu = None
+        is_fall_back = False
         if self._context.spec and self._context.spec.ocr_use_gpu is True:
             if importlib.util.find_spec("paddle") and importlib.util.find_spec("onnxruntime"):
                 import paddle
                 import onnxruntime
                 if paddle.is_compiled_with_cuda() and "CUDAExecutionProvider" in onnxruntime.get_available_providers():
                     ocr_use_gpu = True
-                    logger.info("OCR is running on GPU ✅")
+                    # logger.info("OCR is running on GPU ✅")
             if ocr_use_gpu is None:
                 ocr_use_gpu = False
-                logger.warning("OCR expected GPU, falling back to CPU ⚠️")
+                is_fall_back = True
+                # logger.warning("OCR expected GPU, falling back to CPU ⚠️")
         if ocr_use_gpu is None:
             ocr_use_gpu = False
-            logger.info("OCR is running on CPU ✅")
-        return ocr_use_gpu
+            # logger.info("OCR is running on CPU ✅")
+
+        final_device = Device.CUDA if ocr_use_gpu else Device.CPU
+        if self._device.is_gpu():
+            if ocr_use_gpu:
+                logger.info("OCR using GPU ✅")
+            elif is_fall_back:
+                logger.warning("OCR expected GPU, falling back to CPU ⚠️")
+        elif self._device == Device.CPU:
+            if ocr_use_gpu:
+                logger.info("OCR expected GPU, CPU selected")
+                final_device = Device.CPU
+        else:
+            raise NotImplementedError()
+        return final_device
 
     def _resize_bboxes(self, bboxes: list[TextBox], factor: float):
         if bboxes is None:

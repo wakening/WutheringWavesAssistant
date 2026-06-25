@@ -7,6 +7,7 @@ import numpy as np
 from src.core.contexts import Context
 from src.core.geometry import Detection
 from src.core.interface import ODService, ImgService, WindowService
+from src.core.runtime import Device
 from src.util import yolo_util
 from src.util.wrap_util import timeit
 from src.util.yolo_util import Model
@@ -23,6 +24,13 @@ class YoloServiceImpl(ODService):
         self._context: Context = context
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
+
+        try:
+            self._device = context.runtime.cfg.game.device
+        except Exception:
+            self._device = Device.Auto
+        logger.debug(f"device: {self._device}")
+
         # self._provider: list[str] = yolo_util.get_ort_providers()
         self._default_model: Model = yolo_util.MODEL_BOSS_DEFAULT
         self._current_model: Model = self._default_model
@@ -37,7 +45,7 @@ class YoloServiceImpl(ODService):
     def _create_session(self, model_path: str):
         return yolo_util.create_ort_session(
             model_path=model_path,
-            providers=yolo_util.get_ort_providers(),
+            providers=yolo_util.get_ort_providers() if self._device.is_gpu() else yolo_util.get_ort_providers_cpu(),
             sess_options=yolo_util.create_ort_session_options()
         )
 

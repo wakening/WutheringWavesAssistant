@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 from functools import cached_property
 from pathlib import Path
 
@@ -167,6 +168,18 @@ class DailyRuntimeConfig:
         return f"{self.__class__.__name__}({self.__dict__})"
 
 
+class Device(str, Enum):
+    Auto = "Auto"
+    CUDA = "CUDA"
+    CPU = "CPU"
+
+    def is_gpu(self):
+        return self in [Device.Auto, Device.CUDA]
+
+    def is_cpu(self):
+        return not self.is_gpu()
+
+
 class GameRuntimeConfig:
 
     def __init__(self, cfg: GameConfig):
@@ -189,14 +202,8 @@ class GameRuntimeConfig:
 
     @cached_property
     def gamePath(self) -> Path | None:
-        gamePath = None
-        for i in range(2):
-            if i == 0:
-                gamePath = self._cfg.gamePath
-            else:
-                gamePath = winreg_util.get_install_path()
-            if not gamePath:
-                continue
+        gamePath = self._cfg.gamePath
+        if gamePath and gamePath != "Auto":
             try:
                 path = Path(gamePath)
                 if path.is_file():
@@ -204,9 +211,32 @@ class GameRuntimeConfig:
                     return path
             except Exception:
                 pass
-            break
+            logger.warning(f"Invalid game path: '{gamePath}'")
+
+        gamePath = winreg_util.get_install_path()
+        if gamePath:
+            try:
+                path = Path(gamePath)
+                if path.is_file():
+                    logger.info(f"Using game path: '{path}'")
+                    return path
+            except Exception:
+                pass
         logger.warning(f"Invalid game path: '{gamePath}'")
         return None
+
+    @cached_property
+    def device(self) -> Device:
+        device = self._cfg.device
+        if not device:
+            return Device.Auto
+        try:
+            device = Device(device)
+        except Exception:
+            logger.warning(f"Invalid device: '{self._cfg.device}', using default: {Device.Auto}")
+            return Device.Auto
+        logger.info(f"Device: '{device.value}'")
+        return device
 
 
 class SoarToTheBeatRuntimeConfig:
