@@ -4,7 +4,7 @@
 
 https://www.icoconverter.com/
 
-![logo](../gui/resource/images/logo.ico)
+![logo](../resource/images/logo.ico)
 
 ### compiling
 
