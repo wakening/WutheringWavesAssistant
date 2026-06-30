@@ -161,11 +161,6 @@ class AutoStoryProcessTask(ProcessTask):
         return auto_story_task_run
 
 
-class DailyActivityProcessTask(ProcessTask):
-    def get_task(self, *args) -> Callable[..., None] | None:
-        return daily_activity_task_run
-
-
 class EchoMergeProcessTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
         return echo_merge_task_run
@@ -475,55 +470,6 @@ def auto_story_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
                 time.sleep(1)
     except KeyboardInterrupt:
         logger.info("自动剧情任务进程结束")
-    except Exception as e:
-        logger.exception(e)
-    finally:
-        try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
-            keymouse_util.key_up(window_service.window, "W")
-        except Exception:
-            pass
-
-
-def daily_activity_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
-    from src.core.injector import Container
-
-    logging_config.setup_logging(ipc.log_queue)
-    # logger.debug(f"spec: {json.dumps(spec.__dict__)}")
-    logger.info("每日任务进程开始运行")
-
-    context = Context()
-    context.spec = spec
-    # 从快照还原配置
-    context.param_config = spec.param_config
-    # 新旧配置兼容
-    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
-    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
-    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
-
-    container = Container.build(context)
-    logger.debug("Create application context")
-    window_service: WindowService = container.window_service()
-    # img_service: ImgService = container.img_service()
-    # ocr_service: OCRService = container.ocr_service()
-    control_service: ControlService = container.control_service()
-
-    hwnd_util.set_window_left_top(window_service.window)
-    time.sleep(0.2)
-    logger.debug(spec.game_path)
-    create_parent_monitor(event, spec.leader_pid)
-    create_mouse_reset_monitor(event, spec, ipc, **kwargs)
-    # clock_action = ClockAction(control_service.activate, 3.0)
-
-    page_event_service: PageEventService = container.daily_activity_service()
-
-    try:
-        # while event.is_set():
-        #     clock_action.action()
-        page_event_service.execute()
-    except KeyboardInterrupt:
-        logger.info("每日任务进程结束")
     except Exception as e:
         logger.exception(e)
     finally:

@@ -87,8 +87,17 @@ def test_hung():
         time.sleep(2)
 
 
+def test_hwnd16_to_int():
+    hwnd = int("003B09D6", 16)
+    logger.debug("\n")
+    logger.debug(f"hwnd: {hwnd}")
+    logger.debug("\n")
+
+
 def test_get_exe_path_from_hwnd():
-    hwnd = hwnd_util.get_hwnd()
+    # hwnd = hwnd_util.get_hwnd()
+    hwnd = int("01500A42", 16)
+    logger.debug(hwnd)
     exe_path = hwnd_util.get_exe_path_from_hwnd(hwnd)
     logger.debug(exe_path)
 

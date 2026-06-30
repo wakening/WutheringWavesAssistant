@@ -16,7 +16,7 @@ from src.core import environs
 from src.core.contexts import Context
 from src.core.exceptions import StopError
 from src.core.message import ProcessBridge, MessageBus
-from src.core.tasks import ProcessTask, EchoMergeProcessTask
+from src.core.tasks import EchoMergeProcessTask
 from src.core.workflow import TaskSpec, IPCManager
 from src.util import hwnd_util
 
@@ -362,7 +362,7 @@ class MainController:
         logger.debug("Initializing %s", self.__class__.__name__)
 
         from src.core.tasks import MouseResetProcessTask, AutoBossProcessTask, AutoPickupProcessTask, \
-            AutoStoryProcessTask, DailyActivityProcessTask, ProcessTask, SoarToTheBeatMacroReplayTask, \
+            AutoStoryProcessTask, ProcessTask, SoarToTheBeatMacroReplayTask, \
             SoarToTheBeatMacroRecordTask, DailyTask
 
         self.tasks = {
@@ -371,7 +371,6 @@ class MainController:
             "AutoPickupProcessTask": AutoPickupProcessTask,
             "AutoStorySkipProcessTask": AutoStoryProcessTask,
             "AutoStoryEnjoyProcessTask": AutoStoryProcessTask,
-            "DailyActivityProcessTask": DailyActivityProcessTask,
             "EchoMergeProcessTask": EchoMergeProcessTask,
             "SoarToTheBeatMacroReplayTask": SoarToTheBeatMacroReplayTask,
             "SoarToTheBeatMacroRecordTask": SoarToTheBeatMacroRecordTask,

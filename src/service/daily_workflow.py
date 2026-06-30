@@ -687,7 +687,7 @@ def __doClaimActivityPts(
             result.sort(key=lambda p: p.y1)
             if ui.click_bbox(result[0]).sleep(0.6).wait().until(
                     lambda: not ui.snapshot().search(ctx.tr(I18nText.ActivityClaim), claim_roi)):
-                ui.sleep(0.2)
+                ui.sleep(0.4)
 
     # 逐个点击黄色的活跃点
     idx = 0
@@ -2044,72 +2044,6 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             else:
                 raise NotImplementedError()
 
-            # 没刷就打
-            is_combat = not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared))
-            if is_combat:
-                combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-                combat_system.set_resonators(ctx.shared.team_members)
-                combat_system.is_async = True
-                combat_system.check_boss_hp = False
-                combat_system.auto_pickup = False
-                combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
-
-                timeout = 10 * 60
-                deadline = time.monotonic() + timeout
-                no_text_max = 3
-                no_text_count = no_text_max
-                hp_roi = bbox_hp_bar(ctx).as_tuple()
-
-                while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
-                    logger.debug(f"no_text_count: {no_text_count}")
-                    if no_text_count < 0:
-                        break
-                    combat_system.start(3.5)
-                    ui.sleep(1.5)
-                    ui.snapshot()
-                    img = ui.img
-                    if ui.is_on_homepage():
-                        # 残象聚落已清理
-                        logger.debug(f"result: {ui.bbox_result}")
-                        if ui.search(ctx.tr(I18nText.TacetDiscordNestCleared)):
-                            break
-                        # 清理聚落中的残象
-                        if ui.search(ctx.tr(I18nText.ClearTheTacetDiscordNest)):
-                            logger.debug("战斗中")
-                            no_text_count = no_text_max
-                            continue
-                        else:
-                            logger.debug(f"Text not found: {ctx.tr(I18nText.ClearTheTacetDiscordNest).raw}")
-                        # boxes = img_util.detect_hp_bar(img, hp_roi)
-                        # if boxes:
-                        #     logger.debug("有血条，还在战斗中")
-                        #     no_text_count = no_text_max
-                        #     if logger.isEnabledFor(logging.DEBUG):
-                        #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
-                        #         img_util.save_img_in_temp(img_draw)
-                        #     continue
-                        no_text_count -= 1
-
-                    # 断开连接
-                    if ui.match_page(I18nPage.Login_Disconnected.PAGE):
-                        combat_system.stop(join=True)
-                        return False
-                    if ctx.page_service.global_page_action(ui.ocr_result):
-                        logger.debug("global_page_action")
-
-                combat_system.stop(join=True)
-                # 检查复苏弹窗
-                if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.SelectARevivalItem)):
-                    ui.esc().sleep(0.5)
-                combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
-                ui.sleep(0.3)
-
-            logger.info("Tacet Discord Nest Cleared")
-
-            # 吸收
-            ctx.control_service.camera_reset()
-            ui.sleep(0.5)
-
             # TODO 封装
             def _map_fast_travel() -> bool:
                 if not ui.is_on_homepage():
@@ -2165,27 +2099,112 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(0.7)
                 return True
 
-            if ui.snapshot().search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
-                ui.pick_up(2, 0.2)
-                cur_fsm.complete()
-                return True
+            is_combat = not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared))
+            # 可能打着打着出了战斗区域，标识文本消失，误判已经打完，循环重置位置接着打
+            max_combat_range = 3
+            for k in range(max_combat_range):
+                if k > 0:
+                    logger.debug(f"k: {k}")
+                # 没刷就打
+                if is_combat:
+                    combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+                    combat_system.set_resonators(ctx.shared.team_members)
+                    combat_system.is_async = True
+                    combat_system.check_boss_hp = False
+                    combat_system.auto_pickup = False
+                    combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
 
-            # 触发过战斗才需要重置位置
-            if is_combat:
-                if not _map_fast_travel():
-                    # 原地传送失败就结束
-                    if in_progress:
-                        # 没找到吸收，再次来不管怎样都结束掉
-                        cur_fsm.complete()
-                    return True
-                # 前往战斗区域
-                ui.move(tacets_route[_tacets_idx]).sleep(0.3)
+                    timeout = 10 * 60
+                    deadline = time.monotonic() + timeout
+                    no_text_max = 3
+                    no_text_count = no_text_max
+                    hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-                if ui.snapshot().search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
-                    ui.pick_up(2, 0.2)
-                    cur_fsm.complete()
-                    return True
+                    while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+                        logger.debug(f"no_text_count: {no_text_count}")
+                        if no_text_count < 0:
+                            break
+                        combat_system.start(3.5)
+                        ui.sleep(1.5)
+                        ui.snapshot()
+                        img = ui.img
+                        if ui.is_on_homepage():
+                            # 残象聚落已清理
+                            logger.debug(f"result: {ui.bbox_result}")
+                            if ui.search(ctx.tr(I18nText.TacetDiscordNestCleared)):
+                                break
+                            # 清理聚落中的残象
+                            if ui.search(ctx.tr(I18nText.ClearTheTacetDiscordNest)):
+                                logger.debug("战斗中")
+                                no_text_count = no_text_max
+                                continue
+                            else:
+                                logger.debug(f"Text not found: {ctx.tr(I18nText.ClearTheTacetDiscordNest).raw}")
+                            # boxes = img_util.detect_hp_bar(img, hp_roi)
+                            # if boxes:
+                            #     logger.debug("有血条，还在战斗中")
+                            #     no_text_count = no_text_max
+                            #     if logger.isEnabledFor(logging.DEBUG):
+                            #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
+                            #         img_util.save_img_in_temp(img_draw)
+                            #     continue
+                            no_text_count -= 1
 
+                        # 断开连接
+                        if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                            combat_system.stop(join=True)
+                            return False
+                        if ctx.page_service.global_page_action(ui.ocr_result):
+                            logger.debug("global_page_action")
+
+                    combat_system.stop(join=True)
+                    # 检查复苏弹窗
+                    if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.SelectARevivalItem)):
+                        ui.esc().sleep(0.5)
+                    combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+                    ui.sleep(0.3)
+
+                    ctx.control_service.camera_reset()
+                    ui.sleep(0.5)
+
+                    # # 声骸刚好掉在脚下，直接吸收结束，不用后续操作
+                    # if ui.search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
+                    #     logger.info("Tacet Discord Nest Cleared")
+                    #     ui.pick_up(2, 0.2)
+                    #     cur_fsm.complete()
+                    #     return True
+                    ui.pick_up(2, 0.2).sleep(0.2)
+
+                    # 重置位置
+                    if not _map_fast_travel():
+                        # 原地传送失败就结束
+                        if in_progress:
+                            # 没找到吸收，再次来不管怎样都结束掉
+                            cur_fsm.complete()
+                        return True
+                    # 前往战斗区域
+                    ui.move(tacets_route[_tacets_idx]).sleep(0.3)
+
+                    is_combat = not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared))
+                    if k == max_combat_range - 1:
+                        # 打了几回都没打完，重新来
+                        if in_progress:
+                            break
+                        return True
+                    continue
+                # else:
+                #     ctx.control_service.camera_reset()
+                #     ui.sleep(0.5)
+                #     logger.info("Tacet Discord Nest Cleared")
+                #
+                #     # 声骸刚好掉在脚下，直接吸收结束，不用后续操作
+                #     if ui.search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
+                #         ui.pick_up(2, 0.2)
+                #         cur_fsm.complete()
+                #         return True
+                #     break
+
+            # 吸收
             absorb_around_variant_blind(ctx)
             # 不管怎样都结束掉
             cur_fsm.complete()

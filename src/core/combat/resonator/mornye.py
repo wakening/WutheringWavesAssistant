@@ -257,7 +257,7 @@ class Mornye(BaseMornye):
             # ["w", 0.00, 0.80],
         ]
 
-    def a3z_z(self):
+    def a3z_Ez(self):
         return [
             # 3az
             # # ["a", 0.05, 0.42],
@@ -270,7 +270,14 @@ class Mornye(BaseMornye):
             # # ["a", 0.05, 0.30],
             # ["a", 0.05, 0.13],
             # ["a", 0.05, 0.12],
-            ["z", 1.20, 0.00],
+
+            # ["z", 1.20, 0.00],
+            ["a_down", 0.00, 0.00],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.20],
+            ["w", 0.00, 0.70],
+            ["a_up", 0.00, 0.00],
+
             ["w", 0.00, 0.80],
         ]
 
@@ -320,7 +327,7 @@ class Mornye(BaseMornye):
     def E(self):
         return [
             # 共鸣技能 E
-            ["E", 0.05, 0.20],
+            ["E", 0.00, 0.20],
         ]
 
     @combat_cache
@@ -384,8 +391,7 @@ class Mornye(BaseMornye):
         # 不在广域观测模式
         if not is_wide_field_observation_mode_ready:
             if is_heavy_attack_geopotential_shift_ready:
-                self.combo_action(self.E(), False)
-                self.combo_action(self.a3z_z(), True)
+                self.combo_action(self.a3z_Ez(), True)
                 if self.random_float() < 0.25:
                     self.combo_action(self.E(), False)
                     return

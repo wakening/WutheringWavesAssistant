@@ -33,7 +33,6 @@ class Container(containers.DeclarativeContainer):
     from src.service.boss_info_service import BossInfoServiceImpl
     from src.service.combat_service import CombatServiceImpl
     from src.service.control_service import Win32ControlServiceImpl
-    from src.service.daily_activity_service import DailyActivityServiceImpl
     from src.service.img_service import ImgServiceImpl
     # from src.service.ocr_service import PaddleOcrServiceImpl
     # from src.service.ocr_service import RapidOcrServiceImpl
@@ -146,16 +145,6 @@ class Container(containers.DeclarativeContainer):
         ocr_service=ocr_service,
         control_service=control_service,
         od_service=None,
-        boss_info_service=boss_info_service,
-    )
-    daily_activity_service = providers.Singleton(
-        DailyActivityServiceImpl,
-        context=context,
-        window_service=window_service,
-        img_service=img_service,
-        ocr_service=ocr_service,
-        control_service=control_service,
-        od_service=od_service,
         boss_info_service=boss_info_service,
     )
 

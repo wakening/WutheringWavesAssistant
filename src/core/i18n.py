@@ -2,7 +2,7 @@ import logging
 import re
 from enum import Enum
 
-from src.core.geometry import AnchorBBox, AnchorPoint, Align
+from src.core.geometry import AnchorBBox, AnchorPoint, Align, BBox
 
 logger = logging.getLogger(__name__)
 
@@ -254,6 +254,7 @@ class I18nText:
     TapTheBlankAreaToClose = "TapTheBlankAreaToClose"
     SelectARevivalItem = "SelectARevivalItem"
     DoNotShowAgain = "DoNotShowAgain"
+    LuniteSubscriptionReward = "LuniteSubscriptionReward"
 
     # ------- Dialogue -------
     Absorb = "Absorb"
@@ -268,6 +269,7 @@ class I18nText:
     UnionLevel = "UnionLevel"
     UnionEXP = "UnionEXP"
     # item
+    Events = "Events"
     TerminalPioneerPodcast = "TerminalPioneerPodcast"
     Team = "Team"
     DataBank = "DataBank"
@@ -426,6 +428,26 @@ class I18nText:
     # ------- (Home) TacetDiscordNest -------
     ClearTheTacetDiscordNest = "ClearTheTacetDiscordNest"
     TacetDiscordNestCleared = "TacetDiscordNestCleared"
+
+    # ------- View -------
+    ViewClaimRewards = "ViewClaimRewards"
+    ViewClaimRewardsConfirm = "ViewClaimRewardsConfirm"
+    ViewClaimRewardsCancel = "ViewClaimRewardsCancel"
+    CrownlessResonanceCord = "CrownlessResonanceCord"
+    ViewFight = "ViewFight"
+    ViewChallengeComplete = "ViewChallengeComplete"
+    ViewChallengeFailed = "ViewChallengeFailed"
+    ViewBreakFree = "ViewBreakFree"
+    ViewLeaveInstanceNote = "ViewLeaveInstanceNote"
+    ViewLeaveInstanceConfirm = "ViewLeaveInstanceConfirm"
+    ViewLeaveInstanceRestart = "ViewLeaveInstanceRestart"
+    ViewLeaveInstance2Notice = "ViewLeaveInstance2Notice"
+    ViewLeaveInstance2Confirm = "ViewLeaveInstance2Confirm"
+    ViewLeaveInstance2Cancel = "ViewLeaveInstance2Cancel"
+    ViewLeaveInstance2Restart = "ViewLeaveInstance2Restart"
+    ViewLeaveInstance2Leave = "ViewLeaveInstance2Leave"
+    ViewForgeryChallengeNoticeExit = "ViewForgeryChallengeNoticeExit"
+    ViewForgeryChallengeNoticeRestart = "ViewForgeryChallengeNoticeRestart"
 
 
 I18N_TEXT = {
@@ -1060,6 +1082,13 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^本次登录不再提示$", raw="本次登录不再提示"),
         Language.EN: RegexStr(flex_ws(r"^Do not show again$"), raw="Do not show again"),
     },
+    I18nText.LuniteSubscriptionReward: {
+        Language.ZH: RegexStr(r"点击领取今日月相观测卡奖励", raw="点击领取今日月相观测卡奖励"),
+        Language.EN: RegexStr(
+            flex_ws(r"Tap to claim today|Lunite Subscription reward"),
+            raw="Tap to claim today's LuniteSubscription reward"
+        )
+    },
 
     # ------- Dialogue -------
     I18nText.Absorb: {
@@ -1095,6 +1124,10 @@ I18N_TEXT = {
     I18nText.UnionEXP: {
         Language.ZH: RegexStr(r"^联觉经验$", raw="联觉经验"),
         Language.EN: RegexStr(flex_ws(r"^Union EXP$"), raw="Union EXP"),
+    },
+    I18nText.Events: {
+        Language.ZH: RegexStr(r"^活动$", raw="活动"),
+        Language.EN: RegexStr(flex_ws(r"^Events$"), raw="Events"),
     },
     I18nText.TerminalPioneerPodcast: {
         Language.ZH: RegexStr(r"^先约电台$", raw="先约电台"),
@@ -1678,6 +1711,81 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"残象聚落已清理", raw="残象聚落已清理"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
     },
+
+    # ------- View -------
+    # 这几个词在很多页面都有，而且名字有细微差异，不同语言间也有差异，很难统一，各功能单独维护自己的一份
+    I18nText.ViewClaimRewards: {
+        Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
+        Language.EN: RegexStr(flex_ws(r"^Claim Rewards|Claim the rewards$"), raw=r"Claim Rewards"),
+    },
+    I18nText.ViewClaimRewardsConfirm: {
+        Language.ZH: RegexStr(r"^确认$", raw="确认"),
+        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw="Confirm"),
+    },
+    I18nText.ViewClaimRewardsCancel: {
+        Language.ZH: RegexStr(r"^取消$", raw="取消"),
+        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw="Cancel"),
+    },
+    I18nText.CrownlessResonanceCord: {
+        Language.ZH: RegexStr(r"^声弦$", raw="声弦"),
+        Language.EN: RegexStr(flex_ws(r"^Resonance Cord$"), raw="Resonance Cord"),
+    },
+    I18nText.ViewFight: {
+        Language.ZH: RegexStr(r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)", raw="击败"),
+    },
+    I18nText.ViewChallengeComplete: {
+        Language.ZH: RegexStr(r"^挑战达成|挑战成功$", raw="挑战成功"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw="Challenge Complete"),
+    },
+    I18nText.ViewChallengeFailed: {
+        Language.ZH: RegexStr(r"^挑战达成|挑战成功$", raw="挑战成功"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw="Challenge Failed"),
+    },
+    I18nText.ViewBreakFree: {
+        Language.ZH: RegexStr(r"^交替点击进行挣脱$", raw="交替点击进行挣脱"),
+        Language.EN: RegexStr(flex_ws(r"^Click alternately to break free$"), raw="Click alternately to break free"),
+    },
+    I18nText.ViewLeaveInstanceNote: {
+        Language.ZH: RegexStr(r"^提示$", raw="提示"),
+        Language.EN: RegexStr(flex_ws(r"Note"), raw="Note"),
+    },
+    I18nText.ViewLeaveInstanceConfirm: {
+        Language.ZH: RegexStr(r"^确认$", raw="确认"),
+        Language.EN: RegexStr(flex_ws(r"Confirm"), raw="Confirm"),
+    },
+    I18nText.ViewLeaveInstanceRestart: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"Restart"), raw="Restart"),
+    },
+    I18nText.ViewLeaveInstance2Notice: {
+        Language.ZH: RegexStr(r"^提示$", raw="提示"),
+        Language.EN: RegexStr(flex_ws(r"^Notice$"), raw=r"Notice"),
+    },
+    I18nText.ViewLeaveInstance2Confirm: {
+        Language.ZH: RegexStr(r"^确认$", raw="确认"),
+        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw=r"Confirm"),
+    },
+    I18nText.ViewLeaveInstance2Cancel: {
+        Language.ZH: RegexStr(r"^取消$", raw="取消"),
+        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw=r"Cancel"),
+    },
+    I18nText.ViewLeaveInstance2Restart: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"Restart"), raw="Restart"),
+    },
+    I18nText.ViewLeaveInstance2Leave: {
+        Language.ZH: RegexStr(r"离开", raw="离开"),
+        Language.EN: RegexStr(flex_ws(r"Leave"), raw="Leave"),
+    },
+    I18nText.ViewForgeryChallengeNoticeExit: {
+        Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
+        Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
+    },
+    I18nText.ViewForgeryChallengeNoticeRestart: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
+    },
+
 
 }
 
@@ -2596,6 +2704,259 @@ I18N_PAGES_GUIDEBOOK = {
         },
 
     },
+
+}
+
+
+class I18nView:
+    Terminal = "Terminal"
+    LuniteSubscriptionReward = "LuniteSubscriptionReward"
+    ViewClaimRewards = "ViewClaimRewards"
+    ViewFight = "ViewFight"
+    Absorb = "Absorb"
+    ViewChallengeComplete = "ViewChallengeComplete"
+    ViewBreakFree = "ViewBreakFree"
+    ViewLeaveInstance = "ViewLeaveInstance"
+    ViewLeaveInstance2 = "ViewLeaveInstance2"
+    ViewForgeryChallengeNotice = "ViewForgeryChallengeNotice"
+
+
+class View:
+    def __init__(self, *, name: str | None = None, child, assets: dict[Language, str] | None = None):
+        self.name: str | None = name
+        self.child = child
+        self.assets = assets
+
+
+class FeatureGroup(str, Enum):
+    A = "A"
+    B = "B"
+    C = "C"
+    D = "D"
+    E = "E"
+    F = "F"
+    G = "G"
+    H = "H"
+    I = "I"
+    J = "J"
+    K = "K"
+    L = "L"
+    M = "M"
+    N = "N"
+    O = "O"
+    P = "P"
+    Q = "Q"
+    R = "R"
+    S = "S"
+    T = "T"
+    U = "U"
+    V = "V"
+    W = "W"
+    X = "X"
+    Y = "Y"
+    Z = "Z"
+
+
+class Feature:
+    def __init__(
+            self,
+            key: str,
+            *,
+            roi: BBox | None = None,
+            exclude: bool = False,
+            group: str | None = None,
+    ):
+        """
+        文本特征
+        :param key: 文本标识key，表示这个词必须有
+        :param roi: 文本位置
+        :param exclude: 是否为反向词，为True表示这个词不能有
+        :param group: 同组的为或关系，只要组里有一个满足就算对。后续可以直接用组key来拿到命中的文本key，不用逐个判断
+        """
+        self.key: str = key
+        self.roi: BBox | None = roi
+        self.exclude: bool = exclude
+        self.group: str | None = group
+
+
+I18N_PAGES_BOSS = {
+    I18nView.Terminal: {
+        Language.ZH: View(
+            name="终端",
+            child=[
+                Feature(I18nText.Events),
+                # Feature(I18nText.Birthday),
+                Feature(I18nText.SOL3Phase),
+                Feature(I18nText.UnionLevel),
+                Feature(I18nText.UnionEXP),
+            ],
+        ),
+        Language.EN: View(
+            name="Terminal",
+            child=[
+                Feature(I18nText.Events),
+                # Feature(I18nText.Birthday),
+                Feature(I18nText.SOL3Phase),
+                Feature(I18nText.UnionLevel),
+                Feature(I18nText.UnionEXP),
+            ],
+        ),
+    },
+
+    I18nView.LuniteSubscriptionReward: {
+        Language.ZH: View(
+            name="每日月卡奖励",
+            child=[
+                Feature(I18nText.LuniteSubscriptionReward),
+            ],
+        ),
+        Language.EN: View(
+            name="Lunite Subscription reward",
+            child=[
+                Feature(I18nText.LuniteSubscriptionReward),
+            ],
+        ),
+    },
+
+    I18nView.ViewClaimRewards: {
+        Language.ZH: View(
+            name="领取奖励",
+            child=[
+                Feature(I18nText.ViewClaimRewards),
+                Feature(I18nText.ViewClaimRewardsConfirm),
+                Feature(I18nText.ViewClaimRewardsCancel),
+            ],
+        ),
+    },
+
+    I18nView.ViewFight: {
+        Language.ZH: View(
+            name="战斗画面",
+            child=[
+                Feature(I18nText.ViewFight),
+                Feature(I18nText.Activity, exclude=True),
+                Feature(I18nText.ActivityPts, exclude=True),
+                Feature(I18nText.TacetFieldChallengeComplete, exclude=True),
+                Feature(I18nText.TacetFieldNoticeChallengeComplete, exclude=True),
+                Feature(I18nText.ForgeryChallengeComplete, exclude=True),
+            ],
+        ),
+    },
+
+    I18nView.Absorb: {
+        Language.ZH: View(
+            name="吸收",
+            child=[
+                Feature(I18nText.Absorb),
+                Feature(I18nText.ClaimRewards, exclude=True),
+            ],
+        ),
+        Language.EN: View(
+            name="Absorb",
+            child=[
+                Feature(I18nText.Absorb),
+                Feature(I18nText.ClaimRewards, exclude=True),
+            ],
+        ),
+    },
+
+    I18nView.ViewChallengeComplete: {
+        Language.ZH: View(
+            name="挑战成功",
+            child=[
+                Feature(I18nText.ViewChallengeComplete),
+            ],
+        ),
+        Language.EN: View(
+            name="Challenge Complete",
+            child=[
+                Feature(I18nText.ViewChallengeComplete),
+            ],
+        ),
+    },
+
+    I18nView.ViewBreakFree: {
+        Language.ZH: View(
+            name="交替点击进行挣脱",
+            child=[
+                Feature(I18nText.ViewBreakFree),
+            ],
+        ),
+        Language.EN: View(
+            name="Break Free",
+            child=[
+                Feature(I18nText.ViewBreakFree),
+            ],
+        ),
+    },
+
+    I18nView.ViewLeaveInstance: {
+        Language.ZH: View(
+            name="离开副本",
+            child=[
+                Feature(I18nText.ViewLeaveInstanceNote),
+                Feature(I18nText.ViewLeaveInstanceConfirm),
+                Feature(I18nText.ViewLeaveInstanceRestart),
+            ],
+        ),
+        Language.EN: View(
+            name="LeaveInstance",
+            child=[
+                Feature(I18nText.ViewLeaveInstanceNote),
+                Feature(I18nText.ViewLeaveInstanceConfirm),
+                Feature(I18nText.ViewLeaveInstanceRestart),
+            ],
+        ),
+    },
+
+    I18nView.ViewLeaveInstance2: {
+        Language.ZH: View(
+            name="离开副本2",
+            child=[
+                Feature(I18nText.ViewLeaveInstance2Notice),
+                Feature(I18nText.ViewLeaveInstance2Confirm),
+                Feature(I18nText.ViewLeaveInstance2Cancel, group=FeatureGroup.A),
+                Feature(I18nText.ViewLeaveInstance2Restart, group=FeatureGroup.A),
+                Feature(I18nText.ViewLeaveInstance2Leave),
+            ],
+        ),
+        Language.EN: View(
+            name="LeaveInstance2",
+            child=[
+                Feature(I18nText.ViewLeaveInstance2Notice),
+                Feature(I18nText.ViewLeaveInstance2Confirm),
+                Feature(I18nText.ViewLeaveInstance2Cancel, group=FeatureGroup.A),
+                Feature(I18nText.ViewLeaveInstance2Restart, group=FeatureGroup.A),
+                Feature(I18nText.ViewLeaveInstance2Leave),
+            ],
+        ),
+    },
+
+    I18nView.ViewForgeryChallengeNotice: {
+        Language.ZH: View(
+            name="材料本-挑战完成/失败",
+            child=[
+                Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
+                Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
+                Feature(I18nText.ViewForgeryChallengeNoticeExit),
+                Feature(I18nText.ViewForgeryChallengeNoticeRestart),
+            ],
+        ),
+        Language.EN: View(
+            name="ForgeryChallenge-Complete/Failed",
+            child=[
+                Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
+                Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
+                Feature(I18nText.ViewForgeryChallengeNoticeExit),
+                Feature(I18nText.ViewForgeryChallengeNoticeRestart),
+            ],
+        ),
+    },
+
+
+
+
+
 
 }
 
