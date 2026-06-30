@@ -1,11 +1,11 @@
 name: Release Build
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   package:
-    runs-on: windows-latest
+    runs-on: windows-latest  # 使用 Windows 环境
 
     steps:
       - name: 📥 检出代码
@@ -50,6 +50,32 @@ jobs:
           Get-ChildItem -Path . -Force | Where-Object { $_.Name -ne $tempWorkspace } | ForEach-Object {
               Copy-Item -Path $_.FullName -Destination $tempWorkspace -Recurse -Force
           }
+
+      - name: Install 7-Zip
+        shell: pwsh
+        run: |
+          $version = "1900"
+          $url = "https://www.7-zip.org/a/7z${version}-x64.exe"
+          $installer = "$env:RUNNER_TEMP\7z.exe"
+      
+          # 下载
+          Invoke-WebRequest $url -OutFile $installer
+      
+          # 静默安装（/S = silent）
+          Start-Process $installer -ArgumentList "/S" -Wait
+      
+          # 强制加入 PATH（覆盖/确保可用）
+          $sevenZipPath = "C:\Program Files\7-Zip"
+      
+          if (!(Test-Path $sevenZipPath)) {
+              $sevenZipPath = "C:\Program Files (x86)\7-Zip"
+          }
+      
+          # 写入环境变量（后续 step 可直接用 7z）
+          echo $sevenZipPath | Out-File -Append $env:GITHUB_PATH
+      
+          # 验证
+          & "$sevenZipPath\7z.exe" | Write-Host
 
       - name: 🐍 下载 Python 3.12 完整 ZIP
         shell: pwsh
@@ -316,7 +342,6 @@ jobs:
           - `wwa-gpu-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，40系列显卡  
           - `wwa-gpu-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，50系列显卡  
             - 压缩包已分割为001、002两个文件，都要下载，放在同一个目录，对001进行解压即可  
-            - IDM等工具下载可能会在001后面自动添加.7z，请手动删除  
             - 5090太新还不支持，请使用标准版  
           
           **建议使用gpu版**，作者4070使用gpu-cu126版  
@@ -333,10 +358,11 @@ jobs:
               - 移动镜头修正：开  
               - 战斗镜头修正：开  
           - MOD在刷boss时需要关闭，在游戏内按F6，F6在下面就Fn + F6  
+          - 脚本不用每次都重新下载，直接点目录内的一键更新即可  
           
           "@
 
-          $fullContent = $fixedText + "`n`n" + $result + "`n`n" + $fixedDownloadText + "`n`n" + "感谢使用！如有问题请提交 Issue。"
+          $fullContent = $fixedText + "`n`n" + $result + "`n`n" + $fixedDownloadText + "`n`n" + "感谢使用！如有问题请提交 Issue。" + "`n`n" + "不用每次都重新下载，直接点目录内的一键更新！"
     
           # 保存到文件
           $fullContent | Out-File -FilePath "release_body.txt"

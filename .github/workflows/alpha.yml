@@ -51,7 +51,7 @@ jobs:
               Copy-Item -Path $_.FullName -Destination $tempWorkspace -Recurse -Force
           }
 
-      - name: Install 7-Zip (force overwrite)
+      - name: Install 7-Zip
         shell: pwsh
         run: |
           $version = "1900"
