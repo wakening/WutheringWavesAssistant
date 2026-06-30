@@ -30,15 +30,15 @@ jobs:
       - name: 🗜️ 清理不用打包的项目文件
         run: |
           # Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "assets/screenshot" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "assets/screenshot" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "WWA_updater.exe" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "WWA_updater.exe" -Recurse -Force -ErrorAction SilentlyContinue
           
           $tempWorkspace = "temp-workspace"
           mkdir $tempWorkspace -Force
