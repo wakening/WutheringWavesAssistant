@@ -21,6 +21,7 @@ jobs:
 
       - name: 📖 获取WWA版本号
         id: get_version
+        shell: pwsh
         run: |
           $line = (Select-String -Path "src/__init__.py" -Pattern '__version__\s*=\s*"(.*?)"').Matches.Groups[1].Value
           $version = $line.Trim() -split ' ' | Select-Object -First 1
@@ -28,6 +29,7 @@ jobs:
           Write-Host "WWA version: $version"
 
       - name: 🗜️ 清理不用打包的项目文件
+        shell: pwsh
         run: |
           # Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
@@ -50,6 +52,7 @@ jobs:
           }
 
       - name: 🐍 下载 Python 3.12 完整 ZIP
+        shell: pwsh
         run: |
           $pyZipName = "python-3.12.6-amd64.zip"
           $url = "https://www.python.org/ftp/python/3.12.6/$pyZipName"
@@ -57,6 +60,7 @@ jobs:
           Write-Output "PY_ZIP_NAME=$pyZipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: ⬇️ 下载最小 MinGit
+        shell: pwsh
         run: |
           $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.1/MinGit-2.51.0-64-bit.zip"
           $gitFile = "MinGit.zip"
@@ -64,6 +68,7 @@ jobs:
           Expand-Archive -Path $gitFile -DestinationPath "$env:TEMP_WORKSPACE\git"
 
       - name: 🧑‍💻 wwa cpu版本 安装依赖并打包
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           
@@ -109,6 +114,7 @@ jobs:
           path: "wwa-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           
@@ -154,6 +160,7 @@ jobs:
           path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa gpu cuda12.9版本 安装依赖并打包
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           
@@ -202,6 +209,7 @@ jobs:
           path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.*"
 
       - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           
