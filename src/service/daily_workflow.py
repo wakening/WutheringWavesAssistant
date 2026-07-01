@@ -1606,7 +1606,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 取出与选择同名的组
     cur_card = cards.get(cur_instance)
     logger.debug(f"cur_card: {cur_card}")
-    if not cur_card and any(i is None for i in cur_card):
+    if not cur_card or any(i is None for i in cur_card):
         return _fail_return()
 
     tbox, go = cur_card
