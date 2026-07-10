@@ -167,6 +167,8 @@ class ResonatorNameEnum(Enum):
                 return cls.luukherssen
             if len(ocr_text) >= 2 and ocr_text.startswith(cls.lucilla.value[:2]):
                 return cls.lucilla
+            if len(ocr_text) >= 4 and ocr_text.startswith(cls.yangyangxuanling.value[:2]) and ocr_text.endswith(cls.yangyangxuanling.value[-2:]):
+                return cls.yangyangxuanling
         return None
 
 

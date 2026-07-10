@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.core.boss import BossNameEnum
 from src.core.contexts import Status, Context
@@ -526,6 +526,21 @@ class AutoBossServiceImpl(PageEventAbstractService):
             time.sleep(2)
             return True
 
+        def disconnected_page_action(positions: dict[str, Position]) -> bool:
+            """
+            点击确认
+            :param positions: 位置信息
+            :return:
+            """
+            position = positions["确认"]
+            self._control_service.click(*position.center)
+            self._info.in_dungeon = False
+            self._info.status = Status.idle
+            now = datetime.now()
+            self._info.lastFightTime = now + timedelta(seconds=self._config.MaxFightTime / 2)
+            time.sleep(2)
+            return True
+
         disconnected_page = Page(
             name="连接已断开",
             targetTexts=[
@@ -542,7 +557,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
                     text="^确认$",
                 ),
             ],
-            action=confirm_page_action,
+            action=disconnected_page_action,
         )
         self._general_pages.append(disconnected_page)
 
