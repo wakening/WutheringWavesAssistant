@@ -889,7 +889,7 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="吸收",
-                    text="吸收",
+                    text=r"^吸收$",
                 ),
             ],
             excludeTexts=[
