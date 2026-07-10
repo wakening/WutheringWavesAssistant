@@ -157,6 +157,8 @@ class DailyRuntimeConfig:
 
     def __init_tacetDiscordNest(self):
         _all = "All"
+        self.southernYuanHillsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
+            _all, I18nText.SouthernYuanHillsTacetDiscordNest]
         self.starblindCrashsiteTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
             _all, I18nText.StarblindCrashsiteTacetDiscordNest]
         self.rebirthUplandsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [

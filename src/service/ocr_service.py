@@ -4,6 +4,7 @@ import re
 import time
 from abc import ABC
 
+import cv2
 import numpy as np
 
 from src.core.contexts import Context
@@ -16,6 +17,176 @@ from src.util import rapidocr_util
 from src.util.wrap_util import timeit
 
 logger = logging.getLogger(__name__)
+
+
+class ImageTransform:
+    """OCR图片预处理及坐标恢复"""
+
+    def __init__(self) -> None:
+        self.scale: float = 1.0
+
+        # 原图尺寸
+        self.src_w: int = 0
+        self.src_h: int = 0
+
+        # ROI 左上角（原图坐标）
+        self.roi_x: int = 0
+        self.roi_y: int = 0
+
+    @staticmethod
+    def _scale(img: np.ndarray) -> float:
+        """
+        ocr图片统一缩放，仅需在合理范围内缩放，适配1280x720 1600x900 2560x1440等常见分辨率，压缩到高720
+        太离谱的会触发ocr引擎参数自动缩放
+        :param img:
+        :return:
+        """
+        h, w = img.shape[:2]
+        if h > 720 and w > 1280:
+            # 压缩太小会导致小字识别错误
+            # base_h = 540
+            # base_h = 640
+            base_h = 720
+            return base_h / h
+        return 1.0
+
+    @staticmethod
+    def _align_up(value: int, align: int = 32) -> int:
+        """向上对齐到 align 的整数倍。"""
+        return (value + align - 1) // align * align
+
+    @staticmethod
+    def _clip(value: int, low: int, high: int) -> int:
+        return max(low, min(value, high))
+
+    @staticmethod
+    def _pad(
+        img: np.ndarray,
+        target_w: int,
+        target_h: int,
+        value: int = 255,
+    ) -> np.ndarray:
+        """将图片放到左上角并Padding"""
+
+        h, w = img.shape[:2]
+
+        if h == target_h and w == target_w:
+            return img
+
+        if img.ndim == 2:
+            canvas = np.full((target_h, target_w), value, dtype=img.dtype)
+        else:
+            canvas = np.full( (target_h, target_w, img.shape[2]), value, dtype=img.dtype)
+
+        canvas[:h, :w] = img
+        return canvas
+
+    def prepare(
+        self,
+        img: np.ndarray,
+        roi: BBox | None = None,
+        *,
+        scale: float | None = None,
+    ) -> np.ndarray:
+        """
+        OCR前图片处理，缩小，截取roi
+        :param img:
+        :param roi:
+        :param scale:
+        :return:
+        """
+        if scale is None:
+            scale = self._scale(img)
+        self.scale = scale
+        # logger.debug(f"img shape: {img.shape}, roi: {roi}, scale: {self.scale}")
+
+        self.src_h, self.src_w = img.shape[:2]
+
+        self.roi_x = 0
+        self.roi_y = 0
+
+        # 整图缩放
+        if scale != 1.0:
+            scaled_w = max(1, round(self.src_w * scale))
+            scaled_h = max(1, round(self.src_h * scale))
+
+            interpolation = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_CUBIC
+            img = cv2.resize(img, (scaled_w, scaled_h), interpolation=interpolation)
+        else:
+            scaled_h, scaled_w = img.shape[:2]
+
+        if roi is None:
+            # 整图只缩放，不做Padding
+            return img
+
+        # ROI（原图坐标）
+        x1 = self._clip(roi.x1, 0, self.src_w)
+        y1 = self._clip(roi.y1, 0, self.src_h)
+        x2 = self._clip(roi.x2, 0, self.src_w)
+        y2 = self._clip(roi.y2, 0, self.src_h)
+
+        small_w = self._align_up(max(1, scaled_w // 4))
+        small_h = self._align_up(max(1, scaled_h // 4))
+
+        medium_w = self._align_up(max(1, scaled_w // 2))
+        medium_h = scaled_h
+
+        large_w = scaled_w
+        large_h = scaled_h
+
+        if x2 <= x1 or y2 <= y1:
+            if img.ndim == 2:
+                return np.full((small_h, small_w), 255, dtype=img.dtype)
+            return np.full((small_h, small_w, img.shape[2]), 255, dtype=img.dtype)
+
+        # 保存原图 ROI 偏移
+        self.roi_x = x1
+        self.roi_y = y1
+
+        # ROI 同步缩放
+        sx1 = round(x1 * scale)
+        sy1 = round(y1 * scale)
+        sx2 = round(x2 * scale)
+        sy2 = round(y2 * scale)
+
+        crop = img[sy1:sy2, sx1:sx2]
+
+        crop_h, crop_w = crop.shape[:2]
+
+        if crop_w <= small_w and crop_h <= small_h:
+            target_w = small_w
+            target_h = small_h
+
+        elif crop_w <= medium_w and crop_h <= medium_h:
+            target_w = medium_w
+            target_h = medium_h
+
+        else:
+            target_w = large_w
+            target_h = large_h
+
+        return self._pad(crop, target_w, target_h)
+
+    def restore_bbox(self, bbox: TextBox) -> TextBox:
+        """恢复到原图坐标"""
+
+        x1 = round(bbox.x1 / self.scale) + self.roi_x
+        y1 = round(bbox.y1 / self.scale) + self.roi_y
+        x2 = round(bbox.x2 / self.scale) + self.roi_x
+        y2 = round(bbox.y2 / self.scale) + self.roi_y
+
+        return TextBox(
+            x1=self._clip(x1, 0, self.src_w),
+            y1=self._clip(y1, 0, self.src_h),
+            x2=self._clip(x2, 0, self.src_w),
+            y2=self._clip(y2, 0, self.src_h),
+            text=bbox.text,
+            score=bbox.score,
+        )
+
+    def restore_boxes(self, boxes: list[TextBox]) -> list[TextBox]:
+        """批量恢复到原图坐标。"""
+        return [self.restore_bbox(box) for box in boxes]
 
 
 class AbstractOcrService(OCRService, ABC):
@@ -66,28 +237,6 @@ class AbstractOcrService(OCRService, ABC):
         else:
             raise NotImplementedError()
         return final_device
-
-    def _resize_bboxes(self, bboxes: list[TextBox], factor: float):
-        if bboxes is None:
-            return None
-        return [bbox.resize(factor) for bbox in bboxes]
-
-    def _resize_img(self, img: np.ndarray) -> tuple[np.ndarray, float]:
-        """
-        ocr图片统一缩放，仅需在合理范围内缩放，适配1280x720 1600x900 2560x1440等常见分辨率，压缩到高720
-        太离谱的会触发ocr引擎参数自动缩放
-        :param img:
-        :return:
-        """
-        h, w = img.shape[:2]
-        if h > 720 and w > 1280:
-            # 压缩会导致小字识别错误
-            # base_h = 540
-            # base_h = 640
-            base_h = 720
-            new_img = self._img_service.resize_by_ratio(img, base_h / h)
-            return new_img, h / base_h
-        return img, 1.0
 
 
 class RapidOcrServiceImpl(AbstractOcrService):
@@ -181,11 +330,10 @@ class RapidOcrServiceImpl(AbstractOcrService):
             cls=False,
             resize=True,
     ) -> OcrResult:
-        if roi:
-            img = img[roi.as_slice()]
-        ratio = None
-        if resize:
-            img, ratio = self._resize_img(img)
+        # logger.debug(f"img shape1: {img.shape}")
+        itf = ImageTransform()
+        img = itf.prepare(img, roi=roi)
+        # logger.debug(f"img shape2: {img.shape}")
         if det is True and rec is True and cls is False:
             output = self._engine(img, use_det=True, use_rec=True, use_cls=False)
             result = RapidocrTextBox.format(output)
@@ -194,9 +342,16 @@ class RapidOcrServiceImpl(AbstractOcrService):
             result = RapidocrRecTextBox.format(output)
         else:
             raise NotImplementedError("不支持的识别方式")
-        if resize:
-            result = self._resize_bboxes(result, ratio)
-        return OcrResult(result)
+        ocr_result = OcrResult(itf.restore_boxes(result))
+        # logger.debug(f"ocr_result: {ocr_result}")
+        return ocr_result
+        # finally:
+        #     if self.ocr_use_gpu:
+        #         import gc, paddle
+        #         gc.collect()
+        #         # if paddle.device.is_compiled_with_cuda():
+        #         paddle.device.cuda.empty_cache()
+        #         logger.warning("最终清空 CUDA 缓存。")
 
 
 class PaddleOcrServiceImpl(AbstractOcrService):
@@ -291,11 +446,10 @@ class PaddleOcrServiceImpl(AbstractOcrService):
             cls=False,
             resize=True,
     ) -> OcrResult:
-        if roi:
-            img = img[roi.as_slice()]
-        ratio = None
-        if resize:
-            img, ratio = self._resize_img(img)
+        # logger.debug(f"img shape1: {img.shape}")
+        itf = ImageTransform()
+        img = itf.prepare(img, roi=roi)
+        # logger.debug(f"img shape2: {img.shape}")
         if det is True and rec is True and cls is False:
             output = self._engine(img, use_det=True, use_rec=True, use_cls=False)
             result = PaddleocrTextBox.format(output, roi)
@@ -304,9 +458,9 @@ class PaddleOcrServiceImpl(AbstractOcrService):
             result = PaddleocrTextBox.format(output, roi)
         else:
             raise NotImplementedError("不支持的识别方式")
-        if resize:
-            result = self._resize_bboxes(result, ratio)
-        return OcrResult(result)
+        ocr_result = OcrResult(itf.restore_boxes(result))
+        # logger.debug(f"ocr_result: {ocr_result}")
+        return ocr_result
 
 # SVTR
 # class SVTROcrServiceImpl(OCRService):

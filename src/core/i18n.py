@@ -400,6 +400,7 @@ class I18nText:
     ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
     TacetDiscordNestTacetDiscordNest = "TacetDiscordNestTacetDiscordNest"
     # LahaiRoi = "LahaiRoi"
+    SouthernYuanHillsTacetDiscordNest = "SouthernYuanHillsTacetDiscordNest"
     StarblindCrashsiteTacetDiscordNest = "StarblindCrashsiteTacetDiscordNest"
     RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
     StagnantRunTacetDiscordNest = "StagnantRunTacetDiscordNest"
@@ -433,21 +434,34 @@ class I18nText:
     ViewClaimRewards = "ViewClaimRewards"
     ViewClaimRewardsConfirm = "ViewClaimRewardsConfirm"
     ViewClaimRewardsCancel = "ViewClaimRewardsCancel"
+
     CrownlessResonanceCord = "CrownlessResonanceCord"
+
     ViewFight = "ViewFight"
+
     ViewChallengeComplete = "ViewChallengeComplete"
     ViewChallengeFailed = "ViewChallengeFailed"
+
     ViewBreakFree = "ViewBreakFree"
+
     ViewLeaveInstanceNote = "ViewLeaveInstanceNote"
     ViewLeaveInstanceConfirm = "ViewLeaveInstanceConfirm"
     ViewLeaveInstanceRestart = "ViewLeaveInstanceRestart"
+
     ViewLeaveInstance2Notice = "ViewLeaveInstance2Notice"
     ViewLeaveInstance2Confirm = "ViewLeaveInstance2Confirm"
     ViewLeaveInstance2Cancel = "ViewLeaveInstance2Cancel"
     ViewLeaveInstance2Restart = "ViewLeaveInstance2Restart"
     ViewLeaveInstance2Leave = "ViewLeaveInstance2Leave"
-    ViewForgeryChallengeNoticeExit = "ViewForgeryChallengeNoticeExit"
-    ViewForgeryChallengeNoticeRestart = "ViewForgeryChallengeNoticeRestart"
+
+    ViewForgeryChallengeExit = "ViewForgeryChallengeExit"
+    ViewForgeryChallengeRestart = "ViewForgeryChallengeRestart"
+
+    ViewTacetSuppressionChallengeComplete = "ViewTacetSuppressionChallengeComplete"
+    ViewTacetSuppressionConfirm = "ViewTacetSuppressionConfirm"
+    ViewTacetSuppressionExit = "ViewTacetSuppressionExit"
+    ViewTacetSuppressionCancel = "ViewTacetSuppressionCancel"
+    ViewTacetSuppressionRestart = "ViewTacetSuppressionRestart"
 
 
 I18N_TEXT = {
@@ -1652,6 +1666,10 @@ I18N_TEXT = {
     #     Language.ZH: r"^拉海洛$",
     #     Language.EN: flex_ws(r"^Lahai-Roi$"),
     # },
+    I18nText.SouthernYuanHillsTacetDiscordNest: {
+        Language.ZH: RegexStr(r"^落渊南丘残象聚落$", raw="落渊南丘残象聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Southern Yuan Hills"), raw=r"Southern Yuan Hills Tacet Discord Nest"),
+    },
     I18nText.StarblindCrashsiteTacetDiscordNest: {
         Language.ZH: RegexStr(r"^盲望之塌残象聚落$", raw="盲望之塌残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Starblind Crashsite"), raw=r"Starblind Crashsite Tacet Discord Nest"),
@@ -1777,11 +1795,31 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"离开", raw="离开"),
         Language.EN: RegexStr(flex_ws(r"Leave"), raw="Leave"),
     },
-    I18nText.ViewForgeryChallengeNoticeExit: {
+    I18nText.ViewForgeryChallengeExit: {
         Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
         Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
     },
-    I18nText.ViewForgeryChallengeNoticeRestart: {
+    I18nText.ViewForgeryChallengeRestart: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
+    },
+    I18nText.ViewTacetSuppressionChallengeComplete: {
+        Language.ZH: RegexStr(r"^挑战成功$", raw="挑战成功"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw=r"Challenge Complete"),
+    },
+    I18nText.ViewTacetSuppressionConfirm: {
+        Language.ZH: RegexStr(r"^确定$", raw="确定"),
+        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw=r"Confirm"),
+    },
+    I18nText.ViewTacetSuppressionExit: {
+        Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
+        Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
+    },
+    I18nText.ViewTacetSuppressionCancel: {
+        Language.ZH: RegexStr(r"^取消$", raw="取消"),
+        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw=r"Cancel"),
+    },
+    I18nText.ViewTacetSuppressionRestart: {
         Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
         Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
     },
@@ -2718,7 +2756,8 @@ class I18nView:
     ViewBreakFree = "ViewBreakFree"
     ViewLeaveInstance = "ViewLeaveInstance"
     ViewLeaveInstance2 = "ViewLeaveInstance2"
-    ViewForgeryChallengeNotice = "ViewForgeryChallengeNotice"
+    ViewForgeryChallenge = "ViewForgeryChallenge"
+    ViewTacetSuppression = "ViewTacetSuppression"
 
 
 class View:
@@ -2932,14 +2971,14 @@ I18N_PAGES_BOSS = {
         ),
     },
 
-    I18nView.ViewForgeryChallengeNotice: {
+    I18nView.ViewForgeryChallenge: {
         Language.ZH: View(
             name="材料本-挑战完成/失败",
             child=[
                 Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
                 Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
-                Feature(I18nText.ViewForgeryChallengeNoticeExit),
-                Feature(I18nText.ViewForgeryChallengeNoticeRestart),
+                Feature(I18nText.ViewForgeryChallengeExit),
+                Feature(I18nText.ViewForgeryChallengeRestart),
             ],
         ),
         Language.EN: View(
@@ -2947,8 +2986,31 @@ I18N_PAGES_BOSS = {
             child=[
                 Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
                 Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
-                Feature(I18nText.ViewForgeryChallengeNoticeExit),
-                Feature(I18nText.ViewForgeryChallengeNoticeRestart),
+                Feature(I18nText.ViewForgeryChallengeExit),
+                Feature(I18nText.ViewForgeryChallengeRestart),
+            ],
+        ),
+    },
+
+    I18nView.ViewTacetSuppression: {
+        Language.ZH: View(
+            name="无音区-挑战成功",
+            child=[
+                Feature(I18nText.ViewTacetSuppressionChallengeComplete),
+                Feature(I18nText.ViewTacetSuppressionConfirm),
+                Feature(I18nText.ViewTacetSuppressionExit, exclude=True),
+                Feature(I18nText.ViewTacetSuppressionCancel, exclude=True),
+                Feature(I18nText.ViewTacetSuppressionRestart, exclude=True),
+            ],
+        ),
+        Language.EN: View(
+            name="TacetSuppression-Complete",
+            child=[
+                Feature(I18nText.ViewTacetSuppressionChallengeComplete),
+                Feature(I18nText.ViewTacetSuppressionConfirm),
+                Feature(I18nText.ViewTacetSuppressionExit, exclude=True),
+                Feature(I18nText.ViewTacetSuppressionCancel, exclude=True),
+                Feature(I18nText.ViewTacetSuppressionRestart, exclude=True),
             ],
         ),
     },

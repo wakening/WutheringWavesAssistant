@@ -1604,6 +1604,10 @@ class PageEventAbstractService(PageEventService, ABC):
             BossNameEnum.Denia.value,
             BossNameEnum.NightmareAdamSmasherLimitedTime.value,
             BossNameEnum.NightmareAdamSmasher.value,
+            # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value,
+            # BossNameEnum.MyriadSnareRustfireChassis.value,
+            BossNameEnum.CourtOfShackledSouls.value,
+            BossNameEnum.ThousandPuppetPavilion.value,
         ]:
             self.absorption_action_fleurdelys()
             return
@@ -2327,7 +2331,10 @@ class PageEventAbstractService(PageEventService, ABC):
         enemyTracingSidebar = [scaler.as_point(p) for p in self.enemyTracingSidebar]
         milestonesSidebar = scaler.as_point(self.milestonesSidebar)
 
-        if bossName == BossNameEnum.SeedOfIllusoryOrigin.value:
+        if bossName in [
+            BossNameEnum.SeedOfIllusoryOrigin.value,
+            BossNameEnum.CourtOfShackledSouls.value,
+        ]:
             self._control_service.click(*materialsSpotsSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^(战歌重奏)$")
@@ -2339,7 +2346,7 @@ class PageEventAbstractService(PageEventService, ABC):
             img = self._img_service.screenshot()
             result = self._ocr_service.query(img)
             if result:
-                go_list = result.search(r"^(前往)$")
+                go_list = result.search(r"^(直接挑战)$")
                 if go_list:
                     go_list.sort(key=lambda x: x.y1)
                     self._control_service.click(*go_list[0].center)
@@ -2359,10 +2366,13 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._info.waitBoss = True
                     return True
 
-            logger.warning("未找到：虚妄诞生之种（限时提前开放）")
+            logger.warning(f"未找到：{bossName}")
             self._control_service.esc()
             return False
-        elif bossName == BossNameEnum.NightmareAdamSmasherLimitedTime.value:
+        elif bossName in [
+            BossNameEnum.NightmareAdamSmasherLimitedTime.value,
+            BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value
+        ]:
             self._control_service.click(*materialsSpotsSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^讨伐强敌$")
@@ -2374,7 +2384,7 @@ class PageEventAbstractService(PageEventService, ABC):
             img = self._img_service.screenshot()
             result = self._ocr_service.query(img)
             if result:
-                go_list = result.search(r"^(前往)$")
+                go_list = result.search(r"^(直接挑战)$")
                 if go_list:
                     go_list.sort(key=lambda x: x.y1)
                     self._control_service.click(*go_list[0].center)
@@ -2394,7 +2404,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._info.waitBoss = True
                     return True
 
-            logger.warning("未找到：梦魇亚当·重锤（限时提前开放）")
+            logger.warning(f"未找到：{bossName}")
             self._control_service.esc()
             return False
 
@@ -2727,6 +2737,10 @@ class PageEventAbstractService(PageEventService, ABC):
                     BossNameEnum.Denia.value,
                     BossNameEnum.NightmareAdamSmasherLimitedTime.value,
                     BossNameEnum.NightmareAdamSmasher.value,
+                    BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value,
+                    BossNameEnum.MyriadSnareRustfireChassis.value,
+                    BossNameEnum.CourtOfShackledSouls.value,
+                    BossNameEnum.ThousandPuppetPavilion.value,
                 ]
                 )
 

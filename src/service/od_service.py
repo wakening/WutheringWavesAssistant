@@ -25,10 +25,11 @@ class YoloServiceImpl(ODService):
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
 
-        try:
-            self._device = context.runtime.cfg.game.device
-        except Exception:
-            self._device = Device.Auto
+        # try:
+        #     self._device = context.runtime.cfg.game.device
+        # except Exception:
+        #     self._device = Device.Auto
+        self._device = Device.CPU
         logger.debug(f"device: {self._device}")
 
         # self._provider: list[str] = yolo_util.get_ort_providers()

@@ -82,6 +82,10 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.Denia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5)],
     # BossNameEnum.NightmareAdamSmasherLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
     BossNameEnum.NightmareAdamSmasher.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    # BossNameEnum.MyriadSnareRustfireChassis.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    # BossNameEnum.CourtOfShackledSouls.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    # BossNameEnum.ThousandPuppetPavilion.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
 }
 
 # RouteStep后的移动方式配置，没有的也留痕注释掉，方便后续排查
@@ -143,6 +147,10 @@ RESTART_PARAMS: dict[str, RestartParam] = {
     # BossNameEnum.NightmareAdamSmasherLimitedTime.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.NightmareAdamSmasher.value: RestartParam(
         check_text=None, direction=None, cycle=8, step=1, restart_text=r"进入"),
+    # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.MyriadSnareRustfireChassis.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.CourtOfShackledSouls.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.ThousandPuppetPavilion.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
 }
 
 # 点击重新挑战后的移动方式配置，适用于个别boss刷新位置离重新挑战点较远的情况，有才写
@@ -197,6 +205,10 @@ class BossInfoServiceImpl(BossInfoService):
             BossNameEnum.Denia.value,
             BossNameEnum.NightmareAdamSmasherLimitedTime.value,
             BossNameEnum.NightmareAdamSmasher.value,
+            # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value,
+            # BossNameEnum.MyriadSnareRustfireChassis.value,
+            BossNameEnum.CourtOfShackledSouls.value,
+            BossNameEnum.ThousandPuppetPavilion.value,
         ]:
             return True
         return self.is_nightmare(boss_name)

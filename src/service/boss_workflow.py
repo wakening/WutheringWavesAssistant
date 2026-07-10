@@ -74,6 +74,7 @@ class TaskLocal:
         ### ------- Guidebook MaterialsSpots NightmarePurification -------
 
         ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+        self.southernYuanHillsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
         self.starblindCrashsiteTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
         self.rebirthUplandsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
         self.stagnantRunTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StagnantRunTacetDiscordNest)
@@ -125,6 +126,7 @@ class TaskLocal:
         )
         self.nightmarePurificationFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.NightmarePurification)
         self.tacetDiscordNestFSM: TaskFSMGroup = TaskFSMGroup(
+            self.southernYuanHillsTacetDiscordNestFSM,
             self.starblindCrashsiteTacetDiscordNestFSM,
             self.rebirthUplandsTacetDiscordNestFSM,
             self.stagnantRunTacetDiscordNestFSM,
@@ -680,6 +682,7 @@ class BossWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
 
         ### ------- Guidebook MaterialsSpots tacetDiscordNest -------
+        self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)
         self.local.rebirthUplandsTacetDiscordNestFSM.set_enabled(cfg.rebirthUplandsTacetDiscordNest)
         self.local.stagnantRunTacetDiscordNestFSM.set_enabled(cfg.stagnantRunTacetDiscordNest)

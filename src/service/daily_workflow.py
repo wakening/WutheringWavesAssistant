@@ -74,6 +74,7 @@ class TaskLocal:
         ### ------- Guidebook MaterialsSpots NightmarePurification -------
 
         ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+        self.southernYuanHillsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
         self.starblindCrashsiteTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
         self.rebirthUplandsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
         self.stagnantRunTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StagnantRunTacetDiscordNest)
@@ -125,6 +126,7 @@ class TaskLocal:
         )
         self.nightmarePurificationFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.NightmarePurification)
         self.tacetDiscordNestFSM: TaskFSMGroup = TaskFSMGroup(
+            self.southernYuanHillsTacetDiscordNestFSM,
             self.starblindCrashsiteTacetDiscordNestFSM,
             self.rebirthUplandsTacetDiscordNestFSM,
             self.stagnantRunTacetDiscordNestFSM,
@@ -1877,16 +1879,19 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     ui = UIOp(ctx)
     tacets = [
+        I18nText.SouthernYuanHillsTacetDiscordNest,
         I18nText.StarblindCrashsiteTacetDiscordNest,
         I18nText.RebirthUplandsTacetDiscordNest,
         I18nText.StagnantRunTacetDiscordNest,
     ]
     tacets_fsm = [
+        local.southernYuanHillsTacetDiscordNestFSM,
         local.starblindCrashsiteTacetDiscordNestFSM,
         local.rebirthUplandsTacetDiscordNestFSM,
         local.stagnantRunTacetDiscordNestFSM,
     ]
     tacets_route = [
+        [Run.right(0.25), Run.forward(3.0)],
         [Run.right(0.25), Run.forward(3.0)],
         [Run.forward(2.5)],
         [Run.forward(5.5)],
@@ -2438,6 +2443,7 @@ class DailyWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
 
         ### ------- Guidebook MaterialsSpots tacetDiscordNest -------
+        self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)
         self.local.rebirthUplandsTacetDiscordNestFSM.set_enabled(cfg.rebirthUplandsTacetDiscordNest)
         self.local.stagnantRunTacetDiscordNestFSM.set_enabled(cfg.stagnantRunTacetDiscordNest)
