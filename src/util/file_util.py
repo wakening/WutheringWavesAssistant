@@ -99,10 +99,6 @@ def get_assets_map(file_name: str | None = None):
     return get_path(r"assets/map", file_name)
 
 
-def get_assets_map_huanglong(file_name: str | None = None):
-    return get_path(r"assets/map/Huanglong", file_name)
-
-
 def get_ico():
     return get_path("src/gui/resource/images", "logo.ico")
 

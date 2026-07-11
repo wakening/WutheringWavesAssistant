@@ -830,7 +830,7 @@ class UIOp:
             self.__init_home_color_match()
         return self.__home_color_match.match(img if img is not None else self.grap())
 
-    def wait_back_home(self, timeout: int = 20, interval: float = 1.0, close_window: bool = False):
+    def wait_back_home(self, timeout: int = 25, interval: float = 1.0, close_window: bool = False):
         """循环等待回到主界面"""
         if not self.__home_color_match:
             self.__init_home_color_match()

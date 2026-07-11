@@ -54,6 +54,8 @@ class TaskLocal:
         ### ------- Guidebook MaterialsSpots BossChallenge -------
 
         ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        self.westernFangPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.WesternFangPeaksTacetField)
+        self.easternXuanPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.EasternXuanPeaksTacetField)
         self.tacetFieldSolisiaLandingFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldSolisiaLanding)
         self.tacetFieldFrostlandsTransitPortFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldFrostlandsTransitPort)
         self.tacetFieldMountGjallarFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldMountGjallar)
@@ -105,6 +107,8 @@ class TaskLocal:
         self.simulationChallengeFSM: TaskFSMGroup = TaskFSMGroup(name="SimulationChallenge")
         self.bossChallengeFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.BossChallenge)
         self.tacetSuppressionFSM: TaskFSMGroup = TaskFSMGroup(
+            self.westernFangPeaksTacetFieldFSM,
+            self.easternXuanPeaksTacetFieldFSM,
             self.tacetFieldSolisiaLandingFSM,
             self.tacetFieldFrostlandsTransitPortFSM,
             self.tacetFieldMountGjallarFSM,
@@ -298,23 +302,35 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
             lambda: ui.snapshot().click_text(ctx.tr(I18nText.SwitchMap), delay=0.8)):
         return False
 
-    # 选择瑝珑
+    # 选择瑝珑-今州
     regions_roi = ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(600, 0, Align.Right | Align.Top), AnchorPoint(925, 1280, Align.Right | Align.Bottom)))
-    if not ui.sleep(0.3).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.Huanglong), regions_roi, delay=0.4)):
-        logger.warning(f"Text not found: {ctx.tr(I18nText.Huanglong).raw}")
+        AnchorPoint(600, 0, Align.Right | Align.Top), AnchorPoint(925, 720, Align.Right | Align.Bottom)))
+    for i in range(3):
+        if i == 2:
+            return False
+        if not ui.sleep(0.3).wait().until(
+                lambda: ui.snapshot().search(ctx.tr([I18nText.Huanglong, I18nText.Jinzhou]), regions_roi)):
+            logger.warning(f"Text not found: {ctx.tr(I18nText.Huanglong).raw}")
+            return False
+        if ui.click_text(ctx.tr(I18nText.Jinzhou), regions_roi, delay=0.4, times=2, interval=0.2):
+            break
+        elif ui.click_text(ctx.tr(I18nText.Huanglong), regions_roi, delay=0.4):
+            ui.sleep(0.35)
+            continue
         return False
 
     # 选择今州城
-    if not ui.sleep(0.3).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.Jinzhou), delay=0.4)):
-        logger.warning(f"Text not found: {ctx.tr(I18nText.Jinzhou).raw}")
+    regions_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(915, 0, Align.Right | Align.Top), AnchorPoint(1280, 720, Align.Right | Align.Bottom)))
+    if not ui.sleep(0.5).wait().until(
+            lambda: ui.snapshot().click_text(
+                ctx.tr(I18nText.JinzhouCity), regions_roi, delay=0.4, times=2, interval=0.2)):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.JinzhouCity).raw}")
         return False
 
     # 点击今州城传送点
     tmpl_name = "8_0_-1.png"
-    tmpl_img = img_util.read_img(file_util.get_assets_map_huanglong(tmpl_name))
+    tmpl_img = img_util.read_img(file_util.get_assets_map("Huanglong/Jinzhou/8_0_-1.png"))
     scene_img = ui.sleep(0.8).grap()
     matcher = SIFTFeatureMatcher()
     feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
@@ -1074,6 +1090,8 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     ui = UIOp(ctx)
     tacets = [
+        I18nText.WesternFangPeaksTacetField,
+        I18nText.EasternXuanPeaksTacetField,
         I18nText.TacetFieldSolisiaLanding,
         I18nText.TacetFieldFrostlandsTransitPort,
         I18nText.TacetFieldMountGjallar,
@@ -1081,18 +1099,13 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         I18nText.TacetFieldStagnantRun,
     ]
     tacets_fsm = [
+        local.westernFangPeaksTacetFieldFSM,
+        local.easternXuanPeaksTacetFieldFSM,
         local.tacetFieldSolisiaLandingFSM,
         local.tacetFieldFrostlandsTransitPortFSM,
         local.tacetFieldMountGjallarFSM,
         local.tacetFieldMawburrowDesertFSM,
         local.tacetFieldStagnantRunFSM,
-    ]
-    tacets_route = [
-        [[Walk.forward(7), Walk.right(1), Run.forward(1.5)], [Run.forward(1.6)]],
-        [[Walk.left(1), Run.forward(1.5)], [Run.forward(1.0)]],
-        [[Run.forward(1.5)], [Run.forward(1.6)]],
-        [[Run.forward(1.5)], [Run.forward(1.6)]],
-        [[Run.forward(1.5)], [Run.forward(1.6)]],
     ]
 
     # 任务选中的副本
@@ -1101,7 +1114,6 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     logger.info(f"{ctx.tr(cur_instance).raw}")
     if not cur_fsm:
         return False
-    route = tacets_route[index]
 
     # 任务状态检查
     if cur_fsm.status.is_terminal:
@@ -1157,7 +1169,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             else:
                 local.doubleDropTacetSuppressionFSM.complete()
 
-        keywords = ctx.tr([*tacets, I18nText.Go, I18nText.EchoSet])
+        keywords = ctx.tr([*tacets, I18nText.Go, I18nText.TacetFieldChallenge, I18nText.EchoSet])
         # 获取无音区
         # textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
         textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
@@ -1172,117 +1184,66 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             found_tacet = next((x for x in tacets if re.search(ctx.tr(x), textbox.text, re.I)), None)
             if not found_tacet:
                 continue
-            cur_card = [textbox, None]
+            cur_card = [textbox, None, False]
             cards[found_tacet] = cur_card
             if i + 1 >= len(textboxes):
                 continue
-            if re.search(ctx.tr(I18nText.Go), textboxes[i + 1].text, re.I):
+            # 直接挑战表示可以打，前往表示没解锁不能打
+            if re.search(ctx.tr(I18nText.TacetFieldChallenge), textboxes[i + 1].text, re.I):
                 cur_card[1] = textboxes[i + 1]
+            elif re.search(ctx.tr(I18nText.Go), textboxes[i + 1].text, re.I):
+                cur_card[1] = textboxes[i + 1]
+                cur_card[2] = True
         logger.debug(f"cards: {cards}")
 
         # 取出与选择同名的组
         cur_card = cards.get(cur_instance)
         logger.debug(f"cur_card: {cur_card}")
-        if not cur_card and any(i is None for i in cur_card):
+        if not cur_card or any(i is None for i in cur_card):
             return _fail_return()
 
-        tbox, go = cur_card
+        tbox, challenge, unlock = cur_card
 
-        # 点击前往
+        # 检查副本未解锁
+        if unlock:
+            logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
+            cur_fsm.complete()
+            return True
+
+        # 点击直接挑战
         ui.sleep(0.5).click_bbox(tbox)
         for _ in range(2):
             # 有时ui反应太慢，点快了ui没跳转，再试一次
-            ui.sleep(0.2).click_bbox(go, times=2, interval=0.2)
+            ui.sleep(0.2).click_bbox(challenge, times=2, interval=0.2)
             if ui.sleep(1).wait(3, 0.3).until(
                     lambda: not ui.snapshot().search(ctx.tr(I18nText.TacetSuppression), bbox_guidebook_item(ctx))):
                 break
 
-        # 点击快速旅行
-        if not ui.search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation])):
-            if not ui.wait().until(
-                    lambda: ui.snapshot().search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation]))):
-                return _fail_return()
-        # 检查副本未解锁
-        if ui.search(ctx.tr(I18nText.EnableNavigation)):
-            logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-            cur_fsm.fail()
-            return False
-        # 点击快速旅行
-        ui.click_text(ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)
-
-        if ui.sleep(2).wait_back_home():
-            ui.sleep(1.0)
-        else:
+        # 点击开启挑战
+        if not ui.sleep(0.3).wait().until(
+                lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=2, interval=0.3)):
             return _fail_return()
-
-        def _move():
-            # 前往战斗区域
-            ui.move(route[0])
-            # 进门加载
-            if not ui.is_on_homepage():
-                if ui.wait_back_home():
-                    ui.sleep(0.8)
-                else:
-                    return False
-            if len(route) >= 2:
-                ui.move(route[1])
-            return True
-
-        if not _move():
-            return _fail_return()
-
-        if cur_instance == I18nText.TacetFieldSolisiaLanding:
-            # 落日堤屿
-            # 00 10
-            # 01 11
-            MAP_PATH_0_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_0.png"))
-            MAP_PATH_1_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_0.png"))
-            MAP_PATH_0_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_-1.png"))
-            MAP_PATH_1_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_3_-1.png"))
-
-            grid = TileGrid()
-            grid.add_tile(0, 0, MAP_PATH_0_0)
-            grid.add_tile(1, 0, MAP_PATH_1_0)
-            grid.add_tile(0, 1, MAP_PATH_0_1)
-            grid.add_tile(1, 1, MAP_PATH_1_1)
-            composite = grid.composite_region(min_x=0, min_y=0, max_x=1, max_y=1)
-            tmpl_name = str(int(time.monotonic()))
-            tmpl_img = composite.image
-            matcher = SIFTFeatureMatcher()
-            feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
-            point = Point(1024 + 2, 905)
-        elif cur_instance == I18nText.TacetFieldFrostlandsTransitPort:
-            # 冰原运输港
-            tmpl_name = str(int(time.monotonic()))
-            tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_-1_7.png"))
-            matcher = SIFTFeatureMatcher()
-            feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
-            point = Point(373, 891)
-        elif cur_instance == I18nText.TacetFieldMountGjallar:
-            # 加拉尔冠阶
-            MAP_PATH_0_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_8.png"))
-            MAP_PATH_1_0 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_8.png"))
-            MAP_PATH_0_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_0_7.png"))
-            MAP_PATH_1_1 = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_1_7.png"))
-
-            grid = TileGrid()
-            grid.add_tile(0, 0, MAP_PATH_0_0)
-            grid.add_tile(1, 0, MAP_PATH_1_0)
-            grid.add_tile(0, 1, MAP_PATH_0_1)
-            grid.add_tile(1, 1, MAP_PATH_1_1)
-            composite = grid.composite_region(min_x=0, min_y=0, max_x=1, max_y=1)
-            tmpl_name = str(int(time.monotonic()))
-            tmpl_img = composite.image
-            matcher = SIFTFeatureMatcher()
-            feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
-            point = Point(1024 + 270, 1024 + 247)
-        else:
-            raise NotImplementedError()
 
         # 循环刷
-        for i in range(8):
-            det = ctx.od_service.search_reward()
-            logger.debug(f"det: {det}")
+        max_challenge = 9
+        for i in range(max_challenge):
+            if i == max_challenge - 1:
+                return _fail_return()
+
+            # 进入副本
+            if ui.sleep(0.5).wait_back_home():
+                ui.sleep(1.0)
+            else:
+                return _fail_return()
+
+            # 检查战斗文本
+            keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
+            if not ui.snapshot().search(keyword):
+                ui.esc()
+                if ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot().click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                    continue
+                return _fail_return()
 
             # 直接打，打起来才会有文字提示
             combat_system = CombatSystem(ctx.control_service, ctx.img_service)
@@ -1292,50 +1253,47 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             combat_system.auto_pickup = False
             combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
 
-            if not det:
-                timeout = 10 * 60
-                no_text_count = 3
-                no_text_max = no_text_count
-                deadline = time.monotonic() + timeout
-                hp_roi = bbox_hp_bar(ctx).as_tuple()
+            timeout = 10 * 60
+            no_text_count = 3
+            no_text_max = no_text_count
+            deadline = time.monotonic() + timeout
+            hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-                keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
-
-                while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
-                    if no_text_count < 0:
+            while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+                if no_text_count < 0:
+                    break
+                combat_system.start(3.5)
+                ui.sleep(1.5)
+                ui.snapshot()
+                img = ui.img
+                if ui.is_on_homepage():
+                    # 挑战达成
+                    if ui.search(ctx.tr(I18nText.TacetFieldChallengeComplete)):
                         break
-                    combat_system.start(3.5)
-                    ui.sleep(1.5)
-                    ui.snapshot()
-                    img = ui.img
-                    if ui.is_on_homepage():
-                        # 挑战达成
-                        if ui.search(ctx.tr(I18nText.TacetFieldChallengeComplete)):
-                            break
-                        # 清理无音区中涌现的残象
-                        if ui.search(keyword):
-                            logger.debug("战斗中")
-                            no_text_count = no_text_max
-                            continue
-                        else:
-                            logger.debug(f"Text not found: {ctx.tr(I18nText.TacetField).raw}")
-                        # boxes = img_util.detect_hp_bar(img, hp_roi)
-                        # if boxes:
-                        #     logger.debug("有血条，还在战斗中")
-                        #     no_text_count = no_text_max
-                        #     if logger.isEnabledFor(logging.DEBUG):
-                        #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
-                        #         img_util.save_img_in_temp(img_draw)
-                        #     continue
-                        no_text_count -= 1
-                    # 断开连接
-                    if ui.match_page(I18nPage.Login_Disconnected.PAGE):
-                        combat_system.stop(join=True)
-                        return False
-                    if ctx.page_service.global_page_action(ui.ocr_result):
-                        logger.debug("global_page_action")
+                    # 清理无音区中涌现的残象
+                    if ui.search(keyword):
+                        logger.debug("战斗中")
+                        no_text_count = no_text_max
+                        continue
+                    else:
+                        logger.debug(f"Text not found: {ctx.tr(I18nText.TacetField).raw}")
+                    # boxes = img_util.detect_hp_bar(img, hp_roi)
+                    # if boxes:
+                    #     logger.debug("有血条，还在战斗中")
+                    #     no_text_count = no_text_max
+                    #     if logger.isEnabledFor(logging.DEBUG):
+                    #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
+                    #         img_util.save_img_in_temp(img_draw)
+                    #     continue
+                    no_text_count -= 1
+                # 断开连接
+                if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                    combat_system.stop(join=True)
+                    return False
+                if ctx.page_service.global_page_action(ui.ocr_result):
+                    logger.debug("global_page_action")
 
-                combat_system.stop(join=True)
+            combat_system.stop(join=True)
 
             ui.sleep(0.6).snapshot()
             # 检查复苏弹窗
@@ -1350,78 +1308,17 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(0.3)
                 logger.info("Challenge Complete")
 
-                def _map_fast_travel() -> bool:
-                    if not ui.is_on_homepage():
-                        return False
-                    ctx.control_service.map()
-                    if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
-                        ui.esc().sleep(1)
-                        return False
-                    scene_img = ui.img
-                    result = matcher.match(scene_img, feature_data)
-                    if result is None:
-                        logger.warning("Feature match failed")
-                        ui.esc().sleep(1)
-                        return False
-
-                    scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
-                    x = int(scene_point[0])
-                    y = int(scene_point[1])
-                    logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
-                    ui.click(x, y)
-                    if not ui.sleep(0.5).wait().until(
-                            lambda: ui.snapshot().click_text(
-                                ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
-                        scene_img = ui.grap()
-                        result = matcher.match(scene_img, feature_data)
-                        if result is None:
-                            logger.warning("Feature match failed")
-                            ui.esc().sleep(1)
-                            return False
-                        scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
-                        logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
-                        ui.click(int(scene_point[0]), int(scene_point[1])).sleep(0.35)
-                        ctx.control_service.scroll_mouse(100, x, y)
-                        ui.sleep(0.5)
-
-                        scene_img = ui.grap()
-                        result = matcher.match(scene_img, feature_data)
-                        if result is None:
-                            logger.warning("Feature match failed")
-                            ui.esc().sleep(1)
-                            return False
-                        scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
-                        logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
-                        ui.click(int(scene_point[0]), int(scene_point[1]))
-
-                        if not ui.sleep(0.5).wait().until(
-                                lambda: ui.snapshot().click_text(
-                                    ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
-                            ui.esc().sleep(1)
-                            return False
-
-                    if ui.sleep(0.5).wait_back_home():
-                        ui.sleep(0.7)
-                    else:
-                        return _fail_return()
-                    return True
-
-                # 领取奖励
-                # 就在旁边
-                if ui.snapshot().search(ctx.tr(I18nText.ClaimRewards), bbox_dialogue(ctx)):
-                    pass
-                # 不在旁边，可能离得很远，重传重置位置
-                elif _map_fast_travel():
-                    if not _move():
-                        return _fail_return()
-                    ui.sleep(0.3)
-
                 # 寻找领取奖励交互点
                 if not object_detection(ctx, search_reward=True):
+                    ui.esc()
+                    if ui.sleep(0.3).wait().until(
+                            lambda: ui.snapshot().click_text(
+                                ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                        continue
                     return _fail_return()
 
                 # 领取奖励
-                if not ui.pick_up(2, 0.2).sleep(0.5).wait().until(
+                if not ui.pick_up(2, 0.2).sleep(0.3).wait().until(
                         lambda: ui.snapshot().search(ctx.tr(I18nText.TacetFieldClaim))):
                     return _fail_return()
 
@@ -1447,10 +1344,10 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 此处仅打印日志用，打印剩余次数
             match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
 
-            # 点击确认弹窗
-            if not ui.sleep(0.5).wait().until(
-                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetFieldConfirm), delay=0.3)):
-                return _fail_return()
+            # # 点击确认弹窗
+            # if not ui.sleep(0.5).wait().until(
+            #         lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetFieldConfirm), delay=0.3)):
+            #     return _fail_return()
 
             ui.sleep(1)
             # 容错，判断是否有体力不足是否继续弹窗
@@ -1462,9 +1359,19 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     cur_fsm.complete()
                     return True
 
-            # 消耗体力后，判断是继续还是离开
-            if cur_waveplate >= cost:
-                continue
+            # 根据体力选择重新挑战还是离开
+            if ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot().search(ctx.tr([I18nText.TacetFieldExit, I18nText.TacetFieldRestart]))):
+                if cur_waveplate >= cost:
+                    if ui.click_text(ctx.tr(I18nText.TacetFieldRestart), delay=0.3, times=2, interval=0.3):
+                        continue
+                    else:
+                        return _fail_return()
+                else:
+                    ui.click_text(ctx.tr(I18nText.TacetFieldExit), delay=0.3, times=2, interval=0.3)
+            else:
+                if cur_waveplate >= cost:
+                    return _fail_return()
             cur_fsm.complete()
             return True
 
@@ -1891,8 +1798,8 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         local.stagnantRunTacetDiscordNestFSM,
     ]
     tacets_route = [
-        [Run.right(0.25), Run.forward(3.0)],
-        [Run.right(0.25), Run.forward(3.0)],
+        [Run.forward(4.5)],
+        [Run.right(0.25), Run.forward(3.3)],
         [Run.forward(2.5)],
         [Run.forward(5.5)],
     ]
@@ -2012,8 +1919,8 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 检查副本未解锁
             if ui.search(ctx.tr(I18nText.EnableNavigation)):
                 logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-                cur_fsm.fail()
-                return False
+                cur_fsm.complete()
+                return True
             # 点击快速旅行
             ui.click_text(ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)
 
@@ -2025,7 +1932,14 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 前往战斗区域
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
-            if cur_instance == I18nText.StarblindCrashsiteTacetDiscordNest:
+            if cur_instance == I18nText.SouthernYuanHillsTacetDiscordNest:
+                # 落渊南丘
+                tmpl_name = "8_-7_1.png"
+                tmpl_img = img_util.read_img(file_util.get_assets_map("Huanglong/Mengzhou/8_-7_1.png"))
+                matcher = SIFTFeatureMatcher()
+                feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
+                point = Point(135, 900)
+            elif cur_instance == I18nText.StarblindCrashsiteTacetDiscordNest:
                 # 盲望之塌
                 tmpl_name = "8_-2_8.png"
                 tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_-2_8.png"))
@@ -2104,7 +2018,8 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(0.7)
                 return True
 
-            is_combat = not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNestCleared))
+            is_combat = not ui.snapshot().search(
+                ctx.tr([I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou]))
             # 可能打着打着出了战斗区域，标识文本消失，误判已经打完，循环重置位置接着打
             max_combat_range = 3
             for k in range(max_combat_range):
@@ -2136,10 +2051,12 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         if ui.is_on_homepage():
                             # 残象聚落已清理
                             logger.debug(f"result: {ui.bbox_result}")
-                            if ui.search(ctx.tr(I18nText.TacetDiscordNestCleared)):
+                            if ui.search(ctx.tr(
+                                    [I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou])):
                                 break
                             # 清理聚落中的残象
-                            if ui.search(ctx.tr(I18nText.ClearTheTacetDiscordNest)):
+                            if ui.search(ctx.tr(
+                                    [I18nText.ClearTheTacetDiscordNest, I18nText.ClearTheTacetDiscordNestMengzhou])):
                                 logger.debug("战斗中")
                                 no_text_count = no_text_max
                                 continue
@@ -2421,6 +2338,8 @@ class DailyWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialsSpots BossChallenge -------
 
         ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        self.local.westernFangPeaksTacetFieldFSM.set_enabled(cfg.westernFangPeaksTacetField)
+        self.local.easternXuanPeaksTacetFieldFSM.set_enabled(cfg.easternXuanPeaksTacetField)
         self.local.tacetFieldSolisiaLandingFSM.set_enabled(cfg.tacetFieldSolisiaLanding)
         self.local.tacetFieldFrostlandsTransitPortFSM.set_enabled(cfg.tacetFieldFrostlandsTransitPort)
         self.local.tacetFieldMountGjallarFSM.set_enabled(cfg.tacetFieldMountGjallar)

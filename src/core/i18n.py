@@ -244,6 +244,8 @@ class I18nText:
     TheBlackShores = "TheBlackShores"
     Huanglong = "Huanglong"
     Jinzhou = "Jinzhou"
+    JinzhouCity = "JinzhouCity"
+    Mengzhou = "Mengzhou"
 
     # ------- Notice -------
     Confirm = "Confirm"
@@ -344,6 +346,8 @@ class I18nText:
     ForgeryExit = "ForgeryExit"
 
     ### ------- Guidebook MaterialsSpots TacetSuppression -------
+    WesternFangPeaksTacetField = "WesternFangPeaksTacetField"
+    EasternXuanPeaksTacetField = "EasternXuanPeaksTacetField"
     TacetFieldSolisiaLanding = "TacetFieldSolisiaLanding"
     TacetFieldFrostlandsTransitPort = "TacetFieldFrostlandsTransitPort"
     TacetFieldMountGjallar = "TacetFieldMountGjallar"
@@ -351,12 +355,15 @@ class I18nText:
     TacetFieldStagnantRun = "TacetFieldStagnantRun"
     TacetField = "TacetField"
     EchoSet = "EchoSet"
+    TacetFieldChallenge = "TacetFieldChallenge"
     DefeatTheTdsInTheTacetField = "DefeatTheTdsInTheTacetField"
     TacetFieldChallengeComplete = "TacetFieldChallengeComplete"
     TacetFieldClaim = "TacetFieldClaim"
     TacetFieldClaimX2 = "TacetFieldClaimX2"
     TacetFieldNoticeChallengeComplete = "TacetFieldNoticeChallengeComplete"
     TacetFieldConfirm = "TacetFieldConfirm"
+    TacetFieldRestart = "TacetFieldRestart"
+    TacetFieldExit = "TacetFieldExit"
 
     ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
     WeeklyChallengeWeeklyChallenge = "WeeklyChallengeWeeklyChallenge"
@@ -429,6 +436,8 @@ class I18nText:
     # ------- (Home) TacetDiscordNest -------
     ClearTheTacetDiscordNest = "ClearTheTacetDiscordNest"
     TacetDiscordNestCleared = "TacetDiscordNestCleared"
+    ClearTheTacetDiscordNestMengzhou = "ClearTheTacetDiscordNestMengzhou"
+    TacetDiscordNestClearedMengzhou = "TacetDiscordNestClearedMengzhou"
 
     # ------- View -------
     ViewClaimRewards = "ViewClaimRewards"
@@ -1044,8 +1053,16 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Huanglong$"), raw="Huanglong"),
     },
     I18nText.Jinzhou: {
+        Language.ZH: RegexStr(r"^今州$", raw="今州"),
+        Language.EN: RegexStr(flex_ws(r"^Jinzhou$"), raw="Jinzhou"),
+    },
+    I18nText.JinzhouCity: {
         Language.ZH: RegexStr(r"^今州城$", raw="今州城"),
         Language.EN: RegexStr(flex_ws(r"^Jinzhou$"), raw="Jinzhou"),
+    },
+    I18nText.Mengzhou: {
+        Language.ZH: RegexStr(r"^梦州$", raw="梦州"),
+        Language.EN: RegexStr(flex_ws(r"^Mengzhou$"), raw="Mengzhou"),
     },
     # 黑海岸
     I18nText.TheBlackShores: {
@@ -1446,6 +1463,14 @@ I18N_TEXT = {
     },
 
     ### ------- Guidebook MaterialsSpots TacetSuppression -------
+    I18nText.WesternFangPeaksTacetField: {
+        Language.ZH: RegexStr(r"^方.西峰无音区$", raw="方擎西峰无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Western Fang Peaks"), raw=r"Western Fang Peaks Tacet Field"),
+    },
+    I18nText.EasternXuanPeaksTacetField: {
+        Language.ZH: RegexStr(r"^玄幽东岳无音区$", raw="玄幽东岳无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Eastern Xuan Peaks"), raw=r"Eastern Xuan Peaks Tacet Field"),
+    },
     I18nText.TacetFieldSolisiaLanding: {
         Language.ZH: RegexStr(r"^落日堤屿无音区$", raw="落日堤屿无音区"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Solisia"), raw=r"Tacet Field: Solisia Landing"),
@@ -1470,12 +1495,17 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^声骸套装$", raw="声骸套装"),
         Language.EN: RegexStr(flex_ws(r"^Echo Set$"), raw=r"Echo Set"),
     },
+    I18nText.TacetFieldChallenge: {
+        Language.ZH: RegexStr(r"^直接挑战$", raw="直接挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge$"), raw=r"Challenge"),
+    },
     I18nText.TacetField: {
         Language.ZH: RegexStr(r"无音区", raw="无音区"),
         Language.EN: RegexStr(flex_ws(r"Tacet Field"), raw=r"Tacet Field"),
     },
+    # 下面是进入无音区内的文本
     I18nText.DefeatTheTdsInTheTacetField: {
-        Language.ZH: RegexStr(r"清理无音区中涌现的残象", raw="清理无音区中涌现的残象"),
+        Language.ZH: RegexStr(r"清?理无音区中涌现的残象", raw="清理无音区中涌现的残象"),
         Language.EN: RegexStr(flex_ws(r"Defeat the TDs in the"), raw=r"Defeat the TDs in the Tacet Field"),
     },
     I18nText.TacetFieldChallengeComplete: {
@@ -1497,6 +1527,14 @@ I18N_TEXT = {
     I18nText.TacetFieldConfirm: {
         Language.ZH: RegexStr(r"^确定$", raw="确定"),
         Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw=r"Confirm"),
+    },
+    I18nText.TacetFieldRestart: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
+    },
+    I18nText.TacetFieldExit: {
+        Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
+        Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
     },
 
 
@@ -1722,11 +1760,19 @@ I18N_TEXT = {
 
     # ------- (Home) TacetDiscordNest -------
     I18nText.ClearTheTacetDiscordNest: {
-        Language.ZH: RegexStr(r"清理聚落中的残象", raw="清理聚落中的残象"),
+        Language.ZH: RegexStr(r"清?理聚落中的残象", raw="清理聚落中的残象"),
         Language.EN: RegexStr(flex_ws(r"Clear the Tacet Discord Nest"), raw="Clear the Tacet Discord Nest"),
     },
     I18nText.TacetDiscordNestCleared: {
         Language.ZH: RegexStr(r"残象聚落已清理", raw="残象聚落已清理"),
+        Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
+    },
+    I18nText.ClearTheTacetDiscordNestMengzhou: {
+        Language.ZH: RegexStr(r"(清.|剿)残象聚落", raw="清剿残象聚落"),
+        Language.EN: RegexStr(flex_ws(r"Clear the Tacet Discord Nest"), raw="Clear the Tacet Discord Nest"),
+    },
+    I18nText.TacetDiscordNestClearedMengzhou: {
+        Language.ZH: RegexStr(r"残?象聚落已清剿?", raw="残象聚落已清剿"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
     },
 

@@ -105,8 +105,8 @@ def absorb_around_variant_blind(ctx: NodeContext):
         return absorb_and_claim_rewards(ctx)
 
     route = [
-        Run.forward(0.22), Run.forward(0.23), Run.left(0.22), Run.backward(0.27), Run.backward(0.27),
-        Run.right(0.22), Run.forward(0.27), Run.right(0.22), Run.forward(0.23), Run.backward(0.53)
+        Run.forward(0.32), Run.forward(0.33), Run.left(0.32), Run.backward(0.37), Run.backward(0.37),
+        Run.right(0.32), Run.forward(0.37), Run.right(0.32), Run.forward(0.33), Run.backward(0.63)
     ]
 
     def _pickup(_event):

@@ -123,6 +123,8 @@ class DailyRuntimeConfig:
         self.bellOfArchaicChants: bool = self._cfg.weeklyChallenge == I18nText.BellOfArchaicChants
 
     def __init_tacetSuppression(self):
+        self.westernFangPeaksTacetField: bool = self._cfg.tacetSuppression == I18nText.WesternFangPeaksTacetField
+        self.easternXuanPeaksTacetField: bool = self._cfg.tacetSuppression == I18nText.EasternXuanPeaksTacetField
         self.tacetFieldSolisiaLanding: bool = self._cfg.tacetSuppression == I18nText.TacetFieldSolisiaLanding
         self.tacetFieldFrostlandsTransitPort: bool = self._cfg.tacetSuppression == I18nText.TacetFieldFrostlandsTransitPort
         self.tacetFieldMountGjallar: bool = self._cfg.tacetSuppression == I18nText.TacetFieldMountGjallar

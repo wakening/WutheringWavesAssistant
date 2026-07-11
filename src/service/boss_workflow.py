@@ -54,6 +54,8 @@ class TaskLocal:
         ### ------- Guidebook MaterialsSpots BossChallenge -------
 
         ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        self.westernFangPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.WesternFangPeaksTacetField)
+        self.easternXuanPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.EasternXuanPeaksTacetField)
         self.tacetFieldSolisiaLandingFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldSolisiaLanding)
         self.tacetFieldFrostlandsTransitPortFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldFrostlandsTransitPort)
         self.tacetFieldMountGjallarFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldMountGjallar)
@@ -105,6 +107,8 @@ class TaskLocal:
         self.simulationChallengeFSM: TaskFSMGroup = TaskFSMGroup(name="SimulationChallenge")
         self.bossChallengeFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.BossChallenge)
         self.tacetSuppressionFSM: TaskFSMGroup = TaskFSMGroup(
+            self.westernFangPeaksTacetFieldFSM,
+            self.easternXuanPeaksTacetFieldFSM,
             self.tacetFieldSolisiaLandingFSM,
             self.tacetFieldFrostlandsTransitPortFSM,
             self.tacetFieldMountGjallarFSM,
@@ -314,7 +318,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
 
     # 点击今州城传送点
     tmpl_name = "8_0_-1.png"
-    tmpl_img = img_util.read_img(file_util.get_assets_map_huanglong(tmpl_name))
+    tmpl_img = img_util.read_img(file_util.get_assets_map("Huanglong/Jinzhou/8_0_-1.png"))
     scene_img = ui.sleep(0.8).grap()
     matcher = SIFTFeatureMatcher()
     feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
@@ -660,6 +664,8 @@ class BossWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialsSpots BossChallenge -------
 
         ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        self.local.westernFangPeaksTacetFieldFSM.set_enabled(cfg.westernFangPeaksTacetField)
+        self.local.easternXuanPeaksTacetFieldFSM.set_enabled(cfg.easternXuanPeaksTacetField)
         self.local.tacetFieldSolisiaLandingFSM.set_enabled(cfg.tacetFieldSolisiaLanding)
         self.local.tacetFieldFrostlandsTransitPortFSM.set_enabled(cfg.tacetFieldFrostlandsTransitPort)
         self.local.tacetFieldMountGjallarFSM.set_enabled(cfg.tacetFieldMountGjallar)

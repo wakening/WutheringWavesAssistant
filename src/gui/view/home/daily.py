@@ -159,6 +159,8 @@ class DailyWidget(ScrollArea):
             I18nText.EnemyFallacyOfNoReturn,
         ]
         self.tacetSuppression = [
+            I18nText.WesternFangPeaksTacetField,
+            I18nText.EasternXuanPeaksTacetField,
             I18nText.TacetFieldSolisiaLanding,
             I18nText.TacetFieldFrostlandsTransitPort,
             I18nText.TacetFieldMountGjallar,
@@ -175,6 +177,7 @@ class DailyWidget(ScrollArea):
         self.nightmarePurification = [
         ]
         self.tacetDiscordNest = [
+            I18nText.SouthernYuanHillsTacetDiscordNest,
             I18nText.StarblindCrashsiteTacetDiscordNest,
             I18nText.RebirthUplandsTacetDiscordNest,
             I18nText.StagnantRunTacetDiscordNest,
@@ -422,14 +425,14 @@ class DailyWidget(ScrollArea):
         # self.gridLayout.addWidget(self.bossChallengeSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 0)
-        self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 1)
-        # self.gridLayout.addWidget(self.nightmarePurificationSettingButton, row, 2)
-
-        row += 1
         self.gridLayout.addWidget(self.tacetDiscordNestCheckBox, row, 0)
         self.gridLayout.addWidget(self.tacetDiscordNestComboBox, row, 1)
         # self.gridLayout.addWidget(self.tacetDiscordNestSettingButton, row, 2)
+
+        row += 1
+        self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 0)
+        self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 1)
+        # self.gridLayout.addWidget(self.nightmarePurificationSettingButton, row, 2)
 
         row += 1
         self.gridLayout.addWidget(self.activityCheckBox, row, 0)
