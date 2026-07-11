@@ -110,7 +110,7 @@ class BossRushWidget(QWidget):
         self.aboutButton = PushButton(self.tr("关于"), self)
 
         # for boss in BossNameEnum:
-        new_boss = 2  # TODO 增加boss参数，根据版本区最新版本boss数量
+        new_boss = 4  # TODO 增加boss参数，根据版本区最新版本boss数量
         for i, boss in enumerate(reversed(list(BossNameEnum))):
             checkCard = CheckCard(boss.value, parent=self)
             if i < new_boss or boss == BossNameEnum.NightmareMourningAix:

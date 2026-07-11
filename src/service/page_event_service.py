@@ -2446,6 +2446,8 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇赫卡忒": "梦.*赫卡.?",
             "鸣式利维亚坦": "鸣式.*利维亚坦",
             "梦魇亚当·重锤": "梦.*?亚当.*?重.",
+            "万囮牢·朽躯": "万.?牢.?朽躯",
+            "千傀重楼": "千.重楼",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         # findBoss = None

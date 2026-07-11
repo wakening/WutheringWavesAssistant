@@ -83,9 +83,9 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     # BossNameEnum.NightmareAdamSmasherLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
     BossNameEnum.NightmareAdamSmasher.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
     # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
-    # BossNameEnum.MyriadSnareRustfireChassis.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    BossNameEnum.MyriadSnareRustfireChassis.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.6)],
     # BossNameEnum.CourtOfShackledSouls.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
-    # BossNameEnum.ThousandPuppetPavilion.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
+    BossNameEnum.ThousandPuppetPavilion.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.5)],
 }
 
 # RouteStep后的移动方式配置，没有的也留痕注释掉，方便后续排查
@@ -148,9 +148,11 @@ RESTART_PARAMS: dict[str, RestartParam] = {
     BossNameEnum.NightmareAdamSmasher.value: RestartParam(
         check_text=None, direction=None, cycle=8, step=1, restart_text=r"进入"),
     # BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
-    # BossNameEnum.MyriadSnareRustfireChassis.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.MyriadSnareRustfireChassis.value: RestartParam(
+        check_text=r"击败", direction=None, cycle=25, step=2, check_health_bar=True),
     # BossNameEnum.CourtOfShackledSouls.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
-    # BossNameEnum.ThousandPuppetPavilion.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.ThousandPuppetPavilion.value: RestartParam(
+            check_text=None, direction=None, cycle=8, step=1, restart_text=r"^进入声之"),
 }
 
 # 点击重新挑战后的移动方式配置，适用于个别boss刷新位置离重新挑战点较远的情况，有才写
