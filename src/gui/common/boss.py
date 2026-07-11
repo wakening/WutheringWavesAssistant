@@ -51,6 +51,6 @@ class BossNameEnum(Enum):
     # NightmareAdamSmasherLimitedTime = "梦魇亚当·重锤（限时提前开放）"
     NightmareAdamSmasher = "梦魇亚当·重锤"
     MyriadSnareRustfireChassisLimitedTime = "万囮牢·朽躯（限时提前开放）"
-    # MyriadSnareRustfireChassis = "万囮牢·朽躯"
+    MyriadSnareRustfireChassis = "万囮牢·朽躯"
     CourtOfShackledSouls = "失坠困咎之庭（限时提前开放）"
-    # ThousandPuppetPavilion = "千傀重楼"
+    ThousandPuppetPavilion = "千傀重楼"
