@@ -1,5 +1,7 @@
+import argparse
 import logging
 import sys
+import time
 
 from src import __version__
 from src.config import logging_config, gui_config
@@ -24,11 +26,36 @@ def gui_is_exist():
     sys.exit(0)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--task",
+        type=str,
+        help="Run task without GUI.",
+    )
+
+    return parser.parse_args()
+
+
 def run():
     logger.info(f"WWA v{__version__}, free and open-source")
-
     before()
 
+    args = parse_args()
+    if args.task:
+        _run_task(args.task)
+    else:
+        _run_gui()
+
+def _run_task(task: str):
+    server = MainController()
+    server.execute(task, "START")
+    task, event, spec, ipc = server.running_tasks[task]
+    while event.is_set():
+        time.sleep(0.5)
+
+def _run_gui():
     # 启动后台
     server = MainController()
 

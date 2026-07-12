@@ -18,7 +18,7 @@ from src.core.exceptions import StopError
 from src.core.message import ProcessBridge, MessageBus
 from src.core.tasks import EchoMergeProcessTask
 from src.core.workflow import TaskSpec, IPCManager
-from src.util import hwnd_util
+from src.util import hwnd_util, file_util
 
 logger = logging.getLogger(__name__)
 
@@ -381,7 +381,7 @@ class MainController:
 
         self.task_monitor = None
 
-        self.param_config_path = None
+        self.param_config_path = file_util.get_temp_config("param-config.json")
         self.gui_win_id = None
 
         self.msg_bus = MessageBus()
