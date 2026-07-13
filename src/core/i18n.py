@@ -198,6 +198,8 @@ class I18nText:
     EnemySigillum = "EnemySigillum"
     EnemyNamelessExplorer = "EnemyNamelessExplorer"
     EnemyDenia = "EnemyDenia"
+    EnemyNightmareAdamSmasher = "EnemyNightmareAdamSmasher"
+    EnemyMyriadSnareRustfireChassis = "EnemyMyriadSnareRustfireChassis"
 
     # ------- Sonata -------
     FreezingFrost = "FreezingFrost"
@@ -295,6 +297,10 @@ class I18nText:
 
     ## ------- Guidebook Common -------
     DoubleDropChancesToday = "DoubleDropChancesToday"
+    GuidebookMengzhou = "GuidebookMengzhou"
+    GuidebookLahaiRoi = "GuidebookLahaiRoi"
+    GuidebookRinascita = "GuidebookRinascita"
+    GuidebookJinzhou = "GuidebookJinzhou"
 
     ## ------- Guidebook Activity -------
     ActivityDaily = "ActivityDaily"
@@ -313,6 +319,11 @@ class I18nText:
     TacetDiscordNest = "TacetDiscordNest"
 
     ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+    WingfallChasm = "WingfallChasm"
+    SilentChasm = "SilentChasm"
+    SplitChasm = "SplitChasm"
+    ErodedChasm = "ErodedChasm"
+    AshenChasm = "AshenChasm"
     FallenSanctum = "FallenSanctum"
     LessonInSunset = "LessonInSunset"
     StrickenSanctum = "StrickenSanctum"
@@ -355,7 +366,6 @@ class I18nText:
     TacetFieldStagnantRun = "TacetFieldStagnantRun"
     TacetField = "TacetField"
     EchoSet = "EchoSet"
-    TacetFieldChallenge = "TacetFieldChallenge"
     DefeatTheTdsInTheTacetField = "DefeatTheTdsInTheTacetField"
     TacetFieldChallengeComplete = "TacetFieldChallengeComplete"
     TacetFieldClaim = "TacetFieldClaim"
@@ -371,6 +381,7 @@ class I18nText:
     LimitedTimeEarlyAccess = "LimitedTimeEarlyAccess"
     ArrivingAtTheDestination = "ArrivingAtTheDestination"
     # 周本关卡名
+    CourtOfShackledSouls = "CourtOfShackledSouls"
     SeedOfIllusoryOrigin = "SeedOfIllusoryOrigin"
     GateOfTheLostStar = "GateOfTheLostStar"
     CinderniteApocalypse = "CinderniteApocalypse"
@@ -381,6 +392,7 @@ class I18nText:
     ChaoticJuncture = "ChaoticJuncture"
     BellOfArchaicChants = "BellOfArchaicChants"
     # 前端用关卡名不好认，使用boss名
+    WeeklyBossThousandPuppetPavilion = "WeeklyBossThousandPuppetPavilion"
     WeeklyBossDenia = "WeeklyBossDenia"
     WeeklyBossSigillum = "WeeklyBossSigillum"
     WeeklyBossThrenodianLeviathan = "WeeklyBossThrenodianLeviathan"
@@ -413,6 +425,7 @@ class I18nText:
     StagnantRunTacetDiscordNest = "StagnantRunTacetDiscordNest"
     TacetDiscordDefeated = "TacetDiscordDefeated"
     Go = "Go"
+    Challenge = "Challenge"
 
     # ------- Team -------
     QuickSetup = "QuickSetup"
@@ -901,6 +914,14 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^达妮娅$", raw="达妮娅"),
         Language.EN: RegexStr(flex_ws(r"^Denia$"), raw="Denia"),
     },
+    I18nText.EnemyNightmareAdamSmasher: {
+        Language.ZH: RegexStr(r"^梦.?亚当.?重锤$", raw="梦魇亚当·重锤"),
+        Language.EN: RegexStr(flex_ws(r"^Nightmare.? Adam Smasher$"), raw="Nightmare: Adam Smasher"),
+    },
+    I18nText.EnemyMyriadSnareRustfireChassis: {
+        Language.ZH: RegexStr(r"^万.?牢.?朽躯$", raw="万囮牢·朽躯"),
+        Language.EN: RegexStr(flex_ws(r"^Myriad Snare.? Rustfire Chassis$"), raw="Myriad Snare: Rustfire Chassis"),
+    },
 
     # ------- Sonata -------
     I18nText.FreezingFrost: {
@@ -1271,6 +1292,23 @@ I18N_TEXT = {
             desc="Double Drop Chances Today: 3/3"
         ),
     },
+    # 索拉指南内用到的地区
+    I18nText.GuidebookMengzhou: {
+        Language.ZH: RegexStr(r"梦州", raw="梦州", desc="瑝珑·梦州"),
+        Language.EN: RegexStr(flex_ws(r"Mengzhou"), raw="Mengzhou", desc="Huanglong: Mengzhou"),
+    },
+    I18nText.GuidebookLahaiRoi: {
+        Language.ZH: RegexStr(r"拉海洛", raw="拉海洛", desc="索拉里斯之极·拉海洛"),
+        Language.EN: RegexStr(flex_ws(r"Lahai-Roi"), raw="Lahai-Roi", desc="Solaris's Pole: Lahai-Roi"),
+    },
+    I18nText.GuidebookRinascita: {
+        Language.ZH: RegexStr(r"黎那汐塔", raw="黎那汐塔", desc="黎那汐塔"),
+        Language.EN: RegexStr(flex_ws(r"Rinascita"), raw="Rinascita", desc="Rinascita"),
+    },
+    I18nText.GuidebookJinzhou: {
+        Language.ZH: RegexStr(r"今州", raw="今州", desc="瑝珑·今州"),
+        Language.EN: RegexStr(flex_ws(r"Jinzhou"), raw="Jinzhou", desc="Huanglong: Jinzhou"),
+    },
 
     ## ------- Guidebook Activity -------
     I18nText.ActivityDaily: {
@@ -1336,8 +1374,32 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^前往$", raw="前往"),
         Language.EN: RegexStr(flex_ws(r"^G[o0]$"), raw="Go"),
     },
+    I18nText.Challenge: {
+        Language.ZH: RegexStr(r"^直接挑战$", raw="直接挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge$"), raw=r"Challenge"),
+    },
 
     ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+    I18nText.WingfallChasm: {
+        Language.ZH: RegexStr(r"^.?翼云渊$", raw="陨翼云渊"),
+        Language.EN: RegexStr(flex_ws(r"^Wingfall Chasm$"), raw=r"Wingfall Chasm"),
+    },
+    I18nText.SilentChasm: {
+        Language.ZH: RegexStr(r"^静灭云渊$", raw="静灭云渊"),
+        Language.EN: RegexStr(flex_ws(r"^Silent Chasm$"), raw=r"Silent Chasm"),
+    },
+    I18nText.SplitChasm: {
+        Language.ZH: RegexStr(r"^裂斩云渊$", raw="裂斩云渊"),
+        Language.EN: RegexStr(flex_ws(r"^Split Chasm$"), raw=r"Split Chasm"),
+    },
+    I18nText.ErodedChasm: {
+        Language.ZH: RegexStr(r"^碎蚀云渊$", raw="碎蚀云渊"),
+        Language.EN: RegexStr(flex_ws(r"^Eroded Chasm$"), raw=r"Eroded Chasm"),
+    },
+    I18nText.AshenChasm: {
+        Language.ZH: RegexStr(r"^沉熄云渊$", raw="沉熄云渊"),
+        Language.EN: RegexStr(flex_ws(r"^Ashen Chasm$"), raw=r"Ashen Chasm"),
+    },
     I18nText.FallenSanctum: {
         Language.ZH: RegexStr(r"^荒.旧殿$", raw="荒萋旧殿"),
         Language.EN: RegexStr(flex_ws(r"^Fallen Sanctum$"), raw=r"Fallen Sanctum"),
@@ -1495,10 +1557,6 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^声骸套装$", raw="声骸套装"),
         Language.EN: RegexStr(flex_ws(r"^Echo Set$"), raw=r"Echo Set"),
     },
-    I18nText.TacetFieldChallenge: {
-        Language.ZH: RegexStr(r"^直接挑战$", raw="直接挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Challenge$"), raw=r"Challenge"),
-    },
     I18nText.TacetField: {
         Language.ZH: RegexStr(r"无音区", raw="无音区"),
         Language.EN: RegexStr(flex_ws(r"Tacet Field"), raw=r"Tacet Field"),
@@ -1564,43 +1622,51 @@ I18N_TEXT = {
             raw=r"Arriving at the destination in advance may influence your story experience")
     },
     # 周本关卡名
+    I18nText.CourtOfShackledSouls: {
+        Language.ZH: RegexStr(r"^失坠困.?之庭", raw="失坠困咎之庭", desc="失坠困咎之庭·战歌重奏"),
+        Language.EN: RegexStr(flex_ws(r"Court of Shackled Souls$"), raw=r"Court of Shackled Souls"),
+    },
     I18nText.SeedOfIllusoryOrigin: {
         Language.ZH: RegexStr(r"^虚妄诞生之种", raw="虚妄诞生之种", desc="虚妄诞生之种·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"llusory Origin$"), raw=r"Weekly Challenge: Seed of Illusory Origin"),
+        Language.EN: RegexStr(flex_ws(r"llusory Origin$"), raw=r"Seed of Illusory Origin"),
     },
     I18nText.GateOfTheLostStar: {
         Language.ZH: RegexStr(r"^星海迷途之扉", raw="星海迷途之扉", desc="星海迷途之扉·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"the Lost Star$"), raw=r"Weekly Challenge: Gate of the Lost Star"),
+        Language.EN: RegexStr(flex_ws(r"the Lost Star$"), raw=r"Gate of the Lost Star"),
     },
     I18nText.CinderniteApocalypse: {
         Language.ZH: RegexStr(r"^.夜天启之章", raw="烬夜天启之章", desc="烬夜天启之章·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"Cindernite Apocalypse$"), raw=r"Weekly Challenge: Cindernite Apocalypse"),
+        Language.EN: RegexStr(flex_ws(r"Cindernite Apocalypse$"), raw=r"Cindernite Apocalypse"),
     },
     I18nText.TheWheelOfBrokenFate: {
         Language.ZH: RegexStr(r"^命途断章之轮", raw="命途断章之轮", desc="命途断章之轮·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"Wheel of Broken Fate$"), raw=r"Weekly Challenge: The Wheel of Broken Fate"),
+        Language.EN: RegexStr(flex_ws(r"Wheel of Broken Fate$"), raw=r"The Wheel of Broken Fate"),
     },
     I18nText.BeyondTheCrimsonCurtain: {
         Language.ZH: RegexStr(r"^彼世猩红之幕", raw="彼世猩红之幕", desc="彼世猩红之幕·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"the Crimson Curtain$"), raw=r"Weekly Challenge: Beyond the Crimson Curtain"),
+        Language.EN: RegexStr(flex_ws(r"the Crimson Curtain$"), raw=r"Beyond the Crimson Curtain"),
     },
     I18nText.TheFatedConfrontation: {
         Language.ZH: RegexStr(r"^时序命定之争", raw="时序命定之争", desc="时序命定之争·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"Fated Confrontation$"), raw=r"Weekly Challenge: The Fated Confrontation"),
+        Language.EN: RegexStr(flex_ws(r"Fated Confrontation$"), raw=r"The Fated Confrontation"),
     },
     I18nText.StatueOfTheCrownless: {
         Language.ZH: RegexStr(r"^无冠巨像之心", raw="无冠巨像之心", desc="无冠巨像之心·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"Statue of the Crownless$"), raw=r"Weekly Challenge: Statue of the Crownless"),
+        Language.EN: RegexStr(flex_ws(r"Statue of the Crownless$"), raw=r"Statue of the Crownless"),
     },
     I18nText.ChaoticJuncture: {
         Language.ZH: RegexStr(r"^无序边境之火", raw="无序边境之火", desc="无序边境之火·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"Chaotic Juncture$"), raw=r"Weekly Challenge: Chaotic Juncture"),
+        Language.EN: RegexStr(flex_ws(r"Chaotic Juncture$"), raw=r"Chaotic Juncture"),
     },
     I18nText.BellOfArchaicChants: {
         Language.ZH: RegexStr(r"^昔日咏叹之钟", raw="昔日咏叹之钟", desc="昔日咏叹之钟·战歌重奏"),
-        Language.EN: RegexStr(flex_ws(r"of Archaic Chants$"), raw=r"Weekly Challenge: Bell of Archaic Chants"),
+        Language.EN: RegexStr(flex_ws(r"of Archaic Chants$"), raw=r"Bell of Archaic Chants"),
     },
     # 周本关卡boss名
+    I18nText.WeeklyBossThousandPuppetPavilion: {
+        Language.ZH: RegexStr(r"千傀重楼", raw="千傀重楼"),
+        Language.EN: RegexStr(r"Thousand-Puppet Pavilion", raw="Thousand-Puppet Pavilion"),
+    },
     I18nText.WeeklyBossDenia: {
         Language.ZH: RegexStr(r"达妮娅", raw="达妮娅"),
         Language.EN: RegexStr(r"Denia", raw="Denia"),
@@ -1744,8 +1810,8 @@ I18N_TEXT = {
     },
     # instance
     I18nText.StartChallenge: {
-        Language.ZH: RegexStr(r"^开启挑战$", raw="开启挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Start Challenge$"), raw=r"Start Challenge"),
+        Language.ZH: RegexStr(r"^.{0,1}开启挑战$", raw="开启挑战"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}tart Challenge$"), raw=r"Start Challenge"),
     },
 
     # ------- Mail -------

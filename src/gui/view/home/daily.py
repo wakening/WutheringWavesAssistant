@@ -89,6 +89,7 @@ class DailyWidget(ScrollArea):
 
         # 周本副本名，保存用，后端用，倒叙，最新在前
         self.weeklyChallenge = [
+            I18nText.CourtOfShackledSouls,
             I18nText.SeedOfIllusoryOrigin,
             I18nText.GateOfTheLostStar,
             I18nText.CinderniteApocalypse,
@@ -101,6 +102,7 @@ class DailyWidget(ScrollArea):
         ]
         # 周本boss名，展示用，仅前端用
         self.weeklyBoss = [
+            I18nText.WeeklyBossThousandPuppetPavilion,
             I18nText.WeeklyBossDenia,
             I18nText.WeeklyBossSigillum,
             I18nText.WeeklyBossThrenodianLeviathan,
@@ -120,6 +122,11 @@ class DailyWidget(ScrollArea):
             I18nText.Pistols,
         ]
         self.forgeryChallenge = [
+            I18nText.WingfallChasm,
+            I18nText.SilentChasm,
+            I18nText.SplitChasm,
+            I18nText.ErodedChasm,
+            I18nText.AshenChasm,
             I18nText.FallenSanctum,
             I18nText.LessonInSunset,
             I18nText.StrickenSanctum,
@@ -137,6 +144,8 @@ class DailyWidget(ScrollArea):
             I18nText.MarigoldWoods,
         ]
         self.bossChallenge = [
+            I18nText.EnemyMyriadSnareRustfireChassis,
+            I18nText.EnemyNightmareAdamSmasher,
             I18nText.EnemyNamelessExplorer,
             I18nText.EnemyHyvatia,
             I18nText.EnemyReactorHusk,
@@ -182,6 +191,44 @@ class DailyWidget(ScrollArea):
             I18nText.RebirthUplandsTacetDiscordNest,
             I18nText.StagnantRunTacetDiscordNest,
         ]
+        self.guidebookRegion = [
+            I18nText.GuidebookMengzhou,
+            I18nText.GuidebookLahaiRoi,
+            I18nText.GuidebookRinascita,
+            I18nText.GuidebookJinzhou,
+        ]
+        self.guidebookRegionMap = {
+            I18nText.WingfallChasm: I18nText.GuidebookMengzhou,
+            I18nText.SilentChasm: I18nText.GuidebookMengzhou,
+            I18nText.SplitChasm: I18nText.GuidebookMengzhou,
+            I18nText.ErodedChasm: I18nText.GuidebookMengzhou,
+            I18nText.AshenChasm: I18nText.GuidebookMengzhou,
+            I18nText.FallenSanctum: I18nText.GuidebookLahaiRoi,
+            I18nText.LessonInSunset: I18nText.GuidebookLahaiRoi,
+            I18nText.StrickenSanctum: I18nText.GuidebookLahaiRoi,
+            I18nText.LessonInVoid: I18nText.GuidebookLahaiRoi,
+            I18nText.LessonInEmbers: I18nText.GuidebookLahaiRoi,
+            I18nText.GardenOfSalvation: I18nText.GuidebookRinascita,
+            I18nText.AbyssOfInitiation: I18nText.GuidebookRinascita,
+            I18nText.GardenOfAdoration: I18nText.GuidebookRinascita,
+            I18nText.AbyssOfSacrifice: I18nText.GuidebookRinascita,
+            I18nText.AbyssOfConfession: I18nText.GuidebookRinascita,
+            I18nText.FlamingRemnants: I18nText.GuidebookJinzhou,
+            I18nText.MistyForest: I18nText.GuidebookJinzhou,
+            I18nText.ErodedRuins: I18nText.GuidebookJinzhou,
+            I18nText.MoonlitGroves: I18nText.GuidebookJinzhou,
+            I18nText.MarigoldWoods: I18nText.GuidebookJinzhou,
+
+            I18nText.WesternFangPeaksTacetField: I18nText.GuidebookMengzhou,
+            I18nText.EasternXuanPeaksTacetField: I18nText.GuidebookMengzhou,
+            I18nText.TacetFieldSolisiaLanding: I18nText.GuidebookLahaiRoi,
+            I18nText.TacetFieldFrostlandsTransitPort: I18nText.GuidebookLahaiRoi,
+            I18nText.TacetFieldMountGjallar: I18nText.GuidebookLahaiRoi,
+            I18nText.TacetFieldMawburrowDesert: I18nText.GuidebookLahaiRoi,
+            I18nText.TacetFieldStagnantRun: I18nText.GuidebookLahaiRoi,
+
+        }
+
 
     def __initGridLayout(self):
         # self.weeklyChallengeCheckBox.setStyleSheet("QCheckBox { border: 2px solid red; }")
@@ -202,9 +249,12 @@ class DailyWidget(ScrollArea):
         self.tacetSuppressionComboBox = ComboBox(self.container)
         self.tacetSuppressionComboBox.addItem(self.tr("不选择"), userData=None)
         for i in range(len(self.tacetSuppression)):
-            text = self.tr(self.i18ntr(self.tacetSuppression[i]).raw)
+            text = self.tr("{challenge} - {region}").format(
+                challenge=self.i18ntr(self.tacetSuppression[i]).raw,
+                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetSuppression[i])).raw,
+            )
             self.tacetSuppressionComboBox.addItem(text, userData=self.tacetSuppression[i])
-            if i > 2:
+            if i > 3:
                 self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, False)
         # self.tacetSuppressionSettingButton = ToggleToolButton(FIF.SETTING, self)
 
@@ -212,12 +262,13 @@ class DailyWidget(ScrollArea):
         self.forgeryChallengeComboBox = ComboBox(self.container)
         self.forgeryChallengeComboBox.addItem(self.tr("不选择"), userData=None)
         for i in range(len(self.forgeryChallenge)):
-            text = self.tr("{challenge} - {weapon}").format(
+            text = self.tr("{challenge} - {weapon} - {region}").format(
                 challenge=self.i18ntr(self.forgeryChallenge[i]).raw,
-                weapon=self.i18ntr(self.weapon[i % len(self.weapon)]).raw
+                weapon=self.i18ntr(self.weapon[i % len(self.weapon)]).raw,
+                region=self.i18ntr(self.guidebookRegionMap.get(self.forgeryChallenge[i])).raw,
             )
             self.forgeryChallengeComboBox.addItem(text, userData=self.forgeryChallenge[i])
-            if i > 4:
+            if i > len(self.weapon) * 3 - 1:
                 self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, False)
         # self.forgeryChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 

@@ -112,6 +112,7 @@ class DailyRuntimeConfig:
         self.__init_tacetDiscordNest()
 
     def __init_weeklyChallenge(self):
+        self.courtOfShackledSouls: bool = self._cfg.weeklyChallenge == I18nText.CourtOfShackledSouls
         self.seedOfIllusoryOrigin: bool = self._cfg.weeklyChallenge == I18nText.SeedOfIllusoryOrigin
         self.gateOfTheLostStar: bool = self._cfg.weeklyChallenge == I18nText.GateOfTheLostStar
         self.cinderniteApocalypse: bool = self._cfg.weeklyChallenge == I18nText.CinderniteApocalypse
@@ -132,6 +133,11 @@ class DailyRuntimeConfig:
         self.tacetFieldStagnantRun: bool = self._cfg.tacetSuppression == I18nText.TacetFieldStagnantRun
 
     def __init_forgeryChallenge(self):
+        self.wingfallChasm: bool = self._cfg.forgeryChallenge == I18nText.WingfallChasm
+        self.silentChasm: bool = self._cfg.forgeryChallenge == I18nText.SilentChasm
+        self.splitChasm: bool = self._cfg.forgeryChallenge == I18nText.SplitChasm
+        self.erodedChasm: bool = self._cfg.forgeryChallenge == I18nText.ErodedChasm
+        self.ashenChasm: bool = self._cfg.forgeryChallenge == I18nText.AshenChasm
         self.fallenSanctum: bool = self._cfg.forgeryChallenge == I18nText.FallenSanctum
         self.lessonInSunset: bool = self._cfg.forgeryChallenge == I18nText.LessonInSunset
         self.strickenSanctum: bool = self._cfg.forgeryChallenge == I18nText.StrickenSanctum

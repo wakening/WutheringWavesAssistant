@@ -494,15 +494,7 @@ class BottomWidget(CardWidget):
         self.titleLabel.setObjectName('titleLabel')
 
         # 双倍提醒
-        self.tipsText = ''
-        v = Version(re.search(r"\d+(?:\.\d+){0,2}", __version__).group())
-        if (v.major, v.minor) == (3, 4):
-            if TimeRange.from_str("2026-06-15 04:00", "2026-06-22 04:00").contains():
-                self.tipsText = '<b><font color="red">今日: 双倍材料本</font></b>'
-            elif TimeRange.from_str("2026-07-02 04:00", "2026-07-09 04:00").contains():
-                self.tipsText = '<b><font color="red">今日: 双倍无音区</font></b>'
-
-        self.tipsLabel = QLabel(self.tr(self.tipsText), self)
+        self.tipsLabel = QLabel(self.__tipsText(), self)
         self.tipsLabel.setWordWrap(True)
         self.tipsLabel.setAlignment(Qt.AlignCenter)
 
@@ -580,6 +572,8 @@ class BottomWidget(CardWidget):
         self.currentTask = currentTask
         logger.debug(f"Current task: {self.currentTask}")
 
+        self.tipsLabel.setText(self.__tipsText())
+
     def __on_task_finished(self, task_name):
         logger.debug(f"task_finished: {task_name}")
         self._submittedTask = None
@@ -591,6 +585,17 @@ class BottomWidget(CardWidget):
         self.button.blockSignals(True)
         self.button.setChecked(False)
         self.button.blockSignals(False)
+
+    def __tipsText(self) -> str:
+        # 双倍提醒
+        tipsText = ''
+        v = Version(re.search(r"\d+(?:\.\d+){0,2}", __version__).group())
+        if (v.major, v.minor) == (3, 5):
+            if TimeRange.from_str("2026-07-23 04:00", "2026-07-30 04:00").contains():
+                tipsText = '<b><font color="red">今日: 双倍材料本</font></b>'
+            elif TimeRange.from_str("2026-08-12 04:00", "2026-08-19 04:00").contains():
+                tipsText = '<b><font color="red">今日: 双倍无音区</font></b>'
+        return tipsText
 
     def createTopRightInfoBar(self, title: str, content: str, duration: int):
         InfoBar.success(
