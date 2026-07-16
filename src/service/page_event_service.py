@@ -1452,8 +1452,11 @@ class PageEventAbstractService(PageEventService, ABC):
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
                 try:
+                    for _ in range(3):
+                        self._control_service.attack()
+                        time.sleep(0.05)
                     self._control_service.mouse_left_down()
-                    time.sleep(1.5)
+                    time.sleep(2.0)
                 finally:
                     self._control_service.mouse_left_up()
                 return True
