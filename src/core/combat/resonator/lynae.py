@@ -622,7 +622,7 @@ class Lynae(BaseLynae):
             is_basic_attack_polychrome_leap_ready = self.is_basic_attack_polychrome_leap_ready(img)
             # 流光能量满，三跳下砸
             if is_max_lumiflow:
-                if self.random_float() < 0.5:
+                if self.random_float() > 0.5:
                     self.combo_action(self.kaleidoscopic_parade_2jzja(), True)
                 else:
                     self.combo_action(self.kaleidoscopic_parade_3ja(), True)

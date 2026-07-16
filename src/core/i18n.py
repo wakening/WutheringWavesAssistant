@@ -2041,6 +2041,10 @@ class I18nPage:
         PAGE = "Fight_ClickAlternatelyToBreakFree"
         ClickAlternatelyToBreakFree = "ClickAlternatelyToBreakFree"
 
+    class Fight_BreachTimeRemaining:
+        PAGE = "Fight_BreachTimeRemaining"
+        BreachTimeRemaining = "BreachTimeRemaining"
+
     class UI_ESC_LeaveInstance:
         PAGE = "UI_ESC_LeaveInstance"
         Note = "Note"
@@ -2353,6 +2357,26 @@ I18N_PAGES = {
             I18nPage.Include: {
                 I18nPage.Fight_ClickAlternatelyToBreakFree.ClickAlternatelyToBreakFree: flex_ws(
                     r"^Click alternately to break free$"),
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.Fight_BreachTimeRemaining.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "破解剩余时间",
+            I18nPage.Include: {
+                I18nPage.Fight_BreachTimeRemaining.BreachTimeRemaining: r"^破解剩余时间",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+        Language.EN: {
+            I18nPage.Name: "BREACH TIME REMAINING",
+            I18nPage.Include: {
+                I18nPage.Fight_BreachTimeRemaining.BreachTimeRemaining: flex_ws(
+                    r"^BREACH TIME REMAINING"),
             },
             I18nPage.Exclude: {},
             I18nPage.Assets: [],

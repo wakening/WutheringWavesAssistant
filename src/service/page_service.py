@@ -87,6 +87,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             # I18nPage.Fight_Absorption.PAGE: self._build_Fight_Absorption,
             # I18nPage.Fight_ChallengeCompleted.PAGE: self._build_Fight_ChallengeCompleted,
             I18nPage.Fight_ClickAlternatelyToBreakFree.PAGE: self._build_Fight_ClickAlternatelyToBreakFree,
+            I18nPage.Fight_BreachTimeRemaining.PAGE: self._build_Fight_BreachTimeRemaining,
             I18nPage.UI_ESC_LeaveInstance.PAGE: self._build_UI_ESC_LeaveInstance,
             I18nPage.Notice_LeaveInstance.PAGE: self._build_Notice_LeaveInstance,
             I18nPage.Notice_ForgeryChallengeComplete.PAGE: self._build_Notice_ForgeryChallengeComplete,
@@ -228,6 +229,14 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             self._control_service.left()
             self._control_service.right()
             time.sleep(0.05)
+        return True
+
+    def _build_Fight_BreachTimeRemaining(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        try:
+            self._control_service.mouse_left_down()
+            time.sleep(1.5)
+        finally:
+            self._control_service.mouse_left_up()
         return True
 
     def _build_UI_ESC_LeaveInstance(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):

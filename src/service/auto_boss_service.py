@@ -322,6 +322,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
         click_alternately_to_break_free = self.build_Fight_Click_alternately_to_break_free()
         self._dreamless_pages.append(click_alternately_to_break_free)
 
+        breach_time_remaining = self.build_Fight_BreachTimeRemaining()
+        self._dreamless_pages.append(breach_time_remaining)
+
         # # 击败 战斗状态
         # def fight_action(positions: dict[str, Position]) -> bool:
         #     """

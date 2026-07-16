@@ -1447,6 +1447,30 @@ class PageEventAbstractService(PageEventService, ABC):
             action=action if action else Page.error_action
         )
 
+    def build_Fight_BreachTimeRemaining(self, action: Callable = None) -> Page:
+
+        if action is None:
+            def default_action(positions: dict[str, Position]) -> bool:
+                try:
+                    self._control_service.mouse_left_down()
+                    time.sleep(1.5)
+                finally:
+                    self._control_service.mouse_left_up()
+                return True
+
+            action = default_action
+
+        return Page(
+            name="破解剩余时间",
+            targetTexts=[
+                TextMatch(
+                    name="破解剩余时间",
+                    text=r"^破解剩余时间",
+                ),
+            ],
+            action=action if action else Page.error_action
+        )
+
     def release_skills(self):
         # adapts()
         if self._info.waitBoss:
