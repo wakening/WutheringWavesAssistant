@@ -5,7 +5,7 @@ import time
 from typing import Optional
 
 from src.core.color import ColorRule, Color, ColorMatch
-from src.core.combat.combat_core import ResonatorNameEnum, ScenarioEnum
+from src.core.combat.combat_core import ResonatorNameEnum, Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
@@ -20,7 +20,7 @@ from src.service.common_workflow import (
     absorb_around_variant_blind, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
     match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
     object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_materials_spots, bbox_dialogue,
-    bbox_guidebook_title,
+    bbox_guidebook_title, AsyncPickup,
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -1042,7 +1042,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.debug(f"Found text: {ctx.tr(I18nText.ForgeryClaim)}")
             ui.sleep(0.3)
         else:
-            combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+            combat_system.exit_special_state(Morph.Prefer)
             ui.sleep(0.3)
             logger.info("Challenge Complete")
 
@@ -1281,7 +1281,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             combat_system.is_async = True
             combat_system.check_boss_hp = False
             combat_system.auto_pickup = False
-            combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
+            combat_system.exit_special_state(Morph.Forced)
 
             timeout = 10 * 60
             no_text_count = 3
@@ -1334,7 +1334,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 logger.debug(f"Found text: {ctx.tr(I18nText.TacetFieldClaim)}")
                 ui.sleep(0.3)
             else:
-                combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+                combat_system.exit_special_state(Morph.Prefer)
                 ui.sleep(0.3)
                 logger.info("Challenge Complete")
 
@@ -1662,7 +1662,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         combat_system.is_async = True
         combat_system.check_boss_hp = True
         combat_system.auto_pickup = False
-        combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
+        combat_system.exit_special_state(Morph.Forced)
 
         # 打
         timeout = 10 * 60
@@ -1719,7 +1719,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info("Challenge Complete")
             ui.sleep(0.3)
         else:
-            combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+            combat_system.exit_special_state(Morph.Prefer)
             ui.sleep(0.3)
 
             logger.info("Challenge Complete")
@@ -1949,6 +1949,9 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 return False
 
             # 前往战斗区域
+            combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+            combat_system.set_resonators(ctx.shared.team_members)
+            combat_system.exit_special_state(Morph.Forced)
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
             if cur_instance == I18nText.SouthernYuanHillsTacetDiscordNest:
@@ -2051,7 +2054,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     combat_system.is_async = True
                     combat_system.check_boss_hp = False
                     combat_system.auto_pickup = False
-                    combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
+                    # combat_system.exit_special_state(Morph.Forced)
 
                     timeout = 10 * 60
                     deadline = time.monotonic() + timeout
@@ -2102,7 +2105,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     # 检查复苏弹窗
                     if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.SelectARevivalItem)):
                         ui.esc().sleep(0.5)
-                    combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+                    combat_system.exit_special_state(Morph.Prefer)
                     ui.sleep(0.3)
 
                     ctx.control_service.camera_reset()
@@ -2124,7 +2127,9 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             cur_fsm.complete()
                         return True
                     # 前往战斗区域
-                    ui.move(tacets_route[_tacets_idx]).sleep(0.3)
+                    with AsyncPickup(ctx, delay=1.0):
+                        ui.move(tacets_route[_tacets_idx])
+                    ui.sleep(0.3)
 
                     is_combat = not ui.snapshot().search(ctx.tr(
                         [I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou]))

@@ -91,6 +91,44 @@ def absorb_around_variant(ctx: NodeContext):
     return False
 
 
+class AsyncPickup:
+
+    def __init__(self, ctx, *, delay: float = 0.0, event = None):
+        self.ctx = ctx
+        self.delay = max(0, min(delay, 60))
+        self.event = event
+        if self.event is None:
+            self.event = threading.Event()
+            self.event.set()
+
+        self.thread = threading.Thread(target=self._pickup)
+        self.thread.daemon = True
+
+    def _pickup(self):
+        t = 0.05
+        if self.delay > 0:
+            delay = self.delay
+            while self.event.is_set():
+                if delay - t > 0:
+                    time.sleep(t)
+                    delay -= t
+                    continue
+                time.sleep(delay)
+                break
+        while self.event.is_set():
+            self.ctx.control_service.pick_up()
+            time.sleep(t)
+
+    def __enter__(self):
+        self.thread.start()
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if self.thread.is_alive():
+            self.event.clear()
+            self.thread.join(timeout=1)
+
+
 def absorb_around_variant_blind(ctx: NodeContext):
     """
     路线为：环绕吸收变体
@@ -109,20 +147,9 @@ def absorb_around_variant_blind(ctx: NodeContext):
         Run.right(0.32), Run.forward(0.37), Run.right(0.32), Run.forward(0.33), Run.backward(0.63)
     ]
 
-    def _pickup(_event):
-        t = 0.05
-        while _event.is_set():
-            ctx.control_service.pick_up()
-            time.sleep(t)
-
     executor = RouteExecutor(ctx)
-    event = threading.Event()
-    event.set()
-    thread = threading.Thread(target=_pickup, args=(event,))
-    thread.daemon = True
-    thread.start()
 
-    try:
+    with AsyncPickup(ctx):
         for i, step in enumerate(route):
             key = step.direction.get_key()
             # 点按停顿
@@ -132,9 +159,7 @@ def absorb_around_variant_blind(ctx: NodeContext):
 
             executor.execute([step])
             time.sleep(0.1)
-    finally:
-        event.clear()
-        thread.join(timeout=1)
+
     return True
 
 

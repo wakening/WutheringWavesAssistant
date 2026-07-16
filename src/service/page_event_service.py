@@ -9,7 +9,7 @@ import numpy as np
 
 from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep, DEFAULT_RESTART_TEXT
 from src.core.color import ColorRule, Color, ColorMatch, RuleMode
-from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, ScenarioEnum
+from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
 from src.core.geometry import AnchorPoint, Align, AnchorBBox
@@ -918,7 +918,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     time.sleep(1)
                     return True
 
-                self.combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+                self.combat_system.exit_special_state(Morph.Prefer)
                 # logger.info(f"self._info.needAbsorption: {self._info.needAbsorption}")
                 if self._info.needAbsorption:
                     self.search_echo()
@@ -1588,7 +1588,7 @@ class PageEventAbstractService(PageEventService, ABC):
         time.sleep(2)
 
         if self._context.param_config.autoCombatBeta is True:
-            self.combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+            self.combat_system.exit_special_state(Morph.Prefer)
 
         # 是否在副本中
         if self.absorption_and_receive_rewards({}):
@@ -2525,7 +2525,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     self.team_members_ocr()
                 if self.combat_system.resonators is not None:
                     # 移动前检查，如 椿退出红椿状态
-                    self.combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
+                    self.combat_system.exit_special_state(Morph.Forced)
 
             def route_step_action(route_step_list: list[RouteStep] | None):
                 if route_step_list is None:

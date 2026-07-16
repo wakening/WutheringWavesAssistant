@@ -3,7 +3,7 @@ import logging
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
-    ScenarioEnum
+    Morph
 from src.core.combat.resonator.generic import GenericCombo
 from src.core.interface import ControlService, ImgService
 
@@ -165,18 +165,17 @@ class Phrolova(BasePhrolova):
         super().__init__(control_service, img_service)
         self._generic_combo = GenericCombo(control_service)
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
-        if scenario_enum != ScenarioEnum.BeforeEchoSearch:
-            return
+    def exit_special_state(self, morph: Morph) -> bool:
         logger.debug("exit_special_state")
         img = self.img_service.screenshot()
         if not self.is_cue_curtain_call_ready(img):
-            return
+            return True
         quit_seq = [
             # ["R", 0.05, 4.49],  # R升天
-            ["R", 0.05, 2.37],  # R落地
+            ["R", 0.05, 2.40],  # R落地
         ]
         self.combo_action(quit_seq, True, ignore_event=True)
+        return True
 
     def combo(self):
         self._generic_combo.combo(self)

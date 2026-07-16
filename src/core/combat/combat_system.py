@@ -3,7 +3,7 @@ import threading
 import time
 
 from src.core.combat.combat_core import TeamMemberSelector, BaseResonator, CharClassEnum, ResonatorNameEnum, \
-    ScenarioEnum
+    Morph
 from src.core.combat.resonator.aemeath import Aemeath
 from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.cantarella import Cantarella
@@ -293,16 +293,41 @@ class CombatSystem:
             img = self.img_service.screenshot()
         return BaseResonator.boss_immobilized_bar_exist(img)
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+    def exit_special_state(self, morph: Morph) -> bool:
         if self.resonators is None:
-            return
+            return True
         try:
+            toggle_list = list(range(1, len(self.resonators) + 1))
             cur_member_number = self.team_member_selector.get_cur_member_number(self.resonators)
-            if cur_member_number is None:
-                return
-            resonator = self.resonators[cur_member_number - 1]
-            resonator.exit_special_state(scenario_enum)
-            # if isinstance(resonator, Camellya):
-            #     return
-        except IndexError as e:
+            if cur_member_number in toggle_list:
+                toggle_list.remove(cur_member_number)
+                toggle_list.insert(0, cur_member_number)
+            # logger.debug(f"toggle_list: {toggle_list}")
+            for i, cur_member_number in enumerate(toggle_list):
+                # logger.debug(f"cur_member_number: {cur_member_number}")
+                resonator = self.resonators[cur_member_number - 1]
+                if i > 0:
+                    img = self.img_service.screenshot()
+                    if resonator.is_avatar_grey(img, cur_member_number):
+                        continue
+                    time.sleep(0.1)
+                    self.control_service.toggle_team_member(cur_member_number)
+                    time.sleep(0.35)
+                    toggled_member_number = self.team_member_selector.get_cur_member_number(self.resonators)
+                    # logger.debug(f"toggled_member_number: {toggled_member_number}")
+                    if toggled_member_number is None:
+                        break
+                    if toggled_member_number != cur_member_number:
+                        # 以防万一，关掉复活药弹窗
+                        self.control_service.attack()
+                        time.sleep(0.2)
+                        continue
+
+                exit_result = resonator.exit_special_state(morph)
+                if exit_result:
+                    break
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
             logger.exception(e)
+        return True

@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
-    ScenarioEnum
+    Morph
 from src.core.combat.resonator.generic import GenericCombo
 from src.core.interface import ControlService, ImgService
 
@@ -233,7 +233,7 @@ class Aemeath(BaseAemeath):
         super().__init__(control_service, img_service)
         self._generic_combo = GenericCombo(control_service)
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+    def exit_special_state(self, morph: Morph) -> bool:
         logger.debug("exit_special_state")
         img = self.img_service.screenshot()
         is_resonance_skill_form_switch_aemeath_ready = self.is_resonance_skill_form_switch_aemeath_ready(img)
@@ -260,6 +260,7 @@ class Aemeath(BaseAemeath):
             ]
         if quit_seq:
             self.combo_action(quit_seq, True, ignore_event=True)
+        return True
 
     def combo(self):
 

@@ -427,12 +427,12 @@ class CharClassEnum(Enum):
     Healer = "Healer"  # 奶，排序后于主副c
 
 
-class ScenarioEnum(Enum):
+class Morph(Enum):
     """
-    退出特殊状态的使用场景
+    变回原始形态，用于奔跑、行走前判断，有些角色变身状态无法走路，或走的太快，需要变回普通形态
     """
-    BeforeEchoSearch = "BeforeEchoSearch"  # 战斗结束后，搜索声骸前
-    BeforeGoingToBoss = "BeforeGoingToBoss"  # 传送结束后，去往boss前
+    Prefer = "Prefer"  # 尽量变回去，能动的可以不变如大卡，不能动的必须变回去如红椿
+    Forced = "Forced"  # 强制变回去
 
 
 class BaseResonator(BaseCombo):
@@ -537,13 +537,13 @@ class BaseResonator(BaseCombo):
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         raise NotImplementedError()
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+    def exit_special_state(self, morph: Morph) -> bool:
         """
         脱离特殊状态，部分角色可变身飞天等，影响移动，需实现此函数
-        :param scenario_enum: 调用此函数时的场景，可根据场景做不同实现
+        :param morph:
         :return:
         """
-        pass
+        return True
 
     def combo(self):
         raise NotImplementedError()

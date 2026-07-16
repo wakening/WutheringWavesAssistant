@@ -484,6 +484,9 @@ class I18nText:
     ViewTacetSuppressionExit = "ViewTacetSuppressionExit"
     ViewTacetSuppressionCancel = "ViewTacetSuppressionCancel"
     ViewTacetSuppressionRestart = "ViewTacetSuppressionRestart"
+    ViewTacetSuppressionClaimRewards = "ViewTacetSuppressionClaimRewards"
+    ViewTacetSuppressionClaim = "ViewTacetSuppressionClaim"
+    ViewTacetSuppressionClaimX2 = "ViewTacetSuppressionClaimX2"
 
 
 I18N_TEXT = {
@@ -1483,7 +1486,7 @@ I18N_TEXT = {
     },
     # instance
     I18nText.EnterTheForgeryChallenge: {
-        Language.ZH: RegexStr(r"^进入.凝素领域", raw="进入「凝素领域」"),
+        Language.ZH: RegexStr(r"^进入.?凝素领域", raw="进入「凝素领域」"),
         Language.EN: RegexStr(flex_ws(r"^Enter the .Forgery Challenge"), raw=r"Enter the \"Forgery Challenge\""),
     },
     I18nText.Level: {
@@ -1534,7 +1537,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Eastern Xuan Peaks"), raw=r"Eastern Xuan Peaks Tacet Field"),
     },
     I18nText.TacetFieldSolisiaLanding: {
-        Language.ZH: RegexStr(r"^落日堤屿无音区$", raw="落日堤屿无音区"),
+        Language.ZH: RegexStr(r"^落日.?屿无音区$", raw="落日堤屿无音区"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Solisia"), raw=r"Tacet Field: Solisia Landing"),
     },
     I18nText.TacetFieldFrostlandsTransitPort: {
@@ -1546,7 +1549,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Mount"), raw=r"Tacet Field: Mount Gjallar"),
     },
     I18nText.TacetFieldMawburrowDesert: {
-        Language.ZH: RegexStr(r"^隐喙深腹无音区$", raw="隐喙深腹无音区"),
+        Language.ZH: RegexStr(r"^隐.?深腹无音区$", raw="隐喙深腹无音区"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Mawburrow"), raw=r"Tacet Field: Mawburrow Desert"),
     },
     I18nText.TacetFieldStagnantRun: {
@@ -1824,13 +1827,13 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"Claim All"), raw="Claim All"),
     },
 
-    # ------- (Home) TacetDiscordNest -------
+    # ------- (Overworld) TacetDiscordNest -------
     I18nText.ClearTheTacetDiscordNest: {
         Language.ZH: RegexStr(r"清?理聚落中的残象", raw="清理聚落中的残象"),
         Language.EN: RegexStr(flex_ws(r"Clear the Tacet Discord Nest"), raw="Clear the Tacet Discord Nest"),
     },
     I18nText.TacetDiscordNestCleared: {
-        Language.ZH: RegexStr(r"残象聚落已清理", raw="残象聚落已清理"),
+        Language.ZH: RegexStr(r"残?象聚落已清理", raw="残象聚落已清理"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
     },
     I18nText.ClearTheTacetDiscordNestMengzhou: {
@@ -1842,7 +1845,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
     },
 
-    # ------- View -------
+    # ------- View页面专用 -------
     # 这几个词在很多页面都有，而且名字有细微差异，不同语言间也有差异，很难统一，各功能单独维护自己的一份
     I18nText.ViewClaimRewards: {
         Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
@@ -1864,11 +1867,11 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)", raw="击败"),
     },
     I18nText.ViewChallengeComplete: {
-        Language.ZH: RegexStr(r"^挑战达成|挑战成功$", raw="挑战成功"),
+        Language.ZH: RegexStr(r"^(挑战达成|挑战成功)$", raw="挑战成功"),
         Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw="Challenge Complete"),
     },
     I18nText.ViewChallengeFailed: {
-        Language.ZH: RegexStr(r"^挑战达成|挑战成功$", raw="挑战成功"),
+        Language.ZH: RegexStr(r"^挑战失败$", raw="挑战失败"),
         Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw="Challenge Failed"),
     },
     I18nText.ViewBreakFree: {
@@ -1935,6 +1938,20 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
         Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
     },
+    I18nText.ViewTacetSuppressionClaimRewards: {
+        Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
+        Language.EN: RegexStr(flex_ws(r"^Claim Rewards|Claim the rewards$"), raw=r"Claim Rewards"),
+    },
+    I18nText.ViewTacetSuppressionClaim: {
+        Language.ZH: RegexStr(r"^单倍领取$", raw="单倍领取"),
+        Language.EN: RegexStr(flex_ws(r"^Claim$"), raw=r"Claim"),
+    },
+    I18nText.ViewTacetSuppressionClaimX2: {
+        Language.ZH: RegexStr(r"^双倍领取$", raw="双倍领取"),
+        Language.EN: RegexStr(flex_ws(r"^Claim.?2$"), raw="Claim*2"),
+    },
+
+
 
 
 }
@@ -2868,8 +2885,9 @@ class I18nView:
     ViewBreakFree = "ViewBreakFree"
     ViewLeaveInstance = "ViewLeaveInstance"
     ViewLeaveInstance2 = "ViewLeaveInstance2"
-    ViewForgeryChallenge = "ViewForgeryChallenge"
-    ViewTacetSuppression = "ViewTacetSuppression"
+    ViewForgeryChallengeComplete = "ViewForgeryChallengeComplete"
+    ViewTacetSuppressionComplete = "ViewTacetSuppressionComplete"
+    ViewTacetSuppressionClaimRewards = "ViewTacetSuppressionClaimRewards"
 
 
 class View:
@@ -3083,9 +3101,9 @@ I18N_PAGES_BOSS = {
         ),
     },
 
-    I18nView.ViewForgeryChallenge: {
+    I18nView.ViewForgeryChallengeComplete: {
         Language.ZH: View(
-            name="材料本-挑战完成/失败",
+            name="凝素领域-挑战成功/失败",
             child=[
                 Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
                 Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
@@ -3104,9 +3122,9 @@ I18N_PAGES_BOSS = {
         ),
     },
 
-    I18nView.ViewTacetSuppression: {
+    I18nView.ViewTacetSuppressionComplete: {
         Language.ZH: View(
-            name="无音区-挑战成功",
+            name="无音清剿-挑战成功",
             child=[
                 Feature(I18nText.ViewTacetSuppressionChallengeComplete),
                 Feature(I18nText.ViewTacetSuppressionConfirm),
@@ -3126,6 +3144,27 @@ I18N_PAGES_BOSS = {
             ],
         ),
     },
+
+    I18nView.ViewTacetSuppressionClaimRewards: {
+        Language.ZH: View(
+            name="无音清剿-领取奖励",
+            child=[
+                Feature(I18nText.ViewTacetSuppressionClaimRewards),
+                Feature(I18nText.ViewTacetSuppressionClaim),
+                Feature(I18nText.ViewTacetSuppressionClaimX2),
+            ],
+        ),
+        Language.EN: View(
+            name="TacetSuppression-ClaimRewards",
+            child=[
+                Feature(I18nText.ViewTacetSuppressionClaimRewards),
+                Feature(I18nText.ViewTacetSuppressionClaim),
+                Feature(I18nText.ViewTacetSuppressionClaimX2),
+            ],
+        ),
+    },
+
+
 
 
 

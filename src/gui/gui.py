@@ -62,7 +62,7 @@ def set_foreground_window(w):
     if sys.platform == "win32":
         def _set_foreground_window():
             try:
-                import win32gui, win32con
+                import win32gui, win32con, ctypes
                 hwnd = int(w.winId())
                 # win32gui.SetForegroundWindow(hwnd)
                 win32gui.SetWindowPos(
@@ -78,6 +78,8 @@ def set_foreground_window(w):
                     0, 0, 0, 0,
                     win32con.SWP_NOMOVE | win32con.SWP_NOSIZE
                 )
+
+                # ctypes.windll.user32.ClipCursor(None)
             except Exception:
                 pass
 

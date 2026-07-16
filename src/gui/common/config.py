@@ -82,9 +82,10 @@ EN_SUPPORT_URL = "https://afdian.com/a/wakening"
 CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/CHANGELOG.md" # TODO terminal
 
 VERSION_URLS = [
+    "https://cnb.cool/github.wakening/WutheringWavesAssistant/-/git/raw/main/src/__init__.py",
     "https://ghfast.top/https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
-    "https://cdn.jsdelivr.net/gh/wakening/WutheringWavesAssistant@main/src/__init__.py",
     "https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
+    "https://cdn.jsdelivr.net/gh/wakening/WutheringWavesAssistant@main/src/__init__.py",
 ]
 
 

@@ -5,7 +5,7 @@ import time
 from typing import Optional
 
 from src.core.color import ColorRule, Color, ColorMatch
-from src.core.combat.combat_core import ResonatorNameEnum, ScenarioEnum
+from src.core.combat.combat_core import ResonatorNameEnum, Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point

@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum, \
-    ScenarioEnum, combat_cache
+    Morph, combat_cache
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -476,12 +476,13 @@ class Camellya(BaseCamellya):
         # 测试用，一整套连招
         return self.COMBO_SEQ
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+    def exit_special_state(self, morph: Morph) -> bool:
         logger.debug("exit_special_state")
         self.combo_action(self.ja(), True, ignore_event=True)
         # 椿落地会前移，后闪复位
         self.control_service.dash_dodge()
         time.sleep(0.3)
+        return True
 
     def combo(self):
         # 变奏

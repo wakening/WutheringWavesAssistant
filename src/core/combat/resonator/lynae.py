@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
-    combat_cache
+    combat_cache, Morph
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -507,6 +507,10 @@ class Lynae(BaseLynae):
     def full_combo(self):
         # 测试用，一整套连招
         return self.COMBO_SEQ
+
+    def exit_special_state(self, morph: Morph) -> bool:
+        logger.debug("exit_special_state")
+        return False
 
     def combo(self):
 

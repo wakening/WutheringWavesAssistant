@@ -3,7 +3,7 @@ import logging
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
-    ScenarioEnum, combat_cache
+    Morph, combat_cache
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -361,17 +361,16 @@ class Mornye(BaseMornye):
         # 测试用，一整套连招
         return self.COMBO_SEQ
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
-        if scenario_enum != ScenarioEnum.BeforeEchoSearch:
-            return
+    def exit_special_state(self, morph: Morph) -> bool:
         logger.debug("exit_special_state")
         img = self.img_service.screenshot()
         if not self.is_wide_field_observation_mode_ready(img):
-            return
+            return True
         quit_seq = [
             ["j", 0.05, 2.00],
         ]
         self.combo_action(quit_seq, True, ignore_event=True)
+        return True
 
     def combo(self):
         self.combo_action(self.a3z_a3(), True)
