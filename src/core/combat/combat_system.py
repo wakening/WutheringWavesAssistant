@@ -13,6 +13,7 @@ from src.core.combat.resonator.ciaccona import Ciaccona
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.generic import GenericResonator
 from src.core.combat.resonator.hiyuki import Hiyuki
+from src.core.combat.resonator.iuno import Iuno
 from src.core.combat.resonator.jinhsi import Jinhsi
 from src.core.combat.resonator.lucilla import Lucilla
 from src.core.combat.resonator.lynae import Lynae
@@ -66,6 +67,7 @@ class CombatSystem:
         self.aemeath = Aemeath(self.control_service, self.img_service)
         self.hiyuki = Hiyuki(self.control_service, self.img_service)
         self.lucilla = Lucilla(self.control_service, self.img_service)
+        self.iuno = Iuno(self.control_service, self.img_service)
 
         self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
             ResonatorNameEnum.jinhsi: self.jinhsi,
@@ -85,6 +87,7 @@ class CombatSystem:
             ResonatorNameEnum.aemeath: self.aemeath,
             ResonatorNameEnum.hiyuki: self.hiyuki,
             ResonatorNameEnum.lucilla: self.lucilla,
+            ResonatorNameEnum.iuno: self.iuno,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
