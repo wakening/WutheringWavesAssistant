@@ -198,6 +198,14 @@ class Verina(BaseVerina):
             ["R", 0.05, 2.63],
         ]
 
+    @combat_cache
+    def EQ_fast(self):
+        return [
+            # EQ
+            ["E", 0.00, 0.00],
+            ["Q", 0.00, 0.00],
+        ]
+
     def full_combo(self):
         # 测试用，一整套连招
         return self.COMBO_SEQ
@@ -225,6 +233,7 @@ class Verina(BaseVerina):
         if energy_count > 0:
             self.combo_action(self.ja3(), False)
             time.sleep(0.05)
+            self.combo_action(self.EQ_fast(), False)
             return
 
         time.sleep(0.1)
@@ -232,3 +241,4 @@ class Verina(BaseVerina):
         energy_count = self.energy_count(img)
         if energy_count > 1:
             self.combo_action(self.ja3(), False)
+        self.combo_action(self.EQ_fast(), False)

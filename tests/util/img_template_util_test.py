@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import cv2
 
@@ -8,10 +9,10 @@ from src.util import img_util, file_util, screenshot_util, hwnd_util, img_templa
 logger = logging.getLogger(__name__)
 
 
-def test_find_icon_in_roi():
-    atlas = img_util.read_img(
-        file_util.get_assets_template("Guidebook_Sidebar.png"))
-    icon = atlas[BBox(252, 28, 321, 105).as_slice()]
+def test_find_icon_in_roi(icon = None, anchor_roi = None):
+    if icon is None:
+        atlas = img_util.read_img(file_util.get_assets_template("Guidebook_Sidebar.png"))
+        icon = atlas[BBox(252, 28, 321, 105).as_slice()]
 
     # cv2.imshow(
     #     "alpha",
@@ -23,10 +24,12 @@ def test_find_icon_in_roi():
     hwnd = hwnd_util.get_hwnd()
     img = screenshot_util.screenshot(hwnd)
 
-    anchor_roi = AnchorBBox(
-        AnchorPoint(0, 85, Align.Left | Align.Top),
-        AnchorPoint(99, 720, Align.Left | Align.Top),
-    )
+    if anchor_roi is None:
+        anchor_roi = AnchorBBox(
+            AnchorPoint(0, 85, Align.Left | Align.Top),
+            AnchorPoint(99, 720, Align.Left | Align.Top),
+        )
+
     scale_table = {
         (1024, 768): 0.45,
         (1280, 720): 0.56,
@@ -35,10 +38,10 @@ def test_find_icon_in_roi():
         (2560, 1440): 1.10,
     }
 
-    rs_img, scale = img_template_util.resize_ui_img(img)
+    rs_img, scale = img_template_util._resize_img(img)
     h, w = rs_img.shape[:2]
     cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi)
-    print(f"cur_roi: {cur_roi}, scale: {scale}, scale_roi: {cur_roi.scale(scale)}")
+    logger.debug(f"cur_roi: {cur_roi}, scale: {scale}, scale_roi: {cur_roi.scale(scale)}")
 
     result = img_template_util.find_icon_in_roi(
         # img,
@@ -47,7 +50,7 @@ def test_find_icon_in_roi():
 
         roi=cur_roi.as_tuple(),
 
-        scale_min=0.4,
+        scale_min=0.1,
         scale_max=2.0,
         scale_step=0.03,
     )
@@ -107,7 +110,7 @@ def test_find_icon_in_roi_accelerated():
 
     h, w = img.shape[:2]
     cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi)
-    print(f"cur_roi: {cur_roi}")
+    logger.debug(f"cur_roi: {cur_roi}")
 
     result = img_template_util.find_icon_in_roi_accelerated(
         img,
@@ -140,3 +143,45 @@ def test_find_icon_in_roi_accelerated():
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+
+def test_find_role_icon():
+    img = screenshot_util.screenshot(hwnd_util.get_hwnd())
+    h, w = img.shape[:2]
+    anchor_roi = AnchorBBox(
+        AnchorPoint(1128, 0, Align.Left | Align.Top),
+        AnchorPoint(1280, 720, Align.Left | Align.Top),
+    )
+    cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi).as_tuple()
+    logger.debug("")
+
+    icon = img_util.read_img(file_util.get_assets_role_icon("T_IconRoleHead150_60_Skin1_UI.png"))
+    # icon = img_util.read_img(file_util.get_assets_role_icon("T_IconRoleHead150_40_UI.png"))
+    # img_template_util.find_icon_in_roi_accelerated(img, icon, roi=cur_roi)
+    # img_template_util.find_icon_in_roi(img, icon, roi=cur_roi)
+    test_find_icon_in_roi(icon, anchor_roi=anchor_roi)
+
+    logger.debug("")
+
+
+def test_find_role_icons():
+    img = screenshot_util.screenshot(hwnd_util.get_hwnd())
+    h, w = img.shape[:2]
+    anchor_roi = AnchorBBox(
+        AnchorPoint(1128, 0, Align.Left | Align.Top),
+        AnchorPoint(1280, 720, Align.Left | Align.Top),
+    )
+    cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi).as_tuple()
+    logger.debug("")
+
+    path = file_util.get_assets_role_icon()
+    for p in path.glob("*.png"):
+        logger.debug(p.absolute())
+        icon = img_util.read_img(p.absolute())
+        # img_template_util.find_icon_in_roi_accelerated(img, icon, roi=cur_roi)
+        # img_template_util.find_icon_in_roi(img, icon, roi=cur_roi)
+        test_find_icon_in_roi(icon, anchor_roi=anchor_roi)
+
+    logger.debug("")
+
+

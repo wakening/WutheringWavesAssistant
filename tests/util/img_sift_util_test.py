@@ -1,8 +1,10 @@
 import logging
+import time
 
 import cv2
 
-from src.util import hwnd_util, file_util, screenshot_util
+from src.core.geometry import AnchorBBox, AnchorPoint, Align, Scaler
+from src.util import hwnd_util, file_util, screenshot_util, img_util
 from src.util.img_sift_util import SIFTFeatureMatcher
 from src.util.img_tile_util import TileGrid
 
@@ -286,3 +288,84 @@ def test_format():
     MAP_PATH_909_2_0 = file_util.get_assets_map("Roya Frostlands/Dimmr Plains/909_2_0.png")
     img = Image.open(MAP_PATH_909_2_0)
     print(img.format)
+
+
+def test_identify_roles():
+    hwnd = hwnd_util.get_hwnd()
+    img = screenshot_util.screenshot(hwnd)
+
+    h, w = img.shape[:2]
+    anchor_roi = AnchorBBox(
+        AnchorPoint(1128, 0, Align.Left | Align.Top),
+        AnchorPoint(1280, 720, Align.Left | Align.Top),
+    )
+    cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi)
+    scene_image = img[cur_roi.as_slice()]
+
+    matcher = SIFTFeatureMatcher()
+
+    start_time = time.monotonic()
+    role_features = []
+    path = file_util.get_assets_role_icon()
+    for p in path.glob("*.png"):
+        logger.debug(p.absolute())
+        feature_image = img_util.read_img(p.absolute())
+        feature_data = matcher.build_feature_data(feature_id=p.name, image=feature_image)
+        role_features.append(feature_data)
+
+    use_time = time.monotonic() - start_time
+    logger.debug("耗时: %s 秒", use_time)
+
+    start_time = time.monotonic()
+    results = matcher.identify_roles(scene_image, role_features)
+    use_time = time.monotonic() - start_time
+    logger.debug("耗时: %s 秒", use_time)
+
+    if not results:
+        logger.debug("未识别到任何角色")
+        return
+
+    logger.debug(f"识别到 {len(results)} 个角色：")
+    for i, result in enumerate(results):
+        logger.debug(f"  - 角色ID: {result.feature_id}")
+        logger.debug(f"    得分: {result.score:.2f}")
+        logger.debug(f"    中心位置: {result.center}")
+        logger.debug(f"    内点数: {result.inliers}")
+        # 如果需要画框，使用 res.corners
+
+        scene_xy = (466, 309)
+
+        feature_xy = (
+            matcher.scene_to_feature(
+                result,
+                scene_xy,
+            )
+        )
+
+        logger.debug(
+            "scene -> feature: %s -> %s",
+            scene_xy,
+            feature_xy,
+        )
+
+        reverse_scene_xy = (
+            matcher.feature_to_scene(
+                result,
+                feature_xy,
+            )
+        )
+
+        logger.debug(
+            "feature -> scene: %s -> %s",
+            feature_xy,
+            reverse_scene_xy,
+        )
+
+        # =====================================================
+        # Debug Show
+        # =====================================================
+
+        matcher.debug_show(
+            scene_image=scene_image,
+            match_result=result,
+        )

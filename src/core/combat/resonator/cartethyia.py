@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum, \
-    combat_cache
+    combat_cache, Morph
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -922,6 +922,24 @@ class Cartethyia(BaseCartethyia):
     def full_combo(self):
         # 测试用，一整套连招
         return self.COMBO_SEQ
+
+    def exit_special_state(self, morph: Morph) -> bool:
+        logger.debug("exit_special_state")
+
+        img = self.img_service.screenshot()
+        # 常态 小卡技能
+        is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
+        is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+        # 大卡技能
+        is_resonance_liberation_avatar_cartethyia_ready = self.is_resonance_liberation_avatar_cartethyia_ready(img)
+
+        # 常态 卡提希娅
+        if is_resonance_skill_cartethyia_ready or is_resonance_liberation_ready:
+            return True
+        # 化身·卡提希娅
+        if is_resonance_liberation_avatar_cartethyia_ready:
+            return True
+        return False
 
     def combo(self):
         # 变奏后摇1.2s

@@ -383,34 +383,146 @@ class SIFTFeatureMatcher:
 
         return FeatureMatchResult(
             feature_id=feature_data.feature_id,
-
             matrix=matrix,
-
             inverse_matrix=inverse_matrix,
-
             good_matches=good_matches,
-
             scene_keypoints=scene_keypoints,
-
             scene_descriptors=scene_descriptors,
-
             scale_x=scale_x,
-
             scale_y=scale_y,
-
             inliers=inliers,
-
             inlier_ratio=inlier_ratio,
-
             score=score,
-
-            center=(
-                center_x,
-                center_y,
-            ),
-
+            center=(center_x, center_y),
             corners=scene_corners,
         )
+
+    def _extract_features_masked(self, image: np.ndarray):
+        """
+        带 Mask 的特征提取（用于透明图）
+        :param image:
+        :return:
+        """
+        if image.ndim == 3 and image.shape[2] == 4:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
+            mask = (image[:, :, 3] > 10).astype(np.uint8) * 255
+            return self.sift.detectAndCompute(gray, mask)
+        else:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            return self.sift.detectAndCompute(gray, None)
+
+    def identify_roles(
+            self,
+            scene_image: np.ndarray,
+            role_features_list: list[FeatureData],
+            top_k: int = 5,  # 只对匹配点最多的前 K 个角色跑 RANSAC
+            min_good_matches: int | None = None,  # 初筛阈值，默认等于 self.min_match_count
+    ) -> list[FeatureMatchResult]:
+        """
+        批量识别角色（优化版）
+        - 场景 FLANN 索引只构建一次
+        - 先快速初筛，只对候选跑 RANSAC
+        """
+        if min_good_matches is None:
+            min_good_matches = self.min_match_count
+
+        # 1. 提取场景特征（使用带 Mask 的提取，支持透明图）
+        scene_kp, scene_desc = self._extract_features_masked(scene_image)
+        if scene_desc is None or len(scene_kp) < min_good_matches:
+            return []
+
+        # 2. 构建场景 FLANN 索引（一次性）
+        # 注意：使用新的匹配器实例，避免影响原有 self.matcher
+        scene_matcher = cv2.FlannBasedMatcher(
+            dict(algorithm=1, trees=5),
+            dict(checks=50)
+        )
+        scene_matcher.add([scene_desc])
+        scene_matcher.train()
+
+        # 3. 快速初筛：对每个角色查询，统计 good matches 数量
+        candidates = []  # 元素: (good_matches_count, feature_data, good_matches_list, src_pts, dst_pts)
+
+        for fd in role_features_list:
+            if fd.descriptors is None or len(fd.descriptors) < min_good_matches:
+                continue
+
+            # 使用预构建的场景索引进行查询（不传 train 参数）
+            matches = scene_matcher.knnMatch(fd.descriptors, k=2)
+
+            # 快速统计 good matches（只计数，不构建坐标数组，节省内存）
+            good_count = 0
+            good_matches = []
+            for m, n in matches:
+                if m.distance < self.ratio_test * n.distance:
+                    good_count += 1
+                    good_matches.append(m)
+                    # 可以提前截断，如果已经超过 min_good_matches 即可停止计数
+                    if good_count >= min_good_matches:
+                        break
+
+            if good_count >= min_good_matches:
+                # 为后续 RANSAC 准备坐标（只对候选角色做）
+                src_pts = np.float32([fd.keypoints[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                dst_pts = np.float32([scene_kp[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                candidates.append((good_count, fd, good_matches, src_pts, dst_pts))
+
+        if not candidates:
+            return []
+
+        # 4. 按 good_matches 数量降序排序，只取前 top_k 个候选跑 RANSAC
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        top_candidates = candidates[:top_k]
+
+        results = []
+        for _, fd, good_matches, src_pts, dst_pts in top_candidates:
+            # RANSAC + 评分函数
+            matrix, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, self.ransac_threshold)
+            if matrix is None:
+                continue
+
+            success, inv_matrix = cv2.invert(matrix)
+            if not success:
+                continue
+
+            inliers_mask = mask.ravel().tolist()
+            inliers = sum(inliers_mask)
+            if inliers < self.min_match_count:
+                continue
+
+            inlier_ratio = inliers / len(inliers_mask)
+
+            # 计算缩放、角点、中心、得分（复用原逻辑）
+            scale_x = math.sqrt(matrix[0, 0] ** 2 + matrix[1, 0] ** 2)
+            scale_y = math.sqrt(matrix[0, 1] ** 2 + matrix[1, 1] ** 2)
+
+            h, w = fd.image.shape[:2]
+            corners = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
+            scene_corners = cv2.perspectiveTransform(corners, matrix)
+            center_x = int(np.mean(scene_corners[:, 0, 0]))
+            center_y = int(np.mean(scene_corners[:, 0, 1]))
+
+            score = inlier_ratio * math.log(inliers + 1)
+
+            results.append(FeatureMatchResult(
+                feature_id=fd.feature_id,
+                matrix=matrix,
+                inverse_matrix=inv_matrix,
+                good_matches=good_matches,  # 这里用的是初筛时的 good_matches，可能包含所有点（包括离群点），但为了显示仍保留
+                scene_keypoints=scene_kp,
+                scene_descriptors=scene_desc,
+                scale_x=scale_x,
+                scale_y=scale_y,
+                inliers=inliers,
+                inlier_ratio=inlier_ratio,
+                score=score,
+                center=(center_x, center_y),
+                corners=scene_corners,
+            ))
+
+        # 按得分排序
+        # results.sort(key=lambda x: x.score, reverse=True)
+        return results
 
     # =====================================================
     # Coord Mapping

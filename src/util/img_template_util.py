@@ -94,7 +94,7 @@ def find_icon_in_roi(
             roi_x1:roi_x2
         ]
 
-    logger.debug()
+    logger.debug("")
 
     logger.debug(f"roi = ({roi_x1},{roi_y1})")
 
@@ -169,7 +169,7 @@ def find_icon_in_roi(
 
         count += 1
 
-    logger.debug()
+    logger.debug("")
     logger.debug(f"scale scan count = {count}")
 
     results.sort(
@@ -177,7 +177,7 @@ def find_icon_in_roi(
         reverse=True
     )
 
-    logger.debug()
+    logger.debug("")
     logger.debug("Top 10")
     logger.debug("-" * 80)
 
@@ -200,7 +200,7 @@ def find_icon_in_roi(
     x = best_pos[0] + roi_x1
     y = best_pos[1] + roi_y1
 
-    logger.debug()
+    logger.debug("")
     logger.debug("Best")
     logger.debug(f"score = {best_score:.4f}")
     logger.debug(f"scale = {best_scale:.3f}")

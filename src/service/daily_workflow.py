@@ -321,10 +321,14 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
         if i == 2:
             return False
         if not ui.sleep(0.3).wait().until(
-                lambda: ui.snapshot().search(ctx.tr([I18nText.Huanglong, I18nText.Jinzhou]), regions_roi)):
+                lambda: ui.snapshot().search(
+                    ctx.tr([I18nText.Huanglong, I18nText.Mengzhou, I18nText.Jinzhou]), regions_roi)):
             logger.warning(f"Text not found: {ctx.tr(I18nText.Huanglong).raw}")
             return False
-        if ui.click_text(ctx.tr(I18nText.Jinzhou), regions_roi, delay=0.4, times=2, interval=0.2):
+        ui.sleep(0.4).snapshot()  # 修复文字未显示完全就识别导致少字，等动画结束，重新识别
+        if ui.search(ctx.tr(I18nText.Mengzhou)) or ui.search(ctx.tr(I18nText.Jinzhou)):
+            ui.click_text(ctx.tr(I18nText.Mengzhou), regions_roi, delay=0.4, times=2, interval=0.2)
+            ui.click_text(ctx.tr(I18nText.Jinzhou), regions_roi, delay=0.1, times=2, interval=0.2)
             break
         elif ui.click_text(ctx.tr(I18nText.Huanglong), regions_roi, delay=0.4):
             ui.sleep(0.35)
