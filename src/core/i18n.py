@@ -296,6 +296,7 @@ class I18nText:
     Milestones = "Milestones"
 
     ## ------- Guidebook Common -------
+    CannotPerformThisActionDuringBattle = "CannotPerformThisActionDuringBattle"
     DoubleDropChancesToday = "DoubleDropChancesToday"
     GuidebookMengzhou = "GuidebookMengzhou"
     GuidebookLahaiRoi = "GuidebookLahaiRoi"
@@ -1071,9 +1072,8 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^切换地图$", raw="切换地图"),
         Language.EN: RegexStr(flex_ws(r"^Switch Map$"), raw="Switch Map"),
     },
-    # 瑝珑
     I18nText.Huanglong: {
-        Language.ZH: RegexStr(r"^[瑝珑]{1,2}$", raw="瑝珑"),
+        Language.ZH: RegexStr(r"^.?珑$", raw="瑝珑"),
         Language.EN: RegexStr(flex_ws(r"^Huanglong$"), raw="Huanglong"),
     },
     I18nText.Jinzhou: {
@@ -1088,17 +1088,14 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^梦州$", raw="梦州"),
         Language.EN: RegexStr(flex_ws(r"^Mengzhou$"), raw="Mengzhou"),
     },
-    # 黑海岸
     I18nText.TheBlackShores: {
         Language.ZH: RegexStr(r"^黑海岸$", raw="黑海岸"),
         Language.EN: RegexStr(flex_ws(r"^The Black Shores$"), raw="The Black Shores"),
     },
-    # 黎那汐塔
     I18nText.Rinascita: {
         Language.ZH: RegexStr(r"^黎那汐塔$", raw="黎那汐塔"),
         Language.EN: RegexStr(flex_ws(r"^Rinascita$"), raw="Rinascita"),
     },
-    # 罗伊冰原
     I18nText.RoyaFrostlands: {
         Language.ZH: RegexStr(r"^罗伊冰原$", raw="罗伊冰原"),
         Language.EN: RegexStr(flex_ws(r"^Roya Frostlands$"), raw="Roya Frostlands"),
@@ -1283,6 +1280,16 @@ I18N_TEXT = {
     },
 
     ## ------- Guidebook Common -------
+    I18nText.CannotPerformThisActionDuringBattle: {
+        Language.ZH: RegexStr(
+            flex_ws(r"战斗中无法进行该操作"),
+            raw="提示：战斗中无法进行该操作",
+        ),
+        Language.EN: RegexStr(
+            flex_ws(r"^Cannot perform this action during battle"),
+            raw="Cannot perform this action during battle",
+        ),
+    },
     I18nText.DoubleDropChancesToday: {
         Language.ZH: RegexStr(
             flex_ws(r"^今日剩余双倍奖励次数"),

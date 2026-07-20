@@ -301,11 +301,12 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
 
     # 从终端进入地图
     if ui.match_page(I18nPage.Terminal.PAGE):
-        ui.click_point(AnchorPoint(1197, 350, Align.Right | Align.Middle))
-        if not ui.sleep(0.3).wait().until(
-                lambda: ui.snapshot().click_text(ctx.tr(I18nText.Map), delay=0.2, times=2, interval=0.3)):
-            ui.esc().sleep(1)
-            return False
+        if not ui.click_text(ctx.tr(I18nText.Map), bbox_terminal_content(ctx), delay=0.2, times=2, interval=0.3):
+            ui.click_point(AnchorPoint(1197, 350, Align.Right | Align.Middle))
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.Map), delay=0.3, times=2, interval=0.3)):
+                ui.esc().sleep(1)
+                return False
     else:
         # 大世界进入地图
         ctx.control_service.map()
@@ -360,7 +361,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
     logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
     ui.click(int(scene_point[0]), int(scene_point[1]))
     if not ui.sleep(0.5).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
+            lambda: ui.snapshot().click_text(ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.3)):
         return False
 
     ui.sleep(2).wait_back_home()
@@ -394,11 +395,15 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         AnchorPoint(700, 625, Align.Right | Align.Bottom),
         AnchorPoint(1280, 720, Align.Right | Align.Bottom)
     ))
-    if not ui.sleep(0.8).wait(5, 0.5).until(
-        lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi)):
-        # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.QuickSetup), roi)):
-        logger.info(f"编队已锁定，离开战斗区域")
-        return False
+    if ui.sleep(0.8).wait(5, 0.5).until(
+        lambda: ui.snapshot().search(
+            ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle]))):
+        if ui.search(ctx.tr(I18nText.CannotPerformThisActionDuringBattle)):
+            logger.info(f"Team locked")
+            return False
+        if not ui.search(ctx.tr(I18nText.QuickSetup), roi):
+            logger.info(f"Team locked")
+            return False
 
     # 检查失去意识
     roi = ctx.scaler.as_bbox(AnchorBBox(
