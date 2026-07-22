@@ -98,6 +98,9 @@ def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
 
     # 点击数据合成侧边栏坐标
     data_merge_point = ctx.scaler.as_point(AnchorPoint(50, 400, Align.Top | Align.Left)).as_tuple()
+    time.sleep(0.4)
+    ctx.control_service.click(data_merge_point)
+    time.sleep(0.3)
     ctx.control_service.click(data_merge_point)
     time.sleep(1)
 

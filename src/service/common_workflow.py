@@ -124,8 +124,8 @@ class AsyncPickup:
         return self
 
     def __exit__(self, exc_type, exc, tb):
+        self.event.clear()
         if self.thread.is_alive():
-            self.event.clear()
             self.thread.join(timeout=1)
 
 
