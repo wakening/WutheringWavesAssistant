@@ -207,6 +207,7 @@ class BossRushWidget(QWidget):
                 '任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。'
                 '\n若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。'
                 '\n日常可刷梦魇哀声鸷，通过合成获取1c3c。不建议多选。'
+                '\n萌新建议降低索拉等级刷。'
             ),
             target=self.aboutButton,
             parent=self.window()
@@ -263,6 +264,8 @@ class EchoWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
+        self.tipsLabel = QLabel(self.tr("请勾选需要的功能项"), self.container)
+
         self.bossRushCheckBox = CheckBox(self.tr("刷BOSS:"), self.container)
         self.bossRushCheckBox.setChecked(True)
         self.bossRushWidget = BossRushWidget(self.container)
@@ -300,6 +303,8 @@ class EchoWidget(ScrollArea):
         self.__loadConfig()
 
     def __initLayout(self):
+        self.mainLayout.addWidget(self.tipsLabel)
+        self.mainLayout.addSpacing(20)
         self.mainLayout.addWidget(self.bossRushCheckBox)
         self.mainLayout.addWidget(self.bossRushWidget)
         self.mainLayout.addWidget(self.echoMergeCheckBox)

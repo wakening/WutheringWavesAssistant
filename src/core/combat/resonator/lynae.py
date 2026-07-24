@@ -407,13 +407,15 @@ class Lynae(BaseLynae):
             ["j", 0.05, 0.50],
             ["j", 0.05, 0.50],
             ["z", 1.50, 0.10],
-            ["j", 0.05, 0.50],
+            # ["j", 0.05, 0.50],
+            ["j", 0.05, 0.40],
+            ["d", 0.05, 0.05],
             # ["a", 0.05, 1.22],  # 拆分
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
             ["a", 0.00, 0.20],
             ["a", 0.00, 0.20],
-            ["w", 0.00, 0.37],
+            ["w", 0.00, 0.40],
         ]
 
     @combat_cache
@@ -421,13 +423,15 @@ class Lynae(BaseLynae):
         return [
             ["j", 0.05, 0.50],
             ["j", 0.05, 0.50],
-            ["j", 0.05, 0.50],
+            # ["j", 0.05, 0.50],
+            ["j", 0.05, 0.40],
+            ["d", 0.05, 0.05],
             # ["a", 0.05, 1.22],  # 拆分
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
             ["a", 0.00, 0.20],
             ["a", 0.00, 0.20],
-            ["w", 0.00, 0.37],
+            ["w", 0.00, 0.40],
         ]
 
     @combat_cache
@@ -504,6 +508,15 @@ class Lynae(BaseLynae):
             ["w", 0.00, 0.70],
         ]
 
+    @combat_cache
+    def Ra(self):
+        return [
+            ["R", 0.05, 4.00],
+            ["w", 0.00, 0.70],
+            ["a", 0.05, 0.00],
+            ["a", 0.05, 0.00],
+        ]
+
     def full_combo(self):
         # 测试用，一整套连招
         return self.COMBO_SEQ
@@ -557,7 +570,7 @@ class Lynae(BaseLynae):
                 # 溢彩能量没满
                 if is_resonance_liberation_ready and is_resonance_skill_ready:
                     self.combo_action(self.E(), True)
-                    self.combo_action(self.R(), True)
+                    self.combo_action(self.Ra(), True)
                     return
                 # 有大开大
                 elif is_resonance_liberation_ready:
@@ -621,8 +634,9 @@ class Lynae(BaseLynae):
             is_max_lumiflow = self.is_max_lumiflow(img)
             is_basic_attack_polychrome_leap_ready = self.is_basic_attack_polychrome_leap_ready(img)
             # 流光能量满，三跳下砸
+            random_z = self.random_float()
             if is_max_lumiflow:
-                if self.random_float() > 0.5:
+                if random_z > 0.7:
                     self.combo_action(self.kaleidoscopic_parade_2jzja(), True)
                 else:
                     self.combo_action(self.kaleidoscopic_parade_3ja(), True)
@@ -632,7 +646,7 @@ class Lynae(BaseLynae):
 
             # 折跃
             self.combo_action(self.kaleidoscopic_parade_j(), True)
-            if self.random_float() < 0.25:
+            if random_z < 0.25:
                 self.combo_action(self.kaleidoscopic_parade_z(), False)
 
             # 喷涂

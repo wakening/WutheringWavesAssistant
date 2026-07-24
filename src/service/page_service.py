@@ -303,7 +303,7 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         self._control_service.click(textbox.center)
         time.sleep(0.2)
         self._control_service.click(textbox.near)
-        time.sleep(0.5)
+        time.sleep(3)
         return True
 
     def _build_Login_AccountLogin(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):

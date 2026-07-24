@@ -552,7 +552,7 @@ class OcrQuery:
             img = self.ctx.img_service.screenshot()
         if roi and img is not None:
             if isinstance(roi, AnchorBBox):
-                roi = self.ctx.scaler.as_bbox(roi)
+                roi = Scaler(cur_wh=(img.shape[1], img.shape[0])).as_bbox(roi)
             img = img[roi.as_slice()]
         self.img = img
         self._is_query = False
@@ -614,12 +614,16 @@ class UIOp:
     """
 
     HOME_COLOR_POINT = [
-        # 任务
-        AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 153, Align.Top | Align.Left),
+        # # 任务
+        # AnchorPoint(14, 153, Align.Top | Align.Left), AnchorPoint(26, 153, Align.Top | Align.Left),
+        # 编队
+        AnchorPoint(157, 28, Align.Top | Align.Left), AnchorPoint(158, 44, Align.Top | Align.Left),
         # 背包
         AnchorPoint(212, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
         # # 飞讯
         # AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
+        # 索拉指南
+        AnchorPoint(993, 35, Align.Top | Align.Right),
         # # 先约电台
         # AnchorPoint(1114, 24, Align.Top | Align.Right),
         # 共鸣者
@@ -632,12 +636,9 @@ class UIOp:
         self.ctx = ctx
         self.oq: OcrQuery = OcrQuery(self.ctx)
         # 绑定页面，在指定页面内搜索，默认为全局公共页面
-        self.page_service = page_service if page_service else self.ctx.page_service
+        self.page_service = page_service
 
         # runtime
-
-        # 主页（大世界）
-        self.__home_color_match = None
         self._route_executor = RouteExecutor(self.ctx)
 
     # --------- ocr相关 ---------
@@ -683,7 +684,8 @@ class UIOp:
         :param page: 如：I18nPage.Terminal.PAGE
         :return:
         """
-        return self.page_service.is_match(self.ocr_result, page)
+        page_service = self.page_service if self.page_service else self.ctx.page_service
+        return page_service.is_match(self.ocr_result, page)
 
     def match_key(self, key: str, text: str):
         """
@@ -820,21 +822,16 @@ class UIOp:
         """条件等待"""
         return self.oq.wait(timeout, interval)
 
-    def __init_home_color_match(self):
-        rule = ColorRule().points(self.HOME_COLOR_POINT).colors(Color.bgr(255, 255, 255), 12, RuleMode.ALL)
-        self.__home_color_match = ColorMatch(self.ctx.scaler).rules(rule)
-
     def is_on_homepage(self, img: Optional[np.ndarray] = None) -> bool:
         """是否在主界面"""
-        if not self.__home_color_match:
-            self.__init_home_color_match()
-        return self.__home_color_match.match(img if img is not None else self.grap())
+        if img is None:
+            img = self.grap()
+        rule = ColorRule().points(self.HOME_COLOR_POINT).colors(Color.bgr(255, 255, 255), 12, RuleMode.ALL)
+        home_color_match = ColorMatch(Scaler(cur_wh=(img.shape[1], img.shape[0]))).rules(rule)
+        return home_color_match.match(img)
 
     def wait_back_home(self, timeout: int = 25, interval: float = 1.0, close_window: bool = False):
         """循环等待回到主界面"""
-        if not self.__home_color_match:
-            self.__init_home_color_match()
-
         self.activate()
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:

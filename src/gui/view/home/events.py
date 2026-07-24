@@ -330,7 +330,7 @@ class EventsWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        # self.tipsLabel = QLabel(self.tr("活动"), self.container)
+        self.tipsLabel = QLabel(self.tr("请勾选需要的功能项"), self.container)
 
         self.soarToTheBeatMacroTitle = QLabel(self.tr("沿着节拍启航:"), self.container)
         self.soarToTheBeatLayout = QVBoxLayout()
@@ -373,6 +373,7 @@ class EventsWidget(ScrollArea):
         self.soarToTheBeatLayout.addWidget(self.soarToTheBeatMacroRecordWidget)
         self.soarToTheBeatLayout.setContentsMargins(16, 10, 16, 10)
 
+        self.mainLayout.addWidget(self.tipsLabel)
         self.mainLayout.addWidget(self.soarToTheBeatMacroTitle)
         self.mainLayout.addLayout(self.soarToTheBeatLayout)
         self.mainLayout.addStretch()

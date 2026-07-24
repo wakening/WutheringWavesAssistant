@@ -13,7 +13,7 @@ from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, Mess
 
 from src.gui.view.notice_interface import NoticeInterface
 from src.gui.view.gallery_interface import GalleryInterface
-from src.gui.view.home_interface import HomeInterface, HomeV2Interface
+from src.gui.view.home_interface import HomeV2Interface
 from src.gui.view.param_interface import ParamInterface
 from src.gui.view.setting_interface import SettingInterface
 from src.gui.view.terminal_interface import TerminalInterface
@@ -42,7 +42,6 @@ class MainWindow(FluentWindow):
         # self.setStyleSheet("border: 2px solid red;")
 
         # create sub interface
-        # self.homeInterface = HomeInterface(self)
         self.homeInterface = HomeV2Interface(self)
         self.paramInterface = ParamInterface(self)
         self.noticeInterface = NoticeInterface(self)

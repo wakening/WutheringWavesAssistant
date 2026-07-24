@@ -363,7 +363,7 @@ class MainController:
 
         from src.core.tasks import MouseResetProcessTask, AutoBossProcessTask, AutoPickupProcessTask, \
             AutoStoryProcessTask, ProcessTask, SoarToTheBeatMacroReplayTask, \
-            SoarToTheBeatMacroRecordTask, DailyTask
+            SoarToTheBeatMacroRecordTask, DailyTask, ExploreTask
 
         self.tasks = {
             "MouseResetProcessTask": MouseResetProcessTask,
@@ -375,6 +375,7 @@ class MainController:
             "SoarToTheBeatMacroReplayTask": SoarToTheBeatMacroReplayTask,
             "SoarToTheBeatMacroRecordTask": SoarToTheBeatMacroRecordTask,
             "DailyTask": DailyTask,
+            "ExploreTask": ExploreTask,
         }
         self.running_tasks: Dict[str, Sequence] = {}
         self._lock = threading.Lock()

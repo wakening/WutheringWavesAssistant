@@ -152,6 +152,20 @@ class SIFTFeatureMatcher:
             descriptors=descriptors,
         )
 
+    def build_feature_data_masked(self, feature_id: str, image: np.ndarray) -> FeatureData:
+        """
+        构建特征数据
+        """
+
+        keypoints, descriptors = self._extract_features_masked(image)
+
+        return FeatureData(
+            feature_id=feature_id,
+            image=image,
+            keypoints=keypoints,
+            descriptors=descriptors,
+        )
+
     # =====================================================
     # Export
     # =====================================================
@@ -411,12 +425,13 @@ class SIFTFeatureMatcher:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             return self.sift.detectAndCompute(gray, None)
 
-    def identify_roles(
+    def identify_rolesV1(
             self,
             scene_image: np.ndarray,
             role_features_list: list[FeatureData],
             top_k: int = 5,  # 只对匹配点最多的前 K 个角色跑 RANSAC
             min_good_matches: int | None = None,  # 初筛阈值，默认等于 self.min_match_count
+            min_inliers: int | None = None,  # 阈值，默认等于 self.min_match_count
     ) -> list[FeatureMatchResult]:
         """
         批量识别角色（优化版）
@@ -425,14 +440,22 @@ class SIFTFeatureMatcher:
         """
         if min_good_matches is None:
             min_good_matches = self.min_match_count
+        min_good_matches = max(min_good_matches, 4)
+        if min_inliers is None:
+            min_inliers = self.min_match_count  # 默认与原阈值一致
+        min_inliers = max(min_inliers, 4)
 
-        # 1. 提取场景特征（使用带 Mask 的提取，支持透明图）
+        # =========================================================
+        # 1. 提取场景特征（支持透明图 Mask）
+        # =========================================================
         scene_kp, scene_desc = self._extract_features_masked(scene_image)
         if scene_desc is None or len(scene_kp) < min_good_matches:
             return []
 
-        # 2. 构建场景 FLANN 索引（一次性）
-        # 注意：使用新的匹配器实例，避免影响原有 self.matcher
+        # =========================================================
+        # 2. 构建场景 FLANN 索引（只构建一次！）
+        # =========================================================
+        # 注意：这里使用独立的 matcher 实例，避免污染 self.matcher 的默认状态
         scene_matcher = cv2.FlannBasedMatcher(
             dict(algorithm=1, trees=5),
             dict(checks=50)
@@ -440,44 +463,52 @@ class SIFTFeatureMatcher:
         scene_matcher.add([scene_desc])
         scene_matcher.train()
 
-        # 3. 快速初筛：对每个角色查询，统计 good matches 数量
-        candidates = []  # 元素: (good_matches_count, feature_data, good_matches_list, src_pts, dst_pts)
+        # =========================================================
+        # 3. 全量匹配 + Ratio Test（不截断！）
+        # =========================================================
+        candidates = []  # (good_count, feature_data, good_matches, src_pts, dst_pts)
 
         for fd in role_features_list:
             if fd.descriptors is None or len(fd.descriptors) < min_good_matches:
                 continue
 
-            # 使用预构建的场景索引进行查询（不传 train 参数）
+            # 利用预构建的索引进行快速查询（只传查询描述符，不传场景）
             matches = scene_matcher.knnMatch(fd.descriptors, k=2)
 
-            # 快速统计 good matches（只计数，不构建坐标数组，节省内存）
-            good_count = 0
             good_matches = []
             for m, n in matches:
                 if m.distance < self.ratio_test * n.distance:
-                    good_count += 1
                     good_matches.append(m)
-                    # 可以提前截断，如果已经超过 min_good_matches 即可停止计数
-                    if good_count >= min_good_matches:
-                        break
 
-            if good_count >= min_good_matches:
-                # 为后续 RANSAC 准备坐标（只对候选角色做）
-                src_pts = np.float32([fd.keypoints[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                dst_pts = np.float32([scene_kp[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                candidates.append((good_count, fd, good_matches, src_pts, dst_pts))
+            logger.debug(f"{fd.feature_id}, len: {len(good_matches)}, good_matches: {good_matches}")
+
+            # 只有当匹配数达标时，才构建坐标点集（节省内存）
+            if len(good_matches) >= min_good_matches:
+                src_pts = np.float32([
+                    fd.keypoints[m.queryIdx].pt for m in good_matches
+                ]).reshape(-1, 1, 2)
+                dst_pts = np.float32([
+                    scene_kp[m.trainIdx].pt for m in good_matches
+                ]).reshape(-1, 1, 2)
+
+                candidates.append((len(good_matches), fd, good_matches, src_pts, dst_pts))
 
         if not candidates:
             return []
 
-        # 4. 按 good_matches 数量降序排序，只取前 top_k 个候选跑 RANSAC
+        # =========================================================
+        # 4. 按匹配数排序，仅取 Top-K 进行 RANSAC（几何验证）
+        # =========================================================
         candidates.sort(key=lambda x: x[0], reverse=True)
         top_candidates = candidates[:top_k]
 
         results = []
+
         for _, fd, good_matches, src_pts, dst_pts in top_candidates:
-            # RANSAC + 评分函数
-            matrix, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, self.ransac_threshold)
+            # 4.1 计算单应性矩阵
+            matrix, mask = cv2.findHomography(
+                src_pts, dst_pts, cv2.RANSAC, self.ransac_threshold
+            )
             if matrix is None:
                 continue
 
@@ -485,44 +516,120 @@ class SIFTFeatureMatcher:
             if not success:
                 continue
 
+            # 4.2 统计内点
             inliers_mask = mask.ravel().tolist()
             inliers = sum(inliers_mask)
-            if inliers < self.min_match_count:
+            if inliers < min_inliers:  # 内点不足则丢弃
                 continue
 
             inlier_ratio = inliers / len(inliers_mask)
 
-            # 计算缩放、角点、中心、得分（复用原逻辑）
+            # 4.3 计算缩放
             scale_x = math.sqrt(matrix[0, 0] ** 2 + matrix[1, 0] ** 2)
             scale_y = math.sqrt(matrix[0, 1] ** 2 + matrix[1, 1] ** 2)
 
+            # 4.4 计算映射后的角点和中心
             h, w = fd.image.shape[:2]
-            corners = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
+            corners = np.float32([
+                [0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]
+            ]).reshape(-1, 1, 2)
             scene_corners = cv2.perspectiveTransform(corners, matrix)
+
             center_x = int(np.mean(scene_corners[:, 0, 0]))
             center_y = int(np.mean(scene_corners[:, 0, 1]))
 
+            # 4.5 计算综合评分（内点率 * log(内点数)，兼顾质量与数量）
             score = inlier_ratio * math.log(inliers + 1)
 
-            results.append(FeatureMatchResult(
-                feature_id=fd.feature_id,
-                matrix=matrix,
-                inverse_matrix=inv_matrix,
-                good_matches=good_matches,  # 这里用的是初筛时的 good_matches，可能包含所有点（包括离群点），但为了显示仍保留
-                scene_keypoints=scene_kp,
-                scene_descriptors=scene_desc,
-                scale_x=scale_x,
-                scale_y=scale_y,
-                inliers=inliers,
-                inlier_ratio=inlier_ratio,
-                score=score,
-                center=(center_x, center_y),
-                corners=scene_corners,
-            ))
+            results.append(
+                FeatureMatchResult(
+                    feature_id=fd.feature_id,
+                    matrix=matrix,
+                    inverse_matrix=inv_matrix,
+                    good_matches=good_matches,  # 这里保留了全部 good_matches，便于调试可视化
+                    scene_keypoints=scene_kp,
+                    scene_descriptors=scene_desc,
+                    scale_x=scale_x,
+                    scale_y=scale_y,
+                    inliers=inliers,
+                    inlier_ratio=inlier_ratio,
+                    score=score,
+                    center=(center_x, center_y),
+                    corners=scene_corners,
+                )
+            )
 
-        # 按得分排序
-        # results.sort(key=lambda x: x.score, reverse=True)
+        # =========================================================
+        # 5. 按置信度得分降序返回
+        # =========================================================
+        results.sort(key=lambda x: x.score, reverse=True)
         return results
+
+
+    def identify_roles(
+            self,
+            scene_image: np.ndarray,
+            role_features_list: list[FeatureData],
+            min_good_matches: int = 1,
+    ) -> list[str]:
+        top_k = 1
+        if min_good_matches < 1:
+            min_good_matches = 1
+
+        # =========================================================
+        # 1. 提取场景特征（支持透明图 Mask）
+        # =========================================================
+        scene_kp, scene_desc = self._extract_features_masked(scene_image)
+        if scene_desc is None or len(scene_kp) < min_good_matches:
+            return []
+
+        # =========================================================
+        # 2. 构建场景 FLANN 索引（只构建一次！）
+        # =========================================================
+        # 注意：这里使用独立的 matcher 实例，避免污染 self.matcher 的默认状态
+        scene_matcher = cv2.FlannBasedMatcher(
+            dict(algorithm=1, trees=5),
+            dict(checks=50)
+        )
+        scene_matcher.add([scene_desc])
+        scene_matcher.train()
+
+        # =========================================================
+        # 3. 全量匹配 + Ratio Test（不截断！）
+        # =========================================================
+        candidates = []  # (good_count, feature_data, good_matches, src_pts, dst_pts)
+
+        for fd in role_features_list:
+            if fd.descriptors is None or len(fd.descriptors) < min_good_matches:
+                continue
+
+            # 利用预构建的索引进行快速查询（只传查询描述符，不传场景）
+            matches = scene_matcher.knnMatch(fd.descriptors, k=2)
+
+            good_matches = []
+            for m, n in matches:
+                if m.distance < self.ratio_test * n.distance:
+                    good_matches.append(m)
+
+            logger.debug(f"{fd.feature_id}, len: {len(good_matches)}, good_matches: {good_matches}")
+            candidates.append((len(good_matches), fd, good_matches))
+
+        if not candidates:
+            return []
+
+        # =========================================================
+        # 4. 按匹配数排序，仅取 Top-K 进行 RANSAC（几何验证）
+        # =========================================================
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        top_candidates = candidates[:top_k]
+
+        results = []
+
+        for _, fd, good_matches in top_candidates:
+            results.append(fd.feature_id)
+
+        return results
+
 
     # =====================================================
     # Coord Mapping

@@ -503,7 +503,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
             self._control_service.click(*position.center)
             time.sleep(0.2)
             self._control_service.click(*position.random)
-            time.sleep(0.5)
+            time.sleep(3)
             return True
 
         login_page = Page(

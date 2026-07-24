@@ -15,6 +15,7 @@ class TaskId(str, Enum):
     DailyTask = "DailyTask"
     AutoBossProcessTask = "AutoBossProcessTask"
     AutoPickupProcessTask = "AutoPickupProcessTask"
+    ExploreTask = "ExploreTask"
     AutoStorySkipProcessTask = "AutoStorySkipProcessTask"
     AutoStoryEnjoyProcessTask = "AutoStoryEnjoyProcessTask"
     DailyActivityProcessTask = "DailyActivityProcessTask"

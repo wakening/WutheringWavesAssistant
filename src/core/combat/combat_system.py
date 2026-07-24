@@ -164,7 +164,7 @@ class CombatSystem:
                 # self.control_service.camera_reset()
             else:
                 cur_time = time.monotonic()
-                if cur_time - last_time >= 5:
+                if cur_time - last_time >= 1.5:
                     self.control_service.activate()
                 last_time = time.monotonic()
 
@@ -260,7 +260,7 @@ class CombatSystem:
             self.event.clear()
             # logger.debug("combat pause")
 
-    def set_resonators(self, resonator_names_zh: list[str | None]):
+    def set_resonators(self, resonator_names_zh: list[str | None], is_print: bool = True):
         resonators: list[BaseResonator] = []
         _resonators_names_en = []
         for name_zh in resonator_names_zh:
@@ -282,8 +282,9 @@ class CombatSystem:
             resonators.append(resonator_temp)
             _resonators_names_en.append(resonator_temp.resonator_name().name if resonator_temp else None)
 
-        logger.info(f"team_members: {_resonators_names_en}")
-        logger.info(f"编队: {resonator_names_zh}")
+        if is_print:
+            logger.info(f"team_members: {_resonators_names_en}")
+            logger.info(f"编队: {resonator_names_zh}")
         self.resonators = resonators
 
     def is_boss_health_bar_exist(self, img=None):

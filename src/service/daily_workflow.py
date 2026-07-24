@@ -1959,7 +1959,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
             # 前往战斗区域
             combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-            combat_system.set_resonators(ctx.shared.team_members)
+            combat_system.set_resonators(ctx.shared.team_members, is_print=False)
             combat_system.exit_special_state(Morph.Forced)
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 

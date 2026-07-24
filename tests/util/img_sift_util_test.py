@@ -290,7 +290,7 @@ def test_format():
     print(img.format)
 
 
-def test_identify_roles():
+def test_identify_rolesV1():
     hwnd = hwnd_util.get_hwnd()
     img = screenshot_util.screenshot(hwnd)
 
@@ -302,27 +302,31 @@ def test_identify_roles():
     cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi)
     scene_image = img[cur_roi.as_slice()]
 
-    matcher = SIFTFeatureMatcher()
+    matcher = SIFTFeatureMatcher(ransac_threshold=20)
 
     start_time = time.monotonic()
     role_features = []
-    path = file_util.get_assets_role_icon()
+    path = file_util.get_assets_avatar()
     for p in path.glob("*.png"):
         logger.debug(p.absolute())
         feature_image = img_util.read_img(p.absolute())
-        feature_data = matcher.build_feature_data(feature_id=p.name, image=feature_image)
+        feature_data = matcher.build_feature_data_masked(feature_id=p.name, image=feature_image)
         role_features.append(feature_data)
 
     use_time = time.monotonic() - start_time
     logger.debug("耗时: %s 秒", use_time)
 
     start_time = time.monotonic()
-    results = matcher.identify_roles(scene_image, role_features)
+    results = matcher.identify_rolesV1(scene_image, role_features, top_k=8, min_good_matches=4, min_inliers=4)
+    # results = matcher.identify_roles(scene_image, role_features, top_k=1, min_good_matches=4, min_inliers=4)
     use_time = time.monotonic() - start_time
     logger.debug("耗时: %s 秒", use_time)
 
     if not results:
         logger.debug("未识别到任何角色")
+        cv2.imshow("window_name", scene_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         return
 
     logger.debug(f"识别到 {len(results)} 个角色：")
@@ -369,3 +373,65 @@ def test_identify_roles():
             scene_image=scene_image,
             match_result=result,
         )
+
+
+def test_identify_rolesV2():
+    hwnd = hwnd_util.get_hwnd()
+    img = screenshot_util.screenshot(hwnd)
+
+    member_boxes = [
+        AnchorBBox(
+            AnchorPoint(1140, 116, Align.Top | Align.Right),
+            AnchorPoint(1280, 210, Align.Top | Align.Right),
+        ),
+        AnchorBBox(
+            AnchorPoint(1140, 210, Align.Top | Align.Right),
+            AnchorPoint(1280, 300, Align.Top | Align.Right),
+        ),
+        AnchorBBox(
+            AnchorPoint(1130, 300, Align.Top | Align.Right),
+            AnchorPoint(1280, 400, Align.Top | Align.Right),
+        ),
+    ]
+
+    for i, anchor_roi in enumerate(member_boxes):
+        h, w = img.shape[:2]
+        cur_roi = Scaler(cur_wh=(w, h)).as_bbox(anchor_roi)
+        scene_image = img[cur_roi.as_slice()]
+
+        matcher = SIFTFeatureMatcher()
+
+        start_time = time.monotonic()
+        role_features = []
+        path = file_util.get_assets_avatar()
+        for p in path.glob("*.png"):
+            logger.debug(p.absolute())
+            feature_image = img_util.read_img(p.absolute())
+            feature_data = matcher.build_feature_data_masked(feature_id=p.name, image=feature_image)
+            role_features.append(feature_data)
+
+        use_time = time.monotonic() - start_time
+        logger.debug("耗时: %s 秒", use_time)
+
+        start_time = time.monotonic()
+        results = matcher.identify_roles(scene_image, role_features)
+        use_time = time.monotonic() - start_time
+        logger.debug("耗时: %s 秒", use_time)
+
+        if not results:
+            logger.debug("未识别到任何角色")
+            return
+
+        logger.debug(f"识别到 {len(results)} 个角色：")
+        for i, feature_id in enumerate(results):
+            logger.debug(f"  - 角色ID: {feature_id}")
+            # logger.debug(f"  - 角色ID: {result.feature_id}")
+            # logger.debug(f"    得分: {result.score:.2f}")
+            # logger.debug(f"    中心位置: {result.center}")
+            # logger.debug(f"    内点数: {result.inliers}")
+
+            cv2.imshow(str(feature_id), scene_image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+

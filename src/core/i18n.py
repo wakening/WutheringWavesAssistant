@@ -498,10 +498,10 @@ I18N_TEXT = {
     },
 
     # ------- Resonator -------
-    # I18nText.Rover: {
-    #     Language.ZH: RegexStr(r"^漂泊者$", raw="漂泊者"),
-    #     Language.EN: RegexStr(flex_ws(r"^Rover$"), raw="Rover"),
-    # },
+    I18nText.Rover: {
+        Language.ZH: RegexStr(r"^漂泊者$", raw="漂泊者"),
+        Language.EN: RegexStr(flex_ws(r"^Rover$"), raw="Rover"),
+    },
     # I18nText.Generic: {
     #     Language.ZH: RegexStr(r"^Generic$", raw="Generic"),
     #     Language.EN: RegexStr(flex_ws(r"^Generic$"), raw="Generic"),
@@ -1836,15 +1836,15 @@ I18N_TEXT = {
 
     # ------- (Overworld) TacetDiscordNest -------
     I18nText.ClearTheTacetDiscordNest: {
-        Language.ZH: RegexStr(r"清?理聚落中的残象", raw="清理聚落中的残象"),
+        Language.ZH: RegexStr(r"清?理聚落中的残象?", raw="清理聚落中的残象"),
         Language.EN: RegexStr(flex_ws(r"Clear the Tacet Discord Nest"), raw="Clear the Tacet Discord Nest"),
     },
     I18nText.TacetDiscordNestCleared: {
-        Language.ZH: RegexStr(r"残?象聚落已清理", raw="残象聚落已清理"),
+        Language.ZH: RegexStr(r"残?象聚落已清理?", raw="残象聚落已清理"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
     },
     I18nText.ClearTheTacetDiscordNestMengzhou: {
-        Language.ZH: RegexStr(r"(清.|剿)残象聚落", raw="清剿残象聚落"),
+        Language.ZH: RegexStr(r"(清.|剿)残象聚落?", raw="清剿残象聚落"),
         Language.EN: RegexStr(flex_ws(r"Clear the Tacet Discord Nest"), raw="Clear the Tacet Discord Nest"),
     },
     I18nText.TacetDiscordNestClearedMengzhou: {
@@ -3211,11 +3211,15 @@ class I18nTr:
         self._lang = lang
 
     def __call__(self, text_key: str | list[str], lang: str | None = None):
+        if text_key is None:
+            return None
         if isinstance(text_key, str):
             return self.t(text_key, lang)
         return [self.t(key, lang) for key in text_key]
 
     def t(self, text_key: str, lang: str | None = None):
+        if text_key is None:
+            return None
         lang_map = I18N_TEXT.get(text_key)
         if not lang_map:
             return None

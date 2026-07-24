@@ -96,7 +96,7 @@ class EnjoyCard(QWidget):
 
         self.mainLayout = QVBoxLayout(self)
 
-        self.checkbox = CheckBox(self.tr("自动剧情"), self)
+        self.checkbox = CheckBox(self.tr("看剧情-自动剧情"), self)
         self.descLayout = QVBoxLayout()
 
         self.enjoyStoryDescLabel = QLabel(
@@ -138,6 +138,7 @@ class StoryWidget(ScrollArea):
 
         self.tipsLabel = QLabel(self.tr("战斗、跑图都需手动操作，不能代肝剧情！"), self.container)
         self.tipsLabel.setWordWrap(True)
+        self.tipsLabel2 = QLabel(self.tr("请勾选需要的功能项"), self.container)
 
         self.enjoyCard = EnjoyCard(self.container)
         self.skipCard = SkipCard(self.container)
@@ -172,6 +173,7 @@ class StoryWidget(ScrollArea):
 
     def __initLayout(self):
         self.mainLayout.addWidget(self.tipsLabel)
+        self.mainLayout.addWidget(self.tipsLabel2)
         self.mainLayout.addWidget(self.enjoyCard)
         self.mainLayout.addWidget(self.skipCard)
         self.mainLayout.addStretch()

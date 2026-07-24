@@ -50,6 +50,38 @@ class ExploreTask(BaseTask):
         )
 
 
+class AutoCombatProcessTask(ExploreTask):
+
+    def __init__(self, widget):
+        super().__init__(TaskId.ExploreTask, "AutoCombat", widget)
+
+
+class AutoCombatWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.task = AutoCombatProcessTask(self)
+
+        self.mainLayout = QVBoxLayout(self)
+
+        self.checkbox = CheckBox(self.tr("自动战斗:"), self)
+        self.descLabel = QLabel(
+            self.tr(
+                "用法：启动脚本，回到游戏，点击鼠标侧键，将自动战斗，再次点击侧键或ESC键，可停止战斗。\n"
+                "适用于日常锄地，跑到怪附近，点侧键后挂机，打完点侧键停下，上车去下一个点。"
+            ),
+            self
+        )
+        self.descLabel.setWordWrap(True)
+
+        self.descLayout = QHBoxLayout(self)
+        self.descLayout.addWidget(self.descLabel)
+        self.descLayout.setContentsMargins(30, 0, 0, 0)
+
+        self.mainLayout.addWidget(self.checkbox)
+        self.mainLayout.addLayout(self.descLayout)
+
+
 class AutoPickupProcessTask(ExploreTask):
 
     def __init__(self, widget):
@@ -87,19 +119,23 @@ class ExploreWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        self.tipsLabel = QLabel(self.tr("战斗、跑图都需手动操作，不能代肝大世界！"), self.container)
+        self.tipsLabel = QLabel(self.tr("跑图等都需手动操作，不能代肝大世界！"), self.container)
         self.tipsLabel.setWordWrap(True)
+        self.tipsLabel2 = QLabel(self.tr("请勾选需要的功能项，暂不支持多选"), self.container)
+
+        self.autoCombatWidget = AutoCombatWidget(self.container)
+        self.autoCombatWidget.checkbox.setChecked(True)
 
         self.autopickWidget = AutoPickupWidget(self.container)
-        self.autopickWidget.checkbox.setChecked(True)
 
         self.group = QButtonGroup(self.container)
         self.group.setExclusive(True)
+        self.group.addButton(self.autoCombatWidget.checkbox)
         self.group.addButton(self.autopickWidget.checkbox)
 
         self.__initWidget()
 
-        self.currentTask = self.autopickWidget.task
+        self.currentTask = self.autoCombatWidget.task
 
     def __initWidget(self):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -119,6 +155,8 @@ class ExploreWidget(ScrollArea):
 
     def __initLayout(self):
         self.mainLayout.addWidget(self.tipsLabel)
+        self.mainLayout.addWidget(self.tipsLabel2)
+        self.mainLayout.addWidget(self.autoCombatWidget)
         self.mainLayout.addWidget(self.autopickWidget)
         self.mainLayout.addStretch()
         self.mainLayout.setSpacing(20)
@@ -127,6 +165,8 @@ class ExploreWidget(ScrollArea):
     def __connectSignalToSlot(self):
         self.autopickWidget.checkbox.stateChanged.connect(
             lambda _: self.__onTaskChecked(self.autopickWidget.checkbox, self.autopickWidget.task))
+        self.autoCombatWidget.checkbox.stateChanged.connect(
+            lambda _: self.__onTaskChecked(self.autoCombatWidget.checkbox, self.autoCombatWidget.task))
 
     def __onTaskChecked(self, checkbox, currentTask):
         # logger.debug(f"echo __onTaskChecked: {checkbox.isChecked()}")

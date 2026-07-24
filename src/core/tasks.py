@@ -181,6 +181,11 @@ class DailyTask(ProcessTask):
         return daily_task
 
 
+class ExploreTask(ProcessTask):
+    def get_task(self, *args) -> Callable[..., None]:
+        return explore_task
+
+
 @dataclass
 class TaskMsg:
     task_name: Optional[str] = None
@@ -709,6 +714,36 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
             time.sleep(0.1)
         finally:
             logger.info(f"每日任务结束, task_id: {spec.task_id}")
+            release_press_key(ctx)
+
+    except Exception as e:
+        logger.exception(e)
+
+
+def explore_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
+    try:
+
+        ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
+        logger.info(f"探索任务开始运行, task_id: {spec.task_id}")
+
+        try:
+            from src.service.explore_workflow import ExploreWorkflow
+
+            wf = ExploreWorkflow(ctx)
+            wf.execute()
+
+        except KeyboardInterrupt as e:
+            logger.warning(f"KeyboardInterrupt: {e}")
+        except Exception as e:
+            logger.exception(e)
+            ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
+
+            # ctx.ipc.event_queue.put({
+            #     "task": {"ExploreTask": ["failed"]}
+            # }, block=True)
+            time.sleep(0.1)
+        finally:
+            logger.info(f"探索任务结束, task_id: {spec.task_id}")
             release_press_key(ctx)
 
     except Exception as e:
