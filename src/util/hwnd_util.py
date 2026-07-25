@@ -409,7 +409,9 @@ def set_window_left_top(hwnd=None):
 
 
 def set_window_below_another(hwnd, hwnd_another):
-    logger.debug("将窗口移动到左上角，并置于指定窗口下方")
+    # logger.debug("将窗口移动到左上角，并置于指定窗口下方")
+    if hwnd is None or hwnd_another is None:
+        return
     # 同时移动和改变Z序
     win32gui.SetWindowPos(
         hwnd,  # 当前窗口
@@ -428,6 +430,9 @@ def set_window_left_top_and_below_another(hwnd, hwnd_another):
     UE风格窗口移动：
     以“客户区左上角”为基准进行定位（自动补偿DWM/边框偏移）
     """
+    if hwnd is None or hwnd_another is None:
+        return
+
     # 1. 客户区左上角（屏幕坐标）
     cx, cy = win32gui.ClientToScreen(hwnd, (0, 0))
 
