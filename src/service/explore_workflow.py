@@ -1,9 +1,9 @@
+import ctypes
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 
-from pynput import mouse, keyboard
+import win32con
 
 from src.core.color import ColorRule, Color, RuleMode
 from src.core.combat.combat_system import CombatSystem
@@ -16,6 +16,57 @@ from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
 
 logger = logging.getLogger(__name__)
+
+
+class KeyListener:
+    def __init__(self, *, event, interval=0.001):
+        """
+        interval: 轮询间隔(秒)，建议 0.001~0.005
+        """
+        self.interval = interval
+        self.event = event
+        self._running = False
+        self._thread = None
+
+        self._callbacks = {}
+        self._last_state = {}
+
+    def register(self, vk, callback):
+        """
+        callback(vk, is_down)
+        """
+        self._callbacks[vk] = callback
+        self._last_state[vk] = False
+
+    def start(self):
+        if self._running:
+            return
+
+        self._running = True
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._running = False
+        if self._thread:
+            self._thread.join()
+
+    def join(self, timeout=None):
+        if self._thread:
+            self._thread.join(timeout)
+
+    def _loop(self):
+        while self._running and self.event.is_set():
+            for vk, callback in self._callbacks.items():
+                down = bool(ctypes.windll.user32.GetAsyncKeyState(vk) & 0x8000)
+
+                last = self._last_state[vk]
+
+                if down != last:
+                    self._last_state[vk] = down
+                    callback(vk, down)
+
+            time.sleep(self.interval)
 
 
 class ExploreWorkflow(AbstractWorkflow):
@@ -110,7 +161,6 @@ class ExploreWorkflow(AbstractWorkflow):
             "T_IconRoleHead150_70_UI.png": I18nText.YangyangXuanling,
             "T_IconRoleHead150_71_UI.png": I18nText.Suisui,
         }
-        self.worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="Worker")
         self.role_features = self.__init_role_features()
         self.count = 1
 
@@ -118,18 +168,16 @@ class ExploreWorkflow(AbstractWorkflow):
         try:
             logger.debug(f"task: {self.__class__.__name__}")
 
-            mouse_listener = mouse.Listener(on_click=self._on_click)
-            keyboard_listener = keyboard.Listener(on_press=self._on_press)
+            listener = KeyListener(event=self.ctx.runtime.stop_event, interval=0.005)
 
-            mouse_listener.start()
-            keyboard_listener.start()
+            listener.register(win32con.VK_XBUTTON1, self._on_click)
+            listener.register(win32con.VK_ESCAPE, self._on_press)
 
-            mouse_listener.join()
-            keyboard_listener.join()
+            listener.start()
+            listener.join()
+
         except Exception as e:
             raise e
-        finally:
-            self.worker.shutdown(wait=False)
 
     def __init_role_features(self):
         role_features = []
@@ -169,15 +217,9 @@ class ExploreWorkflow(AbstractWorkflow):
         white_count = sum(x for x in result)
         return min(white_count + 1, 3)
 
-    def _on_click(self, x, y, button, pressed):
-        if button == mouse.Button.x1:
-            if not pressed:  # 忽略弹起信号
-                return True
-            # 异步，及时返回，防止阻塞鼠标
-            self.worker.submit(self.__on_click, x, y, button, pressed)
-        return True
-
-    def __on_click(self, x, y, button, pressed):
+    def _on_click(self, button, pressed):
+        if not pressed:  # 忽略弹起信号
+            return True
         try:
             # logger.info(f"[{self.count:03d}] XButton1 在位置 ({x}, {y}) 被按下")
             with self.lock:
@@ -239,27 +281,23 @@ class ExploreWorkflow(AbstractWorkflow):
             logger.exception(e)
         return True
 
-    def _on_press(self, key):
-        if key == keyboard.Key.esc:
-            self.worker.submit(self.__on_press, key)
-        return True
-
-    def __on_press(self, key):
-        if key == keyboard.Key.esc:
-            try:
-                with self.lock:
-                    combat_system = self.combat_system
-                    self.combat_system = None
-                    if combat_system is not None:
-                        logger.info(f"[{self.count:03d}] ESC stop")
-                        self.count += 1
-                        combat_system.stop()
-                    else:
-                        logger.debug(f"[{self.count:03d}] ESC skip")
-            except KeyboardInterrupt as e:
-                return False
-            except StopError as e:
-                pass
-            except Exception as e:
-                logger.exception(e)
+    def _on_press(self, key, pressed):
+        if not pressed:  # 忽略弹起信号
+            return True
+        try:
+            with self.lock:
+                combat_system = self.combat_system
+                self.combat_system = None
+                if combat_system is not None:
+                    logger.info(f"[{self.count:03d}] ESC stop")
+                    self.count += 1
+                    combat_system.stop()
+                else:
+                    logger.info(f"[{self.count:03d}] ESC skip")
+        except KeyboardInterrupt as e:
+            return False
+        except StopError as e:
+            pass
+        except Exception as e:
+            logger.exception(e)
         return True
