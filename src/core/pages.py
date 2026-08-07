@@ -5,7 +5,7 @@ import time
 from abc import abstractmethod, ABC
 from functools import lru_cache
 from re import Pattern
-from typing import Callable, Dict, List, Optional, Any
+from typing import Callable, Dict, List, Optional, Any, Sequence
 
 import numpy as np
 from pydantic import BaseModel, Field, PrivateAttr
@@ -725,10 +725,12 @@ class UIOp:
 
     # --------- 点击页面相关 ---------
 
-    def click(self, x: int, y: int, times: int = 1, interval: float = 0.0):
+    def click(self, x: int, y: int, *, delay: float = 0.0, times: int = 1, interval: float = 0.0):
         """点击点"""
         if times < 1 or interval < 0:
             raise ValueError(f"Invalid value: {times} / {interval}")
+        if delay > 0:
+            self.sleep(delay)
         logger.debug(f"click: ({x}, {y}), {times}")
         for i in range(times):
             self.ctx.control_service.click(x, y)
@@ -736,22 +738,40 @@ class UIOp:
                 self.sleep(interval)
         return self
 
-    def click_point(self, point: Point, *, times: int = 1, interval: float = 0.0):
+    def click_point(
+            self,
+            point: Point | Sequence[int | float],
+            *,
+            delay: float = 0.0,
+            times: int = 1,
+            interval: float = 0.0
+    ):
         """点击点/逻辑点"""
         if isinstance(point, AnchorPoint):
             point = self.ctx.scaler.as_point(point)
-        self.click(point.x, point.y, times, interval)
+            self.click(point.x, point.y, delay=delay, times=times, interval=interval)
+        elif isinstance(point, Point):
+            self.click(point.x, point.y, delay=delay, times=times, interval=interval)
+        elif isinstance(point, Sequence) and len(point) >= 2:
+            self.click(int(point[0]), int(point[1]), delay=delay, times=times, interval=interval)
+        else:
+            raise ValueError(f"Invalid value")
         return self
 
     def click_bbox(
             self,
-            bbox: BBox | AnchorBBox,
+            bbox: BBox | AnchorBBox | Sequence[BBox | AnchorBBox],
             *,
             pk: PointKind = PointKind.CENTER,
+            delay: float = 0.0,
             times: int = 1,
             interval: float = 0.0
     ):
         """点击指定框内的点"""
+        if not bbox:
+            raise ValueError(f"bbox is empty")
+        if isinstance(bbox, Sequence):
+            bbox = bbox[0]
         if isinstance(bbox, AnchorBBox):
             bbox = self.ctx.scaler.as_bbox(bbox)
         if pk == PointKind.CENTER:
@@ -762,7 +782,7 @@ class UIOp:
             point = bbox.random
         else:
             raise ValueError("Unsupported PointKind")
-        self.click(point[0], point[1], times, interval)
+        self.click(point[0], point[1], delay=delay, times=times, interval=interval)
         return self
 
     def click_key(self, match: dict[str, BBox], key: str, pk: PointKind = PointKind.CENTER):
@@ -796,10 +816,8 @@ class UIOp:
         res = self.search(regex_str, roi)
         if not res:
             return False
-        if delay > 0:
-            self.sleep(delay)
-        logger.debug(f"click: {regex_str}")
-        self.click_bbox(res[0], pk=pk, times=times, interval=interval)
+        logger.debug(f"click: {regex_str} -> {res[0]}")
+        self.click_bbox(res[0], pk=pk, delay=delay, times=times, interval=interval)
         return True
 
     # --------- 等待相关 ---------

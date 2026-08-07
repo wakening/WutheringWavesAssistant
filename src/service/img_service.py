@@ -1,4 +1,5 @@
 import logging
+import time
 from enum import Enum
 
 import numpy as np
@@ -51,7 +52,9 @@ class ImgServiceImpl(ImgService):
     def _background_screenshot(self, region: tuple[int, int, int, int] | None = None) -> np.ndarray:
         try:
             return screenshot_util.screenshot(self._window_service.window)
-        except Exception:  # 重试一次
+        except Exception:
+            # 重试一次
+            time.sleep(0.05)
             return screenshot_util.screenshot(self._window_service.window)
 
     def match_template(self,

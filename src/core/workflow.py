@@ -355,6 +355,8 @@ class AbstractWorkflow(IWorkflow, ABC):
     def __init__(self, ctx: NodeContext, **kwargs):
         self.ctx = ctx
         self.start_node: Optional[str] = None
+        # 是否作为子工作流嵌入，此为开关，具体需要子类根据开关适配
+        self.embedding: bool = False
 
 
 class WorkflowEngine:

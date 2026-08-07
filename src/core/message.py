@@ -121,3 +121,152 @@ def make_sender(queue_or_bus, source: MsgSource, task_id: str):
     return send
 
 
+######## demo
+#
+# def worker_main(queue, task_id: str):
+#     send = make_sender(queue, MsgSource.WINDOW, task_id)
+#
+#     send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
+#
+#     for i in range(5):
+#         time.sleep(1)
+#         send(MsgType.STATS, step=i)
+#
+#     send(MsgType.TASK_STATUS, status=MsgTaskStatus.SUCCESS)
+#
+#
+# def run_small_task(bus: MessageBus, task_id: str):
+#     send = make_sender(bus, MsgSource.TASK, task_id)
+#
+#     send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
+#
+#     # do something...
+#
+#     send(MsgType.TASK_STATUS, status=MsgTaskStatus.SUCCESS)
+#
+#
+# class Server:
+#     def __init__(self):
+#         self.bus = MessageBus()
+#
+#         # 跨进程桥
+#         self.proc_bridge = ProcessBridge(self.bus)
+#         self.proc_bridge.start()
+#
+#         # 注册订阅
+#         self.bus.subscribe(self._handle_log, MsgType.LOG)
+#         self.bus.subscribe(self._handle_task, MsgType.TASK_STATUS)
+#
+#     def start_process_task(self):
+#         task_id = "task_" + str(int(time.time()))
+#
+#         p = multiprocessing.Process(
+#             target=worker_main,
+#             args=(self.proc_bridge.queue, task_id),
+#         )
+#         p.start()
+#
+#     def start_thread_task(self):
+#         task_id = "task_" + str(int(time.time()))
+#
+#         t = threading.Thread(
+#             target=run_small_task,
+#             args=(self.bus, task_id),
+#         )
+#         t.start()
+#
+#     def _handle_log(self, msg: Message):
+#         logger.info(f"[LOG][{msg.source.name}] {msg.data}")
+#
+#     def _handle_task(self, msg: Message):
+#         logger.info(f"[TASK][{msg.task_id}] {msg.data.get('status')}")
+
+# from PySide6.QtCore import QObject, Signal
+#
+#
+# class QtBridge(QObject):
+#     message_signal = Signal(object)
+#
+#     def handle(self, msg: Message):
+#         self.message_signal.emit(msg)
+#
+#
+#
+# @dataclass
+# class TaskInfo:
+#     task_id: str
+#     status: MsgTaskStatus
+#     source: MsgSource
+#
+#     progress: float = 0.0
+#     error: Optional[str] = None
+#
+#     start_time: float = field(default_factory=time.time)
+#     end_time: Optional[float] = None
+#
+#
+# import threading
+#
+#
+# class TaskManager:
+#     def __init__(self, bus: MessageBus):
+#         self._tasks = {}
+#         self._lock = threading.Lock()
+#
+#         # 订阅任务状态
+#         bus.subscribe(self._handle_task, MsgType.TASK_STATUS)
+#
+#     def _handle_task(self, msg: Message):
+#         task_id = msg.task_id
+#         status = msg.data.get("status")
+#
+#         with self._lock:
+#             if task_id not in self._tasks:
+#                 self._tasks[task_id] = TaskInfo(
+#                     task_id=task_id,
+#                     status=status,
+#                     source=msg.source
+#                 )
+#
+#             task = self._tasks[task_id]
+#
+#             # 更新状态
+#             task.status = status
+#
+#             if status == MsgTaskStatus.RUNNING:
+#                 task.start_time = msg.ts
+#
+#             elif status in (MsgTaskStatus.SUCCESS, MsgTaskStatus.FAILED):
+#                 task.end_time = msg.ts
+#
+#             # 可选字段
+#             if "progress" in msg.data:
+#                 task.progress = msg.data["progress"]
+#
+#             if "error" in msg.data:
+#                 task.error = msg.data["error"]
+#
+#     # ========= 对外接口 =========
+#
+#     def get(self, task_id: str) -> Optional[TaskInfo]:
+#         with self._lock:
+#             return self._tasks.get(task_id)
+#
+#     def list_all(self):
+#         with self._lock:
+#             return list(self._tasks.values())
+#
+#     def is_running(self, task_id: str) -> bool:
+#         t = self.get(task_id)
+#         return t and t.status == MsgTaskStatus.RUNNING
+#
+#
+# class Server:
+#     def __init__(self):
+#         self.bus = MessageBus()
+#
+#         self.proc_bridge = ProcessBridge(self.bus)
+#         self.proc_bridge.start()
+#
+#         # 加这一行
+#         self.task_manager = TaskManager(self.bus)

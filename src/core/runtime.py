@@ -98,6 +98,7 @@ class DailyRuntimeConfig:
         self.tacetDiscordNestOpen: bool = bool(cfg.tacetDiscordNestOpen)
         self.activity: bool = bool(cfg.activity)
         self.activityOpen: bool = bool(cfg.activityOpen)
+        self.activityWeeklyOpen: bool = True
         self.mail: bool = bool(cfg.mail)
         self.mailOpen: bool = bool(cfg.mailOpen)
         self.pioneerPodcast: bool = bool(cfg.pioneerPodcast)
@@ -239,11 +240,12 @@ class GameRuntimeConfig:
     def device(self) -> Device:
         device = self._cfg.device
         if not device:
+            logger.info(f"Device: '{Device.Auto.value}'")
             return Device.Auto
         try:
             device = Device(device)
         except Exception:
-            logger.warning(f"Invalid device: '{self._cfg.device}', using default: {Device.Auto}")
+            logger.warning(f"Invalid device: '{self._cfg.device}', using default: {Device.Auto.value}")
             return Device.Auto
         logger.info(f"Device: '{device.value}'")
         return device

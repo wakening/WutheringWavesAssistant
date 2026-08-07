@@ -100,6 +100,7 @@ class DailyConfig(ConfigBase):
     tacetDiscordNestOpen: bool | None = None
     activity: str | None = None
     activityOpen: bool | None = None
+    activityWeeklyOpen: bool | None = None
     mail: str | None = None
     mailOpen: bool | None = None
     pioneerPodcast: str | None = None

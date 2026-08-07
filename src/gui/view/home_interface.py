@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget
 from packaging.version import Version
 
@@ -14,6 +14,7 @@ from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, Indeterminate
 from src import __version__
 from src.gui.common.config import paramConfig
 from src.gui.common.globals import GlobalSignal, globalSignal
+from src.gui.common.signal_bus import signalBus
 from src.gui.view.home.daily import DailyWidget
 from src.gui.common.style_sheet import StyleSheet
 from src.gui.view.home.echo import EchoWidget
@@ -130,6 +131,7 @@ class BasicSettingWidget(QWidget):
         # self.gamePathComboBox = ComboBox(self.scrollWidget)
         # TODO 订阅消息总线，实时写入当前任务消息
         self.messageEdit = TextEdit(self)
+        self.messageEdit.setReadOnly(True)
 
         # self.descriptionEdit.setReadOnly(True)
         # self.descriptionEdit.setHtml("""
@@ -168,6 +170,7 @@ class BasicSettingWidget(QWidget):
     def __connectSignalToSlot(self):
         self.langComboBox.currentIndexChanged.connect(self.__onLangComboBoxChanged)
         self.deviceComboBox.currentIndexChanged.connect(self.__onDeviceComboBoxChanged)
+        signalBus.homeMessageSignal.connect(self.__onMessageChanged)
 
     def __onLangComboBoxChanged(self, index):
         paramConfig.set(paramConfig.gameLanguage, self.langComboBox.currentData())
@@ -175,6 +178,13 @@ class BasicSettingWidget(QWidget):
 
     def __onDeviceComboBoxChanged(self, index):
         paramConfig.set(paramConfig.device, self.deviceComboBox.currentData())
+
+    def __onMessageChanged(self, msg):
+        scrollbar = self.messageEdit.verticalScrollBar()
+        is_at_bottom = scrollbar.value() == scrollbar.maximum()
+        self.messageEdit.append(f"{datetime.now().strftime("%H:%M:%S")} - {msg}")
+        if is_at_bottom:
+            scrollbar.setValue(scrollbar.maximum())
 
     def __loadConfig(self):
         self.langComboBox.setCurrentIndex(
@@ -286,6 +296,10 @@ class BottomWidget(CardWidget):
 
         self.__connectSignalToSlot()
 
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.__updateTipsText)
+        self.timer.start(5000)
+
     def __connectSignalToSlot(self):
         self.button.clicked.connect(self.__onButtonClicked)
         globalSignal.taskChangedSignal.connect(self.__onTaskChanged)
@@ -338,11 +352,14 @@ class BottomWidget(CardWidget):
         self.currentTask = currentTask
         logger.debug(f"Current task: {self.currentTask}")
 
-        self.tipsLabel.setText(self.__tipsText())
+        self.__updateTipsText()
 
     def __on_task_finished(self, task_name):
         logger.debug(f"task_finished: {task_name}")
-        self._submittedTask = None
+
+        if self._submittedTask is not None:
+            signalBus.homeMessageSignal.emit(f"{self.tr("Stop")} {self._submittedTask.name}")
+            self._submittedTask = None
 
         self.spinner.stop()
         self.spinner.reset()
@@ -351,6 +368,9 @@ class BottomWidget(CardWidget):
         self.button.blockSignals(True)
         self.button.setChecked(False)
         self.button.blockSignals(False)
+
+    def __updateTipsText(self):
+        self.tipsLabel.setText(self.__tipsText())
 
     def __tipsText(self) -> str:
         # 双倍提醒

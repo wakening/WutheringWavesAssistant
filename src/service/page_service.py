@@ -103,6 +103,13 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
             I18nPage.SystemNotice_UpdateCompleteConfirm.PAGE: self._build_SystemNotice_UpdateCompleteConfirm,
             I18nPage.SystemNotice_Confirm_DriverVersion.PAGE: self._build_SystemNotice_Confirm_DriverVersion,
             I18nPage.SystemNotice_NetworkTimeout.PAGE: self._build_SystemNotice_NetworkTimeout,
+            I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.PAGE: self._build_PhantasmaDreamlandRhapsody_CurrentPhase,
+            I18nPage.PhantasmaDreamlandRhapsody_Pause.PAGE: self._build_PhantasmaDreamlandRhapsody_Pause,
+            I18nPage.PhantasmaDreamlandRhapsody_Leave.PAGE: self._build_PhantasmaDreamlandRhapsody_Leave,
+            I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.PAGE: self._build_PhantasmaDreamlandRhapsody_PhaseResult,
+            I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.PAGE: self._build_PhantasmaDreamlandRhapsody_ChallengeFinished,
+            I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.PAGE: self._build_PhantasmaDreamlandRhapsody_Pick1Of3,
+            I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.PAGE: self._build_PhantasmaDreamlandRhapsody_StrangeEncounters,
         }
 
     def matches(self, ocr_result: OcrResult) -> dict[str, dict[str, TextBox]]:
@@ -395,6 +402,55 @@ class PageServiceImpl(AbstractPageService, GlobalPageService):
         self._control_service.click(textbox.center)
         time.sleep(2)
         return True
+
+    def _build_PhantasmaDreamlandRhapsody_CurrentPhase(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.Confirm)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_Pause(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_Pause.Finalize)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_Leave(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_Leave.Confirm)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_PhaseResult(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.Confirm)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_ChallengeFinished(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.Return)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_Pick1Of3(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Skip)
+        self._control_service.click(textbox.center)
+        time.sleep(0.5)
+        return True
+
+    def _build_PhantasmaDreamlandRhapsody_StrangeEncounters(self, bbox_map: dict[str, TextBox], ocr_result: OcrResult, **kwargs):
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.ImNotInterestedInThis)
+        self._control_service.click(textbox.center)
+        time.sleep(0.2)
+        self._control_service.click(textbox.center)
+        time.sleep(0.2)
+        textbox = bbox_map.get(I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.Confirm)
+        self._control_service.click(textbox.center)
+        time.sleep(0.4)
+        return True
+
+
 
 
 class EchoMergeServiceImpl(AbstractPageService, EchoMergeService):

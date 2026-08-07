@@ -65,8 +65,8 @@ class ProcessTask(ABC):
 
     def stop(self, timeout=3):
         self._end_time = datetime.now()
-        elapsed_time = (self._end_time - self._start_time).total_seconds()
-        hours, remainder = divmod(elapsed_time, 3600)
+        elapsed_seconds = (self._end_time - self._start_time).total_seconds()
+        hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         logger.info(f"[{self.name}] 任务结束，已运行: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
         self._stop(timeout=timeout)

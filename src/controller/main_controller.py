@@ -15,7 +15,7 @@ from src.config.gui_config import ParamConfig
 from src.core import environs
 from src.core.contexts import Context
 from src.core.exceptions import StopError
-from src.core.message import ProcessBridge, MessageBus
+from src.core.message import ProcessBridge, MessageBus, MsgSource
 from src.core.tasks import EchoMergeProcessTask
 from src.core.workflow import TaskSpec, IPCManager
 from src.util import hwnd_util, file_util
@@ -389,6 +389,8 @@ class MainController:
         # 跨进程桥
         self.proc_bridge = ProcessBridge(self.msg_bus)
         self.proc_bridge.start()
+        # 注册订阅
+        # self.msg_bus.subscribe(lambda _msg: logger.warning(_msg), source=MsgSource.DAILY_TASK)
 
     def execute(self, task_name: str, task_ops: str):
         logger.debug("task_name: %s, task_ops: %s", task_name, task_ops)

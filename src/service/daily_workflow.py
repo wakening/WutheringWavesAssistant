@@ -10,7 +10,7 @@ from src.core.combat.combat_system import CombatSystem
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
 from src.core.i18n import I18nText, Language, I18nTr
-from src.core.message import MsgType, MsgTaskStatus
+from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk
 from src.core.pages import I18nPage, UIOp
 from src.core.resonator import Resonator
@@ -150,12 +150,11 @@ class TaskLocal:
         )
 
         # ------- Guidebook -------
-        self.activityFSM: TaskFSM = TaskFSM(name=I18nText.Activity)
-        # self.activityFSM: TaskFSMGroup = TaskFSMGroup(
-        #     self.activityDailyFSM,
-        #     # self.activityWeeklyFSM,
-        #     name=I18nText.Activity
-        # )
+        self.activityFSM: TaskFSMGroup = TaskFSMGroup(
+            self.activityDailyFSM,
+            self.activityWeeklyFSM,
+            name=I18nText.Activity
+        )
         self.materialsSpotsFSM: TaskFSMGroup = TaskFSMGroup(
             self.forgeryChallengeFSM,
             self.simulationChallengeFSM,
@@ -222,6 +221,11 @@ class NodeName:
     doPathOfGrowth = "doPathOfGrowth"
     doEnemyTracing = "doEnemyTracing"
     doMilestones = "doMilestones"
+
+    # doActivity
+    doActivityDaily = "doActivityDaily"
+    doActivityWeekly = "doActivityWeekly"
+    doPhantasmaDreamlandRhapsody = "doPhantasmaDreamlandRhapsody"
 
     # doMaterialsSpots
     doForgeryChallenge = "doForgeryChallenge"
@@ -396,8 +400,8 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         AnchorPoint(1280, 720, Align.Right | Align.Bottom)
     ))
     if ui.sleep(0.8).wait(5, 0.5).until(
-        lambda: ui.snapshot().search(
-            ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle]))):
+            lambda: ui.snapshot().search(
+                ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle]))):
         if ui.search(ctx.tr(I18nText.CannotPerformThisActionDuringBattle)):
             logger.info(f"Team locked")
             return False
@@ -560,10 +564,14 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
             for i in range(2):
                 icon_point = search_icon_materials_spots(ctx)
                 if not icon_point:
-                    logger.warning(f"materialsSpots icon not found")
-                    return None
-                ui.click(*icon_point, times=2, interval=0.3)
+                    if i == 0:
+                        continue
+                    else:
+                        logger.warning(f"materialsSpots icon not found")
+                        return None
+                ui.click_point(icon_point, times=2, interval=0.3)
                 if ui.sleep(0.2).wait(2, 0.3).until(lambda: ui.snapshot().search(materialsSpots, title_roi)):
+                    ui.sleep(0.3)
                     break
 
             # for i in materialsSpotsSidebar:
@@ -583,29 +591,46 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         return I18nText.Milestones
     if local.activityFSM.is_active:
         # 活跃行迹
-        if not ui.search(activity, title_roi):
-            ui.click_point(activitySidebar, times=2, interval=0.2).sleep(0.5)
+        tab_text = ctx.tr([I18nText.ActivityDaily, I18nText.ActivityWeekly])
+        if ui.search(activity, title_roi) and ui.search(tab_text):
+            pass
+        else:
+            ui.click_point(activitySidebar, times=2, interval=0.3)
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot() and ui.search(activity, title_roi) and ui.search(tab_text)):
+                return None
+            ui.sleep(0.3)
         return I18nText.Activity
 
     return None
 
 
 @node(NodeName.doActivity)
-def doActivity(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+def doActivity(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     """活跃行迹"""
-    if local.activityFSM.is_terminal:
+    if local.activityDailyFSM.is_active:
+        return I18nText.ActivityDaily
+    if local.activityWeeklyFSM.is_active:
+        return I18nText.ActivityWeekly
+    return None
+
+
+@node(NodeName.doActivityDaily)
+def doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    """活跃度"""
+    if local.activityDailyFSM.is_terminal:
         return True
-    in_progress = local.activityFSM.status == TaskStatus.IN_PROGRESS
-    if local.activityFSM.status == TaskStatus.PENDING:
-        local.activityFSM.start()
+    in_progress = local.activityDailyFSM.status == TaskStatus.IN_PROGRESS
+    if local.activityDailyFSM.status == TaskStatus.PENDING:
+        local.activityDailyFSM.start()
 
     ui = UIOp(ctx)
     ui.snapshot()
 
     def _fail_return():
-        ui.esc().sleep(1)
+        # ui.esc().sleep(1)
         if in_progress:
-            local.activityFSM.fail()
+            local.activityDailyFSM.fail()
             return True
         return False
 
@@ -621,72 +646,113 @@ def doActivity(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     roi_bottom_activity_pts = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(0, 575, Align.Bottom | Align.Left), AnchorPoint(400, 720, Align.Bottom | Align.Left)))
 
-    for i in range(2):
-        ui.sleep(0.35)
-        if ui.search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts):
-            __doActivityDaily(ctx, local, **kwargs)
-            if not ui.click_text(ctx.tr(I18nText.ActivityWeekly), roi_tab, delay=0.2, times=2, interval=0.2):
-                return _fail_return()
-            if ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts)):
-                continue
+    # 可能在 活跃度 或 周度游历，切换到标签页
+    if not ui.search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts):
+        if not ui.click_text(ctx.tr(I18nText.ActivityDaily), roi_tab, delay=0.3, times=2, interval=0.3):
             return _fail_return()
-        elif ui.search(ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts):
-            __doActivityWeekly(ctx, local, **kwargs)
-            if not ui.click_text(ctx.tr(I18nText.ActivityDaily), roi_tab, delay=0.2, times=2, interval=0.2):
-                return _fail_return()
-            if ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts)):
-                continue
-            return _fail_return()
-        else:
-            logger.warning(
-                f"Text not found: {[ctx.tr(I18nText.ActivityPts).raw, ctx.tr(I18nText.WeeklyActivityPts).raw]}")
+        if not ui.wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts)):
             return _fail_return()
 
+    # 领取活跃点
+    claim_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(1020, 130, Align.Right | Align.Top),
+        AnchorPoint(1280, 586, Align.Right | Align.Bottom))
+    )
+    res_claim = ui.search(ctx.tr(I18nText.ActivityClaim), claim_roi)
+    if not res_claim:
+        res_claim = ui.sleep(0.3).snapshot().search(ctx.tr(I18nText.ActivityClaim), claim_roi)
+    if res_claim:
+        res_claim.sort(key=lambda p: p.y1)
+        ui.click_bbox(res_claim, delay=0.3)
+        ui.sleep(0.5).wait().until(
+            lambda: not ui.snapshot().search(ctx.tr(I18nText.ActivityClaim), claim_roi))
+
+    # 领取活跃点奖励
+    result = __doClaimActivityPts(ctx, local, 6, 20)
+
+    if not result:
+        return _fail_return()
     # 不管活跃度满没满都算完成
-    local.activityFSM.complete()
+    local.activityDailyFSM.complete()
     return True
 
 
-def __doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    """活跃度"""
-    fsm = local.activityDailyFSM
-    num_points = 6
-    increment = 20
-    claim_item = True
-    return __doClaimActivityPts(ctx, local, fsm, num_points, increment, claim_item, **kwargs)
-
-
-def __doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+@node(NodeName.doActivityWeekly)
+def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[bool]:
     """周度游历"""
-    fsm = local.activityWeeklyFSM
-    num_points = 7
-    increment = 1000
-    claim_item = False
-    return __doClaimActivityPts(ctx, local, fsm, num_points, increment, claim_item, **kwargs)
-
-
-def __doClaimActivityPts(
-        ctx: NodeContext, local: TaskLocal,
-        fsm: TaskFSM, num_points: int, increment: int, claim_item: bool,
-        **kwargs
-) -> bool:
-    """领取活跃点"""
-    if fsm.is_terminal:
+    if local.activityWeeklyFSM.is_terminal:
         return True
-    in_progress = fsm.status == TaskStatus.IN_PROGRESS
-    if fsm.status == TaskStatus.PENDING:
-        fsm.start()
+    in_progress = local.activityWeeklyFSM.status == TaskStatus.IN_PROGRESS
+    if local.activityWeeklyFSM.status == TaskStatus.PENDING:
+        local.activityWeeklyFSM.start()
 
     ui = UIOp(ctx)
     ui.snapshot()
 
     def _fail_return():
+        # ui.esc().sleep(1)
         if in_progress:
-            fsm.fail()
+            local.activityWeeklyFSM.fail()
+        return True
+
+    # 校验是否在活跃度页面
+    if not ui.search(ctx.tr(I18nText.Activity), bbox_guidebook_title(ctx)):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.Activity).raw}")
+        return _fail_return()
+
+    # 上方活跃度、周度游历标签文字
+    roi_tab = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Top | Align.Left), AnchorPoint(610, 130, Align.Top | Align.Left)))
+    # 左下角活跃度、游历值文字
+    roi_bottom_activity_pts = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 575, Align.Bottom | Align.Left), AnchorPoint(400, 720, Align.Bottom | Align.Left)))
+
+    # 可能在 活跃度 或 周度游历，切换到标签页
+    if ui.search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts) or not ui.search(
+            ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts):
+        if not ui.click_text(ctx.tr(I18nText.ActivityWeekly), roi_tab, delay=0.3, times=2, interval=0.3):
+            return _fail_return()
+        if not ui.wait().until(
+                lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts)):
+            return _fail_return()
+
+    # 领取活跃点奖励
+    res_claim = __doClaimActivityPts(ctx, local, 7, 1000)
+
+    # 点击幻梦游园·狂想
+    if not ui.wait().until(lambda: ui.snapshot().click_text(
+            ctx.tr(I18nText.PhantasmaDreamlandRhapsody), delay=0.2, times=2, interval=0.2)):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.PhantasmaDreamlandRhapsody).raw}")
+        return _fail_return()
+
+    # 等待游戏主页
+    if not ui.sleep(0.3).wait().until(
+            lambda: ui.snapshot()
+                    and ui.search(ctx.tr(I18nText.PdrDreamGallery))
+                    and ui.search(ctx.tr(I18nText.PdrWeeklyActivityPts))):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.PdrDreamGallery).raw}")
+        return _fail_return()
+
+    # 检查游历值
+    pts_roi = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Left | Align.Top),
+        AnchorPoint(235, 200, Align.Left | Align.Top)
+    ))
+    if ui.sleep(0.3).snapshot().search(ctx.tr(I18nText.PdrLimitReached), pts_roi):
+        logger.info(f"Weekly Activity Pts: {ctx.tr(I18nText.PdrLimitReached).raw}")
+        if res_claim:
+            local.activityWeeklyFSM.complete()
             return True
-        return False
+        return _fail_return()
+
+    # 刷幻梦游园·狂想
+    return False
+
+
+def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, increment: int) -> bool:
+    """领取活跃点奖励"""
+
+    ui = UIOp(ctx)
 
     max_pts = (num_points - 1) * increment
     # 0-100两端对齐等分布局
@@ -703,45 +769,39 @@ def __doClaimActivityPts(
     yellow = Color.bgr(164, 231, 254)
     grey = Color.bgr(106, 105, 101)
 
+    img = ui.sleep(0.3).grap()
+
     # 检查100活跃点是否为灰色已领取
-    if ColorRule().points(pts_sp[num_points - 1]).colors(grey).match(ui.img):
+    if ColorRule().points(pts_sp[num_points - 1]).colors(grey).match(img):
         logger.info(rf"Activity Pts >= {max_pts}")
-        fsm.complete()
         return True
 
     # 检查100活跃点是否为黄色待领取
-    if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(ui.img):
-        if ui.click_point(pts_sp[num_points - 1]).sleep(0.5).wait().until(
-                lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.2)):
-            ui.sleep(0.5)
+    if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(img):
+        ui.click_point(pts_sp[num_points - 1], times=2, interval=0.2)
+        if not ui.sleep(0.5).wait().until(
+                lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+            return False
+        ui.sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
-        fsm.complete()
         return True
 
-    # 活跃度未满100，先领取活跃点
-    if claim_item:
-        claim_roi = ctx.scaler.as_bbox(AnchorBBox(
-            AnchorPoint(1020, 130, Align.Right | Align.Top), AnchorPoint(1280, 586, Align.Right | Align.Bottom)))
-        if result := ui.search(ctx.tr(I18nText.ActivityClaim), claim_roi):
-            result.sort(key=lambda p: p.y1)
-            if ui.click_bbox(result[0]).sleep(0.6).wait().until(
-                    lambda: not ui.snapshot().search(ctx.tr(I18nText.ActivityClaim), claim_roi)):
-                ui.sleep(0.4)
-
-    # 逐个点击黄色的活跃点
+    # 遍历，找出黄色的活跃点，点击领取
     idx = 0
     for i in range(len(pts_sp) - 1, -1, -1):
         if i == 0:
             break
         # 检查活跃点是否为黄色待领取
-        if ColorRule().points(pts_sp[i]).colors(yellow).match(ui.img):
-            if not ui.click_point(pts_sp[i]).sleep(0.5).wait().until(
-                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.2)):
-                return _fail_return()
+        if ColorRule().points(pts_sp[i]).colors(yellow).match(img):
+            ui.click_point(pts_sp[i], times=2, interval=0.2)
+            if not ui.sleep(0.5).wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                return False
+            ui.sleep(0.3)
             idx = i
             break
         # 检查活跃点是否为灰色已领取
-        if ColorRule().points(pts_sp[i]).colors(grey).match(ui.img):
+        if ColorRule().points(pts_sp[i]).colors(grey).match(img):
             idx = i
             break
 
@@ -753,14 +813,42 @@ def __doClaimActivityPts(
     else:
         logger.warning(rf"Activity Pts: {cur_pts}")
 
-    # 不管活跃度满没满都算完成
-    fsm.complete()
+    return True
+
+
+@node(NodeName.doPhantasmaDreamlandRhapsody)
+def doPhantasmaDreamlandRhapsody(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    """幻梦游园·狂想"""
+    from src.core import message
+    from src.core.runtime import RuntimeConfig
+    from src.service.phantasma_dreamland_rhapsody_workflow import PhantasmaDreamlandRhapsodyWorkflow
+
+    pctx = ctx
+    spec = ctx.spec
+    ipc = ctx.ipc
+    event = ctx.runtime.stop_event
+    container = ctx._container
+    source = MsgSource.DAILY_TASK
+
+    # 创建新的上下文
+    ctx = NodeContext()
+    ctx.spec = spec
+    ctx.ipc = ipc
+    ctx.runtime.stop_event = event
+    ctx.runtime.cfg = RuntimeConfig(spec.user_config)
+    ctx.runtime.send = message.make_sender(ipc.proc_queue, source, spec.task_id)
+
+    ctx._container = container
+
+    wf = PhantasmaDreamlandRhapsodyWorkflow(ctx)
+    wf.embedding = True
+    wf.execute()
     return True
 
 
 @node(NodeName.doMaterialsSpots)
 def doMaterialsSpots(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
-    # TODO 双倍流程， 双倍材料、无音区 > 周本 > 材料、无音区
+    # TODO 双倍流程？
     if local.weeklyChallengeFSM.is_active:
         return I18nText.WeeklyChallenge
     if local.forgeryChallengeFSM.is_active:
@@ -1509,7 +1597,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 本周剩余可收取次数: 3/3
     result = ui.sleep(0.2).wait().until(
         lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
-        # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
+    # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
     remain, max_remain = match_remaining_attempts(result)
     if remain is None or not max_remain:
         return _fail_return()
@@ -1588,66 +1676,6 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if not ui.sleep(0.3).wait().until(
             lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.2, times=2, interval=0.3)):
         return _fail_return()
-
-    # # 选择合适的推荐等级
-    # logger.debug("# 选择合适的推荐等级")
-    # level_roi = AnchorBBox(
-    #     AnchorPoint(0, 0, Align.Left | Align.Top), AnchorPoint(440, 720, Align.Left | Align.Bottom))
-    # level_bboxes = ui.search(ctx.tr(I18nText.WeeklySuggestedLv), level_roi)
-    # if not level_bboxes:
-    #     return _fail_return()
-    # level_bboxes.sort(key=lambda p: p.y1)
-    #
-    # # 选择合适的副本等级
-    # logger.debug("# 选择要刷的副本等级")
-    # conf_level = "Auto"
-    # pattern = re.compile(r"(\d)[0-9o]", flags=re.I)
-    #
-    # # 提取推荐等级
-    # logger.debug("# 提取推荐等级")
-    # level_map = {}
-    # for tbox in level_bboxes:
-    #     match = pattern.search(tbox.text)
-    #     if not match:
-    #         continue
-    #     logger.debug(f"match: {match.group(0)}")
-    #     level_map[int(f"{match.group(1)}0")] = tbox
-    #
-    # start_challenge_clicked = False
-    # notice_keywords = ctx.tr([I18nText.StartChallenge, I18nText.YourCurrentSol3Phase])
-    # if conf_level != "Auto":
-    #     suggested_lv = level_map.get(conf_level)
-    #     if not suggested_lv:
-    #         return _fail_return()
-    #     ui.sleep(0.5).click_bbox(suggested_lv, times=2, interval=0.3).sleep(0.5)
-    #     if not ui.wait().until(lambda: ui.snapshot().search(notice_keywords)):
-    #         return _fail_return()
-    #     if ui.search(ctx.tr(I18nText.YourCurrentSol3Phase)):
-    #         ui.esc().sleep(0.3)
-    #     elif ui.click_text(ctx.tr(I18nText.StartChallenge)):
-    #         start_challenge_clicked = True
-    #     ui.sleep(0.5)
-    # if not start_challenge_clicked:
-    #     for idx, (cur_level, suggested_lv) in enumerate(level_map.items()):
-    #         logger.warning(f"idx: {idx}, cur_level: {cur_level}, suggested_lv: {suggested_lv}")
-    #         if cur_level == conf_level:
-    #             continue
-    #         if idx > 0 and not ui.wait().until(
-    #                 lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklySoloChallenge))):
-    #             return _fail_return()
-    #         ui.sleep(0.5).click_bbox(suggested_lv, times=2, interval=0.3).sleep(0.5)
-    #         if not ui.click_text(ctx.tr(I18nText.WeeklySoloChallenge)):
-    #             return _fail_return()
-    #         if not ui.sleep(0.3).wait().until(lambda: ui.snapshot().search(notice_keywords)):
-    #             return _fail_return()
-    #         if ui.search(ctx.tr(I18nText.YourCurrentSol3Phase)):
-    #             ui.sleep(0.3).esc()
-    #             continue
-    #         if ui.sleep(0.3).click_text(ctx.tr(I18nText.StartChallenge), times=2, interval=0.5):
-    #             start_challenge_clicked = True
-    #             break
-    # if not start_challenge_clicked:
-    #     return _fail_return()
 
     # 循环刷
     max_challenge = 9
@@ -1736,7 +1764,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 寻找领取奖励交互点
             if not object_detection(ctx, search_reward=True):
                 if ui.esc().sleep(0.5).wait().until(
-                    lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                        lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
                     if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
                         continue
                     ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
@@ -1839,10 +1867,11 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 点击残像聚落
         def _wait_content():
             if ui.snapshot().search(
-                ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
+                    ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
                 return True
             if not ui.click_text(
-                ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1):
+                    ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2,
+                    interval=0.1):
                 ui.sleep(0.2).click_point(scrollbar, times=2, interval=0.1).sleep(0.3)
             return False
 
@@ -2330,12 +2359,16 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.pioneerPodcastFSM.set_enabled(cfg.pioneerPodcastOpen)
 
         # ------- Guidebook -------
-        self.local.activityFSM.set_enabled(cfg.activityOpen)
+        self.local.activityFSM.set_enabled(True)
         self.local.materialsSpotsFSM.set_enabled(True)
         self.local.recurringChallengesFSM.set_enabled(False)
         self.local.pathOfGrowthFSM.set_enabled(False)
         self.local.enemyTracingFSM.set_enabled(False)
         self.local.milestonesFSM.set_enabled(False)
+
+        ## ------- Guidebook Activity -------
+        self.local.activityDailyFSM.set_enabled(cfg.activityOpen)
+        self.local.activityWeeklyFSM.set_enabled(cfg.activityOpen and cfg.activityWeeklyOpen)
 
         ## ------- Guidebook MaterialsSpots -------
         self.local.forgeryChallengeFSM.set_enabled(cfg.forgeryChallengeOpen and cfg.forgeryChallenge)
@@ -2455,7 +2488,20 @@ class DailyWorkflow(AbstractWorkflow):
             .always().to(NodeName.globalDispatcher)
         )
 
-        self.engine.source(NodeName.doActivity).always().to(NodeName.globalDispatcher)
+        (
+            self.engine.source(NodeName.doActivity)
+            .on(I18nText.ActivityDaily).to(NodeName.doActivityDaily)
+            .on(I18nText.ActivityWeekly).to(NodeName.doActivityWeekly)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        self.engine.source(NodeName.doActivityDaily).always().to(NodeName.doActivity)
+        (
+            self.engine.source(NodeName.doActivityWeekly)
+            .on(False).to(NodeName.doPhantasmaDreamlandRhapsody)
+            .always().to(NodeName.doActivity)
+        )
+        self.engine.source(NodeName.doPhantasmaDreamlandRhapsody).always().to(NodeName.globalDispatcher)
 
         (
             self.engine.source(NodeName.doMaterialsSpots)

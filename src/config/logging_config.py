@@ -34,6 +34,9 @@ def _custom_logging_format(formatter: logging.Formatter, record: logging.LogReco
         max_fun_name_len = width - 2 - len(str(custom_filename)) - len(str(record.lineno))
         if 4 < max_fun_name_len < len(record.funcName):
             custom_func_name = f"{record.funcName[:max_fun_name_len - 4]}...{record.funcName[-1]}"
+    width_filename = 18
+    if len(custom_filename) > width_filename:
+        custom_filename = f"{custom_filename[:width_filename - 4]}...{custom_filename[-1]}"
     record.customLineno = f"{custom_filename}.{custom_func_name}:{record.lineno}"
     return record
 

@@ -453,6 +453,49 @@ class I18nText:
     ClearTheTacetDiscordNestMengzhou = "ClearTheTacetDiscordNestMengzhou"
     TacetDiscordNestClearedMengzhou = "TacetDiscordNestClearedMengzhou"
 
+    # ------- Phantasma Dreamland: Rhapsody -------
+    PhantasmaDreamlandRhapsody = "PhantasmaDreamlandRhapsody"
+    PdrDreamGallery = "PdrDreamGallery"
+    PdrWeeklyActivityPts = "PdrWeeklyActivityPts"
+    PdrLimitReached = "PdrLimitReached"
+    DreamOfGradation = "DreamOfGradation"
+    DreamOfExchange = "DreamOfExchange"
+    DreamOfDevouring = "DreamOfDevouring"
+    DreamOfIntegration = "DreamOfIntegration"
+    DreamOfConnection = "DreamOfConnection"
+    PhantasmaBlessing = "PhantasmaBlessing"
+    BlessingAddOn = "BlessingAddOn"
+    BlessingTransience = "BlessingTransience"
+    BlessingReset = "BlessingReset"
+    BlessingTeleport = "BlessingTeleport"
+    PdrStart = "PdrStart"
+    PdrContinue = "PdrContinue"
+    PdrSaved = "PdrSaved"
+    PdrNewGame = "PdrNewGame"
+    PdrCurrentPhase = "PdrCurrentPhase"
+    PdrDreamlandOfTheWeek = "PdrDreamlandOfTheWeek"
+    PdrDreamlandDetail = "PdrDreamlandDetail"
+    PdrProceedToNextDay = "PdrProceedToNextDay"
+    PdrUseBlessing = "PdrUseBlessing"
+    PdrRemainingDays = "PdrRemainingDays"
+    PdrRemainingDays5 = "PdrRemainingDays5"
+    PdrMax = "PdrMax"
+    PdrPhaseResult = "PdrPhaseResult"
+    PdrNextPhase = "PdrNextPhase"
+    PdrDreamlandShop = "PdrDreamlandShop"
+    PdrClose = "PdrClose"
+    PdrStrangeEncounters = "PdrStrangeEncounters"
+    PdrImNotInterestedInThis = "PdrImNotInterestedInThis"
+    PdrRefresh = "PdrRefresh"
+    PdrSkip = "PdrSkip"
+    PdrChallengeFailed = "PdrChallengeFailed"
+    PdrChallengeComplete = "PdrChallengeComplete"
+    PdrTryAgain = "PdrTryAgain"
+    PdrReturn = "PdrReturn"
+    PdrFinalize = "PdrFinalize"
+    PdrRestart = "PdrRestart"
+    PdrResume = "PdrResume"
+
     # ------- View -------
     ViewClaimRewards = "ViewClaimRewards"
     ViewClaimRewardsConfirm = "ViewClaimRewardsConfirm"
@@ -1055,18 +1098,18 @@ I18N_TEXT = {
 
     # ------- Login -------
     I18nText.Login: {
-        Language.ZH: r"^登录$",
-        Language.EN: flex_ws(r"^Login$"),
+        Language.ZH: RegexStr(r"^登录$", raw="登录"),
+        Language.EN: RegexStr(flex_ws(r"^Login$"), raw="Login"),
     },
 
     # ------- Map -------
     I18nText.FastTravel: {
-        Language.ZH: r"^快速旅行$",
-        Language.EN: flex_ws(r"^Fast Travel$"),
+        Language.ZH: RegexStr(r"^快速旅行$", raw="快速旅行"),
+        Language.EN: RegexStr(flex_ws(r"^Fast Travel$"), raw="Fast Travel"),
     },
     I18nText.EnableNavigation: {
-        Language.ZH: r"^导航追踪$",
-        Language.EN: flex_ws(r"^Enable Navigation$"),
+        Language.ZH: RegexStr(r"^导航追踪$", raw="导航追踪"),
+        Language.EN: RegexStr(flex_ws(r"^Enable Navigation$"), raw="Enable Navigation"),
     },
     I18nText.SwitchMap: {
         Language.ZH: RegexStr(r"^切换地图$", raw="切换地图"),
@@ -1191,8 +1234,8 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Team$"), raw="Team"),
     },
     I18nText.DataBank: {
-        Language.ZH: r"^数据坞$",
-        Language.EN: flex_ws(r"^Data Bank$"),
+        Language.ZH: RegexStr(r"^数据坞$", raw="数据坞"),
+        Language.EN: RegexStr(flex_ws(r"^Data Bank$"), raw="Data Bank"),
     },
     I18nText.Guidebook: {
         Language.ZH: RegexStr(r"^索拉指南$", raw="索拉指南"),
@@ -1233,12 +1276,12 @@ I18N_TEXT = {
 
     # ------- Data Bank -------
     I18nText.TargetedMerge: {
-        Language.ZH: r"^定向融合$",
-        Language.EN: flex_ws(r"^Targeted Merge$"),
+        Language.ZH: RegexStr(r"^定向融合$", raw="定向融合"),
+        Language.EN: RegexStr(flex_ws(r"^Targeted Merge$"), raw="Targeted Merge"),
     },
     I18nText.StandardMerge: {
-        Language.ZH: r"^标准融合$",
-        Language.EN: flex_ws(r"^Standard Merge$"),
+        Language.ZH: RegexStr(r"^标准融合$", raw="标准融合"),
+        Language.EN: RegexStr(flex_ws(r"^Standard Merge$"), raw="Standard Merge"),
     },
     I18nText.PleaseSelectAtLeast5Echoes: {
         Language.ZH: RegexStr(r"^请至少放入", raw="请至少放入", desc="请至少放入5个声骸"),
@@ -1249,8 +1292,8 @@ I18N_TEXT = {
         ),
     },
     I18nText.DataMergeCount: {
-        Language.ZH: r"^数据融合次数",
-        Language.EN: flex_ws(r"^Data Merge Count"),
+        Language.ZH: RegexStr(r"^数据融合次数", raw="数据融合次数"),
+        Language.EN: RegexStr(flex_ws(r"^Data Merge Count"), raw="Data Merge Count"),
     },
 
     # ------- Guidebook -------
@@ -1263,20 +1306,20 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Materials Spots$"), raw="Materials Spots"),
     },
     I18nText.RecurringChallenges: {
-        Language.ZH: r"^周期挑战$",
-        Language.EN: flex_ws(r"^Recurring Challenges$"),
+        Language.ZH: RegexStr(r"^周期挑战$", raw="周期挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Recurring Challenges$"), raw="Recurring Challenges"),
     },
     I18nText.PathOfGrowth: {
-        Language.ZH: r"^强者之路$",
-        Language.EN: flex_ws(r"^Path of Growth$"),
+        Language.ZH: RegexStr(r"^强者之路$", raw="强者之路"),
+        Language.EN: RegexStr(flex_ws(r"^Path of Growth$"), raw="Path of Growth"),
     },
     I18nText.EnemyTracing: {
-        Language.ZH: r"^敌迹探寻$",
-        Language.EN: flex_ws(r"^Enemy Tracing$"),
+        Language.ZH: RegexStr(r"^敌迹探寻$", raw="敌迹探寻"),
+        Language.EN: RegexStr(flex_ws(r"^Enemy Tracing$"), raw="Enemy Tracing"),
     },
     I18nText.Milestones: {
-        Language.ZH: r"^漂泊日志$",
-        Language.EN: flex_ws(r"^Milestones$"),
+        Language.ZH: RegexStr(r"^漂泊日志$", raw="漂泊日志"),
+        Language.EN: RegexStr(flex_ws(r"^Milestones$"), raw="Milestones"),
     },
 
     ## ------- Guidebook Common -------
@@ -1309,7 +1352,7 @@ I18N_TEXT = {
     },
     I18nText.GuidebookLahaiRoi: {
         Language.ZH: RegexStr(r"拉海洛", raw="拉海洛", desc="索拉里斯之极·拉海洛"),
-        Language.EN: RegexStr(flex_ws(r"Lahai-Roi"), raw="Lahai-Roi", desc="Solaris's Pole: Lahai-Roi"),
+        Language.EN: RegexStr(flex_ws(r"Lahai.?Roi"), raw="Lahai-Roi", desc="Solaris's Pole: Lahai-Roi"),
     },
     I18nText.GuidebookRinascita: {
         Language.ZH: RegexStr(r"黎那汐塔", raw="黎那汐塔", desc="黎那汐塔"),
@@ -1345,28 +1388,28 @@ I18N_TEXT = {
     ## ------- Guidebook MaterialsSpots -------
     # 产出武器及技能材料
     I18nText.ForgeryChallenge: {
-        Language.ZH: r"^凝素领域$",
-        Language.EN: flex_ws(r"^Forgery Challenge$"),
+        Language.ZH: RegexStr(r"^凝素领域$", raw="凝素领域"),
+        Language.EN: RegexStr(flex_ws(r"^Forgery Challenge$"), raw="Forgery Challenge"),
     },
     # 产出经验材料
     I18nText.SimulationChallenge: {
-        Language.ZH: r"^模拟领域$",
-        Language.EN: flex_ws(r"^Simulation Challenge$"),
+        Language.ZH: RegexStr(r"^模拟领域$", raw="模拟领域"),
+        Language.EN: RegexStr(flex_ws(r"^Simulation Challenge$"), raw="Simulation Challenge"),
     },
     # 产出共鸣者突破材料
     I18nText.BossChallenge: {
-        Language.ZH: r"^讨伐强敌$",
-        Language.EN: flex_ws(r"^Boss Challenge$"),
+        Language.ZH: RegexStr(r"^讨伐强敌$", raw="讨伐强敌"),
+        Language.EN: RegexStr(flex_ws(r"^Boss Challenge$"), raw="Boss Challenge"),
     },
     # 产出声骸材料
     I18nText.TacetSuppression: {
-        Language.ZH: r"^无音清剿$",
-        Language.EN: flex_ws(r"^Tacet Suppression$"),
+        Language.ZH: RegexStr(r"^无音清剿$", raw="无音清剿"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Suppression$"), raw="Tacet Suppression"),
     },
     # 产出高级技能材料
     I18nText.WeeklyChallenge: {
-        Language.ZH: r"^战歌重奏$",
-        Language.EN: flex_ws(r"^Weekly Challenge$"),
+        Language.ZH: RegexStr(r"^战歌重奏$", raw="战歌重奏"),
+        Language.EN: RegexStr(flex_ws(r"^Weekly Challenge$"), raw="Weekly Challenge"),
     },
     # 产出梦魇声骸
     I18nText.NightmarePurification: {
@@ -1411,7 +1454,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Ashen Chasm$"), raw=r"Ashen Chasm"),
     },
     I18nText.FallenSanctum: {
-        Language.ZH: RegexStr(r"^荒.旧殿$", raw="荒萋旧殿"),
+        Language.ZH: RegexStr(r"^荒.?旧殿$", raw="荒萋旧殿"),
         Language.EN: RegexStr(flex_ws(r"^Fallen Sanctum$"), raw=r"Fallen Sanctum"),
     },
     I18nText.LessonInSunset: {
@@ -1427,7 +1470,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Lesson in Void$"), raw=r"Lesson in Void"),
     },
     I18nText.LessonInEmbers: {
-        Language.ZH: RegexStr(r"^余.终课$", raw="余烬终课"),
+        Language.ZH: RegexStr(r"^余.?终课$", raw="余烬终课"),
         Language.EN: RegexStr(flex_ws(r"^Lesson in Embers$"), raw=r"Lesson in Embers"),
     },
     I18nText.GardenOfSalvation: {
@@ -1536,7 +1579,7 @@ I18N_TEXT = {
 
     ### ------- Guidebook MaterialsSpots TacetSuppression -------
     I18nText.WesternFangPeaksTacetField: {
-        Language.ZH: RegexStr(r"^方.西峰无音区$", raw="方擎西峰无音区"),
+        Language.ZH: RegexStr(r"^方.?西峰无音区$", raw="方擎西峰无音区"),
         Language.EN: RegexStr(flex_ws(r"^Western Fang Peaks"), raw=r"Western Fang Peaks Tacet Field"),
     },
     I18nText.EasternXuanPeaksTacetField: {
@@ -1645,7 +1688,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"the Lost Star$"), raw=r"Gate of the Lost Star"),
     },
     I18nText.CinderniteApocalypse: {
-        Language.ZH: RegexStr(r"^.夜天启之章", raw="烬夜天启之章", desc="烬夜天启之章·战歌重奏"),
+        Language.ZH: RegexStr(r"^.?夜天启之章", raw="烬夜天启之章", desc="烬夜天启之章·战歌重奏"),
         Language.EN: RegexStr(flex_ws(r"Cindernite Apocalypse$"), raw=r"Cindernite Apocalypse"),
     },
     I18nText.TheWheelOfBrokenFate: {
@@ -1674,8 +1717,8 @@ I18N_TEXT = {
     },
     # 周本关卡boss名
     I18nText.WeeklyBossThousandPuppetPavilion: {
-        Language.ZH: RegexStr(r"千傀重楼", raw="千傀重楼"),
-        Language.EN: RegexStr(r"Thousand-Puppet Pavilion", raw="Thousand-Puppet Pavilion"),
+        Language.ZH: RegexStr(r"千.?重楼", raw="千傀重楼"),
+        Language.EN: RegexStr(r"Thousand.?Puppet Pavilion", raw="Thousand-Puppet Pavilion"),
     },
     I18nText.WeeklyBossDenia: {
         Language.ZH: RegexStr(r"达妮娅", raw="达妮娅"),
@@ -1686,32 +1729,32 @@ I18N_TEXT = {
         Language.EN: RegexStr(r"Sigillum", raw="Sigillum"),
     },
     I18nText.WeeklyBossThrenodianLeviathan: {
-        Language.ZH: RegexStr(r"鸣式·利维亚坦", raw="鸣式·利维亚坦"),
-        Language.EN: RegexStr(r"Threnodian: Leviathan", raw="Threnodian: Leviathan"),
+        Language.ZH: RegexStr(r"鸣式.?利维亚坦", raw="鸣式·利维亚坦"),
+        Language.EN: RegexStr(r"Threnodian.? Leviathan", raw="Threnodian: Leviathan"),
     },
     I18nText.WeeklyBossFleurdelys: {
-        Language.ZH: RegexStr(r"芙露德莉斯", raw="芙露德莉斯"),
+        Language.ZH: RegexStr(r"芙露德.?斯", raw="芙露德莉斯"),
         Language.EN: RegexStr(r"Fleurdelys", raw="Fleurdelys"),
     },
     I18nText.WeeklyBossHecate: {
-        Language.ZH: RegexStr(r"赫卡忒", raw="赫卡忒"),
+        Language.ZH: RegexStr(r"赫卡.?", raw="赫卡忒"),
         Language.EN: RegexStr(r"Hecate", raw="Hecate"),
     },
     I18nText.WeeklyBossJue: {
         Language.ZH: RegexStr(r"角", raw="角"),
-        Language.EN: RegexStr(r"Jué", raw="Jué"),
+        Language.EN: RegexStr(r"Ju.?", raw="Jué"),
     },
     I18nText.WeeklyBossCrownless: {
         Language.ZH: RegexStr(r"无妄者", raw="无妄者"),
         Language.EN: RegexStr(r"Dreamless", raw="Dreamless"),
     },
     I18nText.WeeklyBossScarAberrantNightmare: {
-        Language.ZH: RegexStr(r"伤痕·异生梦魇", raw="伤痕·异生梦魇"),
+        Language.ZH: RegexStr(r"伤痕.?异生梦.?", raw="伤痕·异生梦魇"),
         Language.EN: RegexStr(r"Scar: Aberrant Nightmare", raw=r"Scar: Aberrant Nightmare", desc="Chaotic Juncture"),
     },
     I18nText.WeeklyBossBellBorneGeochelone: {
         Language.ZH: RegexStr(r"鸣钟之龟", raw="鸣钟之龟"),
-        Language.EN: RegexStr(r"Bell-Borne Geochelone", raw="Bell-Borne Geochelone"),
+        Language.EN: RegexStr(r"Bell.?Borne Geochelone", raw="Bell-Borne Geochelone"),
     },
     # instance
     I18nText.EnterTheSonoroSphere: {
@@ -1776,10 +1819,6 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"残象聚落", raw="残象聚落"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest"), raw="Tacet Discord Nest"),
     },
-    # I18nText.LahaiRoi: {
-    #     Language.ZH: r"^拉海洛$",
-    #     Language.EN: flex_ws(r"^Lahai-Roi$"),
-    # },
     I18nText.SouthernYuanHillsTacetDiscordNest: {
         Language.ZH: RegexStr(r"^落渊南丘残象聚落$", raw="落渊南丘残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Southern Yuan Hills"), raw=r"Southern Yuan Hills Tacet Discord Nest"),
@@ -1803,16 +1842,16 @@ I18N_TEXT = {
 
     # ------- Team -------
     I18nText.QuickSetup: {
-        Language.ZH: RegexStr(r"^快速编队", raw="快速编队"),
-        Language.EN: RegexStr(flex_ws(r"Quick Setup"), raw="Quick Setup"),
+        Language.ZH: RegexStr(r"^快速编队$", raw="快速编队"),
+        Language.EN: RegexStr(flex_ws(r"^Quick Setup$"), raw="Quick Setup"),
     },
     I18nText.Deployed: {
-        Language.ZH: RegexStr(r"^已出战", raw="已出战"),
-        Language.EN: RegexStr(flex_ws(r"Deployed"), raw="Deployed"),
+        Language.ZH: RegexStr(r"^已出战$", raw="已出战"),
+        Language.EN: RegexStr(flex_ws(r"^Deployed$"), raw="Deployed"),
     },
     I18nText.Deploy: {
-        Language.ZH: RegexStr(r"^出战", raw="出战"),
-        Language.EN: RegexStr(flex_ws(r"Deploy"), raw="Deploy"),
+        Language.ZH: RegexStr(r"^出战$", raw="出战"),
+        Language.EN: RegexStr(flex_ws(r"^Deploy$"), raw="Deploy"),
     },
     I18nText.ResonatorDowned: {
         Language.ZH: RegexStr(r"^失去意识$", raw="失去意识"),
@@ -1850,6 +1889,172 @@ I18N_TEXT = {
     I18nText.TacetDiscordNestClearedMengzhou: {
         Language.ZH: RegexStr(r"残?象聚落已清剿?", raw="残象聚落已清剿"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
+    },
+
+    # ------- 幻梦游园·狂想 -------
+    I18nText.PhantasmaDreamlandRhapsody: {
+        Language.ZH: RegexStr(r"幻梦游园.?狂想", raw="幻梦游园·狂想"),
+        Language.EN: RegexStr(flex_ws(r"Phantasma Dreamland"), raw="Phantasma Dreamland: Rhapsody"),
+    },
+    I18nText.PdrDreamGallery: {
+        Language.ZH: RegexStr(r"^梦境图鉴$", raw="梦境图鉴"),
+        Language.EN: RegexStr(flex_ws(r"^Dream Gallery$"), raw="Dream Gallery"),
+    },
+    I18nText.PdrWeeklyActivityPts: {
+        Language.ZH: RegexStr(r"^本周游历值$", raw="本周游历值"),
+        Language.EN: RegexStr(flex_ws(r"^Weekly Activity Pts.?$"), raw="Weekly Activity Pts"),
+    },
+    I18nText.PdrLimitReached: {
+        Language.ZH: RegexStr(r"已达到上限$", raw="已达到上限"),
+        Language.EN: RegexStr(flex_ws(r"Limit Reached$"), raw="Limit Reached"),
+    },
+    I18nText.DreamOfGradation: {
+        Language.ZH: RegexStr(r"^.?递变之梦$", raw="递变之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Gradation"), raw="Dream of Gradation"),
+    },
+    I18nText.DreamOfExchange: {
+        Language.ZH: RegexStr(r"^.?换取之梦$", raw="换取之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Exchange"), raw="Dream of Exchange"),
+    },
+    I18nText.DreamOfDevouring: {
+        Language.ZH: RegexStr(r"^.?吞噬之梦$", raw="吞噬之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Devouring"), raw="Dream of Devouring"),
+    },
+    I18nText.DreamOfIntegration: {
+        Language.ZH: RegexStr(r"^.?融合之梦$", raw="融合之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Integration"), raw="Dream of Integration"),
+    },
+    I18nText.DreamOfConnection: {
+        Language.ZH: RegexStr(r"^.?共通之梦$", raw="共通之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Connection"), raw="Dream of Connection"),
+    },
+    I18nText.PhantasmaBlessing: {
+        Language.ZH: RegexStr(r"^幻梦祝福$", raw="幻梦祝福"),
+        Language.EN: RegexStr(flex_ws(r"^Phantasma Blessing$"), raw="Phantasma Blessing"),
+    },
+    I18nText.BlessingAddOn: {
+        Language.ZH: RegexStr(r"^祝福.?幻梦机遇$", raw="祝福·幻梦机遇"),
+        Language.EN: RegexStr(flex_ws(r"^Blessing.*?Add.?on$"), raw="Blessing: Add-on"),
+    },
+    I18nText.BlessingTransience: {
+        Language.ZH: RegexStr(r"^祝福.?美梦一瞬$", raw="祝福·美梦一瞬"),
+        Language.EN: RegexStr(flex_ws(r"^Blessing.*?Transience$"), raw="Blessing: Transience"),
+    },
+    I18nText.BlessingReset: {
+        Language.ZH: RegexStr(r"^祝福.?归零重整$", raw="祝福·归零重整"),
+        Language.EN: RegexStr(flex_ws(r"^Blessing.*?Reset$"), raw="Blessing: Reset"),
+    },
+    I18nText.BlessingTeleport: {
+        Language.ZH: RegexStr(r"^祝福.?惊喜传送$", raw="祝福·惊喜传送"),
+        Language.EN: RegexStr(flex_ws(r"^Blessing.*?Teleport$"), raw="Blessing: Teleport"),
+    },
+    I18nText.PdrStart: {
+        Language.ZH: RegexStr(r"^开始游戏$", raw="开始游戏"),
+        Language.EN: RegexStr(flex_ws(r"^Start$"), raw="Start"),
+    },
+    I18nText.PdrContinue: {
+        Language.ZH: RegexStr(r"^继续游戏$", raw="继续游戏"),
+        Language.EN: RegexStr(flex_ws(r"^Continue$"), raw="Continue"),
+    },
+    I18nText.PdrSaved: {
+        Language.ZH: RegexStr(r"已存档$", raw="已存档"),
+        Language.EN: RegexStr(flex_ws(r"Saved$"), raw="Saved"),
+    },
+    I18nText.PdrNewGame: {
+        Language.ZH: RegexStr(r"^新游戏$", raw="新游戏"),
+        Language.EN: RegexStr(flex_ws(r"^New Game$"), raw="New Game"),
+    },
+    I18nText.PdrCurrentPhase: {
+        Language.ZH: RegexStr(r"^乐园阶段\d/\d目标$", raw="乐园阶段1/7目标"),
+        Language.EN: RegexStr(flex_ws(r"Current Phase \d/\d"), raw="Current Phase 1/7"),
+    },
+    I18nText.PdrDreamlandOfTheWeek: {
+        Language.ZH: RegexStr(r"^本周游园$", raw="本周游园"),
+        Language.EN: RegexStr(flex_ws(r"^Dreamland of the Week"), raw="Dreamland of the Week"),
+    },
+    I18nText.PdrDreamlandDetail: {
+        Language.ZH: RegexStr(r"^乐园详情$", raw="乐园详情"),
+        Language.EN: RegexStr(flex_ws(r"^Dreamland Detail$"), raw="Dreamland Detail"),
+    },
+    I18nText.PdrProceedToNextDay: {
+        Language.ZH: RegexStr(r"^进入下一天$", raw="进入下一天"),
+        Language.EN: RegexStr(flex_ws(r"^Proceed to Next Day$"), raw="Proceed to Next Day"),
+    },
+    I18nText.PdrUseBlessing: {
+        Language.ZH: RegexStr(r"^使用祝福$", raw="使用祝福"),
+        Language.EN: RegexStr(flex_ws(r"^Use Blessing$"), raw="Use Blessing"),
+    },
+    I18nText.PdrRemainingDays: {
+        Language.ZH: RegexStr(r"^剩余\d天$", raw="剩余{0}天"),
+        Language.EN: RegexStr(flex_ws(r"^(Remaining )?Days.? \d$"), raw="Remaining Days: {0}"),
+    },
+    I18nText.PdrRemainingDays5: {
+        Language.ZH: RegexStr(r"^剩余5天$", raw="剩余5天"),
+        Language.EN: RegexStr(flex_ws(r"^(Remaining )?Days.? 5$"), raw="Remaining Days: 5"),
+    },
+    I18nText.PdrMax: {
+        Language.ZH: RegexStr(r"^MAX", raw="MAX"),
+        Language.EN: RegexStr(flex_ws(r"^MAX"), raw="MAX"),
+    },
+    I18nText.PdrPhaseResult: {
+        Language.ZH: RegexStr(r"^第.?阶段收益结算$", raw="第{0}阶段收益结算"),
+        Language.EN: RegexStr(flex_ws(r"^Phase \d Result$"), raw="Phase {0} Result"),
+    },
+    I18nText.PdrNextPhase: {
+        Language.ZH: RegexStr(r"^进入新阶段$", raw="进入新阶段"),
+        Language.EN: RegexStr(flex_ws(r"^Next Phase$"), raw="Next Phase"),
+    },
+    I18nText.PdrDreamlandShop: {
+        Language.ZH: RegexStr(r"^乐园商店$", raw="乐园商店"),
+        Language.EN: RegexStr(flex_ws(r"^Dreamland Shop$"), raw="Dreamland Shop"),
+    },
+    I18nText.PdrClose: {
+        Language.ZH: RegexStr(r"^关闭.{0,2}$", raw="关闭"),
+        Language.EN: RegexStr(flex_ws(r"^Close.{0,2}$"), raw="Close"),
+    },
+    I18nText.PdrStrangeEncounters: {
+        Language.ZH: RegexStr(r"^奇缘异遇$", raw="奇缘异遇"),
+        Language.EN: RegexStr(flex_ws(r"^Strange Encounters$"), raw="Strange Encounters"),
+    },
+    I18nText.PdrImNotInterestedInThis: {
+        Language.ZH: RegexStr(r"^你对此不感兴趣$", raw="你对此不感兴趣"),
+        Language.EN: RegexStr(flex_ws(r"^I.?m not interested in this.*?$"), raw="I'm not interested in this."),
+    },
+    I18nText.PdrRefresh: {
+        Language.ZH: RegexStr(r"^刷新$", raw="刷新"),
+        Language.EN: RegexStr(flex_ws(r"^Refresh$"), raw="Refresh"),
+    },
+    I18nText.PdrSkip: {
+        Language.ZH: RegexStr(r"^跳过$", raw="跳过"),
+        Language.EN: RegexStr(flex_ws(r"^Skip$"), raw="Skip"),
+    },
+    I18nText.PdrChallengeFailed: {
+        Language.ZH: RegexStr(r"^挑战失败$", raw="挑战失败"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw="Challenge Failed"),
+    },
+    I18nText.PdrChallengeComplete: {
+        Language.ZH: RegexStr(r"^挑战成功$", raw="挑战成功"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw="Challenge Complete"),
+    },
+    I18nText.PdrTryAgain: {
+        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^Try Again$"), raw="Try Again"),
+    },
+    I18nText.PdrReturn: {
+        Language.ZH: RegexStr(r"^返回主页$", raw="返回主页"),
+        Language.EN: RegexStr(flex_ws(r"^Return$"), raw="Return"),
+    },
+    I18nText.PdrFinalize: {
+        Language.ZH: RegexStr(r"^结算并离开$", raw="结算并离开"),
+        Language.EN: RegexStr(flex_ws(r"^Finalize$"), raw="Finalize"),
+    },
+    I18nText.PdrRestart: {
+        Language.ZH: RegexStr(r"^重新开始$", raw="重新开始"),
+        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
+    },
+    I18nText.PdrResume: {
+        Language.ZH: RegexStr(r"^继续$", raw="继续"),
+        Language.EN: RegexStr(flex_ws(r"^Resume$"), raw="Resume"),
     },
 
     # ------- View页面专用 -------
@@ -2132,6 +2337,46 @@ class I18nPage:
         SystemNotice = "SystemNotice"
         NetworkTimeout = "NetworkTimeout"
         Confirm = "Confirm"
+
+    class PhantasmaDreamlandRhapsody_CurrentPhase:
+        PAGE = "PhantasmaDreamlandRhapsody_CurrentPhase"
+        CurrentPhase = "CurrentPhase"
+        Confirm = "Confirm"
+
+    class PhantasmaDreamlandRhapsody_Pause:
+        PAGE = "PhantasmaDreamlandRhapsody_Pause"
+        Pause = "Pause"
+        Finalize = "Finalize"
+        Restart = "Restart"
+        Resume = "Resume"
+
+    class PhantasmaDreamlandRhapsody_Leave:
+        PAGE = "PhantasmaDreamlandRhapsody_Leave"
+        LeaveNow = "LeaveNow"
+        Confirm = "Confirm"
+
+    class PhantasmaDreamlandRhapsody_PhaseResult:
+        PAGE = "PhantasmaDreamlandRhapsody_PhaseResult"
+        PhaseResult = "PhaseResult"
+        Confirm = "Confirm"
+
+    class PhantasmaDreamlandRhapsody_ChallengeFinished:
+        PAGE = "PhantasmaDreamlandRhapsody_ChallengeFinished"
+        ChallengeFinished = "ChallengeFinished"
+        Return = "Return"
+
+    class PhantasmaDreamlandRhapsody_Pick1Of3:
+        PAGE = "PhantasmaDreamlandRhapsody_Pick1Of3"
+        Refresh = "Refresh"
+        Skip = "Skip"
+        Confirm = "Confirm"
+
+    class PhantasmaDreamlandRhapsody_StrangeEncounters:
+        PAGE = "PhantasmaDreamlandRhapsody_StrangeEncounters"
+        ImNotInterestedInThis = "ImNotInterestedInThis"
+        Confirm = "Confirm"
+
+
 
 
 # ------------- Global Page --------------
@@ -2515,9 +2760,9 @@ I18N_PAGES = {
 
     I18nPage.Notice_BlankArea.PAGE: {
         Language.ZH: {
-            I18nPage.Name: "空白区域",
+            I18nPage.Name: "点击空白区域关闭",
             I18nPage.Include: {
-                I18nPage.Notice_BlankArea.BlankArea: r"空白区域",
+                I18nPage.Notice_BlankArea.BlankArea: r"^点击空白区域关闭$",
             },
             I18nPage.Exclude: {},
             I18nPage.Assets: [],
@@ -2637,6 +2882,97 @@ I18N_PAGES = {
             I18nPage.Assets: [],
         },
     },
+
+    I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-乐园阶段目标",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.CurrentPhase: r"^乐园阶段\d/\d目标$",
+                I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.Confirm: r"^确认$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_Pause.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-暂停",
+            I18nPage.Include: {
+                # I18nPage.PhantasmaDreamlandRhapsody_Pause.Pause: r"^暂停$",
+                I18nPage.PhantasmaDreamlandRhapsody_Pause.Finalize: r"结算并离开",
+                I18nPage.PhantasmaDreamlandRhapsody_Pause.Restart: r"^重新开始$",
+                I18nPage.PhantasmaDreamlandRhapsody_Pause.Resume: r"^继续$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_Leave.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-确认离开",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_Leave.LeaveNow: r"是否确认立刻结算并退出",
+                I18nPage.PhantasmaDreamlandRhapsody_Leave.Confirm: r"^确认$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-收益结算",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.PhaseResult: r"^第.?阶段收益结算$",
+                I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.Confirm: r"^(确认|进入新阶段)$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-返回主页",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.ChallengeFinished: r"^(挑战失败|挑战成功)$",
+                I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.Return: r"^返回主页$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-选择声骸",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Refresh: r"^刷新$",
+                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Skip: r"^跳过$",
+                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Confirm: r"^确认$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+    I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.PAGE: {
+        Language.ZH: {
+            I18nPage.Name: "幻梦游园·狂想-奇缘异遇",
+            I18nPage.Include: {
+                I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.ImNotInterestedInThis: r"^你对此不感兴趣$",
+                I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.Confirm: r"^确认$",
+            },
+            I18nPage.Exclude: {},
+            I18nPage.Assets: [],
+        },
+    },
+
+
+
+
 
 }
 

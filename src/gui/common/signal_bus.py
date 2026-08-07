@@ -11,6 +11,7 @@ class SignalBus(QObject):
     supportSignal = Signal()
 
     logQueueSignal = Signal(tuple)  # 日志队列信号，表明队列有新日志
+    homeMessageSignal = Signal(str)
 
 
 signalBus = SignalBus()
