@@ -358,7 +358,13 @@ class BottomWidget(CardWidget):
         logger.debug(f"task_finished: {task_name}")
 
         if self._submittedTask is not None:
-            signalBus.homeMessageSignal.emit(f"{self.tr("Stop")} {self._submittedTask.name}")
+            elapsed = ""
+            if self._submittedTask.start_time:
+                elapsed_seconds = (datetime.now() - self._submittedTask.start_time).total_seconds()
+                hours, remainder = divmod(elapsed_seconds, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                elapsed = f", {int(hours)}h {int(minutes)}m {seconds:.2f}s"
+            signalBus.homeMessageSignal.emit(f"{self.tr("Stop")} {self._submittedTask.name}{elapsed}")
             self._submittedTask = None
 
         self.spinner.stop()
