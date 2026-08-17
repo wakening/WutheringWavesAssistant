@@ -12,7 +12,7 @@ from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
 from src.core.i18n import I18nText, Language, I18nTr
 from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk
-from src.core.pages import I18nPage, UIOp
+from src.core.pages import UIOp, GlobalPage
 from src.core.resonator import Resonator
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
@@ -259,24 +259,25 @@ def endNode(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     """检查是否在有效页面（如：终端），不在则esc尝试离开（副本等）"""
     ui = UIOp(ctx)
-    ui.activate().sleep(0.1)
+    ui.activate().sleep(0.1).snapshot()
+
+    page = GlobalPage(ctx)
 
     # 已在终端页
-    if ui.snapshot().match_page(I18nPage.Terminal.PAGE):
-        logger.debug("已在终端")
+    if page.isTerminal(ui=ui):
+        logger.debug(f"Found page: {page.Terminal}")
         return I18nText.Terminal
 
     # 在全局预设中找出离开函数，尝试回到主页
-    if ctx.page_service.global_page_action(ui.ocr_result):
-        logger.debug("找到全局页面")
-        ui.sleep(1)
+    if page_key := page.action(ui=ui):
+        logger.debug(f"Found page: {page_key}")
+        ui.sleep(0.5)
         return None
 
-    # 兜底规则，esc
     logger.info("Transferring")
 
-    # num = round(random.uniform(1.5, 2.0), 2)
     num = max(1, min(1.4, random.gauss(1.2, 0.08)))
+    # 兜底规则，esc
     ui.esc().sleep(num)
     return None
 
@@ -304,7 +305,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
     ui.snapshot()
 
     # 从终端进入地图
-    if ui.match_page(I18nPage.Terminal.PAGE):
+    if GlobalPage(ctx).isTerminal(ui=ui):
         if not ui.click_text(ctx.tr(I18nText.Map), bbox_terminal_content(ctx), delay=0.2, times=2, interval=0.3):
             ui.click_point(AnchorPoint(1197, 350, Align.Right | Align.Middle))
             if not ui.sleep(0.3).wait().until(
@@ -385,7 +386,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     ui.activate().sleep(0.1).snapshot()
 
     # 终端
-    if not ui.match_page(I18nPage.Terminal.PAGE):
+    if not GlobalPage(ctx).isTerminal(ui=ui):
         logger.warning(f"Text not found: {ctx.tr(I18nText.Terminal)}")
         ui.esc().sleep(1)
         return None
@@ -517,7 +518,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     ui = UIOp(ctx)
 
     # 终端
-    if ui.snapshot().match_page(I18nPage.Terminal.PAGE):
+    if GlobalPage(ctx).isTerminal(ui=ui.snapshot()):
         # 点击进入索拉指南
         if not ui.click_text(ctx.tr(I18nText.Guidebook), bbox_terminal_content(ctx),
                              pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
@@ -1122,11 +1123,12 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #     continue
                 no_text_count -= 1
             # 断开连接
-            if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+            page = GlobalPage(ctx)
+            if page.isInternetDisconnecting(ui=ui):
                 combat_system.stop(join=True)
                 return False
-            if ctx.page_service.global_page_action(ui.ocr_result):
-                logger.debug("global_page_action")
+            if page_key := page.action(ui=ui):
+                logger.debug(f"Found page: {page_key}")
 
         combat_system.stop(join=True)
 
@@ -1144,7 +1146,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info("Challenge Complete")
 
             # 寻找领取奖励交互点
-            if not object_detection(ctx, search_reward=True):
+            if not object_detection(ctx, search_reward=True, timeout=25):
                 ui.esc()
                 if ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot().click_text(
@@ -1414,11 +1416,12 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     #     continue
                     no_text_count -= 1
                 # 断开连接
-                if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                page = GlobalPage(ctx)
+                if page.isInternetDisconnecting(ui=ui):
                     combat_system.stop(join=True)
                     return False
-                if ctx.page_service.global_page_action(ui.ocr_result):
-                    logger.debug("global_page_action")
+                if page_key := page.action(ui=ui):
+                    logger.debug(f"Found page: {page_key}")
 
             combat_system.stop(join=True)
 
@@ -1436,7 +1439,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 logger.info("Challenge Complete")
 
                 # 寻找领取奖励交互点
-                if not object_detection(ctx, search_reward=True):
+                if not object_detection(ctx, search_reward=True, timeout=25):
                     ui.esc()
                     if ui.sleep(0.3).wait().until(
                             lambda: ui.snapshot().click_text(
@@ -1737,11 +1740,12 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #     continue
                 no_text_count -= 1
             # 断开连接
-            if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+            page = GlobalPage(ctx)
+            if page.isInternetDisconnecting(ui=ui):
                 combat_system.stop(join=True)
                 return False
-            if ctx.page_service.global_page_action(ui.ocr_result):
-                logger.debug("global_page_action")
+            if page_key := page.action(ui=ui):
+                logger.debug(f"Found page: {page_key}")
 
         combat_system.stop(join=True)
 
@@ -1762,7 +1766,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info("Challenge Complete")
 
             # 寻找领取奖励交互点
-            if not object_detection(ctx, search_reward=True):
+            if not object_detection(ctx, search_reward=True, timeout=40):
                 if ui.esc().sleep(0.5).wait().until(
                         lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
                     if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
@@ -2133,11 +2137,12 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             no_text_count -= 1
 
                         # 断开连接
-                        if ui.match_page(I18nPage.Login_Disconnected.PAGE):
+                        page = GlobalPage(ctx)
+                        if page.isInternetDisconnecting(ui=ui):
                             combat_system.stop(join=True)
                             return False
-                        if ctx.page_service.global_page_action(ui.ocr_result):
-                            logger.debug("global_page_action")
+                        if page_key := page.action(ui=ui):
+                            logger.debug(f"Found page: {page_key}")
 
                     combat_system.stop(join=True)
                     # 检查复苏弹窗
@@ -2234,7 +2239,7 @@ def doMail(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 进入邮件
     if ui.is_on_homepage():
         ctx.control_service.mail()
-    elif ui.snapshot().match_page(I18nPage.Terminal.PAGE):
+    elif GlobalPage(ctx).isTerminal(ui=ui.snapshot()):
         ui.click_point(AnchorPoint(822, 691, Align.Right | Align.Bottom))
     else:
         ctx.control_service.mail()
@@ -2273,12 +2278,12 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 从终端进入先约电台，不用快捷键F4容易被占用
     if ui.is_on_homepage():
         ui.esc().sleep(1.0)
-        if not ui.wait().until(lambda: ui.snapshot().match_page(I18nPage.Terminal.PAGE)):
+        if not ui.wait().until(lambda: GlobalPage(ctx).isTerminal(ui=ui.snapshot())):
             return False
-    elif not ui.snapshot().match_page(I18nPage.Terminal.PAGE):
+    elif not GlobalPage(ctx).isTerminal(ui=ui.snapshot()):
         return False
     if not ui.click_text(ctx.tr(I18nText.TerminalPioneerPodcast),
-                         roi=bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
+                         bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
         return False
     if not ui.sleep(1.2).wait().until(
             lambda: ui.snapshot().search([pioneerPodcast, ctx.tr(I18nText.PioneerPodcastUnavailable)])):

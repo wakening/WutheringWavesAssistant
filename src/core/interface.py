@@ -214,38 +214,6 @@ class PageEventService(ABC):
         pass
 
 
-class PageService(ABC):
-
-    @abstractmethod
-    def matches(self, ocr_result: OcrResult) -> dict[str, dict[str, TextBox]]:
-        pass
-
-    @abstractmethod
-    def match(self, ocr_result: OcrResult) -> Optional[tuple[str, dict[str, TextBox]]]:
-        pass
-
-    @abstractmethod
-    def is_match(self, ocr_result: OcrResult, page_key: str) -> Optional[dict[str, TextBox]]:
-        pass
-
-
-class GlobalPageService(PageService):
-
-    @abstractmethod
-    def global_page_action(self, ocr_result: OcrResult, **kwargs) -> bool:
-        pass
-
-
-class EchoMergeService(PageService, ABC):
-
-    pass
-
-
-class GuidebookService(PageService, ABC):
-
-    pass
-
-
 class GameControlService(ABC):
     """游戏基础按键控制，包含常用按键，简化调用，不做精细控制"""
 

@@ -9,7 +9,7 @@ from src.core.color import Color
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, BBox
 from src.core.i18n import I18nText
 from src.core.message import MsgType, MsgTaskStatus
-from src.core.pages import I18nPage, UIOp
+from src.core.pages import UIOp, GlobalPage
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
@@ -96,20 +96,23 @@ def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[s
             I18nText.PdrDreamlandOfTheWeek)) and ui.search(ctx.tr(I18nText.PdrDreamlandDetail)):
         return I18nText.PdrProceedToNextDay
 
-    # 终端页
-    if ui.match_page(I18nPage.Terminal.PAGE):
+    page = GlobalPage(ctx)
+
+    # 已在终端页
+    if page.isTerminal(ui=ui):
+        logger.debug(f"Found page: {page.Terminal}")
         return I18nText.Terminal
 
     # 在全局预设中找出离开函数，尝试回到主页
-    if ctx.page_service.global_page_action(ui.ocr_result):
-        logger.debug("找到全局页面")
-        ui.sleep(1)
+    if page_key := page.action(ui=ui):
+        logger.debug(f"Found page: {page_key}")
+        ui.sleep(0.5)
         return None
 
-    # 兜底规则，esc
     logger.info("Transferring")
 
     num = max(1, min(1.4, random.gauss(1.2, 0.08)))
+    # 兜底规则，esc
     ui.esc().sleep(num)
     return None
 
@@ -134,7 +137,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     ui.snapshot()
 
     # 终端
-    if ui.match_page(I18nPage.Terminal.PAGE):
+    if GlobalPage(ctx).isTerminal(ui=ui):
         # 点击进入索拉指南
         if not ui.click_text(ctx.tr(I18nText.Guidebook),
                              bbox_terminal_content(ctx), pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):

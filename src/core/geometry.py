@@ -204,7 +204,10 @@ class BBox:
     # ---------------- 随机点 ----------------
     @property
     def random(self) -> Tuple[int, int]:
-        """返回框内部随机一点（不在边上），保证总能返回"""
+        """返回矩形内框的随机一点"""
+        # 0.8表示中心 80%，四周各留 10%
+        ratio = 0.7
+
         w, h = self.width(), self.height()
         cx, cy = self.center
 
@@ -212,10 +215,15 @@ class BBox:
         if w <= 2 or h <= 2:
             return cx, cy
 
-        x1, x2 = self.x1 + 1, self.x2 - 1
-        y1, y2 = self.y1 + 1, self.y2 - 1
+        margin_x = int(w * (1 - ratio) / 2)
+        margin_y = int(h * (1 - ratio) / 2)
 
-        # 避免 x1 > x2 或 y1 > y2
+        x1 = self.x1 + margin_x
+        x2 = self.x2 - margin_x
+        y1 = self.y1 + margin_y
+        y2 = self.y2 - margin_y
+
+        # 防止区域过小
         if x1 > x2:
             x1 = x2 = cx
         if y1 > y2:

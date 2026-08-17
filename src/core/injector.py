@@ -36,9 +36,6 @@ class Container(containers.DeclarativeContainer):
     from src.service.img_service import ImgServiceImpl
     # from src.service.ocr_service import PaddleOcrServiceImpl
     # from src.service.ocr_service import RapidOcrServiceImpl
-    from src.service.page_service import PageServiceImpl
-    from src.service.page_service import EchoMergeServiceImpl
-    from src.service.page_service import GuidebookServiceImpl
     from src.service.od_service import YoloServiceImpl
     from src.service.window_service import HwndServiceImpl
 
@@ -78,36 +75,6 @@ class Container(containers.DeclarativeContainer):
     )
     boss_info_service = providers.Singleton(
         BossInfoServiceImpl
-    )
-    page_service = providers.Singleton(
-        PageServiceImpl,
-        context=context,
-        window_service=window_service,
-        img_service=img_service,
-        ocr_service=ocr_service,
-        control_service=control_service,
-        od_service=od_service,
-        boss_info_service=boss_info_service,
-    )
-    echo_merge_service = providers.Singleton(
-        EchoMergeServiceImpl,
-        context=context,
-        window_service=window_service,
-        img_service=img_service,
-        ocr_service=ocr_service,
-        control_service=control_service,
-        od_service=od_service,
-        boss_info_service=boss_info_service,
-    )
-    guidebook_service = providers.Singleton(
-        GuidebookServiceImpl,
-        context=context,
-        window_service=window_service,
-        img_service=img_service,
-        ocr_service=ocr_service,
-        control_service=control_service,
-        od_service=od_service,
-        boss_info_service=boss_info_service,
     )
     combat_service = providers.Singleton(
         CombatServiceImpl,

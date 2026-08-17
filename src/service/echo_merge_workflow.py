@@ -1,223 +1,302 @@
-import inspect
 import logging
+import random
 import time
 from typing import Optional
 
-from src.core.geometry import AnchorBBox, Align, AnchorPoint
+from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind
 from src.core.i18n import I18nText
 from src.core.message import MsgType, MsgTaskStatus
-from src.core.pages import I18nPage, I18nPageEchoMerge, OcrQuery
-from src.core.task import TaskFSM
+from src.core.pages import UIOp, GlobalPage
+from src.core.task import TaskFSM, TaskFSMGroup, TaskStatus
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
+from src.service.common_workflow import bbox_terminal_content
 
 logger = logging.getLogger(__name__)
 
 
-@node()
-def end_node(ctx: NodeContext, **kwargs) -> bool:
-    logger.debug(inspect.currentframe().f_code.co_name)
+class TaskLocal:
+
+    def __init__(self):
+        self.embedding: bool = False
+
+        self.standardMergeFSM: TaskFSM = TaskFSM(name=I18nText.StandardMerge)
+
+        self.dataBankFSM: TaskFSMGroup = TaskFSMGroup(
+            self.standardMergeFSM,
+            name=I18nText.DataBank
+        )
+
+        self.rootFSM: TaskFSMGroup = TaskFSMGroup(
+            self.dataBankFSM,
+            name="Root"
+        )
+
+        # runtime
+        self._failed_count = 3
+
+    def fail(self) -> bool:
+        self._failed_count -= 1
+        return self._failed_count <= 0
+
+
+class NodeName:
+    globalDispatcher = "globalDispatcher"
+    rootDispatcher = "rootDispatcher"
+    endNode = "endNode"
+
+    # rootDispatcher
+    doDataBank = "doDataBank"
+
+    # doDataBank
+    doDataMerge = "doDataMerge"
+    doStandardMerge = "doStandardMerge"
+
+
+@node(NodeName.endNode)
+def endNode(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    if local.rootFSM.is_finished:
+        ctx.runtime.taskFSM.complete()
+        ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.SUCCESS)
+    else:
+        ctx.runtime.taskFSM.fail()
+        ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
     ctx.ipc.event_queue.put({
         "task": {"EchoMergeProcessTask": "finished"}
     }, block=True)
-    time.sleep(0.2)
+    time.sleep(0.1)
     return True
 
 
-@node()
-def globalDispatcher(ctx: NodeContext, **kwargs) -> Optional[str]:
-    logger.debug(inspect.currentframe().f_code.co_name)
-    time.sleep(1)
+@node(NodeName.globalDispatcher)
+def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
+    """检查是否在有效页面（如：终端），不在则esc尝试离开（副本等）"""
+    ui = UIOp(ctx)
+    ui.activate().sleep(0.1).snapshot()
 
-    oq = OcrQuery(ctx).grab().query()
-    if not oq.has_results():
-        ctx.control_service.esc()
-        time.sleep(1)
-        logger.debug(f"Ocr nothing")
-        return None
+    page = GlobalPage(ctx)
 
     # 已在终端页
-    is_match = ctx.page_service.is_match(oq.results, I18nPage.Terminal.PAGE)
-    if is_match:
-        logger.debug("已在终端")
-        return I18nPage.Terminal.PAGE
+    if page.isTerminal(ui=ui):
+        logger.debug(f"Found page: {page.Terminal}")
+        return I18nText.Terminal
 
-    # 未知页面，全局扫描，尝试回到主页
-    global_result = ctx.page_service.global_page_action(oq.results)
-    if global_result:
-        logger.debug("找到全局页面")
-        time.sleep(1)
+    if (ui.search(ctx.tr(I18nText.DataMerge))
+            and ui.search(ctx.tr(I18nText.TargetedMerge))
+            and ui.search(ctx.tr(I18nText.StandardMerge))):
+        return I18nText.DataMerge
+
+    # 在全局预设中找出离开函数，尝试回到主页
+    if page_key := page.action(ui=ui):
+        logger.debug(f"Found page: {page_key}")
+        ui.sleep(0.5)
         return None
 
+    logger.info("Transferring")
+
+    num = max(1, min(1.4, random.gauss(1.2, 0.08)))
     # 兜底规则，esc
-    ctx.control_service.esc()
-    logger.debug("未找到任何页面")
-    time.sleep(1)
+    ui.esc().sleep(num)
     return None
 
 
-@node()
-def navigateToDataMerge(ctx: NodeContext, **kwargs) -> bool:
-    logger.debug(inspect.currentframe().f_code.co_name)
+@node(NodeName.rootDispatcher)
+def rootDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
+    if local.dataBankFSM.is_active:
+        return I18nText.DataBank
 
-    ctx.control_service.activate()
-    time.sleep(0.1)
+    if local.rootFSM.is_active:
+        logger.warning("Unexpected root state")
+    return None
 
-    oq = OcrQuery(ctx).grab().query()
-    if not oq.has_results():
-        ctx.control_service.esc()
-        time.sleep(1)
+
+@node(NodeName.doDataBank)
+def doDataBank(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
+    """数据坞"""
+    if local.dataBankFSM.is_terminal:
+        return None
+
+    ui = UIOp(ctx)
+    ui.activate().sleep(0.1).snapshot()
+
+    # 从终端点击进入数据坞
+    if GlobalPage(ctx).isTerminal(ui=ui):
+        if not ui.click_text(ctx.tr(I18nText.DataBank), bbox_terminal_content(ctx),
+                             pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
+            logger.warning(f"Text not found: {ctx.tr(I18nText.DataBank).raw}")
+            ui.esc().sleep(1)
+            return None
+    elif ui.search(ctx.tr(I18nText.DataMerge)) and ui.search(ctx.tr(
+            I18nText.TargetedMerge)) and ui.search(ctx.tr(I18nText.StandardMerge)):
+        return I18nText.DataMerge
+    else:
+        return None
+
+    # 等待进入数据坞
+    if not ui.sleep(0.8).wait().until(
+            lambda: ui.snapshot()
+                    and ui.search(ctx.tr(I18nText.DataBankInfo))
+                    and ui.search(ctx.tr(I18nText.DataBank))):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.DataBank).raw}")
+        ui.esc().sleep(1)
+        return None
+
+    # 点击侧边栏图标
+    ui.sleep(0.4).click_point(AnchorPoint(50, 400, Align.Top | Align.Left), times=2, interval=0.3)
+
+    # 等待进入数据融合
+    if not ui.sleep(0.5).wait().until(
+            lambda: ui.snapshot()
+                    and ui.search(ctx.tr(I18nText.DataMerge))
+                    and ui.search(ctx.tr(I18nText.TargetedMerge))
+                    and ui.search(ctx.tr(I18nText.StandardMerge))):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.DataMerge).raw}")
+        ui.esc().sleep(1)
+        return None
+
+    return I18nText.DataMerge
+
+
+@node(NodeName.doDataMerge)
+def doDataMerge(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
+    """数据融合"""
+    if local.dataBankFSM.is_terminal:
+        return None
+
+    ui = UIOp(ctx)
+    ui.snapshot()
+
+    roi_tab = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 0, Align.Left | Align.Middle),
+        AnchorPoint(1280, 720 // 2, Align.Right | Align.Middle)
+    ))
+    roi_bottom = ctx.scaler.as_bbox(AnchorBBox(
+        AnchorPoint(0, 720 // 2, Align.Left | Align.Middle),
+        AnchorPoint(1280, 720, Align.Right | Align.Middle)
+    ))
+    # 等待进入数据融合
+    if not (ui.search(ctx.tr(I18nText.TargetedMerge), roi_tab)
+            and ui.search(ctx.tr(I18nText.StandardMerge), roi_tab)
+            and ui.search(ctx.tr([I18nText.TargetedMerge, I18nText.StandardMerge]), roi_bottom)):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.StandardMerge).raw}")
+        ui.esc().sleep(1)
+        return None
+
+    # 点击标准融合
+    ui.click_text(ctx.tr(I18nText.StandardMerge), roi_tab, delay=0.3, times=2, interval=0.2)
+    ui.sleep(0.4).click_text(ctx.tr([I18nText.TargetedMerge, I18nText.StandardMerge]), roi_bottom)
+
+    # 等待进入标准融合
+    if not ui.sleep(0.3).wait().until(
+            lambda: ui.snapshot()
+                    and ui.search(ctx.tr(I18nText.DataMergeSelectAll))
+                    and ui.search(ctx.tr(I18nText.StandardMerge))):
+        ui.esc().sleep(1)
+        return None
+
+    return I18nText.StandardMerge
+
+
+@node(NodeName.doStandardMerge)
+def doStandardMerge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    """标准融合"""
+    if local.standardMergeFSM.is_terminal:
+        return True
+    if local.standardMergeFSM.status == TaskStatus.PENDING:
+        logger.info(f"{ctx.tr(I18nText.StandardMerge).raw}")
+        local.standardMergeFSM.start()
+
+    ui = UIOp(ctx)
+    ui.activate().sleep(0.1).snapshot()
+
+    select_all = ctx.tr(I18nText.DataMergeSelectAll)
+    standard_merge = ctx.tr(I18nText.StandardMerge)
+
+    # 确认在标准融合
+    if not ui.search(select_all) and not ui.search(standard_merge):
+        logger.warning(f"Text not found: {standard_merge.raw}")
+        ui.esc().sleep(1)
         return False
 
-    # 终端
-    match_result = ctx.page_service.is_match(oq.results, I18nPage.Terminal.PAGE)
-    if not match_result:
-        logger.warning(f"Page not found: {I18nPage.Terminal.PAGE}")
+    def _fail_return():
+        ui.esc().sleep(0.5)
+        if local.fail():
+            local.standardMergeFSM.fail()
+            return True
         return False
 
-    # 点击进入数据坞
-    data_bank = ctx.tr(I18nText.DataBank)
-    data_bank_bbox = ctx.scaler.as_bbox(
-        AnchorBBox(AnchorPoint(500, 0, Align.Top | Align.Left), AnchorPoint(1280, 720, Align.Right | Align.Bottom)))
-    search_result = oq.search(data_bank, data_bank_bbox)
-    if not search_result:
-        logger.warning(f"Text not found: {data_bank}")
-        return False
-    bbox = search_result[0]
-    ctx.control_service.click(bbox.near)
-    time.sleep(1)
+    def _wait_new_echo():
+        ui.snapshot()
 
-    # 等待葫芦等级页面出现
-    oq = OcrQuery(ctx)
-    match_result = oq.poll(
-        lambda: ctx.echo_merge_service.is_match(oq.grab().query().results, I18nPageEchoMerge.DataBank.PAGE),
-        timeout=5.0, interval=0.3
-    )
-    if not match_result:
-        logger.warning(f"Page not found: {I18nPageEchoMerge.DataBank.PAGE}")
+        if ui.search(ctx.tr(I18nText.DataMergeNewEcho)):
+            return True
+
+        # 检查声骸数量不足提示
+        if ui.search(ctx.tr(I18nText.PleaseSelectAtLeast5Echoes)):
+            return True
+
+        # 检查高品质提示弹窗
+        if ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3) and ui.click_text(
+                ctx.tr(I18nText.Confirm), delay=0.3):
+            ui.sleep(0.3)
+
         return False
 
-    # 点击数据合成侧边栏坐标
-    data_merge_point = ctx.scaler.as_point(AnchorPoint(50, 400, Align.Top | Align.Left)).as_tuple()
-    time.sleep(0.4)
-    ctx.control_service.click(data_merge_point)
-    time.sleep(0.3)
-    ctx.control_service.click(data_merge_point)
-    time.sleep(1)
+    last_time = None
 
-    # 等待数据合成页面出现
-    oq = OcrQuery(ctx)
-    match_result = oq.poll(
-        lambda: ctx.echo_merge_service.is_match(oq.grab().query().results, I18nPageEchoMerge.DataMerge.PAGE),
-        timeout=5.0, interval=0.3
-    )
-    if not match_result:
-        logger.warning(f"Page not found: {I18nPageEchoMerge.DataMerge.PAGE}")
-        return False
-    # 查找定向融合 TODO 进入定向融合
-    targeted_merge = ctx.tr(I18nText.TargetedMerge)
-    search_result = oq.search(targeted_merge)
-    if not search_result or len(search_result) > 2:
-        logger.warning(f"Insufficient text count: {targeted_merge}, expected: 1 or 2")
-        return False
-    if len(search_result) == 2:
-        # 点击标准融合
-        bbox = match_result.get(I18nPageEchoMerge.DataMerge.StandardMerge)
-        ctx.control_service.click(bbox.near)
-        time.sleep(0.2)
-        ctx.control_service.click(bbox.center)
-        time.sleep(1.0)
-    if len(search_result) == 1:
-        search_result = oq.search(ctx.tr(I18nText.StandardMerge))
-    # 点击进入声骸选择页
-    search_result.sort(key=lambda p: p.y2, reverse=True)
-    ctx.control_service.click(search_result[0].near)
-    time.sleep(0.5)
+    def _close_new_echo():
+        ui.snapshot()
 
-    need_notice_check = True
+        nonlocal last_time
+        if last_time is None:
+            last_time = time.monotonic()
+
+        if ui.search(ctx.tr(I18nText.DataMergeSelectAll)) and ui.search(ctx.tr(I18nText.StandardMerge)):
+            return True
+
+        # 每隔一段时间检查一次，防止因卡顿等，导致esc被吞，还留在获得声骸页
+        if time.monotonic() - last_time < 1.2:
+            return False
+        if ui.search(ctx.tr(I18nText.DataMergeNewEcho)):
+            ui.sleep(0.3).esc().sleep(0.3)
+        last_time = time.monotonic()
+
+        return False
 
     # 开始循环融合
     idx = 0
-    while idx < 1000:
-        # 等待选择页面出现
-        oq = OcrQuery(ctx)
-        match_result = oq.poll(
-            lambda: ctx.echo_merge_service.is_match(oq.grab().query().results,
-                                                    I18nPageEchoMerge.StandardMerge_SelectAll.PAGE),
-            timeout=3.0, interval=0.3
-        )
-        if not match_result:
-            logger.warning(f"Page not found: {I18nPageEchoMerge.StandardMerge_SelectAll.PAGE}")
-            return False
+    while idx < 100:
+        if idx > 0:
+            logger.info(f"Merge: {idx}")
 
         # 点击全选 合成
-        time.sleep(0.2)
-        bbox = match_result.get(I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll)
-        ctx.control_service.click(bbox.center)
-        time.sleep(0.2)
-        bbox = match_result.get(I18nPageEchoMerge.StandardMerge_SelectAll.StandardMerge)
-        ctx.control_service.click(bbox.near)
-        time.sleep(0.4)
+        if not ui.search(select_all) and not ui.search(standard_merge):
+            return _fail_return()
+        ui.click_text(select_all, delay=0.3)
+        ui.click_text(standard_merge, delay=0.2)
 
-        oq = OcrQuery(ctx).grab().query()
-        # 检查弹窗
-        if need_notice_check:
-            match_result = ctx.echo_merge_service.is_match(oq.results, I18nPageEchoMerge.Notice_IncludesHighRarity.PAGE)
-            if match_result:
-                bbox = match_result.get(I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain)
-                time.sleep(0.3)
-                ctx.control_service.click(bbox.center)
-                time.sleep(0.3)
-                bbox = match_result.get(I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm)
-                ctx.control_service.click(bbox.center)
-                time.sleep(0.5)
-            need_notice_check = False
+        # 等待合成结果
+        if not ui.sleep(0.4).wait(8, 0.3).until(_wait_new_echo):
+            return _fail_return()
 
-        is_new_echo = None
-        is_finished = False
-        end_time = time.monotonic() + 5.0
-        # 循环等待合成结果
-        while True:
-            oq = OcrQuery(ctx).grab().query()
-            # 检查合成是否完成
-            is_new_echo = ctx.echo_merge_service.is_match(oq.results, I18nPageEchoMerge.NewEcho.PAGE)
-            if is_new_echo:
-                break
-            # 检查是否有声骸不足提示，退出
-            is_match = ctx.echo_merge_service.is_match(oq.results, I18nPageEchoMerge.StandardMerge_SelectAll.PAGE)
-            if is_match:
-                search_result = oq.search(ctx.tr(I18nText.PleaseSelectAtLeast5Echoes))
-                if search_result:
-                    is_finished = True
-                    break
-            if time.monotonic() >= end_time:
-                break
-            time.sleep(0.3)
-
-        if is_finished:
-            logger.debug(f"声骸融合结束")
-            ctx.control_service.esc()
-            time.sleep(0.8)
-            ctx.control_service.esc()
-            time.sleep(1)
+        # 声骸不足
+        if ui.search(ctx.tr(I18nText.PleaseSelectAtLeast5Echoes)):
+            local.standardMergeFSM.complete()
+            ui.esc().sleep(0.8)
             return True
-        elif not is_new_echo:
-            logger.warning(f"Page not found: {I18nPageEchoMerge.NewEcho.PAGE}")
-            return False
 
-        # 合成结果页，esc返回选择声骸页，动画时间不定，可能吞键，循环检查
-        for i in range(5):
-            time.sleep(0.3)
-            ctx.control_service.esc()
-            time.sleep(0.3)
-            oq = OcrQuery(ctx).grab().query()
-            is_match = ctx.echo_merge_service.is_match(oq.results, I18nPageEchoMerge.NewEcho.PAGE)
-            if is_match:
-                continue
-            break
+        # 获得声骸
+        if not ui.search(ctx.tr(I18nText.DataMergeNewEcho)):
+            return _fail_return()
+
+        # 等待回到选择页
+        ui.sleep(0.4).esc().sleep(0.3)
+        if not ui.wait(8, 0.3).until(_close_new_echo):
+            return _fail_return()
 
         idx += 1
+        ui.sleep(0.3)
 
-    return False
+    return _fail_return()
 
 
 class EchoMergeWorkflow(AbstractWorkflow):
@@ -227,17 +306,10 @@ class EchoMergeWorkflow(AbstractWorkflow):
 
         self.engine = WorkflowEngine()
         self.fsm = TaskFSM(name="EchoMergeWorkflow")
+        self.local = TaskLocal()
 
+        self.__init_task_local()
         self.__init_workflow()
-
-    def __init_workflow(self):
-        (
-            self.engine.source("globalDispatcher", is_start=True)
-            .when(lambda ctx: ctx.shared.last_result == I18nPage.Terminal.PAGE).to("navigateToDataMerge")
-            .always().to("globalDispatcher")
-        )
-
-        self.engine.source("navigateToDataMerge").always().to("end_node")
 
     def execute(self, **kwargs):
         try:
@@ -247,8 +319,51 @@ class EchoMergeWorkflow(AbstractWorkflow):
             self.ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.SUCCESS)
             self.ctx.control_service.activate()
             time.sleep(0.1)
-            self.engine.run(self, **kwargs)
-            self.fsm.complete()
+            self.engine.run(self, local=self.local, **kwargs)
         except Exception as e:
             self.fsm.fail()
             raise e
+
+    def __init_task_local(self):
+        """根据配置初始化任务状态"""
+
+        self.local.rootFSM.set_enabled(True)
+        self.local.dataBankFSM.set_enabled(True)
+        self.local.standardMergeFSM.set_enabled(True)
+
+        if not self.local.rootFSM.is_active:
+            logger.warning('Task is not active')
+
+    def __init_workflow(self):
+        (
+            self.engine.source(NodeName.globalDispatcher, is_start=True)
+            .on(I18nText.Terminal).to(NodeName.rootDispatcher)
+            .on(I18nText.DataMerge).to(NodeName.doDataMerge)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        (
+            self.engine.source(NodeName.rootDispatcher)
+            .on(I18nText.DataBank).to(NodeName.doDataBank)
+            .always().to(NodeName.endNode)
+        )
+
+        (
+            self.engine.source(NodeName.doDataBank)
+            .on(I18nText.DataMerge).to(NodeName.doDataMerge)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        (
+            self.engine.source(NodeName.doDataMerge)
+            .on(I18nText.StandardMerge).to(NodeName.doStandardMerge)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        (
+            self.engine.source(NodeName.doStandardMerge)
+            .on(True).to(NodeName.endNode)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        self.engine.exception(NodeName.endNode)

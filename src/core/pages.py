@@ -5,7 +5,7 @@ import time
 from abc import abstractmethod, ABC
 from functools import lru_cache
 from re import Pattern
-from typing import Callable, Dict, List, Optional, Any, Sequence
+from typing import Callable, Dict, List, Optional, Sequence
 
 import numpy as np
 from pydantic import BaseModel, Field, PrivateAttr
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, PrivateAttr
 from src.core.color import ColorRule, ColorMatch, Color, RuleMode
 from src.core.exceptions import StopError
 from src.core.geometry import TextBox, BBox, Scaler, AnchorBBox, AnchorPoint, Align, PointKind, Point
-from src.core.i18n import I18nPage, I18nPageEchoMerge, Language
+from src.core.i18n import Language, I18nText
 from src.core.movement import RouteExecutor, MoveStep
 from src.core.regions import Position, DynamicPosition, TextPosition, Pos
 from src.util import img_util, file_util
@@ -322,117 +322,6 @@ class IMatch(ABC):
         pass
 
 
-class RegexPage(IMatch):
-
-    class _Regex:
-        def __init__(self):
-            self.key = None
-            self.regex_str = None
-            self.pattern: Pattern = None
-            self.limit: Optional[AnchorBBox] = None
-
-    def __init__(self, page_key: str, page_dict: dict[str, Any]):
-        self.page_key: str = page_key
-        self.page_dict: dict[str, Any] = page_dict
-
-        self.name = page_dict.get(I18nPage.Name)
-        self.includes: list[RegexPage._Regex] = self._build_regex(I18nPage.Include)
-        self.excludes: list[RegexPage._Regex] = self._build_regex(I18nPage.Exclude)
-        self.assets = page_dict.get(I18nPage.Assets)
-
-    def _build_regex(self, data_key: str, flags: int = re.I):
-        data_dict: dict = self.page_dict.get(data_key)
-        if not data_dict:
-            return []
-        rpr_list = []
-        for i, (k, v) in enumerate(data_dict.items()):
-            rpr = RegexPage._Regex()
-            rpr.key = k
-            rpr.regex_str = v
-            if isinstance(v, dict):
-                rpr.regex_str = v.get(I18nPage.Text)
-                rpr.limit = AnchorBBox.from_list(v.get(I18nPage.Limit))
-            rpr.pattern = re.compile(rpr.regex_str, flags=flags)
-            rpr_list.append(rpr)
-        return rpr_list
-
-    def match(
-            self,
-            scaler: Scaler,
-            textboxes: list[TextBox],
-            **kwargs
-    ) -> Optional[dict[str, TextBox]]:
-        if not textboxes:
-            return None
-
-        text_excludes_result: dict[str, TextBox] = {}
-
-        # excludes
-        for rpr in self.excludes:
-            # text
-            for textbox in textboxes:
-                # 文本匹配
-                if not rpr.pattern.search(textbox.text):
-                    continue
-
-                # 位置匹配
-                if not rpr.limit:
-                    text_excludes_result[rpr.key] = textbox
-                    break
-                limit_bbox = scaler.as_bbox(rpr.limit)
-                if limit_bbox.contains_bbox(textbox):
-                    text_excludes_result[rpr.key] = textbox
-                    break
-
-            if len(text_excludes_result) > 0:
-                logger.debug(f"text_excludes_result: {text_excludes_result}")
-                return None
-
-        text_matches_result: dict[str, TextBox] = {}
-
-        # text_matches
-        for rpr in self.includes:
-            matched_textbox = None
-            # text
-            for textbox in textboxes:
-                # 文本匹配
-                if not rpr.pattern.search(textbox.text):
-                    continue
-
-                # 位置匹配
-                if not rpr.limit:
-                    matched_textbox = textbox
-                    break
-                limit_bbox = scaler.as_bbox(rpr.limit)
-                if limit_bbox.contains_bbox(textbox):
-                    matched_textbox = textbox
-                    break
-
-            if matched_textbox is not None:
-                text_matches_result[rpr.key] = matched_textbox
-
-        if len(text_matches_result) != len(self.includes):
-            # logger.debug(f"text_matches_result: {text_matches_result}, result: False")
-            return None
-        logger.debug(f"text_matches_result: {text_matches_result}, result: True")
-
-        return text_matches_result
-
-    @staticmethod
-    def error_action(positions: dict[str, Position], **kwargs) -> bool:
-        raise NotImplementedError("Page callback function not implemented")
-
-
-class I18nPageX:
-
-    def __init__(self, data: dict | str):
-        self.data: dict = json.loads(data) if isinstance(data, str) else data
-        self.i18n_regex_pages: dict[Language, dict[str, RegexPage]] = {}
-        for page_key, k_lang_v_page in self.data.items():
-            for k_lang, v_page in k_lang_v_page.items():
-                self.i18n_regex_pages.setdefault(k_lang, {})[page_key] = RegexPage(page_key, v_page)
-
-
 @lru_cache(maxsize=2000)
 def _cached_compile_regex(regex_str: str, flags=re.I) -> Pattern:
     return re.compile(regex_str, flags)
@@ -552,17 +441,19 @@ class OcrQuery:
             img = self.ctx.img_service.screenshot()
         if roi and img is not None:
             if isinstance(roi, AnchorBBox):
-                roi = Scaler(cur_wh=(img.shape[1], img.shape[0])).as_bbox(roi)
+                roi = Scaler(self.ctx.window_service.get_client_wh()).as_bbox(roi)
             img = img[roi.as_slice()]
         self.img = img
         self._is_query = False
         return self
 
-    def query(self, roi: BBox | None = None, resize: bool = True) -> "OcrQuery":
+    def query(self, roi: Optional[BBox | AnchorBBox] = None, resize: bool = True) -> "OcrQuery":
         if self._is_query:
             raise Exception("OcrQuery is already query")
         if not self.ctx.runtime.stop_event.is_set():
             raise StopError()
+        if roi and isinstance(roi, AnchorBBox):
+            roi = Scaler(self.ctx.window_service.get_client_wh()).as_bbox(roi)
         self.results = self.ctx.ocr_service.query(self.img, roi=roi, resize=resize)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"ocr result: {self.results.results}")
@@ -643,9 +534,9 @@ class UIOp:
 
     # --------- ocr相关 ---------
 
-    @property
-    def lang(self):
-        return self.ctx.window_service.get_lang()
+    # @property
+    # def lang(self):
+    #     return self.ctx.window_service.get_lang()
 
     @property
     def img(self):
@@ -655,9 +546,9 @@ class UIOp:
     def bbox_result(self):
         return self.oq.results.results
 
-    @property
-    def ocr_result(self):
-        return self.oq.results
+    # @property
+    # def ocr_result(self):
+    #     return self.oq.results
 
     def grap(self) -> np.ndarray:
         """截图"""
@@ -678,14 +569,14 @@ class UIOp:
         # logger.info(f"snapshot, 耗时: {elapsed:.4f}", stacklevel=2)
         return self
 
-    def match_page(self, page: str):
-        """
-        根据页面key匹配页面是否命中
-        :param page: 如：I18nPage.Terminal.PAGE
-        :return:
-        """
-        page_service = self.page_service if self.page_service else self.ctx.page_service
-        return page_service.is_match(self.ocr_result, page)
+    # def match_page(self, page: str):
+    #     """
+    #     根据页面key匹配页面是否命中
+    #     :param page:
+    #     :return:
+    #     """
+    #     page_service = self.page_service if self.page_service else self.ctx.page_service
+    #     return page_service.is_match(self.ocr_result, page)
 
     def match_key(self, key: str, text: str):
         """
@@ -699,7 +590,7 @@ class UIOp:
         return match
 
     @staticmethod
-    @lru_cache(maxsize=666)
+    @lru_cache(maxsize=1024)
     def __compile_pattern(pattern: str, flags: int):
         return re.compile(pattern, flags)
 
@@ -760,7 +651,7 @@ class UIOp:
 
     def click_bbox(
             self,
-            bbox: BBox | AnchorBBox | Sequence[BBox | AnchorBBox],
+            bbox: BBox | AnchorBBox | Sequence[BBox]| Sequence[AnchorBBox],
             *,
             pk: PointKind = PointKind.CENTER,
             delay: float = 0.0,
@@ -894,6 +785,402 @@ class UIOp:
         return self
 
 
+class GlobalPage:
+
+    Terminal = "Terminal"
+    LuniteSubscriptionReward = "LuniteSubscriptionReward"
+    ChallengeComplete = "ChallengeComplete"
+    LeaveInstance = "LeaveInstance"
+    Revive = "Revive"
+    SelectARevivalItem = "SelectARevivalItem"
+    ReplenishWaveplate = "ReplenishWaveplate"
+    TapTheBlankAreaToClose = "TapTheBlankAreaToClose"
+    TapToLandInSolaris3 = "TapToLandInSolaris3"
+    Login = "Login"
+    InternetDisconnecting = "InternetDisconnecting"
+    PatchingCompleteTheGameIsRestarting = "PatchingCompleteTheGameIsRestarting"
+    PatchingCompletePleaseRestartTheGame = "PatchingCompletePleaseRestartTheGame"
+    DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
+    RequestTimedOut = "RequestTimedOut"
+    BreachTimeRemaining = "BreachTimeRemaining"
+
+    PdrCurrentPhase = "PdrCurrentPhase"
+    PdrFinalize = "PdrFinalize"
+    PdrConfirmProgressAndLeaveNow = "PdrConfirmProgressAndLeaveNow"
+    PdrPhaseResult = "PdrPhaseResult"
+    PdrReturn = "PdrReturn"
+    PdrSkip = "PdrSkip"
+    PdrStrangeEncounters = "PdrStrangeEncounters"
+
+    class ActionStr(str):
+        def __new__(cls, value, action):
+            obj = super().__new__(cls, value)
+            obj.action = action
+            return obj
+
+    def __init__(self, ctx, **kwargs):
+        self.ctx = ctx
+        self.register_match = {
+            self.Terminal: self.isTerminal
+        }
+        self.register = {
+            # self.Terminal: self.isTerminal,
+            self.LuniteSubscriptionReward: self.isLuniteSubscriptionReward,
+            self.ChallengeComplete: self.isChallengeComplete,
+            self.LeaveInstance: self.isLeaveInstance,
+            self.Revive: self.isRevive,
+            self.SelectARevivalItem: self.isSelectARevivalItem,
+            self.ReplenishWaveplate: self.isReplenishWaveplate,
+            self.TapTheBlankAreaToClose: self.isTapTheBlankAreaToClose,
+            self.TapToLandInSolaris3: self.isTapToLandInSolaris3,
+            self.Login: self.isLogin,
+            self.InternetDisconnecting: self.isInternetDisconnecting,
+            self.PatchingCompleteTheGameIsRestarting: self.isPatchingCompleteTheGameIsRestarting,
+            self.PatchingCompletePleaseRestartTheGame: self.isPatchingCompletePleaseRestartTheGame,
+            self.DevicesDriverIsOutdated: self.isDevicesDriverIsOutdated,
+            self.RequestTimedOut: self.isRequestTimedOut,
+            self.BreachTimeRemaining: self.isBreachTimeRemaining,
+            self.PdrCurrentPhase: self.isPdrCurrentPhase,
+            self.PdrFinalize: self.isPdrFinalize,
+            self.PdrConfirmProgressAndLeaveNow: self.isPdrConfirmProgressAndLeaveNow,
+            self.PdrPhaseResult: self.isPdrPhaseResult,
+            self.PdrReturn: self.isPdrReturn,
+            self.PdrSkip: self.isPdrSkip,
+            self.PdrStrangeEncounters: self.isPdrStrangeEncounters,
+        }
+
+    def match(self, *, ui: UIOp, key: Optional[str] = None, **kwargs) -> Optional[ActionStr]:
+        """识别当前页面是什么页面"""
+        logger.debug(f"input key: {key}")
+        if ui is None:
+            ui = UIOp(self.ctx)
+
+        if key is None:
+            for idx, (key, func) in enumerate(self.register.items()):
+                if res := func(ctx=self.ctx, ui=ui, **kwargs):
+                    logger.debug(f"idx: {idx}, match: {key} -> {res}")
+                    return res
+        else:
+            func = self.register.get(key)
+            if not func:
+                raise ValueError(f"Invalid key: {key}")
+            if res := func(ctx=self.ctx, ui=ui, **kwargs):
+                return res
+
+        return None
+
+    def action(self, *, ui: UIOp, **kwargs) -> Optional[str]:
+        """识别当前页面是否是注册的页面，执行预设的函数，用于退出某些无法离开的页面或弹窗"""
+        action_str = self.match(ui=ui, **kwargs)
+        if action_str is None:
+            return None
+        action_str.action()
+        return str(action_str)
+
+    def isTerminal(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.Events))
+                and ui.search(self.ctx.tr(I18nText.SOL3Phase))
+                and ui.search(self.ctx.tr(I18nText.UnionLevel))
+                and ui.search(self.ctx.tr(I18nText.UnionEXP))):
+            return self.ActionStr(self.Terminal, None)
+        return None
+
+    def isLuniteSubscriptionReward(self, *, ui: UIOp, **kwargs):
+        """领取每日月卡奖励"""
+        if res := ui.search(self.ctx.tr(I18nText.LuniteSubscriptionReward)):
+            return self.ActionStr(
+                self.LuniteSubscriptionReward,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(0.3)
+            )
+        return None
+
+    def isChallengeComplete(self, *, ui: UIOp, **kwargs):
+        """挑战完成"""
+
+        # 凝素领域
+        if ((res := ui.search(self.ctx.tr(I18nText.ForgeryExit)))
+                and ui.search(self.ctx.tr(I18nText.ForgeryRestart))):
+            return self.ActionStr(
+                self.ChallengeComplete,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
+            )
+
+        # 无音清剿
+        if ((res := ui.search(self.ctx.tr(I18nText.TacetFieldExit)))
+                and ui.search(self.ctx.tr(I18nText.TacetFieldRestart))):
+            return self.ActionStr(
+                self.ChallengeComplete,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
+            )
+
+        return None
+
+    def isLeaveInstance(self, *, ui: UIOp, **kwargs):
+        """离开副本"""
+        if ((res := ui.search(self.ctx.tr(I18nText.Confirm)))
+                and (ui.search(self.ctx.tr(I18nText.Cancel)) or ui.search(self.ctx.tr(I18nText.Restart)))
+                and (ui.search(self.ctx.tr(I18nText.Notice)) or ui.search(self.ctx.tr(I18nText.Note)))):
+            return self.ActionStr(
+                self.LeaveInstance,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
+            )
+
+        # 周本消耗体力领取奖励后弹出页面
+        if ((res := ui.search(self.ctx.tr(I18nText.WeeklyExit)))
+                and ui.search(self.ctx.tr(I18nText.WeeklyRestart))):
+            return self.ActionStr(
+                self.ChallengeComplete,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
+            )
+
+        return None
+
+    def isRevive(self, *, ui: UIOp, **kwargs):
+        if ((res := ui.search(self.ctx.tr(I18nText.Revive)))
+                and ui.search(self.ctx.tr(I18nText.Defeated))):
+            return self.ActionStr(
+                self.Revive,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(1)
+            )
+        return None
+
+    def isSelectARevivalItem(self, *, ui: UIOp, **kwargs):
+        if ui.search(self.ctx.tr(I18nText.SelectARevivalItem)):
+            return self.ActionStr(
+                self.SelectARevivalItem,
+                lambda: ui.sleep(0.3).esc().sleep(0.4)
+            )
+        return None
+
+    def isReplenishWaveplate(self, *, ui: UIOp, **kwargs):
+        if ui.search(self.ctx.tr(I18nText.ReplenishWaveplate)):
+            return self.ActionStr(
+                self.ReplenishWaveplate,
+                lambda: ui.sleep(0.3).esc().sleep(0.4)
+            )
+        return None
+
+    def isTapTheBlankAreaToClose(self, *, ui: UIOp, **kwargs):
+        if res := ui.search(self.ctx.tr(I18nText.TapTheBlankAreaToClose)):
+            return self.ActionStr(
+                self.TapTheBlankAreaToClose,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.1).sleep(1)
+            )
+        return None
+
+    def isTapToLandInSolaris3(self, *, ui: UIOp, **kwargs):
+        """点击连接，可直接进入游戏"""
+        if res := ui.search(self.ctx.tr(I18nText.TapToLandInSolaris3)):
+            logger.info(f"{self.ctx.tr(I18nText.TapToLandInSolaris3).raw}")
+            return self.ActionStr(
+                self.TapToLandInSolaris3,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(3)
+            )
+        return None
+
+    def isLogin(self, *, ui: UIOp, **kwargs):
+        """登入账号（可能有手机号登录弹窗）"""
+        if ((res := ui.search(self.ctx.tr(I18nText.Login)))
+                and ui.search(self.ctx.tr(I18nText.Settings))
+                and not ui.search(self.ctx.tr(I18nText.TapToLandInSolaris3))):
+
+            ui.activate().sleep(0.1)
+            ui.click_bbox(res, pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2).sleep(0.4)
+
+            from src.core.i18n import I18N_TEXT
+            from src.util import hwnd_util
+
+            def _click_login(handles) -> bool:
+                has_login_text = False
+
+                try:
+                    if not isinstance(handles, list):
+                        handles = [handles]
+
+                    for handle in handles:
+                        self.ctx.control_service.activate_window(handle)
+                        ui.sleep(0.1)
+
+                        img = self.ctx.img_service.screenshot_window(handle)
+                        keywords = list(I18N_TEXT.get(I18nText.ClientLogin).values())
+                        if not UIOp(self.ctx).snapshot(img=img).search(keywords):
+                            continue
+
+                        has_login_text = True
+                        child_handles = hwnd_util.get_child_hwnds(handle)
+
+                        for child_handle in child_handles:
+                            child_wh = hwnd_util.get_client_wh(child_handle)
+                            if child_wh[0] == 0 or child_wh[1] == 0:
+                                continue
+                            child_img = self.ctx.img_service.screenshot_window(child_handle)
+                            # img_util.save_img_in_temp(child_img)
+                            if result := UIOp(self.ctx).snapshot(img=child_img).search(keywords):
+                                self.ctx.control_service.click_window(child_handle, *result[0].near)
+                                ui.sleep(0.2)
+                                self.ctx.control_service.click_window(child_handle, *result[0].near)
+                                ui.sleep(0.2)
+                                break
+
+                        break
+                except (KeyboardInterrupt, StopError) as e:
+                    raise e
+                except Exception as e:
+                    # logger.exception(e)
+                    pass
+                return has_login_text
+
+            def _func():
+                # 先试官服
+                if _click_login(hwnd_util.get_login_hwnd_official()):
+                    logger.info("Official server login")
+                    ui.sleep(3)
+                    return
+
+                # 再试b服
+                if _click_login(hwnd_util.get_login_hwnd_bilibili()):
+                    logger.info("Bilibili server login")
+                    ui.sleep(3)
+                    return
+
+                logger.debug(f"Login failed")
+                ui.sleep(3)
+                return
+
+            return self.ActionStr(self.Login, _func)
+        return None
+
+    def isInternetDisconnecting(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.InternetDisconnecting))
+                and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
+            return self.ActionStr(
+                self.InternetDisconnecting,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(3)
+            )
+        return None
+
+    def isPatchingCompletePleaseRestartTheGame(self, *, ui: UIOp, **kwargs):
+        if ui.search(self.ctx.tr(I18nText.PatchingCompletePleaseRestartTheGame)):
+
+            def _func():
+                self.ctx.window_service.close_window()
+                ui.sleep(3)
+
+            return self.ActionStr(self.PatchingCompletePleaseRestartTheGame, _func)
+        return None
+
+    def isPatchingCompleteTheGameIsRestarting(self, *, ui: UIOp, **kwargs):
+        if ui.search(self.ctx.tr(I18nText.PatchingCompleteTheGameIsRestarting)):
+
+            def _func():
+                self.ctx.window_service.close_window()
+                ui.sleep(3)
+
+            return self.ActionStr(self.PatchingCompleteTheGameIsRestarting, _func)
+        return None
+
+    def isDevicesDriverIsOutdated(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.DevicesDriverIsOutdated))
+                and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
+            return self.ActionStr(
+                self.DevicesDriverIsOutdated,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
+            )
+        return None
+
+    def isRequestTimedOut(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.RequestTimedOut))
+                and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
+            return self.ActionStr(
+                self.RequestTimedOut,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
+            )
+        return None
+
+    def isBreachTimeRemaining(self, *, ui: UIOp, **kwargs):
+        """露西大招 破解剩余时间"""
+        if ui.search(self.ctx.tr(I18nText.BreachTimeRemaining)):
+
+            def _func():
+                try:
+                    self.ctx.control_service.mouse_left_down()
+                    ui.sleep(1.5)
+                finally:
+                    self.ctx.control_service.mouse_left_up()
+
+            return self.ActionStr(self.BreachTimeRemaining, _func)
+        return None
+
+    def isPdrCurrentPhase(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.PdrCurrentPhase))
+                and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
+            return self.ActionStr(
+                self.PdrCurrentPhase,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
+            )
+        return None
+
+    def isPdrFinalize(self, *, ui: UIOp, **kwargs):
+        if ((res := ui.search(self.ctx.tr(I18nText.PdrFinalize)))
+                and ui.search(self.ctx.tr(I18nText.PdrRestart))
+                and ui.search(self.ctx.tr(I18nText.PdrResume))):
+            return self.ActionStr(
+                self.PdrFinalize,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3).sleep(1)
+            )
+        return None
+
+    def isPdrConfirmProgressAndLeaveNow(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.PdrConfirmProgressAndLeaveNow))
+                and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
+            return self.ActionStr(
+                self.PdrConfirmProgressAndLeaveNow,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3).sleep(1)
+            )
+        return None
+
+    def isPdrPhaseResult(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.PdrPhaseResult))
+                and (res := ui.search(self.ctx.tr([I18nText.PdrNextPhase, I18nText.Confirm])))):
+            return self.ActionStr(
+                self.PdrPhaseResult,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3).sleep(1)
+            )
+        return None
+
+    def isPdrReturn(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr([I18nText.PdrChallengeComplete, I18nText.PdrChallengeFailed]))
+                and (res := ui.search(self.ctx.tr(I18nText.PdrReturn)))):
+            return self.ActionStr(
+                self.PdrReturn,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3).sleep(1)
+            )
+        return None
+
+    def isPdrSkip(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.PdrRefresh))
+                and ui.search(self.ctx.tr(I18nText.Confirm))
+                and (res := ui.search(self.ctx.tr(I18nText.PdrSkip)))):
+            return self.ActionStr(
+                self.PdrSkip,
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3).sleep(1)
+            )
+        return None
+
+    def isPdrStrangeEncounters(self, *, ui: UIOp, **kwargs):
+        if (ui.search(self.ctx.tr(I18nText.PdrStrangeEncounters))
+                and (notInterested := ui.search(self.ctx.tr(I18nText.PdrImNotInterestedInThis)))
+                and (confirm := ui.search(self.ctx.tr(I18nText.Confirm)))):
+
+            def _func():
+                ui.click_bbox(notInterested, delay=0.3, times=2, interval=0.2)
+                ui.click_bbox(confirm, pk=PointKind.NEAR, delay=0.3)
+                ui.sleep(1)
+
+            return self.ActionStr(self.PdrStrangeEncounters, _func)
+        return None
+
+
 if __name__ == '__main__':
     # patterns = [
     #     r"cat",
@@ -911,4 +1198,5 @@ if __name__ == '__main__':
     #
     # print(match_with_index(regex, "nothing"))
     # # (False, None)
-    print(I18nPageEchoMerge.StandardMerge_SelectAll.__name__)
+    # print(I18nPageEchoMerge.StandardMerge_SelectAll.__name__)
+    pass

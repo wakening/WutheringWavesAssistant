@@ -85,7 +85,7 @@ class RegexStr(str):
 class I18nText:
     """国际化key，唯一，kv必须一样，不然无法保证唯一性，有冲突就加功能前缀"""
 
-    # ------- game window title -------
+    # ------- Game -------
     WutheringWaves = "WutheringWaves"
 
     # ------- Resonator -------
@@ -148,6 +148,9 @@ class I18nText:
     Jingran = "Jingran"
     Qingxiao = "Qingxiao"
     Hsin = "Hsin"
+
+    # ------- Combat -------
+    BreachTimeRemaining = "BreachTimeRemaining"
 
     # ------- Task -------
     DailyTask = "DailyTask"
@@ -235,7 +238,13 @@ class I18nText:
     ShadowOfShatteredDreams = "ShadowOfShatteredDreams"
 
     # ------- Login -------
+    Bulletin = "Bulletin"
+    Tools = "Tools"
+    Account = "Account"
+    Settings = "Settings"
+    TapToLandInSolaris3 = "TapToLandInSolaris3"
     Login = "Login"
+    ClientLogin = "ClientLogin"
 
     # ------- Map -------
     FastTravel = "FastTravel"
@@ -250,15 +259,27 @@ class I18nText:
     Mengzhou = "Mengzhou"
 
     # ------- Notice -------
+    Notice = "Notice"
+    Note = "Note"
     Confirm = "Confirm"
     Restart = "Restart"
     Exit = "Exit"
+    Exit2 = "Exit2"
+    Cancel = "Cancel"
     CollectSupplies = "CollectSupplies"
     ItemsObtained = "ItemsObtained"
     TapTheBlankAreaToClose = "TapTheBlankAreaToClose"
     SelectARevivalItem = "SelectARevivalItem"
     DoNotShowAgain = "DoNotShowAgain"
     LuniteSubscriptionReward = "LuniteSubscriptionReward"
+    Defeated = "Defeated"
+    Revive = "Revive"
+    ReplenishWaveplate = "ReplenishWaveplate"
+    InternetDisconnecting = "InternetDisconnecting"
+    PatchingCompletePleaseRestartTheGame = "PatchingCompletePleaseRestartTheGame"
+    PatchingCompleteTheGameIsRestarting = "PatchingCompleteTheGameIsRestarting"
+    DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
+    RequestTimedOut = "RequestTimedOut"
 
     # ------- Dialogue -------
     Absorb = "Absorb"
@@ -282,10 +303,14 @@ class I18nText:
     Mail = "Mail"
 
     # ------- Data Bank -------
+    DataBankInfo = "DataBankInfo"
+    DataMerge = "DataMerge"
     TargetedMerge = "TargetedMerge"
     StandardMerge = "StandardMerge"
     PleaseSelectAtLeast5Echoes = "PleaseSelectAtLeast5Echoes"
     DataMergeCount = "DataMergeCount"
+    DataMergeSelectAll = "DataMergeSelectAll"
+    DataMergeNewEcho = "DataMergeNewEcho"
 
     # ------- Guidebook -------
     Activity = "Activity"
@@ -495,6 +520,7 @@ class I18nText:
     PdrFinalize = "PdrFinalize"
     PdrRestart = "PdrRestart"
     PdrResume = "PdrResume"
+    PdrConfirmProgressAndLeaveNow = "PdrConfirmProgressAndLeaveNow"
 
     # ------- View -------
     ViewClaimRewards = "ViewClaimRewards"
@@ -534,7 +560,7 @@ class I18nText:
 
 
 I18N_TEXT = {
-    # ------- game window title -------
+    # ------- Game -------
     I18nText.WutheringWaves: {
         Language.ZH: "鸣潮  ",
         Language.EN: "Wuthering Waves  ",
@@ -776,6 +802,12 @@ I18N_TEXT = {
     I18nText.Hsin: {
         Language.ZH: RegexStr(r"^心$", raw="心"),
         Language.EN: RegexStr(flex_ws(r"^Hsin$"), raw="Hsin"),
+    },
+
+    # ------- Combat -------
+    I18nText.BreachTimeRemaining: {
+        Language.ZH: RegexStr(r"^破解剩余时间", raw="破解剩余时间"),
+        Language.EN: RegexStr(flex_ws(r"^BREACH TIME REMAINING"), raw="BREACH TIME REMAINING"),
     },
 
     # ------- Task -------
@@ -1097,9 +1129,36 @@ I18N_TEXT = {
     },
 
     # ------- Login -------
+    I18nText.Bulletin: {
+        Language.ZH: RegexStr(r"^公告$", raw="公告"),
+        Language.EN: RegexStr(flex_ws(r"^Bulletin$"), raw="Bulletin"),
+    },
+    I18nText.Tools: {
+        Language.ZH: RegexStr(r"^工具$", raw="工具"),
+        Language.EN: RegexStr(flex_ws(r"^Tools$"), raw="Tools"),
+    },
+    I18nText.Account: {
+        Language.ZH: RegexStr(r"^账号$", raw="账号"),
+        Language.EN: RegexStr(flex_ws(r"^Account$"), raw="Account"),
+    },
+    I18nText.Settings: {
+        Language.ZH: RegexStr(r"^设置$", raw="设置"),
+        Language.EN: RegexStr(flex_ws(r"^Settings$"), raw="Settings"),
+    },
+    # 已登录账号
+    I18nText.TapToLandInSolaris3: {
+        Language.ZH: RegexStr(r"^点击连接$", raw="点击连接"),
+        Language.EN: RegexStr(flex_ws(r"^Tap to land in Solaris.?3$"), raw="Tap to land in Solaris-3"),
+    },
+    # 未登录账号（可能有手机号登录弹窗）
     I18nText.Login: {
-        Language.ZH: RegexStr(r"^登录$", raw="登录"),
+        Language.ZH: RegexStr(r"^登入$", raw="登入"),
         Language.EN: RegexStr(flex_ws(r"^Login$"), raw="Login"),
+    },
+    # 手机号、邮箱登录弹窗
+    I18nText.ClientLogin: {
+        Language.ZH: RegexStr(r"^登录$", raw="登录"),
+        Language.EN: RegexStr(r"^Login$", raw="Login"),
     },
 
     # ------- Map -------
@@ -1145,6 +1204,14 @@ I18N_TEXT = {
     },
 
     # ------- Notice -------
+    I18nText.Notice: {
+        Language.ZH: RegexStr(r"^提示$", raw="提示"),
+        Language.EN: RegexStr(flex_ws(r"^Notice$"), raw="Notice"),
+    },
+    I18nText.Note: {
+        Language.ZH: RegexStr(r"^提示$", raw="提示"),
+        Language.EN: RegexStr(flex_ws(r"^Note$"), raw="Note"),
+    },
     I18nText.Confirm: {
         Language.ZH: RegexStr(r"^确认$", raw="确认"),
         Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw="Confirm"),
@@ -1156,6 +1223,10 @@ I18N_TEXT = {
     I18nText.Exit: {
         Language.ZH: RegexStr(r"^离开$", raw="离开"),
         Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
+    },
+    I18nText.Cancel: {
+        Language.ZH: RegexStr(r"^取消$", raw="取消"),
+        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw="Cancel"),
     },
     I18nText.CollectSupplies: {
         Language.ZH: RegexStr(r"^收取物资$", raw="收取物资"),
@@ -1183,6 +1254,48 @@ I18N_TEXT = {
             flex_ws(r"Tap to claim today|Lunite Subscription reward"),
             raw="Tap to claim today's LuniteSubscription reward"
         )
+    },
+    I18nText.Defeated: {
+        Language.ZH: RegexStr(r"^失去意识$", raw="失去意识"),
+        Language.EN: RegexStr(flex_ws(r"^Defeated$"), raw="Defeated"),
+    },
+    I18nText.Revive: {
+        Language.ZH: RegexStr(r"^复苏$", raw="复苏"),
+        Language.EN: RegexStr(flex_ws(r"^Revive$"), raw="Revive"),
+    },
+    I18nText.ReplenishWaveplate: {
+        Language.ZH: RegexStr(r"^补充结晶波片$", raw="补充结晶波片"),
+        Language.EN: RegexStr(flex_ws(r"^Replenish Waveplate$"), raw="Replenish Waveplate"),
+    },
+    # 全局提示
+    I18nText.InternetDisconnecting: {
+        Language.ZH: RegexStr(r"^连接已断开$", raw="连接已断开"),
+        Language.EN: RegexStr(flex_ws(r"^Internet Disconnecting$"), raw="Internet Disconnecting"),
+    },
+    I18nText.PatchingCompletePleaseRestartTheGame: {
+        Language.ZH: RegexStr(r"^更新完成.*?请重新启动游戏.*?$", raw="更新完成，请重新启动游戏。"),
+        Language.EN: RegexStr(flex_ws(r"^Patching complete.*?Please restart the game.*?$"), raw="Patching complete. Please restart the game."),
+    },
+    I18nText.PatchingCompleteTheGameIsRestarting: {
+        Language.ZH: RegexStr(r"^更新完成.*?游戏即将重启.*?$", raw="更新完成，游戏即将重启。"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Patching complete. The game is restarting.*?$"),
+            raw="Patching complete. The game is restarting."
+        ),
+    },
+    I18nText.DevicesDriverIsOutdated: {
+        Language.ZH: RegexStr(r"^检测到设备显卡驱动版本过旧", raw="检测到设备显卡驱动版本过旧"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Your device.?s driver is outdated"),
+            raw="Your device's driver is outdated"
+        ),
+    },
+    I18nText.RequestTimedOut: {
+        Language.ZH: RegexStr(r"^网络请求超时", raw="网络请求超时，无法连接服务器，请稍后再尝试。"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Request timed out.*?Failed"),
+            raw="Request timed out. Failed to connect to the server. Please try again later."
+        ),
     },
 
     # ------- Dialogue -------
@@ -1275,6 +1388,14 @@ I18N_TEXT = {
     },
 
     # ------- Data Bank -------
+    I18nText.DataBankInfo: {
+        Language.ZH: RegexStr(r"^数据坞信息$", raw="数据坞信息"),
+        Language.EN: RegexStr(flex_ws(r"^Data Bank Info$"), raw="Data Bank Info"),
+    },
+    I18nText.DataMerge: {
+        Language.ZH: RegexStr(r"数据融合$", raw="数据融合"),
+        Language.EN: RegexStr(flex_ws(r"Data Merge$"), raw="Data Merge"),
+    },
     I18nText.TargetedMerge: {
         Language.ZH: RegexStr(r"^定向融合$", raw="定向融合"),
         Language.EN: RegexStr(flex_ws(r"^Targeted Merge$"), raw="Targeted Merge"),
@@ -1284,9 +1405,9 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Standard Merge$"), raw="Standard Merge"),
     },
     I18nText.PleaseSelectAtLeast5Echoes: {
-        Language.ZH: RegexStr(r"^请至少放入", raw="请至少放入", desc="请至少放入5个声骸"),
+        Language.ZH: RegexStr(r"请至少放入", raw="请至少放入", desc="请至少放入5个声骸"),
         Language.EN: RegexStr(
-            flex_ws(r"^Please select at least"),
+            flex_ws(r"Please select at least"),
             raw="Please select at least",
             desc="Please select at least 5 Echoes"
         ),
@@ -1294,6 +1415,14 @@ I18N_TEXT = {
     I18nText.DataMergeCount: {
         Language.ZH: RegexStr(r"^数据融合次数", raw="数据融合次数"),
         Language.EN: RegexStr(flex_ws(r"^Data Merge Count"), raw="Data Merge Count"),
+    },
+    I18nText.DataMergeSelectAll: {
+        Language.ZH: RegexStr(r"^全选", raw="全选"),
+        Language.EN: RegexStr(flex_ws(r"^Select All"), raw="Select All"),
+    },
+    I18nText.DataMergeNewEcho: {
+        Language.ZH: RegexStr(r"^获得声骸$", raw="获得声骸"),
+        Language.EN: RegexStr(flex_ws(r"^New Echo$"), raw="New Echo"),
     },
 
     # ------- Guidebook -------
@@ -2056,6 +2185,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^继续$", raw="继续"),
         Language.EN: RegexStr(flex_ws(r"^Resume$"), raw="Resume"),
     },
+    I18nText.PdrConfirmProgressAndLeaveNow: {
+        Language.ZH: RegexStr(r"^是否确认立刻结算并退出.?$", raw="是否确认立刻结算并退出？"),
+        Language.EN: RegexStr(flex_ws(r"^Confirm progress and leave now.?$"), raw="Confirm progress and leave now?"),
+    },
 
     # ------- View页面专用 -------
     # 这几个词在很多页面都有，而且名字有细微差异，不同语言间也有差异，很难统一，各功能单独维护自己的一份
@@ -2162,1380 +2295,6 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^双倍领取$", raw="双倍领取"),
         Language.EN: RegexStr(flex_ws(r"^Claim.?2$"), raw="Claim*2"),
     },
-
-
-
-
-}
-
-
-class I18nPage:
-    """语义key"""
-    Name = "name"
-    Include = "include"
-    Exclude = "exclude"
-    Assets = "assets"
-    # sub key
-    Text = "text"
-    Limit = "limit"
-
-    class Terminal:
-        PAGE = "Terminal"
-        Terminal = "Terminal"
-        Birthday = "Birthday"
-        SOL3Phase = "SOL3Phase"
-        UnionLevel = "UnionLevel"
-        UnionEXP = "UnionEXP"
-
-        Team = "Team"
-        Events = "Events"
-        DataBank = "DataBank"
-
-    class Reward_LuniteSubscriptionReward:
-        PAGE = "Reward_LuniteSubscriptionReward"
-        Reward = "Reward"
-
-    class Reward_ReceiveRewards:
-        PAGE = "Reward_ReceiveRewards"
-        ClaimRewards = "ClaimRewards"
-        Confirm = "Confirm"
-        Cancel = "Cancel"
-
-    class Boss_Crownless_ResonanceCord:
-        PAGE = "Boss_Crownless_ResonanceCord"
-        ResonanceCord = "ResonanceCord"
-
-    class Boss_Dreamless_Enter:
-        PAGE = "Boss_Dreamless_Enter"
-        Dreamless = "Dreamless"
-        Heart = "Heart"
-        Enter = "Enter"
-        Confirm = "Confirm"
-        FastTravel = "FastTravel"
-
-    class Boss_Jue_Enter:
-        PAGE = "Boss_Jue_Enter"
-        Enter = "Enter"
-        Confirm = "Confirm"
-
-    class Boss_Hecate_Enter:
-        PAGE = "Boss_Hecate_Enter"
-        Enter = "Enter"
-        Confirm = "Confirm"
-
-    class Boss_RecommendedLevel:
-        PAGE = "Boss_RecommendedLevel"
-        RecommendedLevel = "RecommendedLevel"
-        SoloChallenge = "SoloChallenge"
-        ClaimsRemaining = "ClaimsRemaining"
-
-    class Boss_StartChallenge:
-        PAGE = "Boss_StartChallenge"
-        QuickSetup = "QuickSetup"
-        StartChallenge = "StartChallenge"
-
-    class Fight_Fight:
-        PAGE = "Fight_Fight"
-        Fight = "Fight"
-        Activity = "Activity"
-        ChallengeCompleted = "ChallengeCompleted"
-
-    class Fight_Absorption:
-        PAGE = "Fight_Absorption"
-        Absorb = "Absorb"
-        ClaimRewards = "ClaimRewards"
-
-    class Fight_ChallengeCompleted:
-        PAGE = "Fight_ChallengeCompleted"
-        ChallengeCompleted = "ChallengeCompleted"
-
-    class Fight_ClickAlternatelyToBreakFree:
-        PAGE = "Fight_ClickAlternatelyToBreakFree"
-        ClickAlternatelyToBreakFree = "ClickAlternatelyToBreakFree"
-
-    class Fight_BreachTimeRemaining:
-        PAGE = "Fight_BreachTimeRemaining"
-        BreachTimeRemaining = "BreachTimeRemaining"
-
-    class UI_ESC_LeaveInstance:
-        PAGE = "UI_ESC_LeaveInstance"
-        Note = "Note"
-        Confirm = "Confirm"
-        Restart = "Restart"
-
-    class Notice_LeaveInstance:
-        PAGE = "Notice_LeaveInstance"
-        Notice = "Notice"
-        Leave = "Leave"
-        Confirm = "Confirm"
-        Cancel = "Cancel"
-
-    class Notice_ForgeryChallengeComplete:
-        PAGE = "Notice_ForgeryChallengeComplete"
-        ChallengeComplete = "ChallengeComplete"
-        Exit = "Exit"
-        Restart = "Restart"
-
-    class Notice_TacetSuppression:
-        PAGE = "Notice_TacetSuppression"
-        ChallengeComplete = "ChallengeComplete"
-        Confirm = "Confirm"
-        Exit = "Exit"
-        Cancel = "Cancel"
-        Restart = "Restart"
-
-    class Notice_LoseConsciousness:
-        PAGE = "Notice_LoseConsciousness"
-        LoseConsciousness = "LoseConsciousness"
-        Revive = "Revive"
-
-    class Notice_SelectRevivalItem:
-        PAGE = "Notice_SelectRevivalItem"
-        SelectRevivalItem = "SelectRevivalItem"
-
-    class Notice_Replenish_Waveplate:
-        PAGE = "Notice_Replenish_Waveplate"
-        ReplenishWaveplate = "Replenish_Waveplate"
-
-    class Notice_BlankArea:
-        PAGE = "Notice_BlankArea"
-        BlankArea = "BlankArea"
-
-    class Login_ClickLink:
-        PAGE = "Login_ClickLink"
-        ClickLink = "ClickLink"
-
-    class Login_AccountLogin:
-        PAGE = "Login_AccountLogin"
-        Text = "Text"
-        Login = "Login"
-        ClickLink = "ClickLink"
-
-    class Login_Disconnected:
-        PAGE = "Login_Disconnected"
-        Disconnected = "Disconnected"
-        LoginTimeout = "LoginTimeout"
-        Confirm = "Confirm"
-
-    class SystemNotice_UpdateCompleteExit:
-        PAGE = "SystemNotice_UpdateCompleteExit"
-        UpdateComplete = "UpdateComplete"
-        Exit = "Exit"
-
-    class SystemNotice_UpdateCompleteConfirm:
-        PAGE = "SystemNotice_UpdateCompleteConfirm"
-        UpdateComplete = "UpdateComplete"
-        Confirm = "Confirm"
-
-    class SystemNotice_Confirm_DriverVersion:
-        PAGE = "SystemNotice_Confirm_DriverVersion"
-        DriverVersion = "DriverVersion"
-        Confirm = "Confirm"
-
-    class SystemNotice_NetworkTimeout:
-        PAGE = "SystemNotice_NetworkTimeout"
-        SystemNotice = "SystemNotice"
-        NetworkTimeout = "NetworkTimeout"
-        Confirm = "Confirm"
-
-    class PhantasmaDreamlandRhapsody_CurrentPhase:
-        PAGE = "PhantasmaDreamlandRhapsody_CurrentPhase"
-        CurrentPhase = "CurrentPhase"
-        Confirm = "Confirm"
-
-    class PhantasmaDreamlandRhapsody_Pause:
-        PAGE = "PhantasmaDreamlandRhapsody_Pause"
-        Pause = "Pause"
-        Finalize = "Finalize"
-        Restart = "Restart"
-        Resume = "Resume"
-
-    class PhantasmaDreamlandRhapsody_Leave:
-        PAGE = "PhantasmaDreamlandRhapsody_Leave"
-        LeaveNow = "LeaveNow"
-        Confirm = "Confirm"
-
-    class PhantasmaDreamlandRhapsody_PhaseResult:
-        PAGE = "PhantasmaDreamlandRhapsody_PhaseResult"
-        PhaseResult = "PhaseResult"
-        Confirm = "Confirm"
-
-    class PhantasmaDreamlandRhapsody_ChallengeFinished:
-        PAGE = "PhantasmaDreamlandRhapsody_ChallengeFinished"
-        ChallengeFinished = "ChallengeFinished"
-        Return = "Return"
-
-    class PhantasmaDreamlandRhapsody_Pick1Of3:
-        PAGE = "PhantasmaDreamlandRhapsody_Pick1Of3"
-        Refresh = "Refresh"
-        Skip = "Skip"
-        Confirm = "Confirm"
-
-    class PhantasmaDreamlandRhapsody_StrangeEncounters:
-        PAGE = "PhantasmaDreamlandRhapsody_StrangeEncounters"
-        ImNotInterestedInThis = "ImNotInterestedInThis"
-        Confirm = "Confirm"
-
-
-
-
-# ------------- Global Page --------------
-
-I18N_PAGES = {
-
-    # ----------- UI -----------
-
-    I18nPage.Terminal.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "UI-终端",
-            I18nPage.Include: {
-                I18nPage.Terminal.Events: r"^活动$",
-                # I18nPage.Terminal.Birthday: r"^生日$",
-                I18nPage.Terminal.SOL3Phase: r"^索拉等级$",
-                I18nPage.Terminal.UnionLevel: r"^联觉等级$",
-                I18nPage.Terminal.UnionEXP: r"^联觉经验$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001.png"],
-        },
-        Language.EN: {
-            I18nPage.Name: "UI-Terminal",
-            I18nPage.Include: {
-                I18nPage.Terminal.Events: flex_ws(r"^Events$"),
-                # I18nPage.Terminal.Birthday: flex_ws(r"^Birthday$"),
-                I18nPage.Terminal.SOL3Phase: flex_ws(r"^S[O0]L3 Phase$"),
-                I18nPage.Terminal.UnionLevel: flex_ws(r"^Union Level$"),
-                I18nPage.Terminal.UnionEXP: flex_ws(r"^Union EXP$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-
-    # ----------- Reward -----------
-
-    I18nPage.Reward_LuniteSubscriptionReward.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "每日月卡奖励",
-            I18nPage.Include: {
-                I18nPage.Reward_LuniteSubscriptionReward.Reward: r"点击领取今日月相观测卡奖励",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["Reward_LuniteSubscriptionReward_001.png"],
-        },
-        Language.EN: {
-            I18nPage.Name: "Lunite Subscription reward",
-            I18nPage.Include: {
-                I18nPage.Reward_LuniteSubscriptionReward.Reward: RegexStr(
-                    flex_ws(r"Tap to claim today|Lunite Subscription reward"),
-                    raw="Tap to claim today's LuniteSubscription reward"
-                ),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-
-    I18nPage.Reward_ReceiveRewards.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "领取奖励",
-            I18nPage.Include: {
-                I18nPage.Reward_ReceiveRewards.ClaimRewards: r"^领取奖励$",
-                I18nPage.Reward_ReceiveRewards.Confirm: r"^确认$",
-                I18nPage.Reward_ReceiveRewards.Cancel: r"^取消$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Boss -----------
-
-    I18nPage.Boss_Crownless_ResonanceCord.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "无冠者-声弦",
-            I18nPage.Include: {
-                I18nPage.Boss_Crownless_ResonanceCord.ResonanceCord: r"^声弦$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Crownless-ResonanceCord",
-            I18nPage.Include: {
-                I18nPage.Boss_Crownless_ResonanceCord.ResonanceCord: flex_ws(r"^Resonance Cord$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Dreamless_Enter.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "无冠者之像·心脏",
-            I18nPage.Include: {
-                I18nPage.Boss_Dreamless_Enter.Dreamless: r"无冠者之像",
-                I18nPage.Boss_Dreamless_Enter.Heart: r"心脏",
-                I18nPage.Boss_Dreamless_Enter.Enter: r"进入",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Boss_Dreamless_Enter.Confirm: r"^确认$",
-                I18nPage.Boss_Dreamless_Enter.FastTravel: r"快速旅行",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Jue_Enter.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "角-时序之寰",
-            I18nPage.Include: {
-                I18nPage.Boss_Jue_Enter.Enter: r"进入时序之",
-                I18nPage.Boss_Jue_Enter.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_Hecate_Enter.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "声之领域|梦魇领域|最终章",
-            I18nPage.Include: {
-                I18nPage.Boss_Hecate_Enter.Enter: r"^(进入声之领域|进入梦.?领域|进入.*最终章.*)$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Boss_Hecate_Enter.Confirm: r"^确认$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_RecommendedLevel.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "推荐等级",
-            I18nPage.Include: {
-                I18nPage.Boss_RecommendedLevel.RecommendedLevel: r"推荐等级",
-                I18nPage.Boss_RecommendedLevel.SoloChallenge: r"单人挑战",
-                I18nPage.Boss_RecommendedLevel.ClaimsRemaining: r"可收取次数",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Boss_StartChallenge.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "开启挑战",
-            I18nPage.Include: {
-                I18nPage.Boss_StartChallenge.QuickSetup: r"^快速编队$",
-                I18nPage.Boss_StartChallenge.StartChallenge: r"^开启挑战$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "StartChallenge",
-            I18nPage.Include: {
-                I18nPage.Boss_StartChallenge.QuickSetup: r"^QuickSetup$",
-                I18nPage.Boss_StartChallenge.StartChallenge: r"^StartChallenge$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Fight -----------
-
-    I18nPage.Fight_Fight.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "战斗画面",
-            I18nPage.Include: {
-                I18nPage.Fight_Fight.Fight: r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Fight_Fight.Activity: r"^(活跃度|活跃行迹)$",
-                I18nPage.Fight_Fight.ChallengeCompleted: r"^挑战成功$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_Absorption.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "吸收",
-            I18nPage.Include: {
-                I18nPage.Fight_Absorption.Absorb: r"^吸收$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Fight_Absorption.ClaimRewards: r"^领取奖励$",
-            },
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Absorb",
-            I18nPage.Include: {
-                I18nPage.Fight_Absorption.Absorb: flex_ws(r"^Absorb$"),
-            },
-            I18nPage.Exclude: {
-                I18nPage.Fight_Absorption.ClaimRewards: flex_ws(r"^Claim Rewards$"),
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_ChallengeCompleted.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "挑战成功",
-            I18nPage.Include: {
-                I18nPage.Fight_ChallengeCompleted.ChallengeCompleted: r"^挑战成功$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_ClickAlternatelyToBreakFree.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "交替点击进行挣脱",
-            I18nPage.Include: {
-                I18nPage.Fight_ClickAlternatelyToBreakFree.ClickAlternatelyToBreakFree: r"^交替点击进行挣脱$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Click alternately to break free",
-            I18nPage.Include: {
-                I18nPage.Fight_ClickAlternatelyToBreakFree.ClickAlternatelyToBreakFree: flex_ws(
-                    r"^Click alternately to break free$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Fight_BreachTimeRemaining.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "破解剩余时间",
-            I18nPage.Include: {
-                I18nPage.Fight_BreachTimeRemaining.BreachTimeRemaining: r"^破解剩余时间",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "BREACH TIME REMAINING",
-            I18nPage.Include: {
-                I18nPage.Fight_BreachTimeRemaining.BreachTimeRemaining: flex_ws(
-                    r"^BREACH TIME REMAINING"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Notice -----------
-
-    I18nPage.UI_ESC_LeaveInstance.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "UI-离开副本",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_LeaveInstance.Note: r"^提示$",
-                I18nPage.UI_ESC_LeaveInstance.Confirm: r"^确认$",
-                I18nPage.UI_ESC_LeaveInstance.Restart: r"^重新挑战$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "UI-LeaveInstance",
-            I18nPage.Include: {
-                I18nPage.UI_ESC_LeaveInstance.Note: r"^Note$",
-                I18nPage.UI_ESC_LeaveInstance.Confirm: r"^Confirm$",
-                I18nPage.UI_ESC_LeaveInstance.Restart: r"^Restart$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_LeaveInstance_001_EN.png"],
-        },
-    },
-
-    I18nPage.Notice_LeaveInstance.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "Notice-离开副本",  # 梦魇赫卡忒、凝素领域
-            I18nPage.Include: {
-                I18nPage.Notice_LeaveInstance.Notice: r"^提示$",
-                I18nPage.Notice_LeaveInstance.Confirm: r"^确认$",
-                I18nPage.Notice_LeaveInstance.Cancel: r"^取消$",
-                I18nPage.Notice_LeaveInstance.Leave: r"离开",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Notice-LeaveInstance",
-            I18nPage.Include: {
-                I18nPage.Notice_LeaveInstance.Notice: r"^Notice$",
-                I18nPage.Notice_LeaveInstance.Confirm: r"^Confirm$",
-                I18nPage.Notice_LeaveInstance.Cancel: r"^(Cancel|Restart)$",
-                I18nPage.Notice_LeaveInstance.Leave: r"Leave",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_ForgeryChallengeComplete.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "Notice-副本-挑战完成/失败",
-            I18nPage.Include: {
-                I18nPage.Notice_ForgeryChallengeComplete.ChallengeComplete: r"^(挑战完成|挑战成功|挑战失败)$",
-                I18nPage.Notice_ForgeryChallengeComplete.Exit: r"^退出副本$",
-                I18nPage.Notice_ForgeryChallengeComplete.Restart: r"^重新挑战$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Notice-Instance-ChallengeComplete/Failed",
-            I18nPage.Include: {
-                I18nPage.Notice_ForgeryChallengeComplete.ChallengeComplete: flex_ws(r"^(Challenge Complete|Challenge Failed)$"),
-                I18nPage.Notice_ForgeryChallengeComplete.Exit: r"^Exit$",
-                I18nPage.Notice_ForgeryChallengeComplete.Restart: r"^Restart$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_TacetSuppression.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "Notice-无音区-挑战成功",
-            I18nPage.Include: {
-                I18nPage.Notice_TacetSuppression.ChallengeComplete: r"^挑战成功$",
-                I18nPage.Notice_TacetSuppression.Confirm: r"^确定$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Notice_TacetSuppression.Exit: r"^退出副本$",
-                I18nPage.Notice_TacetSuppression.Cancel: r"^取消$",
-                I18nPage.Notice_TacetSuppression.Restart: r"^重新挑战$",
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_LoseConsciousness.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "失去意识",
-            I18nPage.Include: {
-                I18nPage.Notice_LoseConsciousness.LoseConsciousness: r"失去意识",
-                I18nPage.Notice_LoseConsciousness.Revive: r"复苏",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_SelectRevivalItem.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "选择复苏物品",
-            I18nPage.Include: {
-                I18nPage.Notice_SelectRevivalItem.SelectRevivalItem: r"选择复苏物品",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_Replenish_Waveplate.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "补充结晶波片",
-            I18nPage.Include: {
-                I18nPage.Notice_Replenish_Waveplate.ReplenishWaveplate: r"补充结晶波片",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Notice_BlankArea.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "点击空白区域关闭",
-            I18nPage.Include: {
-                I18nPage.Notice_BlankArea.BlankArea: r"^点击空白区域关闭$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- Login -----------
-
-    I18nPage.Login_ClickLink.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "点击连接",
-            I18nPage.Include: {
-                I18nPage.Login_ClickLink.ClickLink: r"^点击连接$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Tap to land in Solaris-3",
-            I18nPage.Include: {
-                # I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"Tap to land in Solaris-3"),
-                I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"^Tap to land in Solaris*"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Login_AccountLogin.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "账户登录",
-            I18nPage.Include: {
-                I18nPage.Login_AccountLogin.Text: r"^(退出|公告|修复)$",
-                I18nPage.Login_AccountLogin.Login: r"^登入$",
-            },
-            I18nPage.Exclude: {
-                I18nPage.Login_AccountLogin.ClickLink: r"点击连接",
-            },
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "AccountLogin",
-            I18nPage.Include: {
-                I18nPage.Login_AccountLogin.Text: r"^(Exit|Notice|Repair)$",
-                I18nPage.Login_AccountLogin.Login: r"^Login$",
-            },
-            I18nPage.Exclude: {
-                # I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"Tap to land in Solaris-3"),
-                I18nPage.Login_AccountLogin.ClickLink: flex_ws(r"^Tap to land in Solaris*"),
-            },
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.Login_Disconnected.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "连接已断开",
-            I18nPage.Include: {
-                # 已与服务器断开连接，请尝试重新登录，如有疑问请联系客服
-                I18nPage.Login_Disconnected.Disconnected: r"连接已断开",
-                # I18nPage.Login_Disconnected.LoginTimeout: r"登录超时",
-                I18nPage.Login_Disconnected.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    # ----------- System Notice -----------
-
-    I18nPage.SystemNotice_UpdateCompleteExit.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "更新完成，请重新启动游戏",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_UpdateCompleteExit.UpdateComplete: r"更新完成.*请重新启动游戏",
-                I18nPage.SystemNotice_UpdateCompleteExit.Exit: r"^退出$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.SystemNotice_UpdateCompleteConfirm.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "更新完成，游戏即将重启",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_UpdateCompleteExit.UpdateComplete: RegexStr(
-                    r"更新完成.*?游戏即将重启", raw=r"更新完成，游戏即将重启"),
-                I18nPage.SystemNotice_UpdateCompleteConfirm.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.SystemNotice_Confirm_DriverVersion.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "检测到设备显卡驱动版本过旧",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_Confirm_DriverVersion.DriverVersion: r"显卡驱动版本过旧",
-                I18nPage.SystemNotice_Confirm_DriverVersion.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.SystemNotice_NetworkTimeout.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "系统提示-网络请求超时",
-            I18nPage.Include: {
-                I18nPage.SystemNotice_NetworkTimeout.SystemNotice: r"系统提示",
-                I18nPage.SystemNotice_NetworkTimeout.NetworkTimeout: r"网络请求超时",
-                I18nPage.SystemNotice_NetworkTimeout.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-乐园阶段目标",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.CurrentPhase: r"^乐园阶段\d/\d目标$",
-                I18nPage.PhantasmaDreamlandRhapsody_CurrentPhase.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_Pause.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-暂停",
-            I18nPage.Include: {
-                # I18nPage.PhantasmaDreamlandRhapsody_Pause.Pause: r"^暂停$",
-                I18nPage.PhantasmaDreamlandRhapsody_Pause.Finalize: r"结算并离开",
-                I18nPage.PhantasmaDreamlandRhapsody_Pause.Restart: r"^重新开始$",
-                I18nPage.PhantasmaDreamlandRhapsody_Pause.Resume: r"^继续$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_Leave.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-确认离开",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_Leave.LeaveNow: r"是否确认立刻结算并退出",
-                I18nPage.PhantasmaDreamlandRhapsody_Leave.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-收益结算",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.PhaseResult: r"^第.?阶段收益结算$",
-                I18nPage.PhantasmaDreamlandRhapsody_PhaseResult.Confirm: r"^(确认|进入新阶段)$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-返回主页",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.ChallengeFinished: r"^(挑战失败|挑战成功)$",
-                I18nPage.PhantasmaDreamlandRhapsody_ChallengeFinished.Return: r"^返回主页$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-选择声骸",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Refresh: r"^刷新$",
-                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Skip: r"^跳过$",
-                I18nPage.PhantasmaDreamlandRhapsody_Pick1Of3.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-    I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "幻梦游园·狂想-奇缘异遇",
-            I18nPage.Include: {
-                I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.ImNotInterestedInThis: r"^你对此不感兴趣$",
-                I18nPage.PhantasmaDreamlandRhapsody_StrangeEncounters.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-
-
-
-
-}
-
-
-# ------------- Echo Merge 声骸融合 --------------
-
-class I18nPageEchoMerge(I18nPage):
-    class DataBank:
-        PAGE = "DataBank"
-        DataBankInfo = "DataBankInfo"
-        Rewards = "Rewards"
-
-    # class DataBank_EchoGallery:
-    #     PAGE = "DataBank_EchoGallery"
-    #     EchoGallery = "EchoGallery"
-    #
-    # class DataBank_SonataGallery:
-    #     PAGE = "DataBank_SonataGallery"
-    #     SonataGallery = "SonataGallery"
-
-    class DataMerge:
-        PAGE = "DataMerge"
-        DataMerge = "DataMerge"
-        TargetedMerge = "TargetedMerge"
-        StandardMerge = "StandardMerge"
-
-    class StandardMerge_SelectAll:
-        PAGE = "DataMerge_SelectAll"
-        SelectAll = "SelectAll"
-        DataMergeCount = "DataMergeCount"
-        StandardMerge = "StandardMerge"
-
-    class Notice_IncludesHighRarity:
-        PAGE = "Notice_High_Rarity"
-        Notice = "Notice"
-        HighRarity = "HighRarity"
-        DoNotShowAgain = "DoNotShowAgain"
-        Confirm = "Confirm"
-
-    class NewEcho:
-        PAGE = "NewEcho"
-        NewEcho = "NewEcho"
-
-    # class DataBank_DataModify:
-    #     PAGE = "DataBank_DataModify"
-    #     DataModify = "DataModify"
-    #
-    # class DataBank_EchoManagement:
-    #     PAGE = "DataBank_EchoManagement"
-    #     EchoManagement = "EchoManagement"
-
-
-I18N_PAGES_ECHO_MERGE = {
-    I18nPage.Terminal.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "UI-终端",
-            I18nPage.Include: {
-                I18nPage.Terminal.Terminal: {
-                    I18nPage.Text: r"^终端$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.Terminal.Team: r"^编队$",
-                I18nPage.Terminal.Events: r"^活动$",
-                I18nPage.Terminal.DataBank: r"^数据坞$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001.png"],
-        },
-        Language.EN: {
-            I18nPage.Name: "UI-Terminal",
-            I18nPage.Include: {
-                I18nPage.Terminal.Terminal: {
-                    I18nPage.Text: r"^Terminal$",
-                    I18nPage.Limit: AnchorBBox(
-                        AnchorPoint(0, 0, Align.Top | Align.Left),
-                        AnchorPoint(280, 90, Align.Top | Align.Left),
-                    ).as_tuple(),
-                },
-                I18nPage.Terminal.Team: r"^Team$",
-                I18nPage.Terminal.Events: r"^Events$",
-                I18nPage.Terminal.DataBank: flex_ws(r"^Data Bank$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: ["UI_ESC_Terminal_001_EN.png"],
-        },
-    },
-    I18nPageEchoMerge.DataBank.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "数据坞",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataBank.DataBankInfo: r"^数据坞信息$",
-                I18nPageEchoMerge.DataBank.Rewards: r"^奖励$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "DataBank",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataBank.DataBankInfo: flex_ws(r"^Data Bank Info$"),
-                I18nPageEchoMerge.DataBank.Rewards: r"^Rewards$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-
-    },
-    I18nPageEchoMerge.DataMerge.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "数据坞-数据融合",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataMerge.TargetedMerge: r"定向融合$",
-                I18nPageEchoMerge.DataMerge.StandardMerge: r"标准融合$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "DataBank-DataMerge",
-            I18nPage.Include: {
-                I18nPageEchoMerge.DataMerge.TargetedMerge: flex_ws(r"Targeted Merge$"),
-                I18nPageEchoMerge.DataMerge.StandardMerge: flex_ws(r"Standard Merge$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.StandardMerge_SelectAll.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "标准融合-全选",
-            I18nPage.Include: {
-                I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll: r"^全选",
-                I18nPageEchoMerge.StandardMerge_SelectAll.StandardMerge: r"^标准融合$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "StandardMerge-SelectAll",
-            I18nPage.Include: {
-                I18nPageEchoMerge.StandardMerge_SelectAll.SelectAll: flex_ws(r"^Select All"),
-                # I18nPageEchoMerge.StandardMerge_SelectAll.DataMergeCount: flex_ws(r"Data Merge Count"),
-                I18nPageEchoMerge.StandardMerge_SelectAll.StandardMerge: flex_ws(r"^Standard Merge$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.Notice_IncludesHighRarity.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "提示-包含品质较高的声骸",
-            I18nPage.Include: {
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Notice: r"^提示$",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.HighRarity: r"包含品质较高",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain: r"本次登录不再提示",
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm: r"^确认$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Notice-IncludesHighRarity",
-            I18nPage.Include: {
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Notice: flex_ws(r"^Notice$"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.HighRarity: flex_ws(r"High Rarity"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.DoNotShowAgain: flex_ws(r"Do not show again"),
-                I18nPageEchoMerge.Notice_IncludesHighRarity.Confirm: flex_ws(r"^Confirm$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-    I18nPageEchoMerge.NewEcho.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "获得声骸",
-            I18nPage.Include: {
-                I18nPageEchoMerge.NewEcho.NewEcho: r"获得声骸",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "NewEcho",
-            I18nPage.Include: {
-                I18nPageEchoMerge.NewEcho.NewEcho: flex_ws(r"New Echo"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-    },
-
-}
-
-
-# ------------- Guidebook --------------
-
-class I18nPageGuidebook(I18nPage):
-    class Activity:
-        pass
-
-    class MaterialsSpots:
-        PAGE = "MaterialsSpots"
-        ForgeryChallenge = "ForgeryChallenge"
-        SimulationChallenge = "SimulationChallenge"
-        BossChallenge = "BossChallenge"
-        TacetSuppression = "TacetSuppression"
-        WeeklyChallenge = "WeeklyChallenge"
-        NightmarePurification = "NightmarePurification"
-        TacetDiscordNest = "TacetDiscordNest"
-
-    class RecurringChallenges:
-        pass
-
-    class PathOfGrowth:
-        pass
-
-    class EnemyTracing:
-        pass
-
-    class Milestones:
-        pass
-
-
-I18N_PAGES_GUIDEBOOK = {
-    I18nPageGuidebook.MaterialsSpots.PAGE: {
-        Language.ZH: {
-            I18nPage.Name: "素材获取",
-            I18nPage.Include: {
-                # 产出武器及技能材料
-                I18nPageGuidebook.MaterialsSpots.ForgeryChallenge: r"^凝素领域$",
-                # 产出经验材料
-                I18nPageGuidebook.MaterialsSpots.SimulationChallenge: r"^模拟领域$",
-                # 产出共鸣者突破材料
-                I18nPageGuidebook.MaterialsSpots.BossChallenge: r"^讨伐强敌$",
-                # 产出声骸材料
-                I18nPageGuidebook.MaterialsSpots.TacetSuppression: r"^无音清剿$",
-                # 产出高级技能材料
-                I18nPageGuidebook.MaterialsSpots.WeeklyChallenge: r"^战歌重奏$",
-                # 产出梦魇声骸
-                I18nPageGuidebook.MaterialsSpots.NightmarePurification: r"^梦魇祓除$",
-                # 产出声骸套件
-                I18nPageGuidebook.MaterialsSpots.TacetDiscordNest: r"^残像聚落$",
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-        Language.EN: {
-            I18nPage.Name: "Materials Spots",
-            I18nPage.Include: {
-                I18nPageGuidebook.MaterialsSpots.ForgeryChallenge: flex_ws(r"^Forgery Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.SimulationChallenge: flex_ws(r"^Simulation Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.BossChallenge: flex_ws(r"^Boss Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.TacetSuppression: flex_ws(r"^Tacet Suppression$"),
-                I18nPageGuidebook.MaterialsSpots.WeeklyChallenge: flex_ws(r"^Weekly Challenge$"),
-                I18nPageGuidebook.MaterialsSpots.NightmarePurification: flex_ws(r"^Nightmare Purification$"),
-                I18nPageGuidebook.MaterialsSpots.TacetDiscordNest: flex_ws(r"^Tacet Discord Nest$"),
-            },
-            I18nPage.Exclude: {},
-            I18nPage.Assets: [],
-        },
-
-    },
-
-}
-
-
-class I18nView:
-    Terminal = "Terminal"
-    LuniteSubscriptionReward = "LuniteSubscriptionReward"
-    ViewClaimRewards = "ViewClaimRewards"
-    ViewFight = "ViewFight"
-    Absorb = "Absorb"
-    ViewChallengeComplete = "ViewChallengeComplete"
-    ViewBreakFree = "ViewBreakFree"
-    ViewLeaveInstance = "ViewLeaveInstance"
-    ViewLeaveInstance2 = "ViewLeaveInstance2"
-    ViewForgeryChallengeComplete = "ViewForgeryChallengeComplete"
-    ViewTacetSuppressionComplete = "ViewTacetSuppressionComplete"
-    ViewTacetSuppressionClaimRewards = "ViewTacetSuppressionClaimRewards"
-
-
-class View:
-    def __init__(self, *, name: str | None = None, child, assets: dict[Language, str] | None = None):
-        self.name: str | None = name
-        self.child = child
-        self.assets = assets
-
-
-class FeatureGroup(str, Enum):
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
-    E = "E"
-    F = "F"
-    G = "G"
-    H = "H"
-    I = "I"
-    J = "J"
-    K = "K"
-    L = "L"
-    M = "M"
-    N = "N"
-    O = "O"
-    P = "P"
-    Q = "Q"
-    R = "R"
-    S = "S"
-    T = "T"
-    U = "U"
-    V = "V"
-    W = "W"
-    X = "X"
-    Y = "Y"
-    Z = "Z"
-
-
-class Feature:
-    def __init__(
-            self,
-            key: str,
-            *,
-            roi: BBox | None = None,
-            exclude: bool = False,
-            group: str | None = None,
-    ):
-        """
-        文本特征
-        :param key: 文本标识key，表示这个词必须有
-        :param roi: 文本位置
-        :param exclude: 是否为反向词，为True表示这个词不能有
-        :param group: 同组的为或关系，只要组里有一个满足就算对。后续可以直接用组key来拿到命中的文本key，不用逐个判断
-        """
-        self.key: str = key
-        self.roi: BBox | None = roi
-        self.exclude: bool = exclude
-        self.group: str | None = group
-
-
-I18N_PAGES_BOSS = {
-    I18nView.Terminal: {
-        Language.ZH: View(
-            name="终端",
-            child=[
-                Feature(I18nText.Events),
-                # Feature(I18nText.Birthday),
-                Feature(I18nText.SOL3Phase),
-                Feature(I18nText.UnionLevel),
-                Feature(I18nText.UnionEXP),
-            ],
-        ),
-        Language.EN: View(
-            name="Terminal",
-            child=[
-                Feature(I18nText.Events),
-                # Feature(I18nText.Birthday),
-                Feature(I18nText.SOL3Phase),
-                Feature(I18nText.UnionLevel),
-                Feature(I18nText.UnionEXP),
-            ],
-        ),
-    },
-
-    I18nView.LuniteSubscriptionReward: {
-        Language.ZH: View(
-            name="每日月卡奖励",
-            child=[
-                Feature(I18nText.LuniteSubscriptionReward),
-            ],
-        ),
-        Language.EN: View(
-            name="Lunite Subscription reward",
-            child=[
-                Feature(I18nText.LuniteSubscriptionReward),
-            ],
-        ),
-    },
-
-    I18nView.ViewClaimRewards: {
-        Language.ZH: View(
-            name="领取奖励",
-            child=[
-                Feature(I18nText.ViewClaimRewards),
-                Feature(I18nText.ViewClaimRewardsConfirm),
-                Feature(I18nText.ViewClaimRewardsCancel),
-            ],
-        ),
-    },
-
-    I18nView.ViewFight: {
-        Language.ZH: View(
-            name="战斗画面",
-            child=[
-                Feature(I18nText.ViewFight),
-                Feature(I18nText.Activity, exclude=True),
-                Feature(I18nText.ActivityPts, exclude=True),
-                Feature(I18nText.TacetFieldChallengeComplete, exclude=True),
-                Feature(I18nText.TacetFieldNoticeChallengeComplete, exclude=True),
-                Feature(I18nText.ForgeryChallengeComplete, exclude=True),
-            ],
-        ),
-    },
-
-    I18nView.Absorb: {
-        Language.ZH: View(
-            name="吸收",
-            child=[
-                Feature(I18nText.Absorb),
-                Feature(I18nText.ClaimRewards, exclude=True),
-            ],
-        ),
-        Language.EN: View(
-            name="Absorb",
-            child=[
-                Feature(I18nText.Absorb),
-                Feature(I18nText.ClaimRewards, exclude=True),
-            ],
-        ),
-    },
-
-    I18nView.ViewChallengeComplete: {
-        Language.ZH: View(
-            name="挑战成功",
-            child=[
-                Feature(I18nText.ViewChallengeComplete),
-            ],
-        ),
-        Language.EN: View(
-            name="Challenge Complete",
-            child=[
-                Feature(I18nText.ViewChallengeComplete),
-            ],
-        ),
-    },
-
-    I18nView.ViewBreakFree: {
-        Language.ZH: View(
-            name="交替点击进行挣脱",
-            child=[
-                Feature(I18nText.ViewBreakFree),
-            ],
-        ),
-        Language.EN: View(
-            name="Break Free",
-            child=[
-                Feature(I18nText.ViewBreakFree),
-            ],
-        ),
-    },
-
-    I18nView.ViewLeaveInstance: {
-        Language.ZH: View(
-            name="离开副本",
-            child=[
-                Feature(I18nText.ViewLeaveInstanceNote),
-                Feature(I18nText.ViewLeaveInstanceConfirm),
-                Feature(I18nText.ViewLeaveInstanceRestart),
-            ],
-        ),
-        Language.EN: View(
-            name="LeaveInstance",
-            child=[
-                Feature(I18nText.ViewLeaveInstanceNote),
-                Feature(I18nText.ViewLeaveInstanceConfirm),
-                Feature(I18nText.ViewLeaveInstanceRestart),
-            ],
-        ),
-    },
-
-    I18nView.ViewLeaveInstance2: {
-        Language.ZH: View(
-            name="离开副本2",
-            child=[
-                Feature(I18nText.ViewLeaveInstance2Notice),
-                Feature(I18nText.ViewLeaveInstance2Confirm),
-                Feature(I18nText.ViewLeaveInstance2Cancel, group=FeatureGroup.A),
-                Feature(I18nText.ViewLeaveInstance2Restart, group=FeatureGroup.A),
-                Feature(I18nText.ViewLeaveInstance2Leave),
-            ],
-        ),
-        Language.EN: View(
-            name="LeaveInstance2",
-            child=[
-                Feature(I18nText.ViewLeaveInstance2Notice),
-                Feature(I18nText.ViewLeaveInstance2Confirm),
-                Feature(I18nText.ViewLeaveInstance2Cancel, group=FeatureGroup.A),
-                Feature(I18nText.ViewLeaveInstance2Restart, group=FeatureGroup.A),
-                Feature(I18nText.ViewLeaveInstance2Leave),
-            ],
-        ),
-    },
-
-    I18nView.ViewForgeryChallengeComplete: {
-        Language.ZH: View(
-            name="凝素领域-挑战成功/失败",
-            child=[
-                Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
-                Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
-                Feature(I18nText.ViewForgeryChallengeExit),
-                Feature(I18nText.ViewForgeryChallengeRestart),
-            ],
-        ),
-        Language.EN: View(
-            name="ForgeryChallenge-Complete/Failed",
-            child=[
-                Feature(I18nText.ViewChallengeComplete, group=FeatureGroup.A),
-                Feature(I18nText.ViewChallengeFailed, group=FeatureGroup.A),
-                Feature(I18nText.ViewForgeryChallengeExit),
-                Feature(I18nText.ViewForgeryChallengeRestart),
-            ],
-        ),
-    },
-
-    I18nView.ViewTacetSuppressionComplete: {
-        Language.ZH: View(
-            name="无音清剿-挑战成功",
-            child=[
-                Feature(I18nText.ViewTacetSuppressionChallengeComplete),
-                Feature(I18nText.ViewTacetSuppressionConfirm),
-                Feature(I18nText.ViewTacetSuppressionExit, exclude=True),
-                Feature(I18nText.ViewTacetSuppressionCancel, exclude=True),
-                Feature(I18nText.ViewTacetSuppressionRestart, exclude=True),
-            ],
-        ),
-        Language.EN: View(
-            name="TacetSuppression-Complete",
-            child=[
-                Feature(I18nText.ViewTacetSuppressionChallengeComplete),
-                Feature(I18nText.ViewTacetSuppressionConfirm),
-                Feature(I18nText.ViewTacetSuppressionExit, exclude=True),
-                Feature(I18nText.ViewTacetSuppressionCancel, exclude=True),
-                Feature(I18nText.ViewTacetSuppressionRestart, exclude=True),
-            ],
-        ),
-    },
-
-    I18nView.ViewTacetSuppressionClaimRewards: {
-        Language.ZH: View(
-            name="无音清剿-领取奖励",
-            child=[
-                Feature(I18nText.ViewTacetSuppressionClaimRewards),
-                Feature(I18nText.ViewTacetSuppressionClaim),
-                Feature(I18nText.ViewTacetSuppressionClaimX2),
-            ],
-        ),
-        Language.EN: View(
-            name="TacetSuppression-ClaimRewards",
-            child=[
-                Feature(I18nText.ViewTacetSuppressionClaimRewards),
-                Feature(I18nText.ViewTacetSuppressionClaim),
-                Feature(I18nText.ViewTacetSuppressionClaimX2),
-            ],
-        ),
-    },
-
-
-
-
-
-
 
 
 }

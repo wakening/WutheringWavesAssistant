@@ -18,7 +18,7 @@ from src.core.exceptions import StopError
 from src.core.geometry import Scaler
 from src.core.i18n import I18nTr
 from src.core.interface import WindowService, ImgService, OCRService, ControlService, ODService, BossInfoService, \
-    EchoMergeService, GlobalPageService, CombatService, PageEventService, GuidebookService
+    CombatService, PageEventService
 from src.core.runtime import RuntimeConfig
 from src.core.task import TaskFSM
 
@@ -92,18 +92,6 @@ class Services:
     @property
     def page_event_service(self) -> PageEventService:
         return self._c.page_event_service()
-
-    @property
-    def page_service(self) -> GlobalPageService:
-        return self._c.page_service()
-
-    @property
-    def echo_merge_service(self) -> EchoMergeService:
-        return self._c.echo_merge_service()
-
-    @property
-    def guidebook_service(self) -> GuidebookService:
-        return self._c.guidebook_service()
 
     # ===== 其他 =====
 
@@ -215,18 +203,6 @@ class NodeContext:
     @property
     def boss_info_service(self) -> BossInfoService:
         return self._container.boss_info_service()
-
-    @property
-    def page_service(self) -> GlobalPageService:
-        return self._container.page_service()
-
-    @property
-    def echo_merge_service(self) -> EchoMergeService:
-        return self._container.echo_merge_service()
-
-    @property
-    def guidebook_service(self) -> GuidebookService:
-        return self._container.guidebook_service()
 
     @property
     def combat_service(self) -> CombatService:
