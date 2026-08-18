@@ -479,10 +479,20 @@ def linear_spacing(start: int, end: int, num_points: int, offset=None):
     return positions
 
 
-def search_icon_materials_spots(ctx: NodeContext):
-    atlas = img_util.read_img(
-        file_util.get_assets_template("Guidebook_Sidebar.png"))
-    icon = atlas[BBox(252, 28, 321, 105).as_slice()]
+def search_icon_guidebook(
+        ctx: NodeContext,
+        *,
+        material_collection: bool = False,
+        enemy_tracing: bool = False):
+    if material_collection:
+        bbox = BBox(252, 28, 321, 105)
+    elif enemy_tracing:
+        bbox = BBox(467, 33, 541, 113)
+    else:
+        raise ValueError("Unknown icon")
+
+    atlas = img_util.read_img(file_util.get_assets_template("Guidebook_Sidebar.png"))
+    icon = atlas[bbox.as_slice()]
     roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(0, 85, Align.Left | Align.Top),
         AnchorPoint(99, 720, Align.Left | Align.Top),
@@ -498,4 +508,4 @@ def search_icon_materials_spots(ctx: NodeContext):
     )
     if bbox is None or bbox.score < 0.7:
         return None
-    return bbox.center
+    return bbox.near

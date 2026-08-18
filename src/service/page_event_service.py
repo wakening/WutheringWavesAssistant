@@ -62,7 +62,7 @@ class PageEventAbstractService(PageEventService, ABC):
 
         # 左侧图标坐标
         self.activitySidebar = AnchorPoint(50, 128, Align.Top | Align.Left)
-        self.materialsSpotsSidebar = AnchorPoint(50, 218, Align.Top | Align.Left)
+        self.materialCollectionSidebar = AnchorPoint(50, 218, Align.Top | Align.Left)
         self.recurringChallengesSidebar = AnchorPoint(50, 308, Align.Top | Align.Left)
         self.pathOfGrowthSidebar = AnchorPoint(50, 396, Align.Top | Align.Left)
         self.enemyTracingSidebar = [
@@ -2352,7 +2352,7 @@ class PageEventAbstractService(PageEventService, ABC):
         scaler = self._window_service.scaler
 
         activitySidebar = scaler.as_point(self.activitySidebar)
-        materialsSpotsSidebar = scaler.as_point(self.materialsSpotsSidebar)
+        materialCollectionSidebar = scaler.as_point(self.materialCollectionSidebar)
         recurringChallengesSidebar = scaler.as_point(self.recurringChallengesSidebar)
         pathOfGrowthSidebar = scaler.as_point(self.pathOfGrowthSidebar)
         enemyTracingSidebar = [scaler.as_point(p) for p in self.enemyTracingSidebar]
@@ -2362,7 +2362,7 @@ class PageEventAbstractService(PageEventService, ABC):
             BossNameEnum.SeedOfIllusoryOrigin.value,
             BossNameEnum.CourtOfShackledSouls.value,
         ]:
-            self._control_service.click(*materialsSpotsSidebar)
+            self._control_service.click(*materialCollectionSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^(战歌重奏)$")
             if weeklyChallenge:
@@ -2400,7 +2400,7 @@ class PageEventAbstractService(PageEventService, ABC):
             BossNameEnum.NightmareAdamSmasherLimitedTime.value,
             BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value
         ]:
-            self._control_service.click(*materialsSpotsSidebar)
+            self._control_service.click(*materialCollectionSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^讨伐强敌$")
             if weeklyChallenge:

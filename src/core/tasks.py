@@ -530,42 +530,29 @@ def echo_merge_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
         ctx, container = task_init(event, spec, ipc, **kwargs)
         logger.info("声骸融合任务进程开始运行")
 
-        time.sleep(0.2)
         logger.debug(spec.game_path)
         create_parent_monitor(event, spec.leader_pid)
         create_mouse_reset_monitor(event, spec, ipc, **kwargs)
-        clock_action = ClockAction(ctx.control_service.activate, 3.0)
-
-        logger.debug("-------- run ----------")
-        count = 0
-
-        from src.service.echo_merge_workflow import EchoMergeWorkflow
-        workflow = EchoMergeWorkflow(ctx)
 
         try:
-            try:
-                count += 1
-                clock_action.action()
+            from src.service.echo_merge_workflow import EchoMergeWorkflow
 
-                workflow.execute()
-            except ScreenshotError:
-                try:
-                    logger.warning("截图异常，关闭游戏")
-                    hwnd_util.force_close_process(ctx.window_service.window)
-                except Exception:
-                    logger.error("关闭游戏时异常")
-                raise
-        except KeyboardInterrupt:
-            logger.warning("KeyboardInterrupt")
+            wf = EchoMergeWorkflow(ctx)
+            wf.execute()
+
+        except KeyboardInterrupt as e:
+            logger.warning(f"KeyboardInterrupt: {e}")
         except Exception as e:
             logger.exception(e)
+            ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
 
             ctx.ipc.event_queue.put({
-                "task": {"SoarToTheBeatMacroReplayTask": ["failed"]}
+                "task": {"EchoMergeProcessTask": ["failed"]}
             }, block=True)
+            time.sleep(0.1)
         finally:
+            logger.info(f"声骸融合任务结束, task_id: {spec.task_id}")
             release_press_key(ctx)
-            logger.info("声骸融合任务进程结束")
     except Exception as e:
         logger.exception(e)
 

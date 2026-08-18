@@ -149,7 +149,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     # 进入索拉指南后，默认是 活跃度 或 素材获取页
     titles = ctx.tr([
         I18nText.Activity,
-        I18nText.MaterialsSpots,
+        I18nText.MaterialCollection,
         I18nText.RecurringChallenges,
         I18nText.PathOfGrowth,
         I18nText.EnemyTracing,

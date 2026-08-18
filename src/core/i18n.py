@@ -2,7 +2,6 @@ import logging
 import re
 from enum import Enum
 
-from src.core.geometry import AnchorBBox, AnchorPoint, Align, BBox
 
 logger = logging.getLogger(__name__)
 
@@ -314,7 +313,7 @@ class I18nText:
 
     # ------- Guidebook -------
     Activity = "Activity"
-    MaterialsSpots = "MaterialsSpots"
+    MaterialCollection = "MaterialCollection"
     RecurringChallenges = "RecurringChallenges"
     PathOfGrowth = "PathOfGrowth"
     EnemyTracing = "EnemyTracing"
@@ -335,7 +334,7 @@ class I18nText:
     WeeklyActivityPts = "WeeklyActivityPts"
     ActivityClaim = "ActivityClaim"
 
-    ## ------- Guidebook MaterialsSpots -------
+    ## ------- Guidebook MaterialCollection -------
     ForgeryChallenge = "ForgeryChallenge"
     SimulationChallenge = "SimulationChallenge"
     BossChallenge = "BossChallenge"
@@ -344,7 +343,7 @@ class I18nText:
     NightmarePurification = "NightmarePurification"
     TacetDiscordNest = "TacetDiscordNest"
 
-    ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+    ### ------- Guidebook MaterialCollection ForgeryChallenge -------
     WingfallChasm = "WingfallChasm"
     SilentChasm = "SilentChasm"
     SplitChasm = "SplitChasm"
@@ -382,7 +381,7 @@ class I18nText:
     ForgeryRestart = "ForgeryRestart"
     ForgeryExit = "ForgeryExit"
 
-    ### ------- Guidebook MaterialsSpots TacetSuppression -------
+    ### ------- Guidebook MaterialCollection TacetSuppression -------
     WesternFangPeaksTacetField = "WesternFangPeaksTacetField"
     EasternXuanPeaksTacetField = "EasternXuanPeaksTacetField"
     TacetFieldSolisiaLanding = "TacetFieldSolisiaLanding"
@@ -401,7 +400,7 @@ class I18nText:
     TacetFieldRestart = "TacetFieldRestart"
     TacetFieldExit = "TacetFieldExit"
 
-    ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+    ### ------- Guidebook MaterialCollection WeeklyChallenge -------
     WeeklyChallengeWeeklyChallenge = "WeeklyChallengeWeeklyChallenge"
     RemainingWeeklyAttempts = "RemainingWeeklyAttempts"
     LimitedTimeEarlyAccess = "LimitedTimeEarlyAccess"
@@ -442,7 +441,7 @@ class I18nText:
     WeeklyExit = "WeeklyExit"
     YouHaveReachedTheChallengeLimit = "YouHaveReachedTheChallengeLimit"
 
-    ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+    ### ------- Guidebook MaterialCollection TacetDiscordNest -------
     TacetDiscordNestTacetDiscordNest = "TacetDiscordNestTacetDiscordNest"
     # LahaiRoi = "LahaiRoi"
     SouthernYuanHillsTacetDiscordNest = "SouthernYuanHillsTacetDiscordNest"
@@ -452,6 +451,13 @@ class I18nText:
     TacetDiscordDefeated = "TacetDiscordDefeated"
     Go = "Go"
     Challenge = "Challenge"
+
+    ## ------- Guidebook EnemyTracing -------
+    Detect = "Detect"
+    EnemyTracingSearch = "EnemyTracingSearch"
+    NoDetectableResult = "NoDetectableResult"
+    DetectionTargetNotFound = "DetectionTargetNotFound"
+    EnemyDefeat = "EnemyDefeat"
 
     # ------- Team -------
     QuickSetup = "QuickSetup"
@@ -464,10 +470,12 @@ class I18nText:
     # ------- Mail -------
     Mailbox = "Mailbox"
     MailClaimAll = "MailClaimAll"
+    NoMailToClaim = "NoMailToClaim"
 
     # ------- Pioneer Podcast -------
     PioneerPodcast = "PioneerPodcast"
     PioneerPodcastUnavailable = "PioneerPodcastUnavailable"
+    MaxLevelReached = "MaxLevelReached"
     PodcastTasks = "PodcastTasks"
     PioneerPodcastClaimAll = "PioneerPodcastClaimAll"
     PioneerPodcastConfirm = "PioneerPodcastConfirm"
@@ -521,42 +529,6 @@ class I18nText:
     PdrRestart = "PdrRestart"
     PdrResume = "PdrResume"
     PdrConfirmProgressAndLeaveNow = "PdrConfirmProgressAndLeaveNow"
-
-    # ------- View -------
-    ViewClaimRewards = "ViewClaimRewards"
-    ViewClaimRewardsConfirm = "ViewClaimRewardsConfirm"
-    ViewClaimRewardsCancel = "ViewClaimRewardsCancel"
-
-    CrownlessResonanceCord = "CrownlessResonanceCord"
-
-    ViewFight = "ViewFight"
-
-    ViewChallengeComplete = "ViewChallengeComplete"
-    ViewChallengeFailed = "ViewChallengeFailed"
-
-    ViewBreakFree = "ViewBreakFree"
-
-    ViewLeaveInstanceNote = "ViewLeaveInstanceNote"
-    ViewLeaveInstanceConfirm = "ViewLeaveInstanceConfirm"
-    ViewLeaveInstanceRestart = "ViewLeaveInstanceRestart"
-
-    ViewLeaveInstance2Notice = "ViewLeaveInstance2Notice"
-    ViewLeaveInstance2Confirm = "ViewLeaveInstance2Confirm"
-    ViewLeaveInstance2Cancel = "ViewLeaveInstance2Cancel"
-    ViewLeaveInstance2Restart = "ViewLeaveInstance2Restart"
-    ViewLeaveInstance2Leave = "ViewLeaveInstance2Leave"
-
-    ViewForgeryChallengeExit = "ViewForgeryChallengeExit"
-    ViewForgeryChallengeRestart = "ViewForgeryChallengeRestart"
-
-    ViewTacetSuppressionChallengeComplete = "ViewTacetSuppressionChallengeComplete"
-    ViewTacetSuppressionConfirm = "ViewTacetSuppressionConfirm"
-    ViewTacetSuppressionExit = "ViewTacetSuppressionExit"
-    ViewTacetSuppressionCancel = "ViewTacetSuppressionCancel"
-    ViewTacetSuppressionRestart = "ViewTacetSuppressionRestart"
-    ViewTacetSuppressionClaimRewards = "ViewTacetSuppressionClaimRewards"
-    ViewTacetSuppressionClaim = "ViewTacetSuppressionClaim"
-    ViewTacetSuppressionClaimX2 = "ViewTacetSuppressionClaimX2"
 
 
 I18N_TEXT = {
@@ -1273,13 +1245,16 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Internet Disconnecting$"), raw="Internet Disconnecting"),
     },
     I18nText.PatchingCompletePleaseRestartTheGame: {
-        Language.ZH: RegexStr(r"^更新完成.*?请重新启动游戏.*?$", raw="更新完成，请重新启动游戏。"),
-        Language.EN: RegexStr(flex_ws(r"^Patching complete.*?Please restart the game.*?$"), raw="Patching complete. Please restart the game."),
+        Language.ZH: RegexStr(r"^更新完成.*?请重新启动游戏", raw="更新完成，请重新启动游戏。"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Patching complete.*?Please restart the game"),
+            raw="Patching complete. Please restart the game."
+        ),
     },
     I18nText.PatchingCompleteTheGameIsRestarting: {
-        Language.ZH: RegexStr(r"^更新完成.*?游戏即将重启.*?$", raw="更新完成，游戏即将重启。"),
+        Language.ZH: RegexStr(r"^更新完成.*?游戏即将重启", raw="更新完成，游戏即将重启。"),
         Language.EN: RegexStr(
-            flex_ws(r"^Patching complete. The game is restarting.*?$"),
+            flex_ws(r"^Patching complete. The game is restarting"),
             raw="Patching complete. The game is restarting."
         ),
     },
@@ -1291,9 +1266,9 @@ I18N_TEXT = {
         ),
     },
     I18nText.RequestTimedOut: {
-        Language.ZH: RegexStr(r"^网络请求超时", raw="网络请求超时，无法连接服务器，请稍后再尝试。"),
+        Language.ZH: RegexStr(r"^网络请求超时.*?无法连接服务器", raw="网络请求超时，无法连接服务器，请稍后再尝试。"),
         Language.EN: RegexStr(
-            flex_ws(r"^Request timed out.*?Failed"),
+            flex_ws(r"^Request timed out.*?Failed to"),
             raw="Request timed out. Failed to connect to the server. Please try again later."
         ),
     },
@@ -1374,6 +1349,10 @@ I18N_TEXT = {
             flex_ws(r"Pioneer Podcast.*?unavailable"),
             raw="All channels on the Pioneer Podcast are currently unavailable"),
     },
+    I18nText.MaxLevelReached: {
+        Language.ZH: RegexStr(r"^已满级$", raw="已满级"),
+        Language.EN: RegexStr(flex_ws(r"^Max Level Reached$"), raw="Max Level Reached"),
+    },
     I18nText.PodcastTasks: {
         Language.ZH: RegexStr(r"^电台任务$", raw="电台任务"),
         Language.EN: RegexStr(flex_ws(r"^Podcast Tasks$"), raw="Podcast Tasks"),
@@ -1430,9 +1409,9 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^活跃行迹$", raw="活跃行迹"),
         Language.EN: RegexStr(flex_ws(r"^Activity$"), raw="Activity"),
     },
-    I18nText.MaterialsSpots: {
+    I18nText.MaterialCollection: {
         Language.ZH: RegexStr(r"^素材获取$", raw="素材获取"),
-        Language.EN: RegexStr(flex_ws(r"^Materials Spots$"), raw="Materials Spots"),
+        Language.EN: RegexStr(flex_ws(r"^Material Collection$"), raw="Material Collection"),
     },
     I18nText.RecurringChallenges: {
         Language.ZH: RegexStr(r"^周期挑战$", raw="周期挑战"),
@@ -1514,7 +1493,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Claim$"), raw="Claim"),
     },
 
-    ## ------- Guidebook MaterialsSpots -------
+    ## ------- Guidebook MaterialCollection -------
     # 产出武器及技能材料
     I18nText.ForgeryChallenge: {
         Language.ZH: RegexStr(r"^凝素领域$", raw="凝素领域"),
@@ -1561,7 +1540,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Challenge$"), raw=r"Challenge"),
     },
 
-    ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+    ### ------- Guidebook MaterialCollection ForgeryChallenge -------
     I18nText.WingfallChasm: {
         Language.ZH: RegexStr(r"^.?翼云渊$", raw="陨翼云渊"),
         Language.EN: RegexStr(flex_ws(r"^Wingfall Chasm$"), raw=r"Wingfall Chasm"),
@@ -1706,7 +1685,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
     },
 
-    ### ------- Guidebook MaterialsSpots TacetSuppression -------
+    ### ------- Guidebook MaterialCollection TacetSuppression -------
     I18nText.WesternFangPeaksTacetField: {
         Language.ZH: RegexStr(r"^方.?西峰无音区$", raw="方擎西峰无音区"),
         Language.EN: RegexStr(flex_ws(r"^Western Fang Peaks"), raw=r"Western Fang Peaks Tacet Field"),
@@ -1778,7 +1757,7 @@ I18N_TEXT = {
     },
 
 
-    ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+    ### ------- Guidebook MaterialCollection WeeklyChallenge -------
     I18nText.WeeklyChallengeWeeklyChallenge: {
         Language.ZH: RegexStr(r"战歌重奏", raw="战歌重奏", desc="xxxx·战歌重奏"),
         Language.EN: RegexStr(
@@ -1943,7 +1922,7 @@ I18N_TEXT = {
             flex_ws(r"^You have reached the challenge limit"), raw="You have reached the challenge limit"),
     },
 
-    ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+    ### ------- Guidebook MaterialCollection TacetDiscordNest -------
     I18nText.TacetDiscordNestTacetDiscordNest: {
         Language.ZH: RegexStr(r"残象聚落", raw="残象聚落"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest"), raw="Tacet Discord Nest"),
@@ -1967,6 +1946,28 @@ I18N_TEXT = {
     I18nText.TacetDiscordDefeated: {
         Language.ZH: RegexStr(r"^已击败残象.*\d.*", raw=r"已击败残象:0/48"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Discords Defeated.*\d.*"), raw=r"Tacet Discords Defeated: 0/48"),
+    },
+
+    ## ------- Guidebook EnemyTracing -------
+    I18nText.Detect: {
+        Language.ZH: RegexStr(r"^探测$", raw="探测"),
+        Language.EN: RegexStr(flex_ws(r"^Detect$"), raw="Detect"),
+    },
+    I18nText.EnemyTracingSearch: {
+        Language.ZH: RegexStr(r"^输入搜索内容$", raw="输入搜索内容"),
+        Language.EN: RegexStr(flex_ws(r"^Search$"), raw="Search"),
+    },
+    I18nText.NoDetectableResult: {
+        Language.ZH: RegexStr(r"^暂无搜索结果$", raw="暂无搜索结果"),
+        Language.EN: RegexStr(flex_ws(r"^No detectable result$"), raw="No detectable result"),
+    },
+    I18nText.DetectionTargetNotFound: {
+        Language.ZH: RegexStr(r"找不到探测目标", raw="找不到探测目标"),
+        Language.EN: RegexStr(flex_ws(r"Detection target not found"), raw="Detection target not found"),
+    },
+    I18nText.EnemyDefeat: {
+        Language.ZH: RegexStr(r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)", raw="击败"),
+        Language.EN: RegexStr(flex_ws(r"Defeat"), raw="Defeat"),
     },
 
     # ------- Team -------
@@ -2000,6 +2001,10 @@ I18N_TEXT = {
     I18nText.MailClaimAll: {
         Language.ZH: RegexStr(r"^全部领取", raw="全部领取"),
         Language.EN: RegexStr(flex_ws(r"Claim All"), raw="Claim All"),
+    },
+    I18nText.NoMailToClaim: {
+        Language.ZH: RegexStr(r"^当前没有邮件$", raw="当前没有邮件"),
+        Language.EN: RegexStr(flex_ws(r"^No Mail to claim$"), raw="No Mail to claim"),
     },
 
     # ------- (Overworld) TacetDiscordNest -------
@@ -2188,112 +2193,6 @@ I18N_TEXT = {
     I18nText.PdrConfirmProgressAndLeaveNow: {
         Language.ZH: RegexStr(r"^是否确认立刻结算并退出.?$", raw="是否确认立刻结算并退出？"),
         Language.EN: RegexStr(flex_ws(r"^Confirm progress and leave now.?$"), raw="Confirm progress and leave now?"),
-    },
-
-    # ------- View页面专用 -------
-    # 这几个词在很多页面都有，而且名字有细微差异，不同语言间也有差异，很难统一，各功能单独维护自己的一份
-    I18nText.ViewClaimRewards: {
-        Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
-        Language.EN: RegexStr(flex_ws(r"^Claim Rewards|Claim the rewards$"), raw=r"Claim Rewards"),
-    },
-    I18nText.ViewClaimRewardsConfirm: {
-        Language.ZH: RegexStr(r"^确认$", raw="确认"),
-        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw="Confirm"),
-    },
-    I18nText.ViewClaimRewardsCancel: {
-        Language.ZH: RegexStr(r"^取消$", raw="取消"),
-        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw="Cancel"),
-    },
-    I18nText.CrownlessResonanceCord: {
-        Language.ZH: RegexStr(r"^声弦$", raw="声弦"),
-        Language.EN: RegexStr(flex_ws(r"^Resonance Cord$"), raw="Resonance Cord"),
-    },
-    I18nText.ViewFight: {
-        Language.ZH: RegexStr(r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)", raw="击败"),
-    },
-    I18nText.ViewChallengeComplete: {
-        Language.ZH: RegexStr(r"^(挑战达成|挑战成功)$", raw="挑战成功"),
-        Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw="Challenge Complete"),
-    },
-    I18nText.ViewChallengeFailed: {
-        Language.ZH: RegexStr(r"^挑战失败$", raw="挑战失败"),
-        Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw="Challenge Failed"),
-    },
-    I18nText.ViewBreakFree: {
-        Language.ZH: RegexStr(r"^交替点击进行挣脱$", raw="交替点击进行挣脱"),
-        Language.EN: RegexStr(flex_ws(r"^Click alternately to break free$"), raw="Click alternately to break free"),
-    },
-    I18nText.ViewLeaveInstanceNote: {
-        Language.ZH: RegexStr(r"^提示$", raw="提示"),
-        Language.EN: RegexStr(flex_ws(r"Note"), raw="Note"),
-    },
-    I18nText.ViewLeaveInstanceConfirm: {
-        Language.ZH: RegexStr(r"^确认$", raw="确认"),
-        Language.EN: RegexStr(flex_ws(r"Confirm"), raw="Confirm"),
-    },
-    I18nText.ViewLeaveInstanceRestart: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"Restart"), raw="Restart"),
-    },
-    I18nText.ViewLeaveInstance2Notice: {
-        Language.ZH: RegexStr(r"^提示$", raw="提示"),
-        Language.EN: RegexStr(flex_ws(r"^Notice$"), raw=r"Notice"),
-    },
-    I18nText.ViewLeaveInstance2Confirm: {
-        Language.ZH: RegexStr(r"^确认$", raw="确认"),
-        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw=r"Confirm"),
-    },
-    I18nText.ViewLeaveInstance2Cancel: {
-        Language.ZH: RegexStr(r"^取消$", raw="取消"),
-        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw=r"Cancel"),
-    },
-    I18nText.ViewLeaveInstance2Restart: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"Restart"), raw="Restart"),
-    },
-    I18nText.ViewLeaveInstance2Leave: {
-        Language.ZH: RegexStr(r"离开", raw="离开"),
-        Language.EN: RegexStr(flex_ws(r"Leave"), raw="Leave"),
-    },
-    I18nText.ViewForgeryChallengeExit: {
-        Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
-        Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
-    },
-    I18nText.ViewForgeryChallengeRestart: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
-    },
-    I18nText.ViewTacetSuppressionChallengeComplete: {
-        Language.ZH: RegexStr(r"^挑战成功$", raw="挑战成功"),
-        Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw=r"Challenge Complete"),
-    },
-    I18nText.ViewTacetSuppressionConfirm: {
-        Language.ZH: RegexStr(r"^确定$", raw="确定"),
-        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw=r"Confirm"),
-    },
-    I18nText.ViewTacetSuppressionExit: {
-        Language.ZH: RegexStr(r"^退出副本$", raw="退出副本"),
-        Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
-    },
-    I18nText.ViewTacetSuppressionCancel: {
-        Language.ZH: RegexStr(r"^取消$", raw="取消"),
-        Language.EN: RegexStr(flex_ws(r"^Cancel$"), raw=r"Cancel"),
-    },
-    I18nText.ViewTacetSuppressionRestart: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
-    },
-    I18nText.ViewTacetSuppressionClaimRewards: {
-        Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
-        Language.EN: RegexStr(flex_ws(r"^Claim Rewards|Claim the rewards$"), raw=r"Claim Rewards"),
-    },
-    I18nText.ViewTacetSuppressionClaim: {
-        Language.ZH: RegexStr(r"^单倍领取$", raw="单倍领取"),
-        Language.EN: RegexStr(flex_ws(r"^Claim$"), raw=r"Claim"),
-    },
-    I18nText.ViewTacetSuppressionClaimX2: {
-        Language.ZH: RegexStr(r"^双倍领取$", raw="双倍领取"),
-        Language.EN: RegexStr(flex_ws(r"^Claim.?2$"), raw="Claim*2"),
     },
 
 

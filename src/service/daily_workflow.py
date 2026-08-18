@@ -19,7 +19,7 @@ from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflo
 from src.service.common_workflow import (
     absorb_around_variant_blind, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
     match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
-    object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_materials_spots, bbox_dialogue,
+    object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_guidebook, bbox_dialogue,
     bbox_guidebook_title, AsyncPickup,
 )
 from src.util import img_util, file_util
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class TaskLocal:
 
     def __init__(self):
-        ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+        ### ------- Guidebook MaterialCollection ForgeryChallenge -------
         self.wingfallChasmFSM: TaskFSM = TaskFSM(name=I18nText.WingfallChasm)
         self.silentChasmFSM: TaskFSM = TaskFSM(name=I18nText.SilentChasm)
         self.splitChasmFSM: TaskFSM = TaskFSM(name=I18nText.SplitChasm)
@@ -54,11 +54,11 @@ class TaskLocal:
         self.moonlitGrovesFSM: TaskFSM = TaskFSM(name=I18nText.MoonlitGroves)
         self.marigoldWoodsFSM: TaskFSM = TaskFSM(name=I18nText.MarigoldWoods)
 
-        ### ------- Guidebook MaterialsSpots SimulationChallenge -------
+        ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
-        ### ------- Guidebook MaterialsSpots BossChallenge -------
+        ### ------- Guidebook MaterialCollection BossChallenge -------
 
-        ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        ### ------- Guidebook MaterialCollection TacetSuppression -------
         self.westernFangPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.WesternFangPeaksTacetField)
         self.easternXuanPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.EasternXuanPeaksTacetField)
         self.tacetFieldSolisiaLandingFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldSolisiaLanding)
@@ -67,7 +67,7 @@ class TaskLocal:
         self.tacetFieldMawburrowDesertFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldMawburrowDesert)
         self.tacetFieldStagnantRunFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldStagnantRun)
 
-        ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+        ### ------- Guidebook MaterialCollection WeeklyChallenge -------
         self.courtOfShackledSoulsFSM: TaskFSM = TaskFSM(name=I18nText.CourtOfShackledSouls)
         self.seedOfIllusoryOriginFSM: TaskFSM = TaskFSM(name=I18nText.SeedOfIllusoryOrigin)
         self.gateOfTheLostStarFSM: TaskFSM = TaskFSM(name=I18nText.GateOfTheLostStar)
@@ -79,9 +79,9 @@ class TaskLocal:
         self.chaoticJunctureFSM: TaskFSM = TaskFSM(name=I18nText.ChaoticJuncture)
         self.bellOfArchaicChantsFSM: TaskFSM = TaskFSM(name=I18nText.BellOfArchaicChants)
 
-        ### ------- Guidebook MaterialsSpots NightmarePurification -------
+        ### ------- Guidebook MaterialCollection NightmarePurification -------
 
-        ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+        ### ------- Guidebook MaterialCollection TacetDiscordNest -------
         self.southernYuanHillsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
         self.starblindCrashsiteTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
         self.rebirthUplandsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
@@ -91,7 +91,7 @@ class TaskLocal:
         self.activityDailyFSM: TaskFSM = TaskFSM(name=I18nText.ActivityDaily)
         self.activityWeeklyFSM: TaskFSM = TaskFSM(name=I18nText.ActivityWeekly)
 
-        ## ------- Guidebook MaterialsSpots -------
+        ## ------- Guidebook MaterialCollection -------
         self.forgeryChallengeFSM: TaskFSMGroup = TaskFSMGroup(
             self.wingfallChasmFSM,
             self.silentChasmFSM,
@@ -155,7 +155,7 @@ class TaskLocal:
             self.activityWeeklyFSM,
             name=I18nText.Activity
         )
-        self.materialsSpotsFSM: TaskFSMGroup = TaskFSMGroup(
+        self.materialCollectionFSM: TaskFSMGroup = TaskFSMGroup(
             self.forgeryChallengeFSM,
             self.simulationChallengeFSM,
             self.bossChallengeFSM,
@@ -163,7 +163,7 @@ class TaskLocal:
             self.weeklyChallengeFSM,
             self.nightmarePurificationFSM,
             self.tacetDiscordNestFSM,
-            name=I18nText.MaterialsSpots
+            name=I18nText.MaterialCollection
         )
         self.recurringChallengesFSM: TaskFSMGroup = TaskFSMGroup(name="RecurringChallenges")
         self.pathOfGrowthFSM: TaskFSMGroup = TaskFSMGroup(name="PathOfGrowth")
@@ -173,7 +173,7 @@ class TaskLocal:
         # ------- Root -------
         self.guidebookFSM: TaskFSMGroup = TaskFSMGroup(
             self.activityFSM,
-            self.materialsSpotsFSM,
+            self.materialCollectionFSM,
             self.recurringChallengesFSM,
             self.pathOfGrowthFSM,
             self.enemyTracingFSM,
@@ -216,7 +216,7 @@ class NodeName:
 
     # doGuidebook
     doActivity = "doActivity"
-    doMaterialsSpots = "doMaterialsSpots"
+    doMaterialCollection = "doMaterialCollection"
     doRecurringChallenges = "doRecurringChallenges"
     doPathOfGrowth = "doPathOfGrowth"
     doEnemyTracing = "doEnemyTracing"
@@ -227,7 +227,7 @@ class NodeName:
     doActivityWeekly = "doActivityWeekly"
     doPhantasmaDreamlandRhapsody = "doPhantasmaDreamlandRhapsody"
 
-    # doMaterialsSpots
+    # doMaterialCollection
     doForgeryChallenge = "doForgeryChallenge"
     doSimulationChallenge = "doSimulationChallenge"
     doBossChallenge = "doBossChallenge"
@@ -529,7 +529,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 
     # 左侧图标坐标
     activitySidebar = AnchorPoint(50, 128, Align.Top | Align.Left)
-    materialsSpotsSidebar = [
+    materialCollectionSidebar = [
         AnchorPoint(50, 218, Align.Top | Align.Left),
         AnchorPoint(50, 308, Align.Top | Align.Left),
     ]
@@ -544,13 +544,13 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 
     # 进入索拉指南后，默认是 活跃度 或 素材获取页
     activity = ctx.tr(I18nText.Activity)
-    materialsSpots = ctx.tr(I18nText.MaterialsSpots)
+    materialCollection = ctx.tr(I18nText.MaterialCollection)
     recurringChallenges = ctx.tr(I18nText.RecurringChallenges)
     pathOfGrowth = ctx.tr(I18nText.PathOfGrowth)
     enemyTracing = ctx.tr(I18nText.EnemyTracing)
     milestones = ctx.tr(I18nText.Milestones)
 
-    titles = [activity, materialsSpots, recurringChallenges, pathOfGrowth, enemyTracing, milestones]
+    titles = [activity, materialCollection, recurringChallenges, pathOfGrowth, enemyTracing, milestones]
     title_roi = bbox_guidebook_title(ctx)
 
     if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(titles, title_roi)):
@@ -558,29 +558,29 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         return None
 
     # 根据任务的开启状态分发任务
-    if local.materialsSpotsFSM.is_active:
+    if local.materialCollectionFSM.is_active:
         # 素材获取
-        if not ui.search(materialsSpots, title_roi):
+        if not ui.search(materialCollection, title_roi):
             ui.sleep(0.2)
             for i in range(2):
-                icon_point = search_icon_materials_spots(ctx)
+                icon_point = search_icon_guidebook(ctx, material_collection=True)
                 if not icon_point:
                     if i == 0:
                         continue
                     else:
-                        logger.warning(f"materialsSpots icon not found")
+                        logger.warning(f"materialCollection icon not found")
                         return None
                 ui.click_point(icon_point, times=2, interval=0.3)
-                if ui.sleep(0.2).wait(2, 0.3).until(lambda: ui.snapshot().search(materialsSpots, title_roi)):
+                if ui.sleep(0.2).wait(2, 0.3).until(lambda: ui.snapshot().search(materialCollection, title_roi)):
                     ui.sleep(0.3)
                     break
 
-            # for i in materialsSpotsSidebar:
+            # for i in materialCollectionSidebar:
             #     ui.click_point(i, 2, 0.2).sleep(0.8)
-            #     if ui.snapshot().search(materialsSpots, title_roi):
+            #     if ui.snapshot().search(materialCollection, title_roi):
             #         break
 
-        return I18nText.MaterialsSpots
+        return I18nText.MaterialCollection
     if local.recurringChallengesFSM.is_active:
         # 周期挑战
         return I18nText.RecurringChallenges
@@ -847,8 +847,8 @@ def doPhantasmaDreamlandRhapsody(ctx: NodeContext, local: TaskLocal, **kwargs) -
     return True
 
 
-@node(NodeName.doMaterialsSpots)
-def doMaterialsSpots(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
+@node(NodeName.doMaterialCollection)
+def doMaterialCollection(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     # TODO 双倍流程？
     if local.weeklyChallengeFSM.is_active:
         return I18nText.WeeklyChallenge
@@ -1084,7 +1084,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         # 打
         combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-        combat_system.set_resonators(ctx.shared.team_members)
+        combat_system.set_resonators(ctx.shared.team_members, is_print=False)
         combat_system.is_async = True
         combat_system.check_boss_hp = False
         combat_system.auto_pickup = False
@@ -1376,7 +1376,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
             # 直接打，打起来才会有文字提示
             combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-            combat_system.set_resonators(ctx.shared.team_members)
+            combat_system.set_resonators(ctx.shared.team_members, is_print=False)
             combat_system.is_async = True
             combat_system.check_boss_hp = False
             combat_system.auto_pickup = False
@@ -1698,7 +1698,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             ui.sleep(0.6)
 
         combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-        combat_system.set_resonators(ctx.shared.team_members)
+        combat_system.set_resonators(ctx.shared.team_members, is_print=False)
         combat_system.is_async = True
         combat_system.check_boss_hp = True
         combat_system.auto_pickup = False
@@ -2092,7 +2092,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 # 没刷就打
                 if is_combat:
                     combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-                    combat_system.set_resonators(ctx.shared.team_members)
+                    combat_system.set_resonators(ctx.shared.team_members, is_print=False)
                     combat_system.is_async = True
                     combat_system.check_boss_hp = False
                     combat_system.auto_pickup = False
@@ -2244,21 +2244,26 @@ def doMail(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     else:
         ctx.control_service.mail()
 
-    claim_all = ctx.tr(I18nText.MailClaimAll)
-    if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().click_text(claim_all)):
-        logger.warning(f"Text not found: {claim_all.raw}")
+    def _waitClaimAll():
+        if ui.search(ctx.tr(I18nText.NoMailToClaim)):
+            return True
+        if not ui.snapshot().click_text(ctx.tr(I18nText.MailClaimAll), delay=0.3):
+            return False
+
+        def _waitItemsObtained():
+            if ui.snapshot().click_text(ctx.tr(I18nText.ItemsObtained)):
+                ui.sleep(0.3)
+                return True
+            return ui.search(ctx.tr(I18nText.MailClaimAll))
+
+        ui.sleep(1).wait(2, 0.3).until(_waitItemsObtained)
+        return True
+
+    if not ui.sleep(0.5).wait().until(_waitClaimAll):
+        logger.warning(f"Text not found: {ctx.tr(I18nText.MailClaimAll).raw}")
         local.mailFSM.fail()
         return False
 
-    def isItemsObtained():
-        if ui.snapshot().click_text(ctx.tr(I18nText.ItemsObtained)):
-            ui.sleep(0.3)
-            return True
-        elif ui.search(ctx.tr(I18nText.MailClaimAll)):
-            return True
-        return False
-
-    ui.sleep(1).wait(2, 0.3).until(isItemsObtained)
     local.mailFSM.complete()
     ui.esc().sleep(1)
     return True
@@ -2275,7 +2280,7 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     pioneerPodcast = ctx.tr(I18nText.PioneerPodcast)
     podcastTasks = ctx.tr(I18nText.PodcastTasks)
 
-    # 从终端进入先约电台，不用快捷键F4容易被占用
+    # 从终端进入先约电台，不用快捷键
     if ui.is_on_homepage():
         ui.esc().sleep(1.0)
         if not ui.wait().until(lambda: GlobalPage(ctx).isTerminal(ui=ui.snapshot())):
@@ -2285,10 +2290,13 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if not ui.click_text(ctx.tr(I18nText.TerminalPioneerPodcast),
                          bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
         return False
+
+    pioneerPodcastUnavailable = ctx.tr(I18nText.PioneerPodcastUnavailable)
+    maxLevelReached = ctx.tr(I18nText.MaxLevelReached)
     if not ui.sleep(1.2).wait().until(
-            lambda: ui.snapshot().search([pioneerPodcast, ctx.tr(I18nText.PioneerPodcastUnavailable)])):
+            lambda: ui.snapshot().search([pioneerPodcast, pioneerPodcastUnavailable, maxLevelReached])):
         return False
-    if ui.search(ctx.tr(I18nText.PioneerPodcastUnavailable)):
+    if ui.search([pioneerPodcastUnavailable, maxLevelReached]):
         local.pioneerPodcastFSM.complete()
         ui.sleep(0.3).esc().sleep(1)
         return True
@@ -2312,7 +2320,7 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 先点电台任务
     ui.sleep(0.3).click_point(sidebarsPodcastTasks, times=2, interval=0.2).sleep(0.3)
     if ui.wait().until(lambda: ui.snapshot().search(podcastTasks)):
-        if ui.click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), pk=PointKind.NEAR):
+        if ui.click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), delay=0.3, times=2, interval=0.2):
             ui.sleep(1.5).wait(6, 0.4).until(closePodcastTasksNotice)
 
     # 再点先约电台
@@ -2365,7 +2373,7 @@ class DailyWorkflow(AbstractWorkflow):
 
         # ------- Guidebook -------
         self.local.activityFSM.set_enabled(True)
-        self.local.materialsSpotsFSM.set_enabled(True)
+        self.local.materialCollectionFSM.set_enabled(True)
         self.local.recurringChallengesFSM.set_enabled(False)
         self.local.pathOfGrowthFSM.set_enabled(False)
         self.local.enemyTracingFSM.set_enabled(False)
@@ -2375,7 +2383,7 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.activityDailyFSM.set_enabled(cfg.activityOpen)
         self.local.activityWeeklyFSM.set_enabled(cfg.activityOpen and cfg.activityWeeklyOpen)
 
-        ## ------- Guidebook MaterialsSpots -------
+        ## ------- Guidebook MaterialCollection -------
         self.local.forgeryChallengeFSM.set_enabled(cfg.forgeryChallengeOpen and cfg.forgeryChallenge)
         self.local.simulationChallengeFSM.set_enabled(cfg.simulationChallengeOpen and cfg.simulationChallenge)
         self.local.bossChallengeFSM.set_enabled(cfg.bossChallengeOpen and cfg.bossChallenge)
@@ -2388,7 +2396,7 @@ class DailyWorkflow(AbstractWorkflow):
 
         ## ------- Guidebook PathOfGrowth -------
 
-        ### ------- Guidebook MaterialsSpots ForgeryChallenge -------
+        ### ------- Guidebook MaterialCollection ForgeryChallenge -------
         self.local.wingfallChasmFSM.set_enabled(cfg.wingfallChasm)
         self.local.silentChasmFSM.set_enabled(cfg.silentChasm)
         self.local.splitChasmFSM.set_enabled(cfg.splitChasm)
@@ -2410,11 +2418,11 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.moonlitGrovesFSM.set_enabled(cfg.moonlitGroves)
         self.local.marigoldWoodsFSM.set_enabled(cfg.marigoldWoods)
 
-        ### ------- Guidebook MaterialsSpots SimulationChallenge -------
+        ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
-        ### ------- Guidebook MaterialsSpots BossChallenge -------
+        ### ------- Guidebook MaterialCollection BossChallenge -------
 
-        ### ------- Guidebook MaterialsSpots TacetSuppression -------
+        ### ------- Guidebook MaterialCollection TacetSuppression -------
         self.local.westernFangPeaksTacetFieldFSM.set_enabled(cfg.westernFangPeaksTacetField)
         self.local.easternXuanPeaksTacetFieldFSM.set_enabled(cfg.easternXuanPeaksTacetField)
         self.local.tacetFieldSolisiaLandingFSM.set_enabled(cfg.tacetFieldSolisiaLanding)
@@ -2423,7 +2431,7 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.tacetFieldMawburrowDesertFSM.set_enabled(cfg.tacetFieldMawburrowDesert)
         self.local.tacetFieldStagnantRunFSM.set_enabled(cfg.tacetFieldStagnantRun)
 
-        ### ------- Guidebook MaterialsSpots WeeklyChallenge -------
+        ### ------- Guidebook MaterialCollection WeeklyChallenge -------
         self.local.courtOfShackledSoulsFSM.set_enabled(cfg.courtOfShackledSouls)
         self.local.seedOfIllusoryOriginFSM.set_enabled(cfg.seedOfIllusoryOrigin)
         self.local.gateOfTheLostStarFSM.set_enabled(cfg.gateOfTheLostStar)
@@ -2435,11 +2443,11 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.chaoticJunctureFSM.set_enabled(cfg.chaoticJuncture)
         self.local.bellOfArchaicChantsFSM.set_enabled(cfg.bellOfArchaicChants)
 
-        ### ------- Guidebook MaterialsSpots NightmarePurification -------
+        ### ------- Guidebook MaterialCollection NightmarePurification -------
 
-        ### ------- Guidebook MaterialsSpots TacetDiscordNest -------
+        ### ------- Guidebook MaterialCollection TacetDiscordNest -------
 
-        ### ------- Guidebook MaterialsSpots tacetDiscordNest -------
+        ### ------- Guidebook MaterialCollection tacetDiscordNest -------
         self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)
         self.local.rebirthUplandsTacetDiscordNestFSM.set_enabled(cfg.rebirthUplandsTacetDiscordNest)
@@ -2489,7 +2497,7 @@ class DailyWorkflow(AbstractWorkflow):
         (
             self.engine.source(NodeName.doGuidebook)
             .on(I18nText.Activity).to(NodeName.doActivity)
-            .on(I18nText.MaterialsSpots).to(NodeName.doMaterialsSpots)
+            .on(I18nText.MaterialCollection).to(NodeName.doMaterialCollection)
             .always().to(NodeName.globalDispatcher)
         )
 
@@ -2509,7 +2517,7 @@ class DailyWorkflow(AbstractWorkflow):
         self.engine.source(NodeName.doPhantasmaDreamlandRhapsody).always().to(NodeName.globalDispatcher)
 
         (
-            self.engine.source(NodeName.doMaterialsSpots)
+            self.engine.source(NodeName.doMaterialCollection)
             .on(I18nText.ForgeryChallenge).to(NodeName.doForgeryChallenge)
             .on(I18nText.SimulationChallenge).to(NodeName.doSimulationChallenge)
             .on(I18nText.BossChallenge).to(NodeName.doBossChallenge)

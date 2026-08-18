@@ -254,23 +254,21 @@ def doStandardMerge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return True
 
         # 每隔一段时间检查一次，防止因卡顿等，导致esc被吞，还留在获得声骸页
-        if time.monotonic() - last_time < 1.2:
+        if time.monotonic() - last_time < 0.25:
             return False
         if ui.search(ctx.tr(I18nText.DataMergeNewEcho)):
-            ui.sleep(0.3).esc().sleep(0.3)
+            ui.esc()
         last_time = time.monotonic()
 
         return False
 
     # 开始循环融合
-    idx = 0
+    idx = 1
     while idx < 100:
-        if idx > 0:
-            logger.info(f"Merge: {idx}")
-
         # 点击全选 合成
         if not ui.search(select_all) and not ui.search(standard_merge):
             return _fail_return()
+        logger.info(f"Merge: {idx}")
         ui.click_text(select_all, delay=0.3)
         ui.click_text(standard_merge, delay=0.2)
 
@@ -281,20 +279,15 @@ def doStandardMerge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 声骸不足
         if ui.search(ctx.tr(I18nText.PleaseSelectAtLeast5Echoes)):
             local.standardMergeFSM.complete()
-            ui.esc().sleep(0.8)
+            ui.esc()
             return True
 
-        # 获得声骸
-        if not ui.search(ctx.tr(I18nText.DataMergeNewEcho)):
-            return _fail_return()
-
         # 等待回到选择页
-        ui.sleep(0.4).esc().sleep(0.3)
+        ui.sleep(0.3).esc().sleep(0.3)
         if not ui.wait(8, 0.3).until(_close_new_echo):
             return _fail_return()
 
         idx += 1
-        ui.sleep(0.3)
 
     return _fail_return()
 
