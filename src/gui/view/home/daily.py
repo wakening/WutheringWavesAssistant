@@ -227,6 +227,11 @@ class DailyWidget(ScrollArea):
             I18nText.TacetFieldMawburrowDesert: I18nText.GuidebookLahaiRoi,
             I18nText.TacetFieldStagnantRun: I18nText.GuidebookLahaiRoi,
 
+            I18nText.SouthernYuanHillsTacetDiscordNest: I18nText.GuidebookMengzhou,
+            I18nText.StarblindCrashsiteTacetDiscordNest: I18nText.GuidebookLahaiRoi,
+            I18nText.RebirthUplandsTacetDiscordNest: I18nText.GuidebookLahaiRoi,
+            I18nText.StagnantRunTacetDiscordNest: I18nText.GuidebookLahaiRoi,
+
         }
 
 
@@ -296,8 +301,12 @@ class DailyWidget(ScrollArea):
         self.tacetDiscordNestComboBox = ComboBox(self.container)
         self.tacetDiscordNestComboBox.addItem(self.tr("不选择"), userData=None)
         self.tacetDiscordNestComboBox.addItem(self.tr("全选"), userData="All")
-        # for i in range(len(self.tacetDiscordNest)):
-        #     self.tacetDiscordNestComboBox.addItem(self.i18ntr(self.tacetDiscordNest[i]).raw, userData=self.tacetDiscordNest[i])
+        for i in range(len(self.tacetDiscordNest)):
+            text = self.tr("{challenge} - {region}").format(
+                challenge=self.i18ntr(self.tacetDiscordNest[i]).raw,
+                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNest[i])).raw,
+            )
+            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNest[i])
         # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.activityCheckBox = CheckBox(self.tr("活跃行迹:"), self.container)

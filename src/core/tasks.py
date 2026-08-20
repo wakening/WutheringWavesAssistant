@@ -148,6 +148,7 @@ class MouseResetProcessTask(ProcessTask):
 
 class AutoBossProcessTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
+        # return boss_task
         return auto_boss_task_run
 
 
@@ -701,6 +702,58 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
             time.sleep(0.1)
         finally:
             logger.info(f"每日任务结束, task_id: {spec.task_id}")
+            release_press_key(ctx)
+
+    except Exception as e:
+        logger.exception(e)
+
+
+def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
+    try:
+
+        ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
+        logger.info(f"刷boss任务开始运行, task_id: {spec.task_id}")
+        ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
+
+        # 1. 先获取当前鼠标位置
+        original_x, original_y = keymouse_util.get_mouse_position()
+
+        ctx.control_service.activate()
+        time.sleep(0.05)
+
+        if spec.gui_win_id is not None:
+            # 3. 取消游戏窗口的置顶状态
+            hwnd_util.set_window_not_topmost(ctx.window_service.window)
+            # 2. 释放鼠标限制（如果有）
+            keymouse_util.set_mouse_unlocked()
+            # 4. 移动窗口
+            hwnd_util.set_window_below_another(ctx.window_service.window, spec.gui_win_id)
+            # 5. 将鼠标移回原位
+            keymouse_util.set_mouse_position(original_x, original_y)
+
+        time.sleep(0.2)
+        logger.debug(spec.game_path)
+        create_parent_monitor(event, spec.leader_pid)
+        create_mouse_reset_monitor(event, spec, ipc, **kwargs)
+
+        try:
+            from src.service.boss_workflow import BossWorkflow
+
+            wf = BossWorkflow(ctx)
+            wf.execute()
+
+        except KeyboardInterrupt as e:
+            logger.warning(f"KeyboardInterrupt: {e}")
+        except Exception as e:
+            logger.exception(e)
+            ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
+
+            ctx.ipc.event_queue.put({
+                "task": {"AutoBossProcessTask": ["failed"]}
+            }, block=True)
+            time.sleep(0.1)
+        finally:
+            logger.info(f"刷boss任务结束, task_id: {spec.task_id}")
             release_press_key(ctx)
 
     except Exception as e:

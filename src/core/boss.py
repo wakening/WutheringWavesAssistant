@@ -54,6 +54,7 @@ class BossNameEnum(Enum):
     MyriadSnareRustfireChassis = "万囮牢·朽躯"
     CourtOfShackledSouls = "失坠困咎之庭（限时提前开放）"
     ThousandPuppetPavilion = "千傀重楼"
+    CalamityEffigy = "天傀劫煞"
 
     @staticmethod
     def enemies():

@@ -100,12 +100,10 @@ def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[s
 
     # 已在终端页
     if page.isTerminal(ui=ui):
-        logger.debug(f"Found page: {page.Terminal}")
         return I18nText.Terminal
 
     # 在全局预设中找出离开函数，尝试回到主页
-    if page_key := page.action(ui=ui):
-        logger.debug(f"Found page: {page_key}")
+    if page.action(ui=ui):
         ui.sleep(0.5)
         return None
 

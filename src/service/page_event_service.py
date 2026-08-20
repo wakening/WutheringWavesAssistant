@@ -1635,6 +1635,7 @@ class PageEventAbstractService(PageEventService, ABC):
             # BossNameEnum.MyriadSnareRustfireChassis.value,
             BossNameEnum.CourtOfShackledSouls.value,
             BossNameEnum.ThousandPuppetPavilion.value,
+            BossNameEnum.CalamityEffigy.value,
         ]:
             self.absorption_action_fleurdelys()
             return
@@ -2398,7 +2399,8 @@ class PageEventAbstractService(PageEventService, ABC):
             return False
         elif bossName in [
             BossNameEnum.NightmareAdamSmasherLimitedTime.value,
-            BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value
+            BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value,
+            BossNameEnum.CalamityEffigy.value,
         ]:
             self._control_service.click(*materialCollectionSidebar)
             time.sleep(0.6)
@@ -2770,6 +2772,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     BossNameEnum.MyriadSnareRustfireChassis.value,
                     BossNameEnum.CourtOfShackledSouls.value,
                     BossNameEnum.ThousandPuppetPavilion.value,
+                    BossNameEnum.CalamityEffigy.value,
                 ]
                 )
 

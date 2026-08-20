@@ -554,7 +554,8 @@ class UIOp:
         """截图"""
         return self.ctx.img_service.screenshot()
 
-    def snapshot(self, roi: Optional[BBox | AnchorBBox] = None, img: Optional[np.ndarray] = None, resize: bool = True):
+    def snapshot(self, *, roi: Optional[BBox | AnchorBBox] = None,
+                 img: Optional[np.ndarray] = None, resize: bool = True):
         """
         截图并查询
         :param img: 指定图片，默认重新截图
@@ -717,11 +718,11 @@ class UIOp:
         """等待"""
         t = 0.1
         while seconds > t:
-            if not self.ctx.runtime.stop_event.is_set():
+            if not self.is_set():
                 raise StopError()
             time.sleep(t)
             seconds -= t
-        if not self.ctx.runtime.stop_event.is_set():
+        if not self.is_set():
             raise StopError()
         if seconds > 0:
             time.sleep(seconds)
@@ -754,6 +755,9 @@ class UIOp:
             self.ctx.control_service.close_window()
             raise Exception("Return to overworld failed")
         return False
+
+    def is_set(self) -> bool:
+        return self.ctx.runtime.stop_event.is_set()
 
     # --------- 按键相关 ---------
 
@@ -870,10 +874,17 @@ class GlobalPage:
         return None
 
     def action(self, *, ui: UIOp, **kwargs) -> Optional[str]:
-        """识别当前页面是否是注册的页面，执行预设的函数，用于退出某些无法离开的页面或弹窗"""
+        """
+        识别当前页面是否是注册的页面，若命中则执行预设的函数，
+        用于退出某些无法离开的页面或弹窗
+        :param ui:
+        :param kwargs:
+        :return: 命中的页面key
+        """
         action_str = self.match(ui=ui, **kwargs)
         if action_str is None:
             return None
+        logger.debug(f"Action: {action_str}")
         action_str.action()
         return str(action_str)
 
@@ -882,14 +893,14 @@ class GlobalPage:
                 and ui.search(self.ctx.tr(I18nText.SOL3Phase))
                 and ui.search(self.ctx.tr(I18nText.UnionLevel))
                 and ui.search(self.ctx.tr(I18nText.UnionEXP))):
-            logger.debug(f"{self.ctx.tr(I18nText.Terminal).raw}")
+            logger.debug(f"Page: {self.ctx.tr(I18nText.Terminal).raw}")
             return self.ActionStr(self.Terminal, None)
         return None
 
     def isLuniteSubscriptionReward(self, *, ui: UIOp, **kwargs):
         """领取每日月卡奖励"""
         if res := ui.search(self.ctx.tr(I18nText.LuniteSubscriptionReward)):
-            logger.info(f"{self.ctx.tr(I18nText.LuniteSubscriptionReward).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.LuniteSubscriptionReward).raw}")
             return self.ActionStr(
                 self.LuniteSubscriptionReward,
                 lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(0.3)
@@ -940,7 +951,7 @@ class GlobalPage:
     def isRevive(self, *, ui: UIOp, **kwargs):
         if ((res := ui.search(self.ctx.tr(I18nText.Revive)))
                 and ui.search(self.ctx.tr(I18nText.Defeated))):
-            logger.info(f"{self.ctx.tr(I18nText.Revive).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.Revive).raw}")
             return self.ActionStr(
                 self.Revive,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(1)
@@ -949,7 +960,7 @@ class GlobalPage:
 
     def isSelectARevivalItem(self, *, ui: UIOp, **kwargs):
         if ui.search(self.ctx.tr(I18nText.SelectARevivalItem)):
-            logger.info(f"{self.ctx.tr(I18nText.SelectARevivalItem).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.SelectARevivalItem).raw}")
             return self.ActionStr(
                 self.SelectARevivalItem,
                 lambda: ui.sleep(0.3).esc().sleep(0.4)
@@ -958,7 +969,7 @@ class GlobalPage:
 
     def isReplenishWaveplate(self, *, ui: UIOp, **kwargs):
         if ui.search(self.ctx.tr(I18nText.ReplenishWaveplate)):
-            logger.info(f"{self.ctx.tr(I18nText.ReplenishWaveplate).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.ReplenishWaveplate).raw}")
             return self.ActionStr(
                 self.ReplenishWaveplate,
                 lambda: ui.sleep(0.3).esc().sleep(0.4)
@@ -967,7 +978,7 @@ class GlobalPage:
 
     def isTapTheBlankAreaToClose(self, *, ui: UIOp, **kwargs):
         if res := ui.search(self.ctx.tr(I18nText.TapTheBlankAreaToClose)):
-            logger.info(f"{self.ctx.tr(I18nText.TapTheBlankAreaToClose).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.TapTheBlankAreaToClose).raw}")
             return self.ActionStr(
                 self.TapTheBlankAreaToClose,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.1).sleep(1)
@@ -977,7 +988,7 @@ class GlobalPage:
     def isTapToLandInSolaris3(self, *, ui: UIOp, **kwargs):
         """点击连接，可直接进入游戏"""
         if res := ui.search(self.ctx.tr(I18nText.TapToLandInSolaris3)):
-            logger.info(f"{self.ctx.tr(I18nText.TapToLandInSolaris3).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.TapToLandInSolaris3).raw}")
             return self.ActionStr(
                 self.TapToLandInSolaris3,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(3)
@@ -1059,7 +1070,7 @@ class GlobalPage:
     def isInternetDisconnecting(self, *, ui: UIOp, **kwargs):
         if (ui.search(self.ctx.tr(I18nText.InternetDisconnecting))
                 and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
-            logger.info(f"{self.ctx.tr(I18nText.InternetDisconnecting).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.InternetDisconnecting).raw}")
             return self.ActionStr(
                 self.InternetDisconnecting,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.3).sleep(3)
@@ -1068,7 +1079,7 @@ class GlobalPage:
 
     def isPatchingCompletePleaseRestartTheGame(self, *, ui: UIOp, **kwargs):
         if ui.search(self.ctx.tr(I18nText.PatchingCompletePleaseRestartTheGame)):
-            logger.info(f"{self.ctx.tr(I18nText.PatchingCompletePleaseRestartTheGame).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.PatchingCompletePleaseRestartTheGame).raw}")
 
             def _func():
                 self.ctx.window_service.close_window()
@@ -1079,7 +1090,7 @@ class GlobalPage:
 
     def isPatchingCompleteTheGameIsRestarting(self, *, ui: UIOp, **kwargs):
         if ui.search(self.ctx.tr(I18nText.PatchingCompleteTheGameIsRestarting)):
-            logger.info(f"{self.ctx.tr(I18nText.PatchingCompleteTheGameIsRestarting).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.PatchingCompleteTheGameIsRestarting).raw}")
 
             def _func():
                 self.ctx.window_service.close_window()
@@ -1091,7 +1102,7 @@ class GlobalPage:
     def isDevicesDriverIsOutdated(self, *, ui: UIOp, **kwargs):
         if (ui.search(self.ctx.tr(I18nText.DevicesDriverIsOutdated))
                 and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
-            logger.info(f"{self.ctx.tr(I18nText.DevicesDriverIsOutdated).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.DevicesDriverIsOutdated).raw}")
             return self.ActionStr(
                 self.DevicesDriverIsOutdated,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
@@ -1101,7 +1112,7 @@ class GlobalPage:
     def isRequestTimedOut(self, *, ui: UIOp, **kwargs):
         if (ui.search(self.ctx.tr(I18nText.RequestTimedOut))
                 and (res := ui.search(self.ctx.tr(I18nText.Confirm)))):
-            logger.info(f"{self.ctx.tr(I18nText.RequestTimedOut).raw}")
+            logger.info(f"Page: {self.ctx.tr(I18nText.RequestTimedOut).raw}")
             return self.ActionStr(
                 self.RequestTimedOut,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)

@@ -265,12 +265,10 @@ def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[s
 
     # 已在终端页
     if page.isTerminal(ui=ui):
-        logger.debug(f"Found page: {page.Terminal}")
         return I18nText.Terminal
 
     # 在全局预设中找出离开函数，尝试回到主页
-    if page_key := page.action(ui=ui):
-        logger.debug(f"Found page: {page_key}")
+    if page.action(ui=ui):
         ui.sleep(0.5)
         return None
 
@@ -1122,13 +1120,11 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #         img_util.save_img_in_temp(img_draw)
                 #     continue
                 no_text_count -= 1
-            # 断开连接
-            page = GlobalPage(ctx)
-            if page.isInternetDisconnecting(ui=ui):
-                combat_system.stop(join=True)
-                return False
-            if page_key := page.action(ui=ui):
-                logger.debug(f"Found page: {page_key}")
+
+            if page_key := GlobalPage(ctx).action(ui=ui):
+                if page_key == GlobalPage.InternetDisconnecting:
+                    combat_system.stop(join=True)
+                    return False
 
         combat_system.stop(join=True)
 
@@ -1415,13 +1411,11 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     #         img_util.save_img_in_temp(img_draw)
                     #     continue
                     no_text_count -= 1
-                # 断开连接
-                page = GlobalPage(ctx)
-                if page.isInternetDisconnecting(ui=ui):
-                    combat_system.stop(join=True)
-                    return False
-                if page_key := page.action(ui=ui):
-                    logger.debug(f"Found page: {page_key}")
+
+                if page_key := GlobalPage(ctx).action(ui=ui):
+                    if page_key == GlobalPage.InternetDisconnecting:
+                        combat_system.stop(join=True)
+                        return False
 
             combat_system.stop(join=True)
 
@@ -1739,13 +1733,11 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #         img_util.save_img_in_temp(img_draw)
                 #     continue
                 no_text_count -= 1
-            # 断开连接
-            page = GlobalPage(ctx)
-            if page.isInternetDisconnecting(ui=ui):
-                combat_system.stop(join=True)
-                return False
-            if page_key := page.action(ui=ui):
-                logger.debug(f"Found page: {page_key}")
+
+            if page_key := GlobalPage(ctx).action(ui=ui):
+                if page_key == GlobalPage.InternetDisconnecting:
+                    combat_system.stop(join=True)
+                    return False
 
         combat_system.stop(join=True)
 
@@ -2136,13 +2128,10 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             #     continue
                             no_text_count -= 1
 
-                        # 断开连接
-                        page = GlobalPage(ctx)
-                        if page.isInternetDisconnecting(ui=ui):
-                            combat_system.stop(join=True)
-                            return False
-                        if page_key := page.action(ui=ui):
-                            logger.debug(f"Found page: {page_key}")
+                        if page_key := GlobalPage(ctx).action(ui=ui):
+                            if page_key == GlobalPage.InternetDisconnecting:
+                                combat_system.stop(join=True)
+                                return False
 
                     combat_system.stop(join=True)
                     # 检查复苏弹窗

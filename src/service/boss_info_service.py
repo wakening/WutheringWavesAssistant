@@ -211,6 +211,7 @@ class BossInfoServiceImpl(BossInfoService):
             # BossNameEnum.MyriadSnareRustfireChassis.value,
             BossNameEnum.CourtOfShackledSouls.value,
             BossNameEnum.ThousandPuppetPavilion.value,
+            BossNameEnum.CalamityEffigy.value,
         ]:
             return True
         return self.is_nightmare(boss_name)

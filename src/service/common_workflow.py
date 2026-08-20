@@ -330,8 +330,12 @@ def object_detection(
         search_reward: bool = False,
         timeout: float = 20.0
 ):
-    if not search_echo and not search_reward:
-        raise ValueError("Must choose one: search_echo or search_reward")
+    if search_echo:
+        logger.debug(f"search_echo: {search_echo}")
+    elif search_reward:
+        logger.debug(f"search_reward: {search_reward}")
+    else:
+        raise ValueError("Must choose one: echo or reward")
 
     ui = UIOp(ctx)
     ui.activate().sleep(0.1).camera_reset().sleep(0.5)
@@ -346,27 +350,29 @@ def object_detection(
     camera_reset_count = 0
 
     while time.monotonic() < deadline:
-        # 领取奖励
-        if ui.snapshot(roi=dialogue_roi).search(ctx.tr(I18nText.ClaimRewards)):
-            ui.pick_up().sleep(0.5)
-            return True
-
+        ui.snapshot(roi=dialogue_roi)
         absorb = ui.search(ctx.tr(I18nText.Absorb))
         claim_rewards = ui.search(ctx.tr(I18nText.ClaimRewards))
         logger.debug(f"absorb: {absorb}, claim_rewards: {claim_rewards}")
 
-        # 有吸收和领取奖励
-        if absorb and claim_rewards:
-            # 吸收在下则滚动到下方
-            if absorb[0].y1 < claim_rewards[0].y1:
-                logger.info("向下滚动")
-                ctx.control_service.scroll_mouse(-1)
-                time.sleep(0.5)
-            ui.pick_up().sleep(2)
-        elif absorb:
-            ui.pick_up().sleep(2)
-        elif claim_rewards:
-            pass
+        if search_echo:
+            if absorb:
+                # 有领取奖励，吸收在下则滚动到下方
+                if claim_rewards and absorb[0].y1 < claim_rewards[0].y1:
+                    logger.info("Scroll down")
+                    ctx.control_service.scroll_mouse(-1)
+                    time.sleep(0.5)
+                ui.pick_up().sleep(0.5)
+                return True
+            elif absorb:
+                ui.pick_up().sleep(1)
+        else:
+            # 领取奖励
+            if claim_rewards:
+                ui.pick_up().sleep(0.5)
+                return True
+            elif absorb:
+                ui.pick_up().sleep(1)
 
         if search_echo:
             det = ctx.od_service.search_echo()

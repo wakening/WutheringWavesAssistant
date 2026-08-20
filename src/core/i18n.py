@@ -202,6 +202,11 @@ class I18nText:
     EnemyDenia = "EnemyDenia"
     EnemyNightmareAdamSmasher = "EnemyNightmareAdamSmasher"
     EnemyMyriadSnareRustfireChassis = "EnemyMyriadSnareRustfireChassis"
+    EnemyThousandPuppetPavilion = "EnemyThousandPuppetPavilion"
+    EnemyCalamityEffigy = "EnemyCalamityEffigy"
+
+    # boss战血条上方显示的名字
+    CombatNightmareMourningAix = "CombatNightmareMourningAix"
 
     # ------- Sonata -------
     FreezingFrost = "FreezingFrost"
@@ -973,6 +978,22 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^万.?牢.?朽躯$", raw="万囮牢·朽躯"),
         Language.EN: RegexStr(flex_ws(r"^Myriad Snare.? Rustfire Chassis$"), raw="Myriad Snare: Rustfire Chassis"),
     },
+    I18nText.EnemyThousandPuppetPavilion: {
+        Language.ZH: RegexStr(r"^千.?重楼$", raw="千傀重楼"),
+        Language.EN: RegexStr(flex_ws(r"^Thousand.?Puppet Pavilion$"), raw="Thousand-Puppet Pavilion"),
+    },
+    I18nText.EnemyCalamityEffigy: {
+        Language.ZH: RegexStr(r"^天.劫煞$", raw="天傀劫煞"),
+        Language.EN: RegexStr(flex_ws(r"^Calamity Effigy$"), raw="Calamity Effigy"),
+    },
+
+    I18nText.CombatNightmareMourningAix: {
+        Language.ZH: RegexStr(r"梦.*?声.*?爱欲之容$", raw="梦魇・哀声鸷・爱欲之容"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Nightmare.*?Mourning Aix.*?Face of Lust$"),
+            raw="Nightmare: Mourning Aix- Face of Lust"
+        ),
+    },
 
     # ------- Sonata -------
     I18nText.FreezingFrost: {
@@ -1406,28 +1427,28 @@ I18N_TEXT = {
 
     # ------- Guidebook -------
     I18nText.Activity: {
-        Language.ZH: RegexStr(r"^活跃行迹$", raw="活跃行迹"),
-        Language.EN: RegexStr(flex_ws(r"^Activity$"), raw="Activity"),
+        Language.ZH: RegexStr(r"^.{0,2}活跃行迹$", raw="活跃行迹"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Activity$"), raw="Activity"),
     },
     I18nText.MaterialCollection: {
-        Language.ZH: RegexStr(r"^素材获取$", raw="素材获取"),
-        Language.EN: RegexStr(flex_ws(r"^Material Collection$"), raw="Material Collection"),
+        Language.ZH: RegexStr(r"^.{0,2}素材获取$", raw="素材获取"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Material Collection$"), raw="Material Collection"),
     },
     I18nText.RecurringChallenges: {
-        Language.ZH: RegexStr(r"^周期挑战$", raw="周期挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Recurring Challenges$"), raw="Recurring Challenges"),
+        Language.ZH: RegexStr(r"^.{0,2}周期挑战$", raw="周期挑战"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Recurring Challenges$"), raw="Recurring Challenges"),
     },
     I18nText.PathOfGrowth: {
-        Language.ZH: RegexStr(r"^强者之路$", raw="强者之路"),
-        Language.EN: RegexStr(flex_ws(r"^Path of Growth$"), raw="Path of Growth"),
+        Language.ZH: RegexStr(r"^.{0,2}强者之路$", raw="强者之路"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Path of Growth$"), raw="Path of Growth"),
     },
     I18nText.EnemyTracing: {
-        Language.ZH: RegexStr(r"^敌迹探寻$", raw="敌迹探寻"),
-        Language.EN: RegexStr(flex_ws(r"^Enemy Tracing$"), raw="Enemy Tracing"),
+        Language.ZH: RegexStr(r"^.{0,2}敌迹探寻$", raw="敌迹探寻"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Enemy Tracing$"), raw="Enemy Tracing"),
     },
     I18nText.Milestones: {
-        Language.ZH: RegexStr(r"^漂泊日志$", raw="漂泊日志"),
-        Language.EN: RegexStr(flex_ws(r"^Milestones$"), raw="Milestones"),
+        Language.ZH: RegexStr(r"^.{0,2}漂泊日志$", raw="漂泊日志"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Milestones$"), raw="Milestones"),
     },
 
     ## ------- Guidebook Common -------

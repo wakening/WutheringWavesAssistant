@@ -120,6 +120,7 @@ class MainWindow(FluentWindow):
         windowSize = cfg.get(cfg.windowSize)
         if windowSize == "Default":
             windowSize = (1280, 800)
+            # windowSize = (1080, 760)
         else:
             window_wh = windowSize.split("x")
             windowSize = (int(window_wh[0]), int(window_wh[1]))
@@ -155,13 +156,16 @@ class MainWindow(FluentWindow):
     def showUpdateVersion(self):
         result = self.remoteVersion.checkVersion()
         if result is None:
-            self.setWindowTitle(self.windowTitle() + self.tr(" *检查更新失败"))
+            msg = self.tr(" *检查更新失败")
+            signalBus.homeMessageSignal.emit(msg)
+            self.setWindowTitle(self.windowTitle() + msg)
             return
         if result is False:
             logger.debug("无新版本需要更新")
             return
         if result is True:
             msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            signalBus.homeMessageSignal.emit(msg)
             self.setWindowTitle(self.windowTitle() + msg)
             self.remoteVersion.showInfoBar(msg, 5000, self.homeInterface)
 
