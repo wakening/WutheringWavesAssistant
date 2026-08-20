@@ -12,12 +12,13 @@ from src.core.color import ColorRule, Color, ColorMatch, RuleMode
 from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
-from src.core.geometry import AnchorPoint, Align, AnchorBBox
+from src.core.geometry import AnchorPoint, Align, AnchorBBox, BBox, Scaler
 from src.core.i18n import Language
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
     BossInfoService
 from src.core.pages import ConditionalAction, TextMatch, Page
 from src.core.regions import TextPosition, DynamicPosition, Position, DynamicPointTransformer, AlignEnum
+from src.util import img_util, file_util, img_template_util
 
 logger = logging.getLogger(__name__)
 
@@ -2344,6 +2345,38 @@ class PageEventAbstractService(PageEventService, ABC):
             logger.info("目前声骸吸收率为：%s", str(format(absorption_rate * 100, ".2f")))
         return True
 
+    def search_icon_guidebook(
+            self,
+            scaler: Scaler,
+            *,
+            material_collection: bool = False,
+            enemy_tracing: bool = False):
+        if material_collection:
+            bbox = BBox(252, 28, 321, 105)
+        elif enemy_tracing:
+            bbox = BBox(467, 33, 541, 113)
+        else:
+            raise ValueError("Unknown icon")
+
+        atlas = img_util.read_img(file_util.get_assets_template("Guidebook_Sidebar.png"))
+        icon = atlas[bbox.as_slice()]
+        roi = scaler.as_bbox(AnchorBBox(
+            AnchorPoint(0, 85, Align.Left | Align.Top),
+            AnchorPoint(99, 720, Align.Left | Align.Top),
+        )).as_tuple()
+        img = self._img_service.screenshot()
+        bbox = img_template_util.find_icon_in_roi_accelerated(
+            img,
+            icon,
+            roi=roi,
+            scale_min=0.4,
+            scale_max=2.0,
+            scale_step=0.03,
+        )
+        if bbox is None or bbox.score < 0.7:
+            return None
+        return bbox.near
+
     def transfer_to_boss(self, bossName):
         # 暂停自动战斗，否则会把按键打在输入框里
         if self._context.param_config.autoCombatBeta is True:
@@ -2352,18 +2385,21 @@ class PageEventAbstractService(PageEventService, ABC):
 
         scaler = self._window_service.scaler
 
-        activitySidebar = scaler.as_point(self.activitySidebar)
-        materialCollectionSidebar = scaler.as_point(self.materialCollectionSidebar)
-        recurringChallengesSidebar = scaler.as_point(self.recurringChallengesSidebar)
-        pathOfGrowthSidebar = scaler.as_point(self.pathOfGrowthSidebar)
+        # activitySidebar = scaler.as_point(self.activitySidebar)
+        # materialCollectionSidebar = scaler.as_point(self.materialCollectionSidebar)
+        # recurringChallengesSidebar = scaler.as_point(self.recurringChallengesSidebar)
+        # pathOfGrowthSidebar = scaler.as_point(self.pathOfGrowthSidebar)
         enemyTracingSidebar = [scaler.as_point(p) for p in self.enemyTracingSidebar]
-        milestonesSidebar = scaler.as_point(self.milestonesSidebar)
+        # milestonesSidebar = scaler.as_point(self.milestonesSidebar)
 
         if bossName in [
-            BossNameEnum.SeedOfIllusoryOrigin.value,
-            BossNameEnum.CourtOfShackledSouls.value,
+            BossNameEnum.Denia.value,
+            BossNameEnum.ThousandPuppetPavilion.value,
         ]:
-            self._control_service.click(*materialCollectionSidebar)
+            _materialCollectionSidebar = self.search_icon_guidebook(scaler, material_collection=True)
+            if not _materialCollectionSidebar:
+                _materialCollectionSidebar = scaler.as_point(self.materialCollectionSidebar)
+            self._control_service.click(*_materialCollectionSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^(战歌重奏)$")
             if weeklyChallenge:
@@ -2399,10 +2435,13 @@ class PageEventAbstractService(PageEventService, ABC):
             return False
         elif bossName in [
             BossNameEnum.NightmareAdamSmasherLimitedTime.value,
-            BossNameEnum.MyriadSnareRustfireChassisLimitedTime.value,
+            BossNameEnum.MyriadSnareRustfireChassis.value,
             BossNameEnum.CalamityEffigy.value,
         ]:
-            self._control_service.click(*materialCollectionSidebar)
+            _materialCollectionSidebar = self.search_icon_guidebook(scaler, material_collection=True)
+            if not _materialCollectionSidebar:
+                _materialCollectionSidebar = scaler.as_point(self.materialCollectionSidebar)
+            self._control_service.click(*_materialCollectionSidebar)
             time.sleep(0.6)
             weeklyChallenge = self._ocr_service.wait_text(r"^讨伐强敌$")
             if weeklyChallenge:
@@ -2438,7 +2477,12 @@ class PageEventAbstractService(PageEventService, ABC):
             return False
 
         is_enemy_tracing = False
-        for enemyTracingPoint in enemyTracingSidebar:
+        _enemyTracingSidebar = self.search_icon_guidebook(scaler, enemy_tracing=True)
+        if _enemyTracingSidebar:
+            _enemyTracingSidebar = [_enemyTracingSidebar]
+        else:
+            _enemyTracingSidebar = enemyTracingSidebar
+        for enemyTracingPoint in _enemyTracingSidebar:
             self._control_service.click(*enemyTracingPoint)  # 进入残像探寻
 
             enemy_tracing_or_path_of_growth_pos = self._ocr_service.wait_text(
