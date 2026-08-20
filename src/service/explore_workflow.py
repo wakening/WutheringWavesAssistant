@@ -160,6 +160,9 @@ class ExploreWorkflow(AbstractWorkflow):
             "T_IconRoleHead150_69_UI.png": I18nText.Rebecca,
             "T_IconRoleHead150_70_UI.png": I18nText.YangyangXuanling,
             "T_IconRoleHead150_71_UI.png": I18nText.Suisui,
+            "T_IconRoleHead150_73_Guest1_UI.png": I18nText.Qingxiao,
+            "T_IconRoleHead150_73_UI.png": I18nText.Qingxiao,
+            "T_IconRoleHead150_74_UI.png": I18nText.Jingran,
         }
         self.role_features = self.__init_role_features()
         self.count = 1

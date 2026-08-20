@@ -112,12 +112,16 @@ class ResonatorNameEnum(Enum):
     rebecca = "丽贝卡"
     lucilla = "洛瑟菈"
 
-    # v3.x
+    # v3.5
     yangyangxuanling = "秧秧玄翎"
     suisui = "穗穗"
-    suoming = "锁暝"
-    jingran = "景燃"
+
+    # v3.6
     qingxiao = "清宵"
+    jingran = "景燃"
+
+    # v3.x
+    suoming = "锁暝"
     hsin = "心"
 
     # 缓存

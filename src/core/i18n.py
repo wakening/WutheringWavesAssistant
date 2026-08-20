@@ -143,9 +143,9 @@ class I18nText:
     Lucilla = "Lucilla"
     YangyangXuanling = "YangyangXuanling"
     Suisui = "Suisui"
-    Suoming = "Suoming"
-    Jingran = "Jingran"
     Qingxiao = "Qingxiao"
+    Jingran = "Jingran"
+    Suoming = "Suoming"
     Hsin = "Hsin"
 
     # ------- Combat -------
@@ -764,17 +764,17 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^穗穗$", raw="穗穗"),
         Language.EN: RegexStr(flex_ws(r"^Suisui$"), raw="Suisui"),
     },
-    I18nText.Suoming: {
-        Language.ZH: RegexStr(r"^锁[暝冥]$", raw="锁暝"),
-        Language.EN: RegexStr(flex_ws(r"^Suoming$"), raw="Suoming"),
-    },
-    I18nText.Jingran: {
-        Language.ZH: RegexStr(r"^景燃$", raw="景燃"),
-        Language.EN: RegexStr(flex_ws(r"^Jingran$"), raw="Jingran"),
-    },
     I18nText.Qingxiao: {
         Language.ZH: RegexStr(r"^清宵$", raw="清宵"),
         Language.EN: RegexStr(flex_ws(r"^Qingxiao$"), raw="Qingxiao"),
+    },
+    I18nText.Jingran: {
+        Language.ZH: RegexStr(r"^景[燃然]$", raw="景燃"),
+        Language.EN: RegexStr(flex_ws(r"^Jingran$"), raw="Jingran"),
+    },
+    I18nText.Suoming: {
+        Language.ZH: RegexStr(r"^锁[暝冥]$", raw="锁暝"),
+        Language.EN: RegexStr(flex_ws(r"^Suoming$"), raw="Suoming"),
     },
     I18nText.Hsin: {
         Language.ZH: RegexStr(r"^心$", raw="心"),
