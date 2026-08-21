@@ -330,7 +330,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
             logger.warning(f"Text not found: {ctx.tr(I18nText.Huanglong).raw}")
             return False
         ui.sleep(0.4).snapshot()  # 修复文字未显示完全就识别导致少字，等动画结束，重新识别
-        if ui.search(ctx.tr(I18nText.Mengzhou)) or ui.search(ctx.tr(I18nText.Jinzhou)):
+        if ui.search(ctx.tr([I18nText.Mengzhou, I18nText.Jinzhou])):
             ui.click_text(ctx.tr(I18nText.Mengzhou), regions_roi, delay=0.4, times=2, interval=0.2)
             ui.click_text(ctx.tr(I18nText.Jinzhou), regions_roi, delay=0.1, times=2, interval=0.2)
             break
@@ -1093,7 +1093,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         deadline = time.monotonic() + timeout
         hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-        while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+        while ui.is_set() or time.monotonic() < deadline:
             if no_text_count < 0:
                 break
             combat_system.start(3.5)
@@ -1384,7 +1384,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             deadline = time.monotonic() + timeout
             hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-            while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+            while ui.is_set() or time.monotonic() < deadline:
                 if no_text_count < 0:
                     break
                 combat_system.start(3.5)
@@ -1705,7 +1705,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         deadline = time.monotonic() + timeout
         hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-        while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+        while ui.is_set() or time.monotonic() < deadline:
             if no_text_count < 0:
                 break
             combat_system.start(3.5)
@@ -2096,7 +2096,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     no_text_count = no_text_max
                     hp_roi = bbox_hp_bar(ctx).as_tuple()
 
-                    while ctx.runtime.stop_event.is_set() or time.monotonic() < deadline:
+                    while ui.is_set() or time.monotonic() < deadline:
                         logger.debug(f"no_text_count: {no_text_count}")
                         if no_text_count < 0:
                             break

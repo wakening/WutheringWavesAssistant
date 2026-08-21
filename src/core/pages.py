@@ -931,8 +931,8 @@ class GlobalPage:
     def isLeaveInstance(self, *, ui: UIOp, **kwargs):
         """离开副本"""
         if ((res := ui.search(self.ctx.tr(I18nText.Confirm)))
-                and (ui.search(self.ctx.tr(I18nText.Cancel)) or ui.search(self.ctx.tr(I18nText.Restart)))
-                and (ui.search(self.ctx.tr(I18nText.Notice)) or ui.search(self.ctx.tr(I18nText.Note)))):
+                and ui.search(self.ctx.tr([I18nText.Cancel, I18nText.Restart]))
+                and ui.search(self.ctx.tr([I18nText.Notice, I18nText.Note]))):
             return self.ActionStr(
                 self.LeaveInstance,
                 lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
@@ -998,7 +998,7 @@ class GlobalPage:
     def isLogin(self, *, ui: UIOp, **kwargs):
         """登入账号（可能有手机号登录弹窗）"""
         if ((res := ui.search(self.ctx.tr(I18nText.Login)))
-                and ui.search(self.ctx.tr(I18nText.Settings))
+                and ui.search(self.ctx.tr([I18nText.Settings, I18nText.Bulletin]))
                 and not ui.search(self.ctx.tr(I18nText.TapToLandInSolaris3))):
 
             ui.activate().sleep(0.1)
