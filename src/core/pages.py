@@ -513,9 +513,9 @@ class UIOp:
         AnchorPoint(212, 44, Align.Top | Align.Left), AnchorPoint(222, 44, Align.Top | Align.Left),
         # # 飞讯
         # AnchorPoint(274, 31, Align.Top | Align.Left), AnchorPoint(280, 38, Align.Top | Align.Left),
-        # 索拉指南
-        AnchorPoint(993, 35, Align.Top | Align.Right),
-        # # 先约电台
+        # # 索拉指南 fix: 新号没有先约电台导致这个也错位，不可用
+        # AnchorPoint(993, 35, Align.Top | Align.Right),
+        # # 先约电台 fix: 刚开的新号没有这个图标，不可用
         # AnchorPoint(1114, 24, Align.Top | Align.Right),
         # 共鸣者
         AnchorPoint(1156, 28, Align.Top | Align.Right), AnchorPoint(1160, 30, Align.Top | Align.Right),
