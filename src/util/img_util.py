@@ -1,4 +1,6 @@
+import base64
 import logging
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -7,13 +9,15 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def read_img(img_path: str, alpha: bool | None = True) -> np.ndarray:
+def read_img(img_path: str | Path, alpha: bool | None = True) -> np.ndarray:
     """
     读取图片，返回BGR或BGRA
     :param img_path:
     :param alpha: 默认保留原图Alpha通道
     :return: BGR/BGRA ndarray，有没有Alpha通道取决于原图是否有
     """
+    if isinstance(img_path, Path):
+        img_path = str(img_path)
     logger.debug("Read image: %s", img_path)
     # # OpenCV 默认 BGR，丢弃 Alpha 通道，不支持中文路径
     # img = cv2.imread(img_path)
@@ -60,19 +64,43 @@ def save_img_in_temp(img_bgr: np.ndarray):
     save_img(img_bgr, img_path)
 
 
-def save_rgb_img(img_rgb: np.ndarray, img_path: str):
+# def save_rgb_img(img_rgb: np.ndarray, img_path: str):
+#     """
+#     保存RGB图片
+#     :param img_rgb: 图片格式必需为RGB/RGBA
+#     :param img_path:
+#     :return:
+#     """
+#     logger.debug("Save image: %s", img_path)
+#     if img_rgb.shape[-1] == 4:  # BGRA 图像
+#         img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGBA2BGR)
+#     else:
+#         img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+#     cv2.imwrite(img_path, img_bgr)
+
+
+
+def img_to_base64(img: np.ndarray):
     """
-    保存RGB图片
-    :param img_rgb: 图片格式必需为RGB/RGBA
-    :param img_path:
+    np图片转base64
+    :param img: 图片格式必需为BGR/BGRA
     :return:
     """
-    logger.debug("Save image: %s", img_path)
-    if img_rgb.shape[-1] == 4:  # BGRA 图像
-        img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGBA2BGR)
-    else:
-        img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-    cv2.imwrite(img_path, img_bgr)
+    _, encoded = cv2.imencode('.png', img)
+    b64 = base64.b64encode(encoded.tobytes()).decode()
+    logger.debug(f"b64: {b64}")
+    return b64
+
+
+def base64_to_img(b64: str):
+    """
+    np图片转base64
+    :param b64: 图片格式必需为BGR/BGRA
+    :return:
+    """
+    img_bytes = base64.b64decode(b64)
+    nparr = np.frombuffer(img_bytes, np.uint8)
+    return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
 
 
 def show_img_plt(img: np.ndarray):
@@ -84,6 +112,9 @@ def show_img_plt(img: np.ndarray):
 
 
 def show_img(img: np.ndarray):
+    logger.debug(f"img.shape: {img.shape}")
+    if img.shape[-1] == 4:
+        img = img[:, :, 3]
     cv2.imshow('Image Window', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -115,6 +146,13 @@ def bgr2gray(img_bgr: np.ndarray):
         elif img_bgr.shape[2] == 4:
             return cv2.cvtColor(img_bgr, cv2.COLOR_BGRA2GRAY)  # 4通道 BGRA -> 灰度
     raise ValueError(f"Unsupported image format: {img_bgr.shape}")
+
+
+def create_dummy() -> np.ndarray:
+    dummy = np.zeros((720, 1280, 3), dtype=np.uint8)
+    cv2.putText(dummy, "123456", (50, 100),
+                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3)
+    return dummy
 
 
 def resize(img: np.ndarray, dsize: tuple[int, int]) -> np.ndarray:

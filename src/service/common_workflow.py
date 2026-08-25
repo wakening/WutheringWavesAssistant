@@ -489,7 +489,8 @@ def search_icon_guidebook(
         ctx: NodeContext,
         *,
         material_collection: bool = False,
-        enemy_tracing: bool = False):
+        enemy_tracing: bool = False
+) -> tuple[int, int] | None:
     if material_collection:
         bbox = BBox(252, 28, 321, 105)
     elif enemy_tracing:
@@ -515,3 +516,35 @@ def search_icon_guidebook(
     if bbox is None or bbox.score < 0.7:
         return None
     return bbox.near
+
+
+class RateLimiter:
+    """
+    速率控制器
+    目标：限制调用频率，防止CPU过高
+    """
+
+    def __init__(self, rate: float):
+        # rate表示每秒执行次数
+        if rate <= 0:
+            raise ValueError("rate must be > 0")
+
+        self.interval = 1.0 / rate
+        self.next_time = None
+
+    def __call__(self) -> float:
+        now = time.monotonic()
+
+        if self.next_time is None:
+            self.next_time = now + self.interval
+            return 0.0
+
+        wait = self.next_time - now
+
+        if wait <= 0:
+            self.next_time += self.interval
+            if self.next_time < now:
+                self.next_time = now + self.interval
+            return 0.0
+
+        return round(wait, 6)

@@ -206,7 +206,7 @@ class ContentWidget(QWidget):
 
         self.daily = DailyWidget(self)
         self.echo = EchoWidget(self)
-        self.story = StoryWidget(self)
+        # self.story = StoryWidget(self)
         self.explore = ExploreWidget(self)
         self.events = EventsWidget(self)
         # self.help = QLabel(self.tr("施工中..."), self)
@@ -216,7 +216,7 @@ class ContentWidget(QWidget):
         self.addSubInterface(self.daily, 'daily', self.tr("日常"))
         self.addSubInterface(self.echo, 'echo', self.tr("声骸"))
         self.addSubInterface(self.explore, 'explore', self.tr("探索"))
-        self.addSubInterface(self.story, 'story', self.tr("剧情"))
+        # self.addSubInterface(self.story, 'story', self.tr("剧情"))
         self.addSubInterface(self.events, 'events', self.tr("活动"))
         # self.addSubInterface(self.help, 'help', self.tr("帮助"))
 

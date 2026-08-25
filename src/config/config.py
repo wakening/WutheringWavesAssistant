@@ -107,6 +107,13 @@ class DailyConfig(ConfigBase):
     pioneerPodcastOpen: bool | None = None
 
 
+class ExploreConfig(ConfigBase):
+    autoCombat: bool | None = None
+    autoPickup: bool | None = None
+    skipStory: bool | None = None
+    autoDialogue: bool | None = None
+
+
 class GameConfig(ConfigBase):
     gameLanguage: str | None = None
     gamePath: str | None = None
@@ -122,6 +129,7 @@ class SoarToTheBeatConfig(ConfigBase):
 class Config(ConfigBase):
     bossRush: BossRushConfig = Field(default_factory=BossRushConfig)
     daily: DailyConfig = Field(default_factory=DailyConfig)
+    explore: ExploreConfig = Field(default_factory=ExploreConfig)
     game: GameConfig = Field(default_factory=GameConfig)
     soarToTheBeat: SoarToTheBeatConfig = Field(default_factory=SoarToTheBeatConfig)
 

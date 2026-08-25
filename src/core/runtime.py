@@ -3,7 +3,7 @@ from enum import Enum
 from functools import cached_property
 from pathlib import Path
 
-from src.config.config import Config, BossRushConfig, DailyConfig, GameConfig, SoarToTheBeatConfig
+from src.config.config import Config, BossRushConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
 from src.core.boss import BossNameEnum
 from src.core.i18n import I18nText, Language
 from src.util import winreg_util
@@ -179,6 +179,19 @@ class DailyRuntimeConfig:
         return f"{self.__class__.__name__}({self.__dict__})"
 
 
+class ExploreRuntimeConfig:
+
+    def __init__(self, cfg: ExploreConfig):
+        self._cfg: ExploreConfig = cfg
+        self.autoCombat: bool = bool(cfg.autoCombat)
+        self.autoPickup: bool = bool(cfg.autoPickup)
+        self.skipStory: bool = bool(cfg.skipStory)
+        self.autoDialogue: bool = bool(cfg.autoDialogue)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.__dict__})"
+
+
 class Device(str, Enum):
     Auto = "Auto"
     CUDA = "CUDA"
@@ -269,6 +282,7 @@ class RuntimeConfig:
         self._cfg: Config = self.format_config(cfg)
         self.bossRush: BossRushRuntimeConfig = BossRushRuntimeConfig(self._cfg.bossRush)
         self.daily: DailyRuntimeConfig = DailyRuntimeConfig(self._cfg.daily)
+        self.explore: ExploreRuntimeConfig = ExploreRuntimeConfig(self._cfg.explore)
         self.game: GameRuntimeConfig = GameRuntimeConfig(self._cfg.game)
         self.soarToTheBeat: SoarToTheBeatRuntimeConfig = SoarToTheBeatRuntimeConfig(self._cfg.soarToTheBeat)
 

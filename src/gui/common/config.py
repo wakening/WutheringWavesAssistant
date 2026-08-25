@@ -183,6 +183,12 @@ class ParamConfig(QConfig):
     pioneerPodcast = ConfigItem("Daily", "PioneerPodcast", "Auto")
     pioneerPodcastOpen = ConfigItem("Daily", "PioneerPodcastOpen", False, BoolValidator())
 
+    # Explore
+    exploreAutoCombat = ConfigItem("Explore", "AutoCombat", False, BoolValidator())
+    exploreAutoPickup = ConfigItem("Explore", "AutoPickup", False, BoolValidator())
+    exploreSkipStory = ConfigItem("Explore", "SkipStory", False, BoolValidator())
+    exploreAutoDialogue = ConfigItem("Explore", "AutoDialogue", False, BoolValidator())
+
     # Game
     gameLanguage = ConfigItem("Game", "GameLanguage", None)
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())

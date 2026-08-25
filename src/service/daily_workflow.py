@@ -777,10 +777,15 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
 
     # 检查100活跃点是否为黄色待领取
     if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(img):
-        ui.click_point(pts_sp[num_points - 1], times=2, interval=0.2)
-        if not ui.sleep(0.5).wait().until(
+        ui.click_point(pts_sp[num_points - 1], times=3, interval=0.25)
+        if ui.sleep(0.5).wait().until(
                 lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
-            return False
+            # 再次确认
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot()
+                            and ui.search(ctx.tr(I18nText.Activity))
+                            or ui.click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                return False
         ui.sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
         return True
@@ -792,10 +797,15 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
             break
         # 检查活跃点是否为黄色待领取
         if ColorRule().points(pts_sp[i]).colors(yellow).match(img):
-            ui.click_point(pts_sp[i], times=2, interval=0.2)
-            if not ui.sleep(0.5).wait().until(
+            ui.click_point(pts_sp[i], times=3, interval=0.25)
+            if ui.sleep(0.5).wait().until(
                     lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
-                return False
+                # 再次确认
+                if not ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot()
+                                and ui.search(ctx.tr(I18nText.Activity))
+                                or ui.click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                    return False
             ui.sleep(0.3)
             idx = i
             break
@@ -2074,8 +2084,9 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(0.7)
                 return True
 
-            is_combat = not ui.snapshot().search(
-                ctx.tr([I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou]))
+            cleared_keyword = ctx.tr([
+                I18nText.TacetDiscordNestCleared,I18nText.TacetDiscordNestClearedMengzhou, I18nText.RefreshesTomorrow])
+            is_combat = not ui.snapshot().search(cleared_keyword)
             # 可能打着打着出了战斗区域，标识文本消失，误判已经打完，循环重置位置接着打
             max_combat_range = 3
             for k in range(max_combat_range):
@@ -2107,8 +2118,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         if ui.is_on_homepage():
                             # 残象聚落已清理
                             logger.debug(f"result: {ui.bbox_result}")
-                            if ui.search(ctx.tr(
-                                    [I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou])):
+                            if ui.search(cleared_keyword):
                                 break
                             # 清理聚落中的残象
                             if ui.search(ctx.tr(
@@ -2163,8 +2173,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         ui.move(tacets_route[_tacets_idx])
                     ui.sleep(0.3)
 
-                    is_combat = not ui.snapshot().search(ctx.tr(
-                        [I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou]))
+                    is_combat = not ui.snapshot().search(cleared_keyword)
                     if k == max_combat_range - 1:
                         # 打了几回都没打完，重新来
                         if in_progress:

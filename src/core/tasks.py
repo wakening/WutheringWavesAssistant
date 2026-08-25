@@ -765,6 +765,7 @@ def explore_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 
         ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
         logger.info(f"探索任务开始运行, task_id: {spec.task_id}")
+        create_parent_monitor(event, spec.leader_pid)
 
         try:
             from src.service.explore_workflow import ExploreWorkflow

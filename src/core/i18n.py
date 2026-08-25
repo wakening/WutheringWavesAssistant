@@ -284,6 +284,10 @@ class I18nText:
     PatchingCompleteTheGameIsRestarting = "PatchingCompleteTheGameIsRestarting"
     DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
     RequestTimedOut = "RequestTimedOut"
+    AreYouSureYouWantToProceed = "AreYouSureYouWantToProceed"
+    Summary = "Summary"
+    SummarySkip = "SummarySkip"
+    SummaryResume = "SummaryResume"
 
     # ------- Dialogue -------
     Absorb = "Absorb"
@@ -490,6 +494,120 @@ class I18nText:
     TacetDiscordNestCleared = "TacetDiscordNestCleared"
     ClearTheTacetDiscordNestMengzhou = "ClearTheTacetDiscordNestMengzhou"
     TacetDiscordNestClearedMengzhou = "TacetDiscordNestClearedMengzhou"
+    RefreshesTomorrow = "RefreshesTomorrow"
+
+    # ------- 大世界拾取材料 -------
+    PickAbsorb = "PickAbsorb"
+    PickPickUp = "PickPickUp"
+    PickLotusSeeds = "PickLotusSeeds"
+    PickClimbingFig = "PickClimbingFig"
+    PickIris = "PickIris"
+    PickTerraspawnFungus = "PickTerraspawnFungus"
+    PickLanternberry = "PickLanternberry"
+    PickPecokFlower = "PickPecokFlower"
+    PickCoriolus = "PickCoriolus"
+    PickWintryBell = "PickWintryBell"
+    PickVioletCoral = "PickVioletCoral"
+    PickBittberry = "PickBittberry"
+    PickPearlLeaf = "PickPearlLeaf"
+    PickDewvetch = "PickDewvetch"
+    PickNoctemint = "PickNoctemint"
+    PickHoneysuckle = "PickHoneysuckle"
+    PickPerilla = "PickPerilla"
+    PickAngelica = "PickAngelica"
+    PickLemongrass = "PickLemongrass"
+    PickErodorchid = "PickErodorchid"
+    PickWaterlamp = "PickWaterlamp"
+    PickBunnywort = "PickBunnywort"
+    PickChromeshell = "PickChromeshell"
+    PickDripsnail = "PickDripsnail"
+    PickCliffrecluse = "PickCliffrecluse"
+    PickUmbragricus = "PickUmbragricus"
+    PickGemberry = "PickGemberry"
+    PickGloomSlough = "PickGloomSlough"
+    PickPavoPlum = "PickPavoPlum"
+    PickLoongsPearl = "PickLoongsPearl"
+    PickSilverLotus = "PickSilverLotus"
+    PickNova = "PickNova"
+    PickAirsailer = "PickAirsailer"
+    PickSeaFlytrap = "PickSeaFlytrap"
+    PickLaurusSprouts = "PickLaurusSprouts"
+    PickGoldcrestScarab = "PickGoldcrestScarab"
+    PickSeaBunny = "PickSeaBunny"
+    PickHeliobaneFungia = "PickHeliobaneFungia"
+    PickBellCrab = "PickBellCrab"
+    PickMasticNuvola = "PickMasticNuvola"
+    PickSunflareEverlasting = "PickSunflareEverlasting"
+    PickViscumBerry = "PickViscumBerry"
+    PickFelicitousOlives = "PickFelicitousOlives"
+    PickGoldenFleece = "PickGoldenFleece"
+    PickSwordAcorus = "PickSwordAcorus"
+    PickEdodes = "PickEdodes"
+    PickBellePoppy = "PickBellePoppy"
+    PickCaltrop = "PickCaltrop"
+    PickViola = "PickViola"
+    PickFirecrackerJewelweed = "PickFirecrackerJewelweed"
+    PickSeasideCendrelis = "PickSeasideCendrelis"
+    PickOaknut = "PickOaknut"
+    PickBambooIris = "PickBambooIris"
+    PickBloodleafViburnum = "PickBloodleafViburnum"
+    PickAbyssLuminary = "PickAbyssLuminary"
+    PickAfterlife = "PickAfterlife"
+    PickPaintedMantisShrimp = "PickPaintedMantisShrimp"
+    PickSliverglowBloom = "PickSliverglowBloom"
+    PickLuminousCalendula = "PickLuminousCalendula"
+    PickStoneRose = "PickStoneRose"
+    PickSummerFlower = "PickSummerFlower"
+    PickCreepingTorchpineNeedle = "PickCreepingTorchpineNeedle"
+    PickDuskHoneypot = "PickDuskHoneypot"
+    PickFernSpore = "PickFernSpore"
+    PickCradleLichen = "PickCradleLichen"
+    PickGeminiSpore = "PickGeminiSpore"
+    PickRimewisp = "PickRimewisp"
+    PickArithmeticShell = "PickArithmeticShell"
+    PickWaxweaverWeb = "PickWaxweaverWeb"
+    PickEdelschnee = "PickEdelschnee"
+    PickMossAmber = "PickMossAmber"
+    PickFoxtailKelp = "PickFoxtailKelp"
+    PickFrostwort = "PickFrostwort"
+    PickDreamOfStars = "PickDreamOfStars"
+    PickRedbell = "PickRedbell"
+    PickForgetMeNot = "PickForgetMeNot"
+    PickPrismFruit = "PickPrismFruit"
+    PickPastReveries = "PickPastReveries"
+    PickCloudperchSeed = "PickCloudperchSeed"
+    PickFlowborneDream = "PickFlowborneDream"
+    PickBladeBlossom = "PickBladeBlossom"
+    PickUncrackedJade = "PickUncrackedJade"
+    PickClimberShoots = "PickClimberShoots"
+    PickWhiteJadeBeauty = "PickWhiteJadeBeauty"
+    PickOpusStone = "PickOpusStone"
+    PickLeafweaver = "PickLeafweaver"
+    PickFloralCrestJade = "PickFloralCrestJade"
+    PickSilverBandedLizard = "PickSilverBandedLizard"
+    PickAzureLizard = "PickAzureLizard"
+    PickGreenPitLizard = "PickGreenPitLizard"
+    PickBlackStripedFrog = "PickBlackStripedFrog"
+    PickGoldenbackFrog = "PickGoldenbackFrog"
+    PickGoldenringedDragonfly = "PickGoldenringedDragonfly"
+    PickBlueFeatherButterfly = "PickBlueFeatherButterfly"
+    PickRedFeatherButterfly = "PickRedFeatherButterfly"
+    PickFeather = "PickFeather"
+    PickChrysopa = "PickChrysopa"
+    PickPhoenixButterfly = "PickPhoenixButterfly"
+    PickFowl = "PickFowl"
+    PickBirdEgg = "PickBirdEgg"
+    PickRawMeat = "PickRawMeat"
+    PickFish = "PickFish"
+    PickTetra = "PickTetra"
+    PickSuspiciousChest = "PickSuspiciousChest"
+    PickBasicSupplyChest = "PickBasicSupplyChest"
+    PickStandardSupplyChest = "PickStandardSupplyChest"
+    PickAdvancedSupplyChest = "PickAdvancedSupplyChest"
+    PickPremiumSupplyChest = "PickPremiumSupplyChest"
+    PickTidalSupplyChest = "PickTidalSupplyChest"
+    PickTidalHeritage = "PickTidalHeritage"
+    PickAdvancedSupplyPack = "PickAdvancedSupplyPack"
 
     # ------- Phantasma Dreamland: Rhapsody -------
     PhantasmaDreamlandRhapsody = "PhantasmaDreamlandRhapsody"
@@ -1293,6 +1411,25 @@ I18N_TEXT = {
             raw="Request timed out. Failed to connect to the server. Please try again later."
         ),
     },
+    I18nText.AreYouSureYouWantToProceed: {
+        Language.ZH: RegexStr(r"^完整观看剧情", raw="完整观看剧情更有助于了解故事发展，是否确认跳过"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Story Skip may hinder"),
+            raw="Story Skip may hinder your understanding of the story's progression. Are you sure you want to proceed?"
+        ),
+    },
+    I18nText.Summary: {
+        Language.ZH: RegexStr(r"^剧情梗概$", raw="剧情梗概"),
+        Language.EN: RegexStr(flex_ws(r"^Summary$"), raw="Summary"),
+    },
+    I18nText.SummarySkip: {
+        Language.ZH: RegexStr(r"^跳过剧情$", raw="跳过剧情"),
+        Language.EN: RegexStr(flex_ws(r"^Skip$"), raw="Skip"),
+    },
+    I18nText.SummaryResume: {
+        Language.ZH: RegexStr(r"^继续观看$", raw="继续观看"),
+        Language.EN: RegexStr(flex_ws(r"^Resume$"), raw="Resume"),
+    },
 
     # ------- Dialogue -------
     I18nText.Absorb: {
@@ -1427,8 +1564,8 @@ I18N_TEXT = {
 
     # ------- Guidebook -------
     I18nText.Activity: {
-        Language.ZH: RegexStr(r"^.{0,2}活跃行迹$", raw="活跃行迹"),
-        Language.EN: RegexStr(flex_ws(r"^.{0,2}Activity$"), raw="Activity"),
+        Language.ZH: RegexStr(r"^.{0,3}活跃行迹$", raw="活跃行迹"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,3}Activity$"), raw="Activity"),
     },
     I18nText.MaterialCollection: {
         Language.ZH: RegexStr(r"^.{0,2}素材获取$", raw="素材获取"),
@@ -2044,6 +2181,462 @@ I18N_TEXT = {
     I18nText.TacetDiscordNestClearedMengzhou: {
         Language.ZH: RegexStr(r"残?象聚落已清剿?", raw="残象聚落已清剿"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest Cleared"), raw="Tacet Discord Nest Cleared"),
+    },
+    I18nText.RefreshesTomorrow: {
+        Language.ZH: RegexStr(r"^(等待)?明日刷新$", raw="明日刷新"),
+        Language.EN: RegexStr(flex_ws(r"^Refreshes tomorrow$"), raw="Refreshes tomorrow"),
+    },
+
+    # ------- 大世界拾取材料 -------
+    I18nText.PickAbsorb: {
+        Language.ZH: RegexStr(r"吸收$", raw="吸收"),
+        Language.EN: RegexStr(flex_ws(r"Absorb$"), raw="Absorb"),
+    },
+    I18nText.PickPickUp: {
+        Language.ZH: RegexStr(r"拾取$", raw="拾取"),
+        Language.EN: RegexStr(flex_ws(r"Pick Up$"), raw="Pick Up"),
+    },
+    I18nText.PickLotusSeeds: {
+        Language.ZH: RegexStr(r"莲实$", raw="莲实"),
+        Language.EN: RegexStr(flex_ws(r"Lotus Seeds$"), raw="Lotus Seeds"),
+    },
+    I18nText.PickClimbingFig: {
+        Language.ZH: RegexStr(r"木莲$", raw="木莲"),
+        Language.EN: RegexStr(flex_ws(r"Climbing Fig$"), raw="Climbing Fig"),
+    },
+    I18nText.PickIris: {
+        Language.ZH: RegexStr(r"鸢尾花$", raw="鸢尾花"),
+        Language.EN: RegexStr(flex_ws(r"Iris$"), raw="Iris"),
+    },
+    I18nText.PickTerraspawnFungus: {
+        Language.ZH: RegexStr(r"地涌莲$", raw="地涌莲"),
+        Language.EN: RegexStr(flex_ws(r"Terraspawn Fungus$"), raw="Terraspawn Fungus"),
+    },
+    I18nText.PickLanternberry: {
+        Language.ZH: RegexStr(r"灯笼果$", raw="灯笼果"),
+        Language.EN: RegexStr(flex_ws(r"Lanternberry$"), raw="Lanternberry"),
+    },
+    I18nText.PickPecokFlower: {
+        Language.ZH: RegexStr(r"金阳凤$", raw="金阳凤"),
+        Language.EN: RegexStr(flex_ws(r"Pecok Flower$"), raw="Pecok Flower"),
+    },
+    I18nText.PickCoriolus: {
+        Language.ZH: RegexStr(r"云芝$", raw="云芝"),
+        Language.EN: RegexStr(flex_ws(r"Coriolus$"), raw="Coriolus"),
+    },
+    I18nText.PickWintryBell: {
+        Language.ZH: RegexStr(r"傲寒钟$", raw="傲寒钟"),
+        Language.EN: RegexStr(flex_ws(r"Wintry Bell$"), raw="Wintry Bell"),
+    },
+    I18nText.PickVioletCoral: {
+        Language.ZH: RegexStr(r"紫珊瑚$", raw="紫珊瑚"),
+        Language.EN: RegexStr(flex_ws(r"Violet Coral$"), raw="Violet Coral"),
+    },
+    I18nText.PickBittberry: {
+        Language.ZH: RegexStr(r"金铃子$", raw="金铃子"),
+        Language.EN: RegexStr(flex_ws(r"Bittberry$"), raw="Bittberry"),
+    },
+    I18nText.PickPearlLeaf: {
+        Language.ZH: RegexStr(r"珍珠草$", raw="珍珠草"),
+        Language.EN: RegexStr(flex_ws(r"Pearl Leaf$"), raw="Pearl Leaf"),
+    },
+    I18nText.PickDewvetch: {
+        Language.ZH: RegexStr(r"云露$", raw="云露"),
+        Language.EN: RegexStr(flex_ws(r"Dewvetch$"), raw="Dewvetch"),
+    },
+    I18nText.PickNoctemint: {
+        Language.ZH: RegexStr(r"夜息香$", raw="夜息香"),
+        Language.EN: RegexStr(flex_ws(r"Noctemint$"), raw="Noctemint"),
+    },
+    I18nText.PickHoneysuckle: {
+        Language.ZH: RegexStr(r"鸳鸯花$", raw="鸳鸯花"),
+    },
+    I18nText.PickPerilla: {
+        Language.ZH: RegexStr(r"香苏$", raw="香苏"),
+        Language.EN: RegexStr(flex_ws(r"Perilla$"), raw="Perilla"),
+    },
+    I18nText.PickAngelica: {
+        Language.ZH: RegexStr(r"清芬草$", raw="清芬草"),
+        Language.EN: RegexStr(flex_ws(r"Angelica$"), raw="Angelica"),
+    },
+    I18nText.PickLemongrass: {
+        Language.ZH: RegexStr(r"香柠草$", raw="香柠草"),
+        Language.EN: RegexStr(flex_ws(r"Lemongrass$"), raw="Lemongrass"),
+    },
+    I18nText.PickErodorchid: {
+        Language.ZH: RegexStr(r"蚀夜幽兰$", raw="蚀夜幽兰"),
+        Language.EN: RegexStr(flex_ws(r"Erodorchid$"), raw="Erodorchid"),
+    },
+    I18nText.PickWaterlamp: {
+        Language.ZH: RegexStr(r"水灯花$", raw="水灯花"),
+        Language.EN: RegexStr(flex_ws(r"Waterlamp$"), raw="Waterlamp"),
+    },
+    I18nText.PickBunnywort: {
+        Language.ZH: RegexStr(r"月藻$", raw="月藻"),
+        Language.EN: RegexStr(flex_ws(r"Bunnywort$"), raw="Bunnywort"),
+    },
+    I18nText.PickChromeshell: {
+        Language.ZH: RegexStr(r"锦色贝$", raw="锦色贝"),
+        Language.EN: RegexStr(flex_ws(r"Chromeshell$"), raw="Chromeshell"),
+    },
+    I18nText.PickDripsnail: {
+        Language.ZH: RegexStr(r"雨声蜗$", raw="雨声蜗"),
+        Language.EN: RegexStr(flex_ws(r"Dripsnail$"), raw="Dripsnail"),
+    },
+    I18nText.PickCliffrecluse: {
+        Language.ZH: RegexStr(r"崖仙子$", raw="崖仙子"),
+        Language.EN: RegexStr(flex_ws(r"Cliffrecluse$"), raw="Cliffrecluse"),
+    },
+    I18nText.PickUmbragricus: {
+        Language.ZH: RegexStr(r"伞下客$", raw="伞下客"),
+        Language.EN: RegexStr(flex_ws(r"Umbragricus$"), raw="Umbragricus"),
+    },
+    I18nText.PickGemberry: {
+        Language.ZH: RegexStr(r"龙衔珠$", raw="龙衔珠"),
+        Language.EN: RegexStr(flex_ws(r"Gemberry$"), raw="Gemberry"),
+    },
+    I18nText.PickGloomSlough: {
+        Language.ZH: RegexStr(r"隐火蜕$", raw="隐火蜕"),
+        Language.EN: RegexStr(flex_ws(r"Gloom Slough$"), raw="Gloom Slough"),
+    },
+    I18nText.PickPavoPlum: {
+        Language.ZH: RegexStr(r"雀翎果$", raw="雀翎果"),
+        Language.EN: RegexStr(flex_ws(r"Pavo Plum$"), raw="Pavo Plum"),
+    },
+    I18nText.PickLoongsPearl: {
+        Language.ZH: RegexStr(r"龙吐珠$", raw="龙吐珠"),
+        Language.EN: RegexStr(flex_ws(r"Loong's Pearl$"), raw="Loong's Pearl"),
+    },
+    I18nText.PickSilverLotus: {
+        Language.ZH: RegexStr(r"银雪莲$", raw="银雪莲"),
+        Language.EN: RegexStr(flex_ws(r"Silver Lotus$"), raw="Silver Lotus"),
+    },
+    I18nText.PickNova: {
+        Language.ZH: RegexStr(r"暂星$", raw="暂星"),
+        Language.EN: RegexStr(flex_ws(r"Nova$"), raw="Nova"),
+    },
+    I18nText.PickAirsailer: {
+        Language.ZH: RegexStr(r".?空鱼$", raw="溯空鱼"),
+        Language.EN: RegexStr(flex_ws(r"Airsailer$"), raw="Airsailer"),
+    },
+    I18nText.PickSeaFlytrap: {
+        Language.ZH: RegexStr(r"伪贝母$", raw="伪贝母"),
+        Language.EN: RegexStr(flex_ws(r"Sea Flytrap$"), raw="Sea Flytrap"),
+    },
+    I18nText.PickLaurusSprouts: {
+        Language.ZH: RegexStr(r"月桂丛$", raw="月桂丛", desc="月桂丛拾取后是桂实、桂叶"),
+        Language.EN: RegexStr(flex_ws(r"Laurus Sprouts$"), raw="Laurus Sprouts"),
+    },
+    I18nText.PickGoldcrestScarab: {
+        Language.ZH: RegexStr(r"盾金龟$", raw="盾金龟"),
+        Language.EN: RegexStr(flex_ws(r"Goldcrest Scarab$"), raw="Goldcrest Scarab"),
+    },
+    I18nText.PickSeaBunny: {
+        Language.ZH: RegexStr(r"多肉海兔$", raw="多肉海兔", desc="多肉海兔拾取后是毒莴裙藻，击杀是海兔肉"),
+        Language.EN: RegexStr(flex_ws(r"Sea Bunny$"), raw="Sea Bunny"),
+    },
+    I18nText.PickHeliobaneFungia: {
+        Language.ZH: RegexStr(r"毒莴裙藻$", raw="毒莴裙藻"),
+        Language.EN: RegexStr(flex_ws(r"Heliobane Fungia$"), raw="Heliobane Fungia"),
+    },
+    I18nText.PickBellCrab: {
+        Language.ZH: RegexStr(r"铛铛蟹$", raw="铛铛蟹"),
+        Language.EN: RegexStr(flex_ws(r"Bell Crab$"), raw="Bell Crab"),
+    },
+    I18nText.PickMasticNuvola: {
+        Language.ZH: RegexStr(r"云凝乳香$", raw="云凝乳香"),
+        Language.EN: RegexStr(flex_ws(r"Mastic Nuvola$"), raw="Mastic Nuvola"),
+    },
+    I18nText.PickSunflareEverlasting: {
+        Language.ZH: RegexStr(r"日冕菊$", raw="日冕菊"),
+        Language.EN: RegexStr(flex_ws(r"Sunflare Everlasting$"), raw="Sunflare Everlasting"),
+    },
+    I18nText.PickViscumBerry: {
+        Language.ZH: RegexStr(r"青枝果$", raw="青枝果"),
+        Language.EN: RegexStr(flex_ws(r"Viscum Berry$"), raw="Viscum Berry"),
+    },
+    I18nText.PickFelicitousOlives: {
+        Language.ZH: RegexStr(r"垂青橄榄$", raw="垂青橄榄"),
+        Language.EN: RegexStr(flex_ws(r"Felicitous Olives$"), raw="Felicitous Olives"),
+    },
+    I18nText.PickGoldenFleece: {
+        Language.ZH: RegexStr(r"金羊毛.?$", raw="金羊毛"),
+        Language.EN: RegexStr(flex_ws(r"Golden Fleece$"), raw="Golden Fleece"),
+    },
+    I18nText.PickSwordAcorus: {
+        Language.ZH: RegexStr(r"剑菖蒲$", raw="剑菖蒲"),
+        Language.EN: RegexStr(flex_ws(r"Sword Acorus$"), raw="Sword Acorus"),
+    },
+    I18nText.PickEdodes: {
+        Language.ZH: RegexStr(r"花[蕈草]$", raw="花蕈"),
+        Language.EN: RegexStr(flex_ws(r"Edodes$"), raw="Edodes"),
+    },
+    I18nText.PickBellePoppy: {
+        Language.ZH: RegexStr(r"妙.?花$", raw="妙弋花"),
+        Language.EN: RegexStr(flex_ws(r"Belle Poppy$"), raw="Belle Poppy"),
+    },
+    I18nText.PickCaltrop: {
+        Language.ZH: RegexStr(r"白花菱$", raw="白花菱", desc="白花菱拾取后是菱果"),
+        Language.EN: RegexStr(flex_ws(r"Caltrop$"), raw="Caltrop"),
+    },
+    I18nText.PickViola: {
+        Language.ZH: RegexStr(r"地丁.$", raw="地丁堇"),
+        Language.EN: RegexStr(flex_ws(r"Viola$"), raw="Viola"),
+    },
+    I18nText.PickFirecrackerJewelweed: {
+        Language.ZH: RegexStr(r"礼花.?$", raw="礼花蒴"),
+        Language.EN: RegexStr(flex_ws(r"Firecracker Jewelweed$"), raw="Firecracker Jewelweed"),
+    },
+    I18nText.PickSeasideCendrelis: {
+        Language.ZH: RegexStr(r"海浮棘$", raw="海浮棘"),
+        Language.EN: RegexStr(flex_ws(r"Seaside Cendrelis$"), raw="Seaside Cendrelis"),
+    },
+    I18nText.PickOaknut: {
+        Language.ZH: RegexStr(r"栎木果$", raw="栎木果"),
+        Language.EN: RegexStr(flex_ws(r"Oaknut$"), raw="Oaknut"),
+    },
+    I18nText.PickBambooIris: {
+        Language.ZH: RegexStr(r"扁竹花$", raw="扁竹花"),
+        Language.EN: RegexStr(flex_ws(r"Bamboo Iris$"), raw="Bamboo Iris"),
+    },
+    I18nText.PickBloodleafViburnum: {
+        Language.ZH: RegexStr(r"血叶荚.?$", raw="血叶荚蒾"),
+        Language.EN: RegexStr(flex_ws(r"Bloodleaf Viburnum$"), raw="Bloodleaf Viburnum"),
+    },
+    I18nText.PickAbyssLuminary: {
+        Language.ZH: RegexStr(r"暗渊引灯$", raw="暗渊引灯"),
+        Language.EN: RegexStr(flex_ws(r"Abyss Luminary$"), raw="Abyss Luminary"),
+    },
+    I18nText.PickAfterlife: {
+        Language.ZH: RegexStr(r"来生.?$", raw="来生"),
+        Language.EN: RegexStr(flex_ws(r"Afterlife$"), raw="Afterlife"),
+    },
+    I18nText.PickPaintedMantisShrimp: {
+        Language.ZH: RegexStr(r"彩饰螳螂虾$", raw="彩饰螳螂虾", desc="彩饰螳螂虾拾取后是虾肉"),
+        Language.EN: RegexStr(flex_ws(r"Painted Mantis Shrimp$"), raw="Painted Mantis Shrimp"),
+    },
+    I18nText.PickSliverglowBloom: {
+        Language.ZH: RegexStr(r"见月花$", raw="见月花"),
+        Language.EN: RegexStr(flex_ws(r"Sliverglow Bloom$"), raw="Sliverglow Bloom"),
+    },
+    I18nText.PickLuminousCalendula: {
+        Language.ZH: RegexStr(r"辉光金盏$", raw="辉光金盏"),
+        Language.EN: RegexStr(flex_ws(r"Luminous Calendula$"), raw="Luminous Calendula"),
+    },
+    I18nText.PickStoneRose: {
+        Language.ZH: RegexStr(r"石蔷薇$", raw="石蔷薇"),
+        Language.EN: RegexStr(flex_ws(r"Stone Rose$"), raw="Stone Rose"),
+    },
+    I18nText.PickSummerFlower: {
+        Language.ZH: RegexStr(r"长夏花$", raw="长夏花"),
+        Language.EN: RegexStr(flex_ws(r"Summer Flower$"), raw="Summer Flower"),
+    },
+    I18nText.PickCreepingTorchpineNeedle: {
+        Language.ZH: RegexStr(r"[葡匍]炬松针?$", raw="匍炬松针", desc="匍炬松、匍炬松针拾取后是松塔"),
+        Language.EN: RegexStr(flex_ws(r"Creeping Torchpine Needle$"), raw="Creeping Torchpine Needle"),
+    },
+    I18nText.PickDuskHoneypot: {
+        Language.ZH: RegexStr(r"黄昏蜜罐$", raw="黄昏蜜罐"),
+        Language.EN: RegexStr(flex_ws(r"Dusk Honeypot$"), raw="Dusk Honeypot"),
+    },
+    I18nText.PickFernSpore: {
+        Language.ZH: RegexStr(r"蕨团蕨$", raw="蕨团蕨"),
+        Language.EN: RegexStr(flex_ws(r"Fern Spore$"), raw="Fern Spore"),
+    },
+    I18nText.PickCradleLichen: {
+        Language.ZH: RegexStr(r"[襁强][褓保]岩绒$", raw="襁褓岩绒"),
+        Language.EN: RegexStr(flex_ws(r"Cradle Lichen$"), raw="Cradle Lichen"),
+    },
+    # I18nText.PickJadeWood: {
+    #     Language.ZH: RegexStr(r"玉化木$", raw="玉化木"),
+    # },
+    I18nText.PickGeminiSpore: {
+        Language.ZH: RegexStr(r"双子.?星$", raw="双子蕈星"),
+        Language.EN: RegexStr(flex_ws(r"Gemini Spore$"), raw="Gemini Spore"),
+    },
+    I18nText.PickRimewisp: {
+        Language.ZH: RegexStr(r"霜信花$", raw="霜信花"),
+        Language.EN: RegexStr(flex_ws(r"Rimewisp$"), raw="Rimewisp"),
+    },
+    I18nText.PickArithmeticShell: {
+        Language.ZH: RegexStr(r"螺算石母$", raw="螺算石母"),
+        Language.EN: RegexStr(flex_ws(r"Arithmetic Shell$"), raw="Arithmetic Shell"),
+    },
+    I18nText.PickWaxweaverWeb: {
+        Language.ZH: RegexStr(r"白蜡蛛网$", raw="白蜡蛛网"),
+        Language.EN: RegexStr(flex_ws(r"Waxweaver Web$"), raw="Waxweaver Web"),
+    },
+    I18nText.PickEdelschnee: {
+        Language.ZH: RegexStr(r"雪抚绒$", raw="雪抚绒"),
+        Language.EN: RegexStr(flex_ws(r"Edelschnee$"), raw="Edelschnee"),
+    },
+    I18nText.PickMossAmber: {
+        Language.ZH: RegexStr(r"时苔茧$", raw="时苔茧"),
+        Language.EN: RegexStr(flex_ws(r"Moss Amber$"), raw="Moss Amber"),
+    },
+    I18nText.PickFoxtailKelp: {
+        Language.ZH: RegexStr(r"狐尾蒲藻$", raw="狐尾蒲藻"),
+        Language.EN: RegexStr(flex_ws(r"Foxtail Kelp$"), raw="Foxtail Kelp"),
+    },
+    I18nText.PickFrostwort: {
+        Language.ZH: RegexStr(r"寒(地星|星地)苔$", raw="寒地星苔", desc="寒星地苔"),
+        Language.EN: RegexStr(flex_ws(r"Frostwort$"), raw="Frostwort"),
+    },
+    I18nText.PickDreamOfStars: {
+        Language.ZH: RegexStr(r"星之梦$", raw="星之梦"),
+        Language.EN: RegexStr(flex_ws(r"Dream of Stars$"), raw="Dream of Stars"),
+    },
+    I18nText.PickRedbell: {
+        Language.ZH: RegexStr(r"赤铃兰$", raw="赤铃兰"),
+        Language.EN: RegexStr(flex_ws(r"Redbell$"), raw="Redbell"),
+    },
+    I18nText.PickForgetMeNot: {
+        Language.ZH: RegexStr(r"勿忘我.?$", raw="勿忘我"),
+        Language.EN: RegexStr(flex_ws(r"Forget.?Me.?Not$"), raw="Forget-Me-Not"),
+    },
+    I18nText.PickPrismFruit: {
+        Language.ZH: RegexStr(r"折光果$", raw="折光果"),
+        Language.EN: RegexStr(flex_ws(r"Prism Fruit$"), raw="Prism Fruit"),
+    },
+    I18nText.PickPastReveries: {
+        Language.ZH: RegexStr(r"往昔幻梦$", raw="往昔幻梦"),
+        Language.EN: RegexStr(flex_ws(r"Past Reveries$"), raw="Past Reveries"),
+    },
+    I18nText.PickCloudperchSeed: {
+        Language.ZH: RegexStr(r"栖云翼$", raw="栖云翼"),
+        Language.EN: RegexStr(flex_ws(r"Cloudperch Seed$"), raw="Cloudperch Seed"),
+    },
+    I18nText.PickFlowborneDream: {
+        Language.ZH: RegexStr(r"游霞惊梦$", raw="游霞惊梦"),
+        Language.EN: RegexStr(flex_ws(r"Flowborne Dream$"), raw="Flowborne Dream"),
+    },
+    I18nText.PickBladeBlossom: {
+        Language.ZH: RegexStr(r"白刃.?$", raw="白刃繁"),
+        Language.EN: RegexStr(flex_ws(r"Blade Blossom$"), raw="Blade Blossom"),
+    },
+    I18nText.PickUncrackedJade: {
+        Language.ZH: RegexStr(r"未琢玉$", raw="未琢玉"),
+        Language.EN: RegexStr(flex_ws(r"Uncracked Jade$"), raw="Uncracked Jade"),
+    },
+    I18nText.PickClimberShoots: {
+        Language.ZH: RegexStr(r"登青云$", raw="登青云"),
+        Language.EN: RegexStr(flex_ws(r"Climber Shoots$"), raw="Climber Shoots"),
+    },
+    # I18nText.PickJadeHexahedron: {
+    #     Language.ZH: RegexStr(r"六合.?$", raw="六合瑛"),
+    #     Language.EN: RegexStr(flex_ws(r"Jade Hexahedron$"), raw="Jade Hexahedron"),
+    # },
+    I18nText.PickWhiteJadeBeauty: {
+        Language.ZH: RegexStr(r"白玉美人$", raw="白玉美人"),
+        Language.EN: RegexStr(flex_ws(r"White Jade Beauty$"), raw="White Jade Beauty"),
+    },
+    I18nText.PickOpusStone: {
+        Language.ZH: RegexStr(r".?音石$", raw="洄音石"),
+        Language.EN: RegexStr(flex_ws(r"Opus Stone$"), raw="Opus Stone"),
+    },
+    I18nText.PickLeafweaver: {
+        Language.ZH: RegexStr(r"叶中匠$", raw="叶中匠"),
+        Language.EN: RegexStr(flex_ws(r"Leafweaver$"), raw="Leafweaver"),
+    },
+    I18nText.PickFloralCrestJade: {
+        Language.ZH: RegexStr(r".?华璧$", raw="玟华璧"),
+        Language.EN: RegexStr(flex_ws(r"Floral Crest Jade$"), raw="Floral Crest Jade"),
+    },
+    I18nText.PickSilverBandedLizard: {
+        Language.ZH: RegexStr(r"银环蜥$", raw="银环蜥"),
+        Language.EN: RegexStr(flex_ws(r"Silver.?Banded Lizard$"), raw="Silver-Banded Lizard"),
+    },
+    I18nText.PickAzureLizard: {
+        Language.ZH: RegexStr(r"蓝棘蜥$", raw="蓝棘蜥"),
+        Language.EN: RegexStr(flex_ws(r"Azure Lizard$"), raw="Azure Lizard"),
+    },
+    I18nText.PickGreenPitLizard: {
+        Language.ZH: RegexStr(r"青竹蜥$", raw="青竹蜥"),
+        Language.EN: RegexStr(flex_ws(r"Green Pit Lizard$"), raw="Green Pit Lizard"),
+    },
+    I18nText.PickBlackStripedFrog: {
+        Language.ZH: RegexStr(r"黑纹蛙$", raw="黑纹蛙"),
+        Language.EN: RegexStr(flex_ws(r"Black-Striped Frog$"), raw="Black-Striped Frog"),
+    },
+    I18nText.PickGoldenbackFrog: {
+        Language.ZH: RegexStr(r"金背蛙$", raw="金背蛙"),
+        Language.EN: RegexStr(flex_ws(r"Goldenback Frog$"), raw="Goldenback Frog"),
+    },
+    I18nText.PickGoldenringedDragonfly: {
+        Language.ZH: RegexStr(r"金环蜓$", raw="金环蜓"),
+        Language.EN: RegexStr(flex_ws(r"Golden-ringed Dragonfly$"), raw="Golden-ringed Dragonfly"),
+    },
+    I18nText.PickBlueFeatherButterfly: {
+        Language.ZH: RegexStr(r"蓝羽蝶$", raw="蓝羽蝶"),
+        Language.EN: RegexStr(flex_ws(r"Blue Feather Butterfly$"), raw="Blue Feather Butterfly"),
+    },
+    I18nText.PickRedFeatherButterfly: {
+        Language.ZH: RegexStr(r"赤羽蝶$", raw="赤羽蝶"),
+        Language.EN: RegexStr(flex_ws(r"Red Feather Butterfly$"), raw="Red Feather Butterfly"),
+    },
+    I18nText.PickFeather: {
+        Language.ZH: RegexStr(r"羽毛$", raw="羽毛"),
+        Language.EN: RegexStr(flex_ws(r"Feather$"), raw="Feather"),
+    },
+    I18nText.PickChrysopa: {
+        Language.ZH: RegexStr(r"叶翅.?$", raw="叶翅蛉"),
+        Language.EN: RegexStr(flex_ws(r"Chrysopa$"), raw="Chrysopa"),
+    },
+    I18nText.PickPhoenixButterfly: {
+        Language.ZH: RegexStr(r".?凤蝶$", raw="霄凤蝶"),
+        Language.EN: RegexStr(flex_ws(r"Phoenix Butterfly$"), raw="Phoenix Butterfly"),
+    },
+    I18nText.PickFowl: {
+        Language.ZH: RegexStr(r"禽肉$", raw="禽肉"),
+        Language.EN: RegexStr(flex_ws(r"Fowl$"), raw="Fowl"),
+    },
+    I18nText.PickBirdEgg: {
+        Language.ZH: RegexStr(r"鸟蛋$", raw="鸟蛋"),
+        Language.EN: RegexStr(flex_ws(r"Bird Egg$"), raw="Bird Egg"),
+    },
+    I18nText.PickRawMeat: {
+        Language.ZH: RegexStr(r"兽肉$", raw="兽肉"),
+        Language.EN: RegexStr(flex_ws(r"Raw Meat$"), raw="Raw Meat"),
+    },
+    I18nText.PickFish: {
+        Language.ZH: RegexStr(r"鱼肉$", raw="鱼肉"),
+        Language.EN: RegexStr(flex_ws(r"Fish$"), raw="Fish"),
+    },
+    I18nText.PickTetra: {
+        Language.ZH: RegexStr(r"群彩$", raw="群彩"),
+        Language.EN: RegexStr(flex_ws(r"Tetra$"), raw="Tetra"),
+    },
+    I18nText.PickSuspiciousChest: {
+        Language.ZH: RegexStr(r"可疑的宝箱$", raw="可疑的宝箱"),
+        Language.EN: RegexStr(flex_ws(r"Suspicious Chest$"), raw="Suspicious Chest"),
+    },
+    I18nText.PickBasicSupplyChest: {
+        Language.ZH: RegexStr(r"朴素奇藏箱$", raw="朴素奇藏箱"),
+        Language.EN: RegexStr(flex_ws(r"Basic Supply Chest$"), raw="Basic Supply Chest"),
+    },
+    I18nText.PickStandardSupplyChest: {
+        Language.ZH: RegexStr(r"基准奇藏箱$", raw="基准奇藏箱"),
+        Language.EN: RegexStr(flex_ws(r"Standard Supply Chest$"), raw="Standard Supply Chest"),
+    },
+    I18nText.PickAdvancedSupplyChest: {
+        Language.ZH: RegexStr(r"精密奇藏箱$", raw="精密奇藏箱"),
+        Language.EN: RegexStr(flex_ws(r"Advanced Supply Chest$"), raw="Advanced Supply Chest"),
+    },
+    I18nText.PickPremiumSupplyChest: {
+        Language.ZH: RegexStr(r"辉光奇藏箱$", raw="辉光奇藏箱"),
+        Language.EN: RegexStr(flex_ws(r"Premium Supply Chest$"), raw="Premium Supply Chest"),
+    },
+    I18nText.PickTidalSupplyChest: {
+        Language.ZH: RegexStr(r"涡纹奇藏箱$", raw="涡纹奇藏箱"),
+        Language.EN: RegexStr(flex_ws(r"Tidal Supply Chest$"), raw="Tidal Supply Chest"),
+    },
+    I18nText.PickTidalHeritage: {
+        Language.ZH: RegexStr(r"潮汐之遗$", raw="潮汐之遗"),
+        Language.EN: RegexStr(flex_ws(r"Tidal Heritage$"), raw="Tidal Heritage"),
+    },
+    I18nText.PickAdvancedSupplyPack: {
+        Language.ZH: RegexStr(r"精密物资箱$", raw="精密物资箱"),  # v3.0
+        Language.EN: RegexStr(flex_ws(r"Advanced Supply Pack$"), raw="Advanced Supply Pack"),
     },
 
     # ------- 幻梦游园·狂想 -------
