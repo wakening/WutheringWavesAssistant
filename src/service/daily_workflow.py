@@ -780,15 +780,9 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
     # 检查100活跃点是否为黄色待领取
     if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(img):
         ui.click_point(pts_sp[num_points - 1], times=3, interval=0.25)
-        if ui.sleep(0.5).wait().until(
-                lambda: ui.snapshot().click_text(tap_close, delay=0.3)):
-            # 再次确认
-            if not ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot()
-                            and ui.search(ctx.tr(I18nText.Activity))
-                            or ui.click_text(tap_close, delay=0.3, times=2, interval=0.2)):
-                return False
-        ui.sleep(0.3)
+        if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(tap_close)):
+            return False
+        ui.sleep(0.3).esc().sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
         return True
 
@@ -800,15 +794,9 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
         # 检查活跃点是否为黄色待领取
         if ColorRule().points(pts_sp[i]).colors(yellow).match(img):
             ui.click_point(pts_sp[i], times=3, interval=0.25)
-            if ui.sleep(0.5).wait().until(
-                    lambda: ui.snapshot().click_text(tap_close, delay=0.3)):
-                # 再次确认
-                if not ui.sleep(0.3).wait().until(
-                        lambda: ui.snapshot()
-                                and ui.search(ctx.tr(I18nText.Activity))
-                                or ui.click_text(tap_close, delay=0.3, times=2, interval=0.2)):
-                    return False
-            ui.sleep(0.3)
+            if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(tap_close)):
+                return False
+            ui.sleep(0.3).esc().sleep(0.3)
             idx = i
             break
         # 检查活跃点是否为灰色已领取
@@ -2513,7 +2501,7 @@ class DailyWorkflow(AbstractWorkflow):
             .always().to(NodeName.globalDispatcher)
         )
 
-        self.engine.source(NodeName.doActivityDaily).always().to(NodeName.doActivity)
+        self.engine.source(NodeName.doActivityDaily).always().to(NodeName.globalDispatcher)
         (
             self.engine.source(NodeName.doActivityWeekly)
             .on(False).to(NodeName.doPhantasmaDreamlandRhapsody)

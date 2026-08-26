@@ -1353,7 +1353,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Tap (the blank area|anywhere) to close$"), raw="Tap the blank area to close"),
     },
     I18nText.TapTheBlankAreaToContinue: {
-        Language.ZH: RegexStr(r"^点空白处(可)?继续$", raw="点击空白处继续"),
+        Language.ZH: RegexStr(r"^点空白(区域|处)(可)?继续$", raw="点击空白处继续"),
         Language.EN: RegexStr(flex_ws(r"^Tap (on )?the blank area to continue$"), raw="Tap the blank area to continue"),
     },
     I18nText.SelectARevivalItem: {
