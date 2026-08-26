@@ -786,7 +786,7 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
             if not ui.sleep(0.3).wait().until(
                     lambda: ui.snapshot()
                             and ui.search(ctx.tr(I18nText.Activity))
-                            or ui.click_text(tap_close, delay=0.3)):
+                            or ui.click_text(tap_close, delay=0.3, times=2, interval=0.2)):
                 return False
         ui.sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
@@ -806,7 +806,7 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
                 if not ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot()
                                 and ui.search(ctx.tr(I18nText.Activity))
-                                or ui.click_text(tap_close, delay=0.3)):
+                                or ui.click_text(tap_close, delay=0.3, times=2, interval=0.2)):
                     return False
             ui.sleep(0.3)
             idx = i
