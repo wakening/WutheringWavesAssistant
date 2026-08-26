@@ -775,16 +775,18 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
         logger.info(rf"Activity Pts >= {max_pts}")
         return True
 
+    tap_close = ctx.tr([I18nText.TapTheBlankAreaToClose, I18nText.TapTheBlankAreaToContinue])
+
     # 检查100活跃点是否为黄色待领取
     if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(img):
         ui.click_point(pts_sp[num_points - 1], times=3, interval=0.25)
         if ui.sleep(0.5).wait().until(
-                lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                lambda: ui.snapshot().click_text(tap_close, delay=0.3)):
             # 再次确认
             if not ui.sleep(0.3).wait().until(
                     lambda: ui.snapshot()
                             and ui.search(ctx.tr(I18nText.Activity))
-                            or ui.click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                            or ui.click_text(tap_close, delay=0.3)):
                 return False
         ui.sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
@@ -799,12 +801,12 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
         if ColorRule().points(pts_sp[i]).colors(yellow).match(img):
             ui.click_point(pts_sp[i], times=3, interval=0.25)
             if ui.sleep(0.5).wait().until(
-                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                    lambda: ui.snapshot().click_text(tap_close, delay=0.3)):
                 # 再次确认
                 if not ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot()
                                 and ui.search(ctx.tr(I18nText.Activity))
-                                or ui.click_text(ctx.tr(I18nText.TapTheBlankAreaToClose), delay=0.3)):
+                                or ui.click_text(tap_close, delay=0.3)):
                     return False
             ui.sleep(0.3)
             idx = i
@@ -2085,7 +2087,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 return True
 
             cleared_keyword = ctx.tr([
-                I18nText.TacetDiscordNestCleared,I18nText.TacetDiscordNestClearedMengzhou, I18nText.RefreshesTomorrow])
+                I18nText.TacetDiscordNestCleared, I18nText.TacetDiscordNestClearedMengzhou, I18nText.RefreshesTomorrow])
             is_combat = not ui.snapshot().search(cleared_keyword)
             # 可能打着打着出了战斗区域，标识文本消失，误判已经打完，循环重置位置接着打
             max_combat_range = 3
@@ -2302,7 +2304,12 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     sidebarsPioneerPodcast = ctx.scaler.as_point(AnchorPoint(50, 126, Align.Left | Align.Top))
     sidebarsPodcastTasks = ctx.scaler.as_point(AnchorPoint(50, 213, Align.Left | Align.Top))
     # 提示种类很多
-    confirm = ctx.tr([I18nText.TapTheBlankAreaToClose, I18nText.PioneerPodcastConfirm, I18nText.Confirm])
+    confirm = ctx.tr([
+        I18nText.TapTheBlankAreaToClose,
+        I18nText.TapTheBlankAreaToContinue,
+        I18nText.PioneerPodcastConfirm,
+        I18nText.Confirm,
+    ])
 
     def closePodcastTasksNotice():
         ui.snapshot()

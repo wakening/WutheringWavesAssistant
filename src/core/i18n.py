@@ -273,6 +273,7 @@ class I18nText:
     CollectSupplies = "CollectSupplies"
     ItemsObtained = "ItemsObtained"
     TapTheBlankAreaToClose = "TapTheBlankAreaToClose"
+    TapTheBlankAreaToContinue = "TapTheBlankAreaToContinue"
     SelectARevivalItem = "SelectARevivalItem"
     DoNotShowAgain = "DoNotShowAgain"
     LuniteSubscriptionReward = "LuniteSubscriptionReward"
@@ -1348,8 +1349,12 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Items Obtained$"), raw="Items Obtained"),
     },
     I18nText.TapTheBlankAreaToClose: {
-        Language.ZH: RegexStr(r"^点击空白区域关闭$", raw="点击空白区域关闭"),
-        Language.EN: RegexStr(flex_ws(r"^Tap the blank area to close$"), raw="Tap the blank area to close"),
+        Language.ZH: RegexStr(r"^点击(任意)?空白(区域|处)关闭$", raw="点击空白处关闭"),
+        Language.EN: RegexStr(flex_ws(r"^Tap (the blank area|anywhere) to close$"), raw="Tap the blank area to close"),
+    },
+    I18nText.TapTheBlankAreaToContinue: {
+        Language.ZH: RegexStr(r"^点空白处(可)?继续$", raw="点击空白处继续"),
+        Language.EN: RegexStr(flex_ws(r"^Tap (on )?the blank area to continue$"), raw="Tap the blank area to continue"),
     },
     I18nText.SelectARevivalItem: {
         Language.ZH: RegexStr(r"^选择复苏物品$", raw="选择复苏物品"),
@@ -2305,7 +2310,7 @@ I18N_TEXT = {
     },
     I18nText.PickLoongsPearl: {
         Language.ZH: RegexStr(r"龙吐珠$", raw="龙吐珠"),
-        Language.EN: RegexStr(flex_ws(r"Loong's Pearl$"), raw="Loong's Pearl"),
+        Language.EN: RegexStr(flex_ws(r"Loong.?s Pearl$"), raw="Loong's Pearl"),
     },
     I18nText.PickSilverLotus: {
         Language.ZH: RegexStr(r"银雪莲$", raw="银雪莲"),
