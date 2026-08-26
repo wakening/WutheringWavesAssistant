@@ -454,6 +454,7 @@ class I18nText:
 
     ### ------- Guidebook MaterialCollection TacetDiscordNest -------
     TacetDiscordNestTacetDiscordNest = "TacetDiscordNestTacetDiscordNest"
+    SonataSetFilter = "SonataSetFilter"
     # LahaiRoi = "LahaiRoi"
     SouthernYuanHillsTacetDiscordNest = "SouthernYuanHillsTacetDiscordNest"
     StarblindCrashsiteTacetDiscordNest = "StarblindCrashsiteTacetDiscordNest"
@@ -2094,6 +2095,10 @@ I18N_TEXT = {
     I18nText.TacetDiscordNestTacetDiscordNest: {
         Language.ZH: RegexStr(r"残象聚落", raw="残象聚落"),
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest"), raw="Tacet Discord Nest"),
+    },
+    I18nText.SonataSetFilter: {
+        Language.ZH: RegexStr(r"^合鸣套装.?选$", raw="合鸣套装筛选"),
+        Language.EN: RegexStr(flex_ws(r"^Sonata set filter$"), raw="Sonata set filter"),
     },
     I18nText.SouthernYuanHillsTacetDiscordNest: {
         Language.ZH: RegexStr(r"落.?南丘残象聚落$", raw="落渊南丘残象聚落"),

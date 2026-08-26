@@ -1863,7 +1863,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 点击残像聚落
         def _wait_content():
             if ui.snapshot().search(
-                    ctx.tr(I18nText.TacetDiscordNestTacetDiscordNest), bbox_guidebook_content(ctx)):
+                    ctx.tr(I18nText.SonataSetFilter), bbox_guidebook_content(ctx)):
                 return True
             if not ui.click_text(
                     ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2,
