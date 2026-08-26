@@ -331,6 +331,7 @@ class I18nText:
 
     ## ------- Guidebook Common -------
     CannotPerformThisActionDuringBattle = "CannotPerformThisActionDuringBattle"
+    CannotAdjustTheTeamLineupInTheCurrentState = "CannotAdjustTheTeamLineupInTheCurrentState"
     DoubleDropChancesToday = "DoubleDropChancesToday"
     GuidebookMengzhou = "GuidebookMengzhou"
     GuidebookLahaiRoi = "GuidebookLahaiRoi"
@@ -1595,13 +1596,17 @@ I18N_TEXT = {
 
     ## ------- Guidebook Common -------
     I18nText.CannotPerformThisActionDuringBattle: {
-        Language.ZH: RegexStr(
-            flex_ws(r"战斗中无法进行该操作"),
-            raw="提示：战斗中无法进行该操作",
-        ),
+        Language.ZH: RegexStr(flex_ws(r"战斗中无法进行该操作"), raw="提示：战斗中无法进行该操作"),
         Language.EN: RegexStr(
-            flex_ws(r"^Cannot perform this action during battle"),
+            flex_ws(r"Cannot perform this action during battle"),
             raw="Cannot perform this action during battle",
+        ),
+    },
+    I18nText.CannotAdjustTheTeamLineupInTheCurrentState: {
+        Language.ZH: RegexStr(flex_ws(r"当前状态无法进行编队"), raw="当前状态无法进行编队"),
+        Language.EN: RegexStr(
+            flex_ws(r"Cannot adjust the team lineup in the current state"),
+            raw="Cannot adjust the team lineup in the current state",
         ),
     },
     I18nText.DoubleDropChancesToday: {
@@ -2091,19 +2096,19 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"Tacet Discord Nest"), raw="Tacet Discord Nest"),
     },
     I18nText.SouthernYuanHillsTacetDiscordNest: {
-        Language.ZH: RegexStr(r"^落渊南丘残象聚落$", raw="落渊南丘残象聚落"),
+        Language.ZH: RegexStr(r"落.?南丘残象聚落$", raw="落渊南丘残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Southern Yuan Hills"), raw=r"Southern Yuan Hills Tacet Discord Nest"),
     },
     I18nText.StarblindCrashsiteTacetDiscordNest: {
-        Language.ZH: RegexStr(r"^盲望之塌残象聚落$", raw="盲望之塌残象聚落"),
+        Language.ZH: RegexStr(r".?望之.?残象聚落$", raw="盲望之塌残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Starblind Crashsite"), raw=r"Starblind Crashsite Tacet Discord Nest"),
     },
     I18nText.RebirthUplandsTacetDiscordNest: {
-        Language.ZH: RegexStr(r"^复生丘原残象聚落$", raw="复生丘原残象聚落"),
+        Language.ZH: RegexStr(r"复生丘原残象聚落$", raw="复生丘原残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Rebirth Uplands"), raw=r"Rebirth Uplands Tacet Discord Nest"),
     },
     I18nText.StagnantRunTacetDiscordNest: {
-        Language.ZH: RegexStr(r"^陷足流川残象聚落$", raw="陷足流川残象聚落"),
+        Language.ZH: RegexStr(r"陷足流川残象聚落$", raw="陷足流川残象聚落"),
         Language.EN: RegexStr(flex_ws(r"^Stagnant Run"), raw=r"Stagnant Run Tacet Discord Nest"),
     },
     I18nText.TacetDiscordDefeated: {

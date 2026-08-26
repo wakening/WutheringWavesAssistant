@@ -400,8 +400,8 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     ))
     if ui.sleep(0.8).wait(5, 0.5).until(
             lambda: ui.snapshot().search(
-                ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle]))):
-        if ui.search(ctx.tr(I18nText.CannotPerformThisActionDuringBattle)):
+                ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState]))):
+        if ui.search(ctx.tr([I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState])):
             logger.info(f"Team locked")
             return False
         if not ui.search(ctx.tr(I18nText.QuickSetup), roi):
