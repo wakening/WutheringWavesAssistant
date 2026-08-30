@@ -1,11 +1,23 @@
 import logging
+import time
 
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional, Set, List
+from functools import lru_cache
+from typing import Dict, Optional, List
 
-from src.core.i18n import I18nText
+import numpy as np
+
+from src.core.color import Color, RuleMode, ColorRule
+from src.core.combat.combat_core import Morph
+from src.core.exceptions import StopError
+from src.core.geometry import Scaler, AnchorPoint, Align, AnchorBBox
+from src.core.i18n import I18nText, Language, I18nTr
+from src.core.resource import Resource
+from src.core.workflow import NodeContext
+from src.util import img_util
+from src.util.img_sift_util import SIFTFeatureMatcher
 
 logger = logging.getLogger(__name__)
 
@@ -641,13 +653,17 @@ class Resonator(Enum):
     Rebecca = create_tmp_resonator(I18nText.Rebecca)
     Lucilla = create_tmp_resonator(I18nText.Lucilla)
 
-    # v3.x
+    # v3.5
     YangyangXuanling = create_tmp_resonator(I18nText.YangyangXuanling)
     Suisui = create_tmp_resonator(I18nText.Suisui)
-    Suoming = create_tmp_resonator(I18nText.Suoming)
-    Jingran = create_tmp_resonator(I18nText.Jingran)
+
+    # v3.6
     Qingxiao = create_tmp_resonator(I18nText.Qingxiao)
+    Jingran = create_tmp_resonator(I18nText.Jingran)
+
+    # v3.x
     Hsin = create_tmp_resonator(I18nText.Hsin)
+    Suoming = create_tmp_resonator(I18nText.Suoming)
 
     __value_map = None
 
@@ -718,13 +734,281 @@ class Resonator(Enum):
             I18nText.Lucilla,
             I18nText.YangyangXuanling,
             I18nText.Suisui,
-            I18nText.Suoming,
-            I18nText.Jingran,
             I18nText.Qingxiao,
+            I18nText.Jingran,
             I18nText.Hsin,
+            I18nText.Suoming,
         ]
+
+    @staticmethod
+    @lru_cache
+    def avatar_mappings() -> dict[str, str]:
+        """角色头像"""
+        return {
+            "T_IconRoleHead150_1.png": I18nText.Yangyang,
+            "T_IconRoleHead150_2.png": I18nText.Chixia,
+            "T_IconRoleHead150_3.png": I18nText.Verina,
+            "T_IconRoleHead150_4.png": I18nText.Rover,
+            "T_IconRoleHead150_4_a_UI.png": I18nText.Rover,
+            "T_IconRoleHead150_5.png": I18nText.Rover,
+            "T_IconRoleHead150_5_a_UI.png": I18nText.Rover,
+            "T_IconRoleHead150_6.png": I18nText.Baizhi,
+            "T_IconRoleHead150_7.png": I18nText.Sanhua,
+            "T_IconRoleHead150_7_a.png": I18nText.Sanhua,
+            "T_IconRoleHead150_8.png": I18nText.Encore,
+            "T_IconRoleHead150_9.png": I18nText.Taoqi,
+            "T_IconRoleHead150_10.png": I18nText.Danjin,
+            "T_IconRoleHead150_11.png": I18nText.Jiyan,
+            "T_IconRoleHead150_12.png": I18nText.Aalto,
+            "T_IconRoleHead150_13.png": I18nText.Mortefi,
+            "T_IconRoleHead150_14.png": I18nText.Lingyang,
+            "T_IconRoleHead150_15.png": I18nText.Yuanwu,
+            "T_IconRoleHead150_17.png": I18nText.Yinlin,
+            "T_IconRoleHead150_18.png": I18nText.Calcharo,
+            "T_IconRoleHead150_23_UI.png": I18nText.Jianxin,
+            "T_IconRoleHead150_24_a_UI.png": I18nText.Jinhsi,
+            "T_IconRoleHead150_24_UI.png": I18nText.Jinhsi,
+            "T_IconRoleHead150_25_UI.png": I18nText.XiangliYao,
+            "T_IconRoleHead150_26_a_UI.png": I18nText.Changli,
+            "T_IconRoleHead150_26_UI.png": I18nText.Changli,
+            "T_IconRoleHead150_27_UI.png": I18nText.Zhezhi,
+            "T_IconRoleHead150_28_UI.png": I18nText.Shorekeeper,
+            "T_IconRoleHead150_29_UI.png": I18nText.Camellya,
+            "T_IconRoleHead150_30_UI.png": I18nText.Lumi,
+            "T_IconRoleHead150_31_UI.png": I18nText.Youhu,
+            "T_IconRoleHead150_32_a_UI.png": I18nText.Carlotta,
+            "T_IconRoleHead150_32_UI.png": I18nText.Carlotta,
+            "T_IconRoleHead150_33_UI.png": I18nText.Roccia,
+            "T_IconRoleHead150_34_UI.png": I18nText.Cantarella,
+            "T_IconRoleHead150_37_UI.png": I18nText.Ciaccona,
+            "T_IconRoleHead150_38_a_UI.png": I18nText.Zanni,
+            "T_IconRoleHead150_38_UI.png": I18nText.Zanni,
+            "T_IconRoleHead150_40_UI.png": I18nText.Cartethyia,
+            "T_IconRoleHead150_41_UI.png": I18nText.Phrolova,
+            "T_IconRoleHead150_44_UI.png": I18nText.Brant,
+            "T_IconRoleHead150_45_UI.png": I18nText.Phoebe,
+            "T_IconRoleHead150_46_UI.png": I18nText.Lupa,
+            "T_IconRoleHead150_48_UI.png": I18nText.Iuno,
+            "T_IconRoleHead150_51_UI.png": I18nText.Augusta,
+            "T_IconRoleHead150_53_UI.png": I18nText.Aemeath,
+            "T_IconRoleHead150_54_UI.png": I18nText.LuukHerssen,
+            "T_IconRoleHead150_55_UI.png": I18nText.Galbrena,
+            "T_IconRoleHead150_56_UI.png": I18nText.Qiuyuan,
+            "T_IconRoleHead150_57_Skin1_UI.png": I18nText.Chisa,
+            "T_IconRoleHead150_57_UI.png": I18nText.Chisa,
+            "T_IconRoleHead150_58_UI.png": I18nText.Buling,
+            "T_IconRoleHead150_60_Skin1_UI.png": I18nText.Lynae,
+            "T_IconRoleHead150_60_UI.png": I18nText.Lynae,
+            "T_IconRoleHead150_61_Skin1_UI.png": I18nText.Mornye,
+            "T_IconRoleHead150_61_UI.png": I18nText.Mornye,
+            "T_IconRoleHead150_64_UI.png": I18nText.Denia,
+            "T_IconRoleHead150_65_UI.png": I18nText.Sigrika,
+            "T_IconRoleHead150_66_UI.png": I18nText.Lucilla,
+            "T_IconRoleHead150_67_UI.png": I18nText.Hiyuki,
+            "T_IconRoleHead150_68_UI.png": I18nText.Lucy,
+            "T_IconRoleHead150_69_UI.png": I18nText.Rebecca,
+            "T_IconRoleHead150_70_UI.png": I18nText.YangyangXuanling,
+            "T_IconRoleHead150_71_UI.png": I18nText.Suisui,
+            "T_IconRoleHead150_73_Guest1_UI.png": I18nText.Qingxiao,
+            "T_IconRoleHead150_73_UI.png": I18nText.Qingxiao,
+            "T_IconRoleHead150_74_UI.png": I18nText.Jingran,
+        }
+
+
+class TeamMember:
+    """大世界 编队相关"""
+
+    def __init__(self, ctx: NodeContext):
+        self.ctx = ctx
+
+    @classmethod
+    def __match(cls, img: np.ndarray):
+        points = [
+            [
+                AnchorPoint(1158, 146, Align.Top | Align.Right),
+                AnchorPoint(1160, 151, Align.Top | Align.Right),
+                AnchorPoint(1166, 143, Align.Top | Align.Right),
+                AnchorPoint(1166, 151, Align.Top | Align.Right),
+            ],
+            [
+                AnchorPoint(1159, 234, Align.Top | Align.Right),
+                AnchorPoint(1158, 240, Align.Top | Align.Right),
+                AnchorPoint(1167, 231, Align.Top | Align.Right),
+                AnchorPoint(1168, 240, Align.Top | Align.Right),
+            ],
+            [
+                AnchorPoint(1159, 322, Align.Top | Align.Right),
+                AnchorPoint(1158, 328, Align.Top | Align.Right),
+                AnchorPoint(1167, 319, Align.Top | Align.Right),
+                AnchorPoint(1168, 328, Align.Top | Align.Right),
+            ],
+        ]
+        bgr = Color.bgr(241, 241, 241)
+        scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
+        return [ColorRule().points(p).colors(bgr, tol=20, mode=RuleMode.ALL).match(img, scaler) for p in points]
+
+    @classmethod
+    def get_size(cls, img: np.ndarray):
+        """
+        编队人数
+        :param img: 大世界截图，右侧需有角色头像
+        :return: 1、2、3
+        """
+        res = cls.__match(img)
+        return min(sum(x for x in res) + 1, 3)
+
+    @classmethod
+    def get_cur_idx(cls, img: np.ndarray) -> Optional[int]:
+        """
+        获取当前主控角色编号，
+        :param img: 大世界截图，右侧需有角色头像
+        :return: 1、2、3
+        """
+        res = cls.__match(img)
+        if not res[0]:
+            return 1
+        if not res[1]:
+            return 2
+        if not res[2]:
+            return 3
+        return None
+
+    def switch_to(self, idx: int):
+        """
+        切换到角色
+        :param idx: 1、2、3
+        :return:
+        """
+        if idx > 3 or idx < 1:
+            raise ValueError()
+        self.ctx.control_service.toggle_team_member(idx)
+
+    @staticmethod
+    @lru_cache
+    def load_role_features():
+        """加载头像资源，约0.5s"""
+        role_features = []
+        logger.debug("Loading resources")
+        matcher = SIFTFeatureMatcher()
+        start_time = time.monotonic()
+        for p in Resource.Unpacked.IconRoleHead150.glob("*.png"):
+            feature_image = img_util.read_img(p.absolute())
+            feature_data = matcher.build_feature_data_masked(feature_id=p.name, image=feature_image)
+            role_features.append(feature_data)
+        logger.debug(f"Loading complete. (Duration: {time.monotonic() - start_time:.2f}s)")
+        return role_features
+
+    @classmethod
+    def member_keys(cls, img: np.ndarray) -> list[str | None]:
+        role_features = cls.load_role_features()
+        roi_members = [
+            AnchorBBox(
+                AnchorPoint(1140, 116, Align.Top | Align.Right),
+                AnchorPoint(1280, 210, Align.Top | Align.Right),
+            ),
+            AnchorBBox(
+                AnchorPoint(1140, 210, Align.Top | Align.Right),
+                AnchorPoint(1280, 300, Align.Top | Align.Right),
+            ),
+            AnchorBBox(
+                AnchorPoint(1130, 300, Align.Top | Align.Right),
+                AnchorPoint(1280, 400, Align.Top | Align.Right),
+            ),
+        ]
+        matcher = SIFTFeatureMatcher()
+        mappings = Resonator.avatar_mappings()
+        scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
+
+        member_keys = [None, None, None]
+        for index, roi in enumerate(roi_members):
+            scene_image = img[scaler.as_bbox(roi).as_slice()]
+            res = matcher.identify_roles(scene_image, role_features, min_good_matches=3)
+            logger.debug(f"identify_roles: {res}")
+            if not res:
+                continue
+            avatar_key = mappings.get(res[0])
+            if not avatar_key:
+                continue
+            member_keys[index] = avatar_key
+        logger.debug(f"member_keys: {member_keys}")
+
+        tr = I18nTr(Language.sys_lang())
+        tr_keys = []
+        for key in member_keys:
+            if not key:
+                tr_keys.append(None)
+                continue
+            if not (res := tr(key)):
+                logger.warning(f"Unknown key: {key}")
+                tr_keys.append(None)
+                continue
+            tr_keys.append(res.raw)
+        logger.debug(f"Members: {tr_keys}")
+
+        return member_keys
+
+    # # def reset_state(self, member_keys: list, morph: Morph) -> bool:
+    # def reset_state(self, morph: Morph) -> bool:
+    #     try:
+    #         team_members = self.ctx.shared.team_members
+    #         if not team_members:
+    #             return False
+    #
+    #         src_idx = self.get_cur_idx(self.ctx.img_service.screenshot())
+    #         logger.debug(f"src_idx: {src_idx}")
+    #         if src_idx is None:
+    #             return False
+    #
+    #         # resonator = Resonator.from_key(member_keys[src_idx - 1])
+    #
+    #         from src.core.combat.combat_system import CombatSystem
+    #         combat_system = CombatSystem(self.ctx.control_service, self.ctx.img_service)
+    #         combat_system.set_resonators(self.ctx.shared.team_members, is_print=False)
+    #
+    #         if not combat_system.resonators:
+    #             return False
+    #         resonators = [None, None, None]
+    #         for i, r in enumerate(combat_system.resonators):
+    #             if i > len(resonators) - 1 or not r:
+    #                 break
+    #             resonators[i] = r
+    #         if not (resonator := resonators[src_idx - 1]):
+    #             return False
+    #         if resonator.exit_special_state(morph):
+    #             return True
+    #
+    #         # for i in range(1, len(member_keys) + 1):
+    #         for i in range(1, 4):
+    #             if i == src_idx:
+    #                 continue
+    #
+    #             self.switch_to(i)
+    #             time.sleep(0.35)
+    #             new_idx = self.get_cur_idx(self.ctx.img_service.screenshot())
+    #             if new_idx is None:
+    #                 break
+    #             if new_idx != i:
+    #                 # 没切成功，以防万一，点(0,0)关掉复活药弹窗
+    #                 self.ctx.control_service.attack()
+    #                 time.sleep(0.2)
+    #                 continue
+    #
+    #             # resonator = Resonator.from_key(member_keys[new_idx - 1])
+    #             # if resonator.exit_special_state(morph):
+    #             #     return True
+    #             if not (resonator := resonators[new_idx - 1]):
+    #                 return False
+    #             if resonator.exit_special_state(morph):
+    #                 return True
+    #     except (KeyboardInterrupt, StopError) as e:
+    #         raise e
+    #     except Exception as e:
+    #         logger.exception(e)
+    #     return False
+
 
 
 if __name__ == '__main__':
-    t = Resonator.from_key(I18nText.Cartethyia)
-    print(t)
+    from src.util import file_util
+    print(Resonator.from_key(I18nText.Cartethyia))
+    print(TeamMember.member_keys(img_util.read_img(file_util.get_temp_screenshot("screenshot_1787206343_88366840.png"))))

@@ -802,6 +802,7 @@ class GlobalPage:
     SelectARevivalItem = "SelectARevivalItem"
     ReplenishWaveplate = "ReplenishWaveplate"
     TapTheBlankAreaToClose = "TapTheBlankAreaToClose"
+    TapTheBlankAreaToContinue = "TapTheBlankAreaToContinue"
     TapToLandInSolaris3 = "TapToLandInSolaris3"
     Login = "Login"
     InternetDisconnecting = "InternetDisconnecting"
@@ -839,6 +840,7 @@ class GlobalPage:
             self.SelectARevivalItem: self.isSelectARevivalItem,
             self.ReplenishWaveplate: self.isReplenishWaveplate,
             self.TapTheBlankAreaToClose: self.isTapTheBlankAreaToClose,
+            self.TapTheBlankAreaToContinue: self.isTapTheBlankAreaToContinue,
             self.TapToLandInSolaris3: self.isTapToLandInSolaris3,
             self.Login: self.isLogin,
             self.InternetDisconnecting: self.isInternetDisconnecting,
@@ -935,7 +937,8 @@ class GlobalPage:
         """离开副本"""
         if ((res := ui.search(self.ctx.tr(I18nText.Confirm)))
                 and ui.search(self.ctx.tr([I18nText.Cancel, I18nText.Restart]))
-                and ui.search(self.ctx.tr([I18nText.Notice, I18nText.Note]))):
+                and ui.search(self.ctx.tr([I18nText.Notice, I18nText.Note]))
+                and not ui.search(self.ctx.tr(I18nText.ClaimRewards))):
             return self.ActionStr(
                 self.LeaveInstance,
                 lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
@@ -952,6 +955,7 @@ class GlobalPage:
         return None
 
     def isRevive(self, *, ui: UIOp, **kwargs):
+        """复苏"""
         if ((res := ui.search(self.ctx.tr(I18nText.Revive)))
                 and ui.search(self.ctx.tr(I18nText.Defeated))):
             logger.info(f"{self.ctx.tr(I18nText.Revive).raw}")
@@ -962,6 +966,7 @@ class GlobalPage:
         return None
 
     def isSelectARevivalItem(self, *, ui: UIOp, **kwargs):
+        """选择复苏物品"""
         if ui.search(self.ctx.tr(I18nText.SelectARevivalItem)):
             logger.info(f"{self.ctx.tr(I18nText.SelectARevivalItem).raw}")
             return self.ActionStr(
@@ -971,6 +976,7 @@ class GlobalPage:
         return None
 
     def isReplenishWaveplate(self, *, ui: UIOp, **kwargs):
+        """补充结晶波片"""
         if ui.search(self.ctx.tr(I18nText.ReplenishWaveplate)):
             logger.info(f"{self.ctx.tr(I18nText.ReplenishWaveplate).raw}")
             return self.ActionStr(
@@ -984,7 +990,16 @@ class GlobalPage:
             logger.info(f"{self.ctx.tr(I18nText.TapTheBlankAreaToClose).raw}")
             return self.ActionStr(
                 self.TapTheBlankAreaToClose,
-                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.1).sleep(1)
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.1).sleep(0.5)
+            )
+        return None
+
+    def isTapTheBlankAreaToContinue(self, *, ui: UIOp, **kwargs):
+        if res := ui.search(self.ctx.tr(I18nText.TapTheBlankAreaToContinue)):
+            logger.info(f"{self.ctx.tr(I18nText.TapTheBlankAreaToContinue).raw}")
+            return self.ActionStr(
+                self.TapTheBlankAreaToContinue,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3, times=2, interval=0.1).sleep(0.5)
             )
         return None
 

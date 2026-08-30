@@ -1,12 +1,18 @@
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, ClassVar
 
-from src.core.i18n import I18nText
+from src.core.i18n import I18nText, Language, I18nTr
 from src.core.movement import Run, MoveStep
 
 logger = logging.getLogger(__name__)
+
+__TR = I18nTr(Language.sys_lang())
+
+
+def _tr(key: str) -> str:
+    return __TR(key).raw
 
 
 class EnemyElement(Enum):
@@ -132,6 +138,9 @@ class SonataEffect(Enum):
     WishesOfQuietSnowfall = "Wishes of Quiet Snowfall"  # 雪落无声之愿
     ReelOfSplicedMemories = "Reel of Spliced Memories"  # 剪心辑梦之影
     ShadowOfShatteredDreams = "Shadow of Shattered Dreams"  # 碎梦亡鬼之魇
+    SongOfFeatheredTrace = "Song of Feathered Trace"  # 羽落空尘之歌
+    HeartOfEvilsPurge = "Heart of Evil's Purge"  # 清邪荡煞之心
+    LampOfNetherRoad = "Lamp of Nether Road"  # 冥途夜行之灯
 
 
 @dataclass(frozen=True)
@@ -153,20 +162,23 @@ class QuickBossMeta:
     menu: str  # 快捷挑战菜单标识 (如 "weekly_boss", "event_boss" 等)
     dungeon_name: str  # 副本名称
     battle_text: List[str]  # Boss 战时特殊文本
+    routes: List[MoveStep]  # 路线 (如 ["路线1", "路线2"])
 
 
 @dataclass(frozen=True)
 class EnemyMeta:
     """敌人元数据类 - 用于描述每个敌人"""
 
+    ENEMIES: ClassVar[dict[str, "EnemyMeta"]] = {}
+
     id: str  # 唯一标识
-    name: str  # 显示名称
+    name: str  # 显示名称，仅作开发调试用，不可用于判断
     species: EnemySpecies  # 物种/种族 (如呓语种、啸叫种等)
     rank: EnemyRank  # 阶级/等级 (如轻波级、巨浪级等)
     cost: EnemyCost  # 消耗值
     icon: EnemyIcon  # 图标
     version: EnemyVersion  # 实装版本
-    sonata: SonataEffect  # 奏鸣效果
+    sonata: List[SonataEffect]  # 奏鸣效果
     elements: List[EnemyElement]  # 元素属性列表 (拥有该属性即对该属性有抗性)
     prefer_quick: bool = False  # 是否优先从快速菜单进入 (True=快速菜单, False=野外)
     boss_meta: Optional[BossMeta] = None  # Boss 信息 (非 Boss 敌人为 None)
@@ -180,11 +192,20 @@ class EnemyMeta:
             if not self.boss_meta:
                 raise ValueError("boss_meta is empty")
 
+        if not self.id:
+            raise ValueError("id is empty")
+        if self.id in self.ENEMIES:
+            raise ValueError(f"Duplicate enemy id: {self.id}")
+
+        self.ENEMIES[self.id] = self
+
     @property
     def is_dungeon(self) -> bool:
-        """是否是独立空间的副本boss，相对的为大世界boss"""
+        """是否是独立空间的副本boss，相对的为野外boss"""
+        # 菜单直接挑战的都在独立空间
         if self.prefer_quick:
             return True
+        # 野外的
         return self.boss_meta.is_dungeon
 
     @property
@@ -194,17 +215,27 @@ class EnemyMeta:
             return self.quick_boss_meta.battle_text
         return self.boss_meta.battle_text
 
+    @property
+    def auto_respawn(self) -> bool:
+        return bool(not self.prefer_quick and self.boss_meta and self.boss_meta.auto_respawn)
+
+    @property
+    def routes(self) -> List[MoveStep]:
+        if self.prefer_quick:
+            return self.quick_boss_meta.routes
+        return self.boss_meta.routes
+
 
 class Enemy:
     Dreamless = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyDreamless,
+        id=I18nText.EnemyDreamless,
+        name=_tr(I18nText.EnemyDreamless),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -220,14 +251,14 @@ class Enemy:
     )
 
     FallacyOfNoReturn = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyFallacyOfNoReturn,
+        id=I18nText.EnemyFallacyOfNoReturn,
+        name=_tr(I18nText.EnemyFallacyOfNoReturn),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -243,14 +274,14 @@ class Enemy:
     )
 
     LampylumenMyriad = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyLampylumenMyriad,
+        id=I18nText.EnemyLampylumenMyriad,
+        name=_tr(I18nText.EnemyLampylumenMyriad),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -266,14 +297,14 @@ class Enemy:
     )
 
     BellBorneGeochelone = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyBellBorneGeochelone,
+        id=I18nText.EnemyBellBorneGeochelone,
+        name=_tr(I18nText.EnemyBellBorneGeochelone),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -289,14 +320,14 @@ class Enemy:
     )
 
     InfernoRider = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyInfernoRider,
+        id=I18nText.EnemyInfernoRider,
+        name=_tr(I18nText.EnemyInfernoRider),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -312,14 +343,14 @@ class Enemy:
     )
 
     ImpermanenceHeron = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyImpermanenceHeron,
+        id=I18nText.EnemyImpermanenceHeron,
+        name=_tr(I18nText.EnemyImpermanenceHeron),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -335,14 +366,14 @@ class Enemy:
     )
 
     MechAbomination = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyMechAbomination,
+        id=I18nText.EnemyMechAbomination,
+        name=_tr(I18nText.EnemyMechAbomination),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -358,14 +389,14 @@ class Enemy:
     )
 
     MourningAix = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyMourningAix,
+        id=I18nText.EnemyMourningAix,
+        name=_tr(I18nText.EnemyMourningAix),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -381,14 +412,14 @@ class Enemy:
     )
 
     ThunderingMephis = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyThunderingMephis,
+        id=I18nText.EnemyThunderingMephis,
+        name=_tr(I18nText.EnemyThunderingMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -404,14 +435,14 @@ class Enemy:
     )
 
     TempestMephis = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyTempestMephis,
+        id=I18nText.EnemyTempestMephis,
+        name=_tr(I18nText.EnemyTempestMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -427,14 +458,14 @@ class Enemy:
     )
 
     FeilianBeringal = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyFeilianBeringal,
+        id=I18nText.EnemyFeilianBeringal,
+        name=_tr(I18nText.EnemyFeilianBeringal),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -450,14 +481,14 @@ class Enemy:
     )
 
     Crownless = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyCrownless,
+        id=I18nText.EnemyCrownless,
+        name=_tr(I18nText.EnemyCrownless),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -473,14 +504,14 @@ class Enemy:
     )
 
     Jue = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyJue,
+        id=I18nText.EnemyJue,
+        name=_tr(I18nText.EnemyJue),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -496,14 +527,14 @@ class Enemy:
     )
 
     SentryConstruct = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemySentryConstruct,
+        id=I18nText.EnemySentryConstruct,
+        name=_tr(I18nText.EnemySentryConstruct),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -519,14 +550,14 @@ class Enemy:
     )
 
     Hecate = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyHecate,
+        id=I18nText.EnemyHecate,
+        name=_tr(I18nText.EnemyHecate),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -542,14 +573,14 @@ class Enemy:
     )
 
     Lorelei = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyLorelei,
+        id=I18nText.EnemyLorelei,
+        name=_tr(I18nText.EnemyLorelei),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -565,14 +596,14 @@ class Enemy:
     )
 
     DragonOfDirge = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyDragonOfDirge,
+        id=I18nText.EnemyDragonOfDirge,
+        name=_tr(I18nText.EnemyDragonOfDirge),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -588,14 +619,14 @@ class Enemy:
     )
 
     NightmareFeilianBeringal = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareFeilianBeringal,
+        id=I18nText.EnemyNightmareFeilianBeringal,
+        name=_tr(I18nText.EnemyNightmareFeilianBeringal),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -611,14 +642,14 @@ class Enemy:
     )
 
     NightmareImpermanenceHeron = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareImpermanenceHeron,
+        id=I18nText.EnemyNightmareImpermanenceHeron,
+        name=_tr(I18nText.EnemyNightmareImpermanenceHeron),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -634,14 +665,14 @@ class Enemy:
     )
 
     NightmareTempestMephis = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareTempestMephis,
+        id=I18nText.EnemyNightmareTempestMephis,
+        name=_tr(I18nText.EnemyNightmareTempestMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -657,14 +688,14 @@ class Enemy:
     )
 
     NightmareThunderingMephis = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareThunderingMephis,
+        id=I18nText.EnemyNightmareThunderingMephis,
+        name=_tr(I18nText.EnemyNightmareThunderingMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -680,14 +711,14 @@ class Enemy:
     )
 
     NightmareCrownless = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareCrownless,
+        id=I18nText.EnemyNightmareCrownless,
+        name=_tr(I18nText.EnemyNightmareCrownless),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -703,14 +734,14 @@ class Enemy:
     )
 
     NightmareInfernoRider = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareInfernoRider,
+        id=I18nText.EnemyNightmareInfernoRider,
+        name=_tr(I18nText.EnemyNightmareInfernoRider),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -726,8 +757,8 @@ class Enemy:
     )
 
     NightmareMourningAix = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareMourningAix,
+        id=I18nText.EnemyNightmareMourningAix,
+        name=_tr(I18nText.EnemyNightmareMourningAix),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -749,14 +780,14 @@ class Enemy:
     )
 
     NightmareLampylumenMyriad = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareLampylumenMyriad,
+        id=I18nText.EnemyNightmareLampylumenMyriad,
+        name=_tr(I18nText.EnemyNightmareLampylumenMyriad),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -772,14 +803,14 @@ class Enemy:
     )
 
     Fleurdelys = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyFleurdelys,
+        id=I18nText.EnemyFleurdelys,
+        name=_tr(I18nText.EnemyFleurdelys),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -795,14 +826,14 @@ class Enemy:
     )
 
     NightmareKelpie = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareKelpie,
+        id=I18nText.EnemyNightmareKelpie,
+        name=_tr(I18nText.EnemyNightmareKelpie),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -818,14 +849,14 @@ class Enemy:
     )
 
     LionessOfGlory = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyLionessOfGlory,
+        id=I18nText.EnemyLionessOfGlory,
+        name=_tr(I18nText.EnemyLionessOfGlory),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -841,14 +872,14 @@ class Enemy:
     )
 
     NightmareHecate = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareHecate,
+        id=I18nText.EnemyNightmareHecate,
+        name=_tr(I18nText.EnemyNightmareHecate),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -864,14 +895,14 @@ class Enemy:
     )
 
     Fenrico = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyFenrico,
+        id=I18nText.EnemyFenrico,
+        name=_tr(I18nText.EnemyFenrico),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -887,14 +918,14 @@ class Enemy:
     )
 
     LadyOfTheSea = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyLadyOfTheSea,
+        id=I18nText.EnemyLadyOfTheSea,
+        name=_tr(I18nText.EnemyLadyOfTheSea),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -910,14 +941,14 @@ class Enemy:
     )
 
     TheFalseSovereign = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyTheFalseSovereign,
+        id=I18nText.EnemyTheFalseSovereign,
+        name=_tr(I18nText.EnemyTheFalseSovereign),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -933,14 +964,14 @@ class Enemy:
     )
 
     ThrenodianLeviathan = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyThrenodianLeviathan,
+        id=I18nText.EnemyThrenodianLeviathan,
+        name=_tr(I18nText.EnemyThrenodianLeviathan),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -956,14 +987,14 @@ class Enemy:
     )
 
     Hyvatia = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyHyvatia,
+        id=I18nText.EnemyHyvatia,
+        name=_tr(I18nText.EnemyHyvatia),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -979,14 +1010,14 @@ class Enemy:
     )
 
     ReactorHusk = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyReactorHusk,
+        id=I18nText.EnemyReactorHusk,
+        name=_tr(I18nText.EnemyReactorHusk),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1002,14 +1033,14 @@ class Enemy:
     )
 
     Sigillum = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemySigillum,
+        id=I18nText.EnemySigillum,
+        name=_tr(I18nText.EnemySigillum),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1025,14 +1056,14 @@ class Enemy:
     )
 
     NamelessExplorer = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNamelessExplorer,
+        id=I18nText.EnemyNamelessExplorer,
+        name=_tr(I18nText.EnemyNamelessExplorer),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1048,14 +1079,14 @@ class Enemy:
     )
 
     Denia = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyDenia,
+        id=I18nText.EnemyDenia,
+        name=_tr(I18nText.EnemyDenia),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1071,14 +1102,14 @@ class Enemy:
     )
 
     NightmareAdamSmasher = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyNightmareAdamSmasher,
+        id=I18nText.EnemyNightmareAdamSmasher,
+        name=_tr(I18nText.EnemyNightmareAdamSmasher),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1094,16 +1125,16 @@ class Enemy:
     )
 
     MyriadSnareRustfireChassis = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyMyriadSnareRustfireChassis,
+        id=I18nText.EnemyMyriadSnareRustfireChassis,
+        name=_tr(I18nText.EnemyMyriadSnareRustfireChassis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
-        elements=[EnemyElement.Havoc],
-        prefer_quick=False,
+        version=EnemyVersion.V3_5,
+        sonata=[SonataEffect.HeartOfEvilsPurge, SonataEffect.LampOfNetherRoad],
+        elements=[EnemyElement.Fusion],
+        prefer_quick=True,
         boss_meta=BossMeta(
             name="深渊低语者",
             is_dungeon=True,
@@ -1113,18 +1144,24 @@ class Enemy:
             battle_text=[],
             routes=[],
         ),
-        quick_boss_meta=None,
+        quick_boss_meta=QuickBossMeta(
+            name="",
+            menu=I18nText.BossChallenge,
+            dungeon_name=I18nText.EnemyThousandPuppetPavilion,
+            battle_text=[I18nText.DefeatTheEnemies],
+            routes=[],
+        ),
     )
 
     ThousandPuppetPavilion = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyThousandPuppetPavilion,
+        id=I18nText.EnemyThousandPuppetPavilion,
+        name=_tr(I18nText.EnemyThousandPuppetPavilion),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
+        sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=False,
         boss_meta=BossMeta(
@@ -1140,15 +1177,15 @@ class Enemy:
     )
 
     CalamityEffigy = EnemyMeta(
-        id="test_001",
-        name=I18nText.EnemyCalamityEffigy,
+        id=I18nText.EnemyCalamityEffigy,
+        name=_tr(I18nText.EnemyCalamityEffigy),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
-        sonata=SonataEffect.FreezingFrost,
-        elements=[EnemyElement.Havoc],
+        version=EnemyVersion.V3_6,
+        sonata=[SonataEffect.HeartOfEvilsPurge, SonataEffect.LampOfNetherRoad],
+        elements=[EnemyElement.Aero],
         prefer_quick=False,
         boss_meta=BossMeta(
             name="深渊低语者",
@@ -1162,4 +1199,17 @@ class Enemy:
         quick_boss_meta=None,
     )
 
+    @staticmethod
+    def enemies():
+        return EnemyMeta.ENEMIES
 
+
+if __name__ == '__main__':
+    print(Enemy.enemies())
+
+    import ctypes
+
+    buf = ctypes.create_unicode_buffer(85)
+    ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, 85)
+
+    print(buf.value)

@@ -711,7 +711,7 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     try:
 
-        ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
+        ctx, container = task_init(event, spec, ipc, source=MsgSource.BOSS_TASK, **kwargs)
         logger.info(f"刷boss任务开始运行, task_id: {spec.task_id}")
         ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
 
@@ -763,7 +763,7 @@ def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 def explore_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     try:
 
-        ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
+        ctx, container = task_init(event, spec, ipc, source=MsgSource.EXPLORE_TASK, **kwargs)
         logger.info(f"探索任务开始运行, task_id: {spec.task_id}")
         create_parent_monitor(event, spec.leader_pid)
 

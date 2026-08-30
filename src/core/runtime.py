@@ -3,8 +3,9 @@ from enum import Enum
 from functools import cached_property
 from pathlib import Path
 
-from src.config.config import Config, BossRushConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
+from src.config.config import Config, BossConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
 from src.core.boss import BossNameEnum
+from src.core.enemy import Enemy
 from src.core.i18n import I18nText, Language
 from src.util import winreg_util
 
@@ -18,19 +19,13 @@ logger = logging.getLogger(__name__)
 # =========================================================
 
 
-class BossRushRuntimeConfig:
+class BossRuntimeConfig:
 
-    def __init__(self, cfg: BossRushConfig):
-        self._cfg: BossRushConfig = cfg
+    def __init__(self, cfg: BossConfig):
+        self._cfg: BossConfig = cfg
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.__dict__})"
-
-    @cached_property
-    def autoCombat(self) -> bool:
-        if self._cfg.autoCombatBetaV2 is None:
-            return True
-        return self._cfg.autoCombatBetaV2
 
     @cached_property
     def restartInterval(self) -> int:
@@ -50,32 +45,18 @@ class BossRushRuntimeConfig:
         return -1
 
     @cached_property
-    def bossLevel(self) -> int:
-        if not self._cfg.bossLevel:
-            return -1
-        level = None
-        try:
-            level = int(self._cfg.bossLevel)
-        except Exception:
-            pass
-        if not level or level not in [40, 50, 60, 70, 80, 90]:
-            logger.warning(f"Invalid boss level: {level}")
-            return -1
-        return level
-
-    @cached_property
     def bossName(self) -> list[str]:
-        if not self._cfg.bossName:
-            return [I18nText.EnemyDreamless]
-        try:
-            idx = self._cfg.bossName.index("SeedOfLllusoryOrigin")
-            self._cfg.bossName[idx] = I18nText.SeedOfIllusoryOrigin
-        except Exception:
-            pass
-        enemies = BossNameEnum.enemies()
-        if not set(enemies).issubset(set(self._cfg.bossName)):
-            raise ValueError(f"Invalid boss name in list: '{self._cfg.bossName}'")
-        return list(dict.fromkeys(self._cfg.bossName))
+        names = []
+        if self._cfg.bossName:
+            enemies = Enemy.enemies()
+            for name in self._cfg.bossName:
+                if name in enemies:
+                    names.append(name)
+                    continue
+                logger.warning(f"Invalid boss name: '{name}'")
+        if not names:
+            names.append(I18nText.EnemyDreamless)
+        return names
 
 
 class DailyRuntimeConfig:
@@ -280,7 +261,7 @@ class RuntimeConfig:
 
     def __init__(self, cfg):
         self._cfg: Config = self.format_config(cfg)
-        self.bossRush: BossRushRuntimeConfig = BossRushRuntimeConfig(self._cfg.bossRush)
+        self.boss: BossRuntimeConfig = BossRuntimeConfig(self._cfg.boss)
         self.daily: DailyRuntimeConfig = DailyRuntimeConfig(self._cfg.daily)
         self.explore: ExploreRuntimeConfig = ExploreRuntimeConfig(self._cfg.explore)
         self.game: GameRuntimeConfig = GameRuntimeConfig(self._cfg.game)

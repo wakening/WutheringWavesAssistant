@@ -2,10 +2,13 @@ import logging
 import re
 import threading
 import time
+from functools import cached_property
 from typing import Optional
 
+import numpy as np
+
 from src.core.exceptions import StopError
-from src.core.geometry import AnchorBBox, Align, AnchorPoint, BBox, TextBox
+from src.core.geometry import AnchorBBox, Align, AnchorPoint, BBox, TextBox, Scaler, Point
 from src.core.i18n import I18nText
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp
@@ -63,6 +66,62 @@ def bbox_hp_bar(ctx: NodeContext) -> BBox:
     ))
 
 
+class RoiEx:
+    """提供一些常用的roi，带缓存，方便在lambda中复用"""
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+        self.scaler = Scaler(self.ctx.window_service.get_client_wh())
+
+    @cached_property
+    def terminal_content(self) -> BBox:
+        """终端页右侧功能项所在区域，防止左侧昵称、签名等影响匹配"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(540, 0, Align.Left | Align.Top),
+            AnchorPoint(1280, 720, Align.Right | Align.Bottom)
+        ))
+
+    @cached_property
+    def dialogue(self) -> BBox:
+        """对话框所在区域"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(788, 280, Align.Center | Align.Middle),
+            AnchorPoint(1100, 560, Align.Center | Align.Middle)
+        ))
+
+    @cached_property
+    def guidebook_title(self) -> BBox:
+        """索拉指南左上角小标题"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(0, 0, Align.Top | Align.Left),
+            AnchorPoint(300, 100, Align.Top | Align.Left),
+        ))
+
+    @cached_property
+    def guidebook_item(self) -> BBox:
+        """索拉指南左侧选项区"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(0, 0, Align.Left | Align.Top),
+            AnchorPoint(454, 720, Align.Left | Align.Bottom),
+        ))
+
+    @cached_property
+    def guidebook_content(self) -> BBox:
+        """索拉指南右侧内容区，不包含上面的体力值和下面的uid"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(454, 75, Align.Left | Align.Top),
+            AnchorPoint(1280, 660, Align.Right | Align.Bottom),
+        ))
+
+    @cached_property
+    def hp_bar(self) -> BBox:
+        """血条"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(180, 0, Align.Left | Align.Top),
+            AnchorPoint(1280, 612, Align.Right | Align.Bottom),
+        ))
+
+
 def absorb_around_variant(ctx: NodeContext):
     """环绕吸收变体"""
     roi = bbox_dialogue(ctx)
@@ -93,7 +152,7 @@ def absorb_around_variant(ctx: NodeContext):
 
 class AsyncPickup:
 
-    def __init__(self, ctx, *, delay: float = 0.0, event = None):
+    def __init__(self, ctx, *, delay: float = 0.0, event=None):
         self.ctx = ctx
         self.delay = max(0, min(delay, 60))
         self.event = event
@@ -252,7 +311,7 @@ def query_waveplate_guidebook(ctx: NodeContext):
     # 结晶波片
     total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(798, 0, Align.Right | Align.Top), AnchorPoint(984, 80, Align.Right | Align.Top)))
-    
+
     return _query_waveplate(ctx, waveplate_crystal_roi, total_waveplate_roi)
 
 
@@ -265,7 +324,7 @@ def query_waveplate_claim_rewards(ctx: NodeContext):
     # 结晶波片
     total_waveplate_roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(865, 0, Align.Right | Align.Top), AnchorPoint(1048, 80, Align.Right | Align.Top)))
-    
+
     return _query_waveplate(ctx, waveplate_crystal_roi, total_waveplate_roi)
 
 
@@ -328,7 +387,8 @@ def object_detection(
         ctx: NodeContext,
         search_echo: bool = False,
         search_reward: bool = False,
-        timeout: float = 20.0
+        timeout: float = 20.0,
+        boss_name: Optional[str] = None,
 ):
     if search_echo:
         logger.debug(f"search_echo: {search_echo}")
@@ -375,7 +435,7 @@ def object_detection(
                 ui.pick_up().sleep(1)
 
         if search_echo:
-            det = ctx.od_service.search_echo()
+            det = ctx.od_service.search_echo_2(boss_name=boss_name)
         elif search_reward:
             det = ctx.od_service.search_reward()
         else:
@@ -485,21 +545,7 @@ def linear_spacing(start: int, end: int, num_points: int, offset=None):
     return positions
 
 
-def search_icon_guidebook(
-        ctx: NodeContext,
-        *,
-        material_collection: bool = False,
-        enemy_tracing: bool = False
-) -> tuple[int, int] | None:
-    if material_collection:
-        bbox = BBox(252, 28, 321, 105)
-    elif enemy_tracing:
-        bbox = BBox(467, 33, 541, 113)
-    else:
-        raise ValueError("Unknown icon")
-
-    atlas = img_util.read_img(file_util.get_assets_template("Guidebook_Sidebar.png"))
-    icon = atlas[bbox.as_slice()]
+def search_icon_guidebook(ctx: NodeContext, *, icon: np.ndarray) -> tuple[int, int] | None:
     roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(0, 85, Align.Left | Align.Top),
         AnchorPoint(99, 720, Align.Left | Align.Top),
@@ -513,6 +559,7 @@ def search_icon_guidebook(
         scale_max=2.0,
         scale_step=0.03,
     )
+    logger.debug(f"bbox: {bbox}")
     if bbox is None or bbox.score < 0.7:
         return None
     return bbox.near
@@ -548,3 +595,91 @@ class RateLimiter:
             return 0.0
 
         return round(wait, 6)
+
+
+class LinearSpacing:
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    @staticmethod
+    def horizontal(start: int, end: int, num_points: int, offset=None):
+        """
+        线性插值（支持整体偏移）
+        :param start: 起始位置（第一个点的坐标）
+        :param end: 结束位置（最后一个点的坐标）
+        :param num_points: 点的总数（>= 2）
+        :param offset: 整体偏移量（可选）
+                   - None: 返回主点位置
+                   - 数值: 返回 [p + offset for p in 主点位置]
+        :return: 所有点的位置坐标
+        """
+        if num_points < 2:
+            raise ValueError("num_points 必须 >= 2")
+
+        # 计算等分位置
+        segments = num_points - 1
+        positions = []
+
+        for i in range(num_points):
+            t = i / segments  # 0 到 1 之间的比例
+            pos = start + (end - start) * t
+            positions.append(int(pos))
+
+        # 应用偏移
+        if offset is not None:
+            positions = [p + offset for p in positions]
+
+        return positions
+
+    @staticmethod
+    def vertical(p1: Point, p2: Point, p3: Point) -> list[Point]:
+        """
+        垂直插值
+        :param p1: 第一个点
+        :param p2: 第二个点
+        :param p3: 最后一个点
+        :return: 所有点
+        """
+        y_spacing = p2.y - p1.y
+        points = [p1]
+        next_point = p1
+        while True:
+            next_point = Point(next_point.x, next_point.y + y_spacing)
+            if next_point.y >= p3.y:
+                break
+            points.append(next_point)
+        points.append(p3)
+        return points
+
+    @staticmethod
+    def __find_bar_bottom(point: Point, img: np.ndarray):
+        """滑块底部的点"""
+        column = img[point.y:, point.x]
+        # bgr 219 221 203
+        is_white = np.all(column > 185, axis=1)
+        indices = np.flatnonzero(~is_white)
+        y_end = point.y + indices[0] if indices.size else img.shape[0]
+        return Point(point.x, y_end)
+
+    def boss_challenge(self, img: np.ndarray):
+        # 滑块顶部(1245, 143)往下一些的一个点
+        top_point = self.ctx.scaler.as_point(AnchorPoint(1245, 146, Align.Top | Align.Right))
+        bottom_point = self.__find_bar_bottom(top_point, img)
+        p1 = self.ctx.scaler.as_point(AnchorPoint(1245, 233, Align.Top | Align.Right))
+        p2 = self.ctx.scaler.as_point(AnchorPoint(1245, 268, Align.Top | Align.Right))
+        p3 = self.ctx.scaler.as_point(AnchorPoint(1245, 630, Align.Bottom | Align.Right))
+        return self.vertical(
+            bottom_point,
+            Point(bottom_point.x, bottom_point.y + p2.y - p1.y),
+            p3,
+        )
+
+    def weekly_challenge(self):
+        return self.vertical(
+            self.ctx.scaler.as_point(AnchorPoint(1245, 351, Align.Top | Align.Right)),
+            self.ctx.scaler.as_point(AnchorPoint(1245, 443, Align.Top | Align.Right)),
+            self.ctx.scaler.as_point(AnchorPoint(1245, 630, Align.Bottom | Align.Right)),
+        )
+
+

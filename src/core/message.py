@@ -35,6 +35,8 @@ class MsgSource(Enum):
     WORKFLOW = auto()
 
     DAILY_TASK = auto()
+    BOSS_TASK = auto()
+    EXPLORE_TASK = auto()
 
 
 @dataclass

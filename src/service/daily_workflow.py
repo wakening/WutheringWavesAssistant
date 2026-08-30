@@ -14,6 +14,7 @@ from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk
 from src.core.pages import UIOp, GlobalPage
 from src.core.resonator import Resonator
+from src.core.resource import Icon
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
@@ -24,7 +25,6 @@ from src.service.common_workflow import (
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
-from src.util.img_tile_util import TileGrid
 
 logger = logging.getLogger(__name__)
 
@@ -385,7 +385,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
 
     # 终端
     if not GlobalPage(ctx).isTerminal(ui=ui):
-        logger.warning(f"Text not found: {ctx.tr(I18nText.Terminal)}")
+        logger.warning(f"Text not found: {ctx.tr(I18nText.Terminal).raw}")
         ui.esc().sleep(1)
         return None
 
@@ -398,12 +398,9 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         AnchorPoint(700, 625, Align.Right | Align.Bottom),
         AnchorPoint(1280, 720, Align.Right | Align.Bottom)
     ))
-    if ui.sleep(0.8).wait(5, 0.5).until(
-            lambda: ui.snapshot().search(
-                ctx.tr([I18nText.QuickSetup, I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState]))):
-        if ui.search(ctx.tr([I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState])):
-            logger.info(f"Team locked")
-            return False
+    if ui.sleep(0.8).wait().until(
+            lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi) or ui.search(ctx.tr(
+                [I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState]))):
         if not ui.search(ctx.tr(I18nText.QuickSetup), roi):
             logger.info(f"Team locked")
             return False
@@ -527,18 +524,18 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 
     # 左侧图标坐标
     activitySidebar = AnchorPoint(50, 128, Align.Top | Align.Left)
-    materialCollectionSidebar = [
-        AnchorPoint(50, 218, Align.Top | Align.Left),
-        AnchorPoint(50, 308, Align.Top | Align.Left),
-    ]
-    recurringChallengesSidebar = AnchorPoint(50, 308, Align.Top | Align.Left)
-    pathOfGrowthSidebar = AnchorPoint(50, 396, Align.Top | Align.Left)
-    enemyTracingSidebar = [
-        AnchorPoint(50, 487, Align.Top | Align.Left),
-        AnchorPoint(50, 578, Align.Top | Align.Left),
-        AnchorPoint(50, 396, Align.Top | Align.Left),
-    ]
-    milestonesSidebar = AnchorPoint(50, 578, Align.Top | Align.Left)
+    # materialCollectionSidebar = [
+    #     AnchorPoint(50, 218, Align.Top | Align.Left),
+    #     AnchorPoint(50, 308, Align.Top | Align.Left),
+    # ]
+    # recurringChallengesSidebar = AnchorPoint(50, 308, Align.Top | Align.Left)
+    # pathOfGrowthSidebar = AnchorPoint(50, 396, Align.Top | Align.Left)
+    # enemyTracingSidebar = [
+    #     AnchorPoint(50, 487, Align.Top | Align.Left),
+    #     AnchorPoint(50, 578, Align.Top | Align.Left),
+    #     AnchorPoint(50, 396, Align.Top | Align.Left),
+    # ]
+    # milestonesSidebar = AnchorPoint(50, 578, Align.Top | Align.Left)
 
     # 进入索拉指南后，默认是 活跃度 或 素材获取页
     activity = ctx.tr(I18nText.Activity)
@@ -555,29 +552,28 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         logger.warning(f"Page not found: {ctx.tr(I18nText.Guidebook).raw}")
         return None
 
+    def _click_icon(_icon, _keyword):
+        icon_point = None
+        for i in range(2):
+            # logger.info(f"click icon index: {i}")
+            if icon_point := search_icon_guidebook(ctx, icon=_icon):
+                break
+            ui.sleep(0.3)
+        if not icon_point:
+            logger.warning(f"{_keyword.raw} icon not found")
+            return False
+        # 点击侧边栏图标
+        ui.click_point(icon_point, times=2, interval=0.3)
+        if not ui.sleep(0.2).wait().until(lambda: ui.snapshot().search(_keyword, title_roi)):
+            return False
+        return True
+
     # 根据任务的开启状态分发任务
     if local.materialCollectionFSM.is_active:
-        # 素材获取
-        if not ui.search(materialCollection, title_roi):
-            ui.sleep(0.2)
-            for i in range(2):
-                icon_point = search_icon_guidebook(ctx, material_collection=True)
-                if not icon_point:
-                    if i == 0:
-                        continue
-                    else:
-                        logger.warning(f"materialCollection icon not found")
-                        return None
-                ui.click_point(icon_point, times=2, interval=0.3)
-                if ui.sleep(0.2).wait(2, 0.3).until(lambda: ui.snapshot().search(materialCollection, title_roi)):
-                    ui.sleep(0.3)
-                    break
-
-            # for i in materialCollectionSidebar:
-            #     ui.click_point(i, 2, 0.2).sleep(0.8)
-            #     if ui.snapshot().search(materialCollection, title_roi):
-            #         break
-
+        if not ui.search(materialCollection, title_roi) and not _click_icon(
+                Icon.materialCollection(), materialCollection):
+            return None
+        ui.sleep(0.3)
         return I18nText.MaterialCollection
     if local.recurringChallengesFSM.is_active:
         # 周期挑战
@@ -591,14 +587,12 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     if local.activityFSM.is_active:
         # 活跃行迹
         tab_text = ctx.tr([I18nText.ActivityDaily, I18nText.ActivityWeekly])
-        if ui.search(activity, title_roi) and ui.search(tab_text):
-            pass
-        else:
+        if not ui.search(activity, title_roi) or not ui.search(tab_text):
             ui.click_point(activitySidebar, times=2, interval=0.3)
             if not ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot() and ui.search(activity, title_roi) and ui.search(tab_text)):
+                    lambda: ui.snapshot().search(activity, title_roi) and ui.search(tab_text)):
                 return None
-            ui.sleep(0.3)
+        ui.sleep(0.3)
         return I18nText.Activity
 
     return None
@@ -780,9 +774,9 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
     # 检查100活跃点是否为黄色待领取
     if ColorRule().points(pts_sp[num_points - 1]).colors(yellow).match(img):
         ui.click_point(pts_sp[num_points - 1], times=3, interval=0.25)
-        if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(tap_close)):
+        if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().click_text(tap_close, times=2, interval=0.2)):
             return False
-        ui.sleep(0.3).esc().sleep(0.3)
+        ui.sleep(0.3)
         logger.info(rf"Activity Pts >= {max_pts}")
         return True
 
@@ -794,9 +788,9 @@ def __doClaimActivityPts(ctx: NodeContext, local: TaskLocal, num_points: int, in
         # 检查活跃点是否为黄色待领取
         if ColorRule().points(pts_sp[i]).colors(yellow).match(img):
             ui.click_point(pts_sp[i], times=3, interval=0.25)
-            if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(tap_close)):
+            if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().click_text(tap_close, times=2, interval=0.2)):
                 return False
-            ui.sleep(0.3).esc().sleep(0.3)
+            ui.sleep(0.3)
             idx = i
             break
         # 检查活跃点是否为灰色已领取
@@ -2299,10 +2293,10 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         I18nText.Confirm,
     ])
 
-    def closePodcastTasksNotice():
+    def _closePodcastTasksNotice():
         ui.snapshot()
         # 可能弹窗获得奖励，需要点确定才关闭
-        if ui.click_text(confirm, delay=0.2):
+        if ui.click_text(confirm, times=2, interval=0.2):
             return False
         # 可能提示获得电台经验，切到电台任务页，能过去说明提示已消失
         if ui.search(pioneerPodcast):
@@ -2311,16 +2305,17 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return False
 
     # 先点电台任务
-    ui.sleep(0.3).click_point(sidebarsPodcastTasks, times=2, interval=0.2).sleep(0.3)
-    if ui.wait().until(lambda: ui.snapshot().search(podcastTasks)):
-        if ui.click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), delay=0.3, times=2, interval=0.2):
-            ui.sleep(1.5).wait(6, 0.4).until(closePodcastTasksNotice)
+    ui.sleep(0.3).click_point(sidebarsPodcastTasks, times=2, interval=0.2)
+    if ui.sleep(0.3).wait().until(lambda: ui.snapshot().search(podcastTasks)):
+        if ui.sleep(0.2).snapshot().click_text(
+                ctx.tr(I18nText.PioneerPodcastClaimAll), delay=0.2, times=2, interval=0.2):
+            ui.sleep(1.5).wait().until(_closePodcastTasksNotice)
 
     # 再点先约电台
-    ui.sleep(0.3).click_point(sidebarsPioneerPodcast, times=2, interval=0.2).sleep(0.3)
-    if ui.wait().until(lambda: ui.snapshot().search(pioneerPodcast)):
-        if ui.click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), pk=PointKind.NEAR, times=2, interval=0.2):
-            ui.sleep(2).wait(2, 0.4).until(lambda: ui.snapshot().click_text(confirm, delay=0.2, times=2, interval=0.2))
+    ui.sleep(0.3).click_point(sidebarsPioneerPodcast, times=2, interval=0.2)
+    if ui.sleep(0.3).wait().until(lambda: ui.snapshot().search(pioneerPodcast)):
+        if ui.sleep(0.2).snapshot().click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), times=2, interval=0.2):
+            ui.sleep(2).wait(3, 0.3).until(lambda: ui.snapshot().click_text(confirm, delay=0.2, times=2, interval=0.2))
 
     local.pioneerPodcastFSM.complete()
     ui.sleep(0.3).esc().sleep(1)

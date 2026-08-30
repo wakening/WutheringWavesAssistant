@@ -1,7 +1,7 @@
+import ctypes
 import logging
 import re
 from enum import Enum
-
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,28 @@ class Language(str, Enum):
 
     def __str__(self):
         return self.value
+
+    @staticmethod
+    def sys_lang():
+        buf = ctypes.create_unicode_buffer(85)
+        ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, len(buf))
+        _locale = buf.value.lower()
+
+        # if _locale in {"zh-tw", "zh-hk", "zh-mo"}:
+        #     return Language.ZH_TW
+
+        mapping = {
+            "zh": Language.ZH,
+            "en": Language.EN,
+            "ja": Language.JA,
+            "ko": Language.KO,
+            "es": Language.ES,
+            "fr": Language.FR,
+            "de": Language.DE,
+            "th": Language.TH,
+        }
+
+        return mapping.get(_locale.split("-")[0], Language.EN)
 
 
 def flex_ws(text: str):
@@ -240,6 +262,9 @@ class I18nText:
     WishesOfQuietSnowfall = "WishesOfQuietSnowfall"
     ReelOfSplicedMemories = "ReelOfSplicedMemories"
     ShadowOfShatteredDreams = "ShadowOfShatteredDreams"
+    SongOfFeatheredTrace = "SongOfFeatheredTrace"
+    HeartOfEvilsPurge = "HeartOfEvilsPurge"
+    LampOfNetherRoad = "LampOfNetherRoad"
 
     # ------- Login -------
     Bulletin = "Bulletin"
@@ -354,6 +379,11 @@ class I18nText:
     NightmarePurification = "NightmarePurification"
     TacetDiscordNest = "TacetDiscordNest"
 
+    ### ------- Guidebook common -------
+    Go = "Go"
+    Challenge = "Challenge"
+    DefeatTheEnemies = "DefeatTheEnemies"
+
     ### ------- Guidebook MaterialCollection ForgeryChallenge -------
     WingfallChasm = "WingfallChasm"
     SilentChasm = "SilentChasm"
@@ -411,6 +441,9 @@ class I18nText:
     TacetFieldRestart = "TacetFieldRestart"
     TacetFieldExit = "TacetFieldExit"
 
+    ### ------- Guidebook MaterialCollection BossChallenge -------
+    FilterToViewRewardsForEachPhase = "FilterToViewRewardsForEachPhase"
+
     ### ------- Guidebook MaterialCollection WeeklyChallenge -------
     WeeklyChallengeWeeklyChallenge = "WeeklyChallengeWeeklyChallenge"
     RemainingWeeklyAttempts = "RemainingWeeklyAttempts"
@@ -461,8 +494,6 @@ class I18nText:
     RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
     StagnantRunTacetDiscordNest = "StagnantRunTacetDiscordNest"
     TacetDiscordDefeated = "TacetDiscordDefeated"
-    Go = "Go"
-    Challenge = "Challenge"
 
     ## ------- Guidebook EnemyTracing -------
     Detect = "Detect"
@@ -502,6 +533,7 @@ class I18nText:
     # ------- 大世界拾取材料 -------
     PickAbsorb = "PickAbsorb"
     PickPickUp = "PickPickUp"
+    PickActivate = "PickActivate"
     PickLotusSeeds = "PickLotusSeeds"
     PickClimbingFig = "PickClimbingFig"
     PickIris = "PickIris"
@@ -850,7 +882,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Aemeath$"), raw="Aemeath"),
     },
     I18nText.LuukHerssen: {
-        Language.ZH: RegexStr(r"陆.*?赫斯$", raw="陆·赫斯"),
+        Language.ZH: RegexStr(r"^陆.?赫斯$", raw="陆·赫斯"),
         Language.EN: RegexStr(flex_ws(r"^Luuk.*?Herssen$"), raw="Luuk Herssen"),
     },
     I18nText.Sigrika: {
@@ -1008,35 +1040,35 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Dragon of Dirge$"), raw="Dragon of Dirge"),
     },
     I18nText.EnemyNightmareFeilianBeringal: {
-        Language.ZH: RegexStr(r"^梦.*?飞廉之猩$", raw="梦魇飞廉之猩"),
+        Language.ZH: RegexStr(r"^梦.*?飞廉之猩$", raw="梦魇·飞廉之猩"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Feilian Beringal$"), raw="Nightmare: Feilian Beringal"),
     },
     I18nText.EnemyNightmareImpermanenceHeron: {
-        Language.ZH: RegexStr(r"^梦.*?无常凶鹭$", raw="梦魇无常凶鹭"),
+        Language.ZH: RegexStr(r"^梦.*?无常凶鹭$", raw="梦魇·无常凶鹭"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Impermanence Heron$"), raw="Nightmare: Impermanence Heron"),
     },
     I18nText.EnemyNightmareTempestMephis: {
-        Language.ZH: RegexStr(r"^梦.*?云闪之鳞$", raw="梦魇云闪之鳞"),
+        Language.ZH: RegexStr(r"^梦.*?云闪之鳞$", raw="梦魇·云闪之鳞"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?TempestMephis$"), raw="Nightmare: Tempest Mephis"),
     },
     I18nText.EnemyNightmareThunderingMephis: {
-        Language.ZH: RegexStr(r"^梦.*?朔雷之鳞$", raw="梦魇朔雷之鳞"),
+        Language.ZH: RegexStr(r"^梦.*?朔雷之鳞$", raw="梦魇·朔雷之鳞"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Thundering Mephis$"), raw="Nightmare: Thundering Mephis"),
     },
     I18nText.EnemyNightmareCrownless: {
-        Language.ZH: RegexStr(r"^梦.*?无冠者$", raw="梦魇无冠者"),
+        Language.ZH: RegexStr(r"^梦.*?无冠者$", raw="梦魇·无冠者"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Crownless$"), raw="Nightmare: Crownless"),
     },
     I18nText.EnemyNightmareInfernoRider: {
-        Language.ZH: RegexStr(r"^梦.*?燎照之骑$", raw="梦魇燎照之骑"),
+        Language.ZH: RegexStr(r"^梦.*?燎照之骑$", raw="梦魇·燎照之骑"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Inferno Rider$"), raw="Nightmare: Inferno Rider"),
     },
     I18nText.EnemyNightmareMourningAix: {
-        Language.ZH: RegexStr(r"^梦.*?[哀袁]声.?$", raw="梦魇哀声鸷"),
+        Language.ZH: RegexStr(r"^梦.*?[哀袁]声.?$", raw="梦魇·哀声鸷"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Mourning Aix$"), raw="Nightmare: Mourning Aix"),
     },
     I18nText.EnemyNightmareLampylumenMyriad: {
-        Language.ZH: RegexStr(r"^梦.*?辉.军势$", raw="梦魇辉萤军势"),
+        Language.ZH: RegexStr(r"^梦.*?辉.军势$", raw="梦魇·辉萤军势"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Lampylumen Myriad$"), raw="Nightmare: Lampylumen Myriad"),
     },
     I18nText.EnemyFleurdelys: {
@@ -1044,7 +1076,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Fleurdelys$"), raw="Fleurdelys"),
     },
     I18nText.EnemyNightmareKelpie: {
-        Language.ZH: RegexStr(r"^梦.*?凯尔匹$", raw="梦魇凯尔匹"),
+        Language.ZH: RegexStr(r"^梦.*?凯尔匹$", raw="梦魇·凯尔匹"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Kelpie$"), raw="Nightmare: Kelpie"),
     },
     I18nText.EnemyLionessOfGlory: {
@@ -1052,7 +1084,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Lioness of Glory$"), raw="Lioness of Glory"),
     },
     I18nText.EnemyNightmareHecate: {
-        Language.ZH: RegexStr(r"^梦.*?赫卡.?$", raw="梦魇赫卡忒"),
+        Language.ZH: RegexStr(r"^梦.*?赫卡.?$", raw="梦魇·赫卡忒"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Hecate$"), raw="Nightmare: Hecate"),
     },
     I18nText.EnemyFenrico: {
@@ -1109,7 +1141,7 @@ I18N_TEXT = {
     },
 
     I18nText.CombatNightmareMourningAix: {
-        Language.ZH: RegexStr(r"梦.*?声.*?爱欲之容$", raw="梦魇・哀声鸷・爱欲之容"),
+        Language.ZH: RegexStr(r"梦.*?声.*?爱|爱欲之容$", raw="梦魇・哀声鸷・爱欲之容"),
         Language.EN: RegexStr(
             flex_ws(r"^Nightmare.*?Mourning Aix.*?Face of Lust$"),
             raw="Nightmare: Mourning Aix- Face of Lust"
@@ -1240,6 +1272,18 @@ I18N_TEXT = {
     I18nText.ShadowOfShatteredDreams: {
         Language.ZH: RegexStr(r"^碎梦亡鬼之魇$", raw="碎梦亡鬼之魇"),
         Language.EN: RegexStr(flex_ws(r"^Shadow of Shattered Dreams$"), raw="Shadow of Shattered Dreams"),
+    },
+    I18nText.SongOfFeatheredTrace: {
+        Language.ZH: RegexStr(r"^羽落空尘之歌$", raw="羽落空尘之歌"),
+        Language.EN: RegexStr(flex_ws(r"^Song of Feathered Trace$"), raw="Song of Feathered Trace"),
+    },
+    I18nText.HeartOfEvilsPurge: {
+        Language.ZH: RegexStr(r"^清邪荡煞之心$", raw="清邪荡煞之心"),
+        Language.EN: RegexStr(flex_ws(r"^Heart of Evil.?s Purge$"), raw="Heart of Evil's Purge"),
+    },
+    I18nText.LampOfNetherRoad: {
+        Language.ZH: RegexStr(r"^冥途夜行之灯$", raw="冥途夜行之灯"),
+        Language.EN: RegexStr(flex_ws(r"^Lamp of Nether Road$"), raw="Lamp of Nether Road"),
     },
 
     # ------- Login -------
@@ -1444,8 +1488,8 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Absorb$"), raw="Absorb"),
     },
     I18nText.ClaimRewards: {
-        Language.ZH: RegexStr(r"^领取奖励$", raw="领取奖励"),
-        Language.EN: RegexStr(flex_ws(r"^Claim Rewards$"), raw="Claim Rewards"),
+        Language.ZH: RegexStr(r"^.{0,2}领取奖励$", raw="领取奖励"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Claim Rewards$"), raw="Claim Rewards"),
     },
     I18nText.ChallengeAgain: {
         Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
@@ -1597,14 +1641,14 @@ I18N_TEXT = {
 
     ## ------- Guidebook Common -------
     I18nText.CannotPerformThisActionDuringBattle: {
-        Language.ZH: RegexStr(flex_ws(r"战斗中无法进行该操作"), raw="提示：战斗中无法进行该操作"),
+        Language.ZH: RegexStr(r"战斗中无法进行该操作", raw="提示：战斗中无法进行该操作"),
         Language.EN: RegexStr(
             flex_ws(r"Cannot perform this action during battle"),
             raw="Cannot perform this action during battle",
         ),
     },
     I18nText.CannotAdjustTheTeamLineupInTheCurrentState: {
-        Language.ZH: RegexStr(flex_ws(r"当前状态无法进行编队"), raw="当前状态无法进行编队"),
+        Language.ZH: RegexStr(r"当前状态无法进行编队", raw="当前状态无法进行编队"),
         Language.EN: RegexStr(
             flex_ws(r"Cannot adjust the team lineup in the current state"),
             raw="Cannot adjust the team lineup in the current state",
@@ -1707,6 +1751,10 @@ I18N_TEXT = {
     I18nText.Challenge: {
         Language.ZH: RegexStr(r"^直接挑战$", raw="直接挑战"),
         Language.EN: RegexStr(flex_ws(r"^Challenge$"), raw=r"Challenge"),
+    },
+    I18nText.DefeatTheEnemies: {
+        Language.ZH: RegexStr(r"^.{0,2}击败敌人$", raw="击败敌人"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Defeat the (enemies|enemy)$"), raw="Defeat the enemies"),
     },
 
     ### ------- Guidebook MaterialCollection ForgeryChallenge -------
@@ -1925,6 +1973,14 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
     },
 
+    ### ------- Guidebook MaterialCollection BossChallenge -------
+    I18nText.FilterToViewRewardsForEachPhase: {
+        Language.ZH: RegexStr(r"^筛选查看各等级奖励$", raw="筛选查看各等级奖励"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Filter to view rewards for each Phase$"),
+            raw="Filter to view rewards for each Phase"
+        ),
+    },
 
     ### ------- Guidebook MaterialCollection WeeklyChallenge -------
     I18nText.WeeklyChallengeWeeklyChallenge: {
@@ -2210,6 +2266,10 @@ I18N_TEXT = {
     I18nText.PickPickUp: {
         Language.ZH: RegexStr(r"拾取$", raw="拾取"),
         Language.EN: RegexStr(flex_ws(r"Pick Up$"), raw="Pick Up"),
+    },
+    I18nText.PickActivate: {
+        Language.ZH: RegexStr(r"^激活$", raw="激活"),
+        Language.EN: RegexStr(flex_ws(r"^Activate$"), raw="Activate"),
     },
     I18nText.PickLotusSeeds: {
         Language.ZH: RegexStr(r"莲实$", raw="莲实"),
@@ -2831,19 +2891,21 @@ I18N_TEXT = {
 class I18nTr:
 
     def __init__(self, lang: Language):
-        self._lang = lang
+        self._lang: Language = lang
 
-    def __call__(self, text_key: str | list[str], lang: str | None = None):
+    def __call__(self, text_key: str | list[str], lang: Language | None = None):
         if text_key is None:
             return None
         if isinstance(text_key, str):
             return self.t(text_key, lang)
         return [self.t(key, lang) for key in text_key]
 
-    def t(self, text_key: str, lang: str | None = None):
+    def t(self, text_key: str, lang: Language | None = None):
         if text_key is None:
             return None
         lang_map = I18N_TEXT.get(text_key)
         if not lang_map:
             return None
-        return lang_map.get(lang if lang is not None else self._lang)
+        if lang is None:
+            lang = self._lang
+        return lang_map.get(lang)

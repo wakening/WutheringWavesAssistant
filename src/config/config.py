@@ -76,10 +76,8 @@ class ConfigBase(BaseModel):
         )
 
 
-class BossRushConfig(ConfigBase):
-    autoCombatBetaV2: bool | None = None
+class BossConfig(ConfigBase):
     autoRestartPeriod: str | None = None
-    bossLevel: str | None = None
     bossName: list[str] | None = None
 
 
@@ -127,7 +125,7 @@ class SoarToTheBeatConfig(ConfigBase):
 
 
 class Config(ConfigBase):
-    bossRush: BossRushConfig = Field(default_factory=BossRushConfig)
+    boss: BossConfig = Field(default_factory=BossConfig)
     daily: DailyConfig = Field(default_factory=DailyConfig)
     explore: ExploreConfig = Field(default_factory=ExploreConfig)
     game: GameConfig = Field(default_factory=GameConfig)

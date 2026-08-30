@@ -53,7 +53,7 @@ class Color:
 
 class ColorRule:
     def __init__(self):
-        self._points: Sequence[AnchorPoint | Point] | Sequence[tuple[int, int]] = []
+        self._points: Sequence[AnchorPoint | Point | tuple[int, int]] = []
         self._groups = []  # (compiled_colors, mode)
 
     def points(self, pts):

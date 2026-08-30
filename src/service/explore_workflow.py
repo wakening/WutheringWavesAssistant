@@ -14,6 +14,7 @@ from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, Scaler
 from src.core.i18n import I18nText, Language
 from src.core.pages import UIOp
+from src.core.resonator import TeamMember, Resonator
 from src.core.resource import Resource, Icon
 from src.core.workflow import NodeContext, AbstractWorkflow
 from src.service.common_workflow import RateLimiter
@@ -99,79 +100,10 @@ class ExploreWorkflow(AbstractWorkflow):
                 AnchorPoint(1280, 400, Align.Top | Align.Right),
             ),
         ]
-        self.avatar_map = {
-            "T_IconRoleHead150_1.png": I18nText.Yangyang,
-            "T_IconRoleHead150_2.png": I18nText.Chixia,
-            "T_IconRoleHead150_3.png": I18nText.Verina,
-            "T_IconRoleHead150_4.png": I18nText.Rover,
-            "T_IconRoleHead150_4_a_UI.png": I18nText.Rover,
-            "T_IconRoleHead150_5.png": I18nText.Rover,
-            "T_IconRoleHead150_5_a_UI.png": I18nText.Rover,
-            "T_IconRoleHead150_6.png": I18nText.Baizhi,
-            "T_IconRoleHead150_7.png": I18nText.Sanhua,
-            "T_IconRoleHead150_7_a.png": I18nText.Sanhua,
-            "T_IconRoleHead150_8.png": I18nText.Encore,
-            "T_IconRoleHead150_9.png": I18nText.Taoqi,
-            "T_IconRoleHead150_10.png": I18nText.Danjin,
-            "T_IconRoleHead150_11.png": I18nText.Jiyan,
-            "T_IconRoleHead150_12.png": I18nText.Aalto,
-            "T_IconRoleHead150_13.png": I18nText.Mortefi,
-            "T_IconRoleHead150_14.png": I18nText.Lingyang,
-            "T_IconRoleHead150_15.png": I18nText.Yuanwu,
-            "T_IconRoleHead150_17.png": I18nText.Yinlin,
-            "T_IconRoleHead150_18.png": I18nText.Calcharo,
-            "T_IconRoleHead150_23_UI.png": I18nText.Jianxin,
-            "T_IconRoleHead150_24_a_UI.png": I18nText.Jinhsi,
-            "T_IconRoleHead150_24_UI.png": I18nText.Jinhsi,
-            "T_IconRoleHead150_25_UI.png": I18nText.XiangliYao,
-            "T_IconRoleHead150_26_a_UI.png": I18nText.Changli,
-            "T_IconRoleHead150_26_UI.png": I18nText.Changli,
-            "T_IconRoleHead150_27_UI.png": I18nText.Zhezhi,
-            "T_IconRoleHead150_28_UI.png": I18nText.Shorekeeper,
-            "T_IconRoleHead150_29_UI.png": I18nText.Camellya,
-            "T_IconRoleHead150_30_UI.png": I18nText.Lumi,
-            "T_IconRoleHead150_31_UI.png": I18nText.Youhu,
-            "T_IconRoleHead150_32_a_UI.png": I18nText.Carlotta,
-            "T_IconRoleHead150_32_UI.png": I18nText.Carlotta,
-            "T_IconRoleHead150_33_UI.png": I18nText.Roccia,
-            "T_IconRoleHead150_34_UI.png": I18nText.Cantarella,
-            "T_IconRoleHead150_37_UI.png": I18nText.Ciaccona,
-            "T_IconRoleHead150_38_a_UI.png": I18nText.Zanni,
-            "T_IconRoleHead150_38_UI.png": I18nText.Zanni,
-            "T_IconRoleHead150_40_UI.png": I18nText.Cartethyia,
-            "T_IconRoleHead150_41_UI.png": I18nText.Phrolova,
-            "T_IconRoleHead150_44_UI.png": I18nText.Brant,
-            "T_IconRoleHead150_45_UI.png": I18nText.Phoebe,
-            "T_IconRoleHead150_46_UI.png": I18nText.Lupa,
-            "T_IconRoleHead150_48_UI.png": I18nText.Iuno,
-            "T_IconRoleHead150_51_UI.png": I18nText.Augusta,
-            "T_IconRoleHead150_53_UI.png": I18nText.Aemeath,
-            "T_IconRoleHead150_54_UI.png": I18nText.LuukHerssen,
-            "T_IconRoleHead150_55_UI.png": I18nText.Galbrena,
-            "T_IconRoleHead150_56_UI.png": I18nText.Qiuyuan,
-            "T_IconRoleHead150_57_Skin1_UI.png": I18nText.Chisa,
-            "T_IconRoleHead150_57_UI.png": I18nText.Chisa,
-            "T_IconRoleHead150_58_UI.png": I18nText.Buling,
-            "T_IconRoleHead150_60_Skin1_UI.png": I18nText.Lynae,
-            "T_IconRoleHead150_60_UI.png": I18nText.Lynae,
-            "T_IconRoleHead150_61_Skin1_UI.png": I18nText.Mornye,
-            "T_IconRoleHead150_61_UI.png": I18nText.Mornye,
-            "T_IconRoleHead150_64_UI.png": I18nText.Denia,
-            "T_IconRoleHead150_65_UI.png": I18nText.Sigrika,
-            "T_IconRoleHead150_66_UI.png": I18nText.Lucilla,
-            "T_IconRoleHead150_67_UI.png": I18nText.Hiyuki,
-            "T_IconRoleHead150_68_UI.png": I18nText.Lucy,
-            "T_IconRoleHead150_69_UI.png": I18nText.Rebecca,
-            "T_IconRoleHead150_70_UI.png": I18nText.YangyangXuanling,
-            "T_IconRoleHead150_71_UI.png": I18nText.Suisui,
-            "T_IconRoleHead150_73_Guest1_UI.png": I18nText.Qingxiao,
-            "T_IconRoleHead150_73_UI.png": I18nText.Qingxiao,
-            "T_IconRoleHead150_74_UI.png": I18nText.Jingran,
-        }
-        self.role_features = None
         self.pickup_texts = ctx.tr([
             I18nText.PickAbsorb,
             I18nText.PickPickUp,
+            # I18nText.PickActivate,
             I18nText.PickLotusSeeds,
             I18nText.PickClimbingFig,
             I18nText.PickIris,
@@ -392,14 +324,17 @@ class ExploreWorkflow(AbstractWorkflow):
 
     def __async_init(self):
 
-        def _():
+        def _foo():
             with self.async_init_lock:
-                self.role_features = self.__init_role_features()
+                TeamMember.load_role_features()
+
+        def _bar():
             with self.async_init_ocr_lock:
                 # 预热
                 UIOp(self.ctx).snapshot(img=img_util.create_dummy())
 
-        self.executor.submit(_)
+        self.executor.submit(_foo)
+        self.executor.submit(_bar)
 
     def _skip(self, img):
         ui = UIOp(self.ctx)
@@ -482,9 +417,9 @@ class ExploreWorkflow(AbstractWorkflow):
                 return True
 
             try:
-                end_time = time.monotonic() + 4
+                deadline = time.monotonic() + 4
                 idx = 0
-                while ui.is_set() and end_time - time.monotonic() > 0:
+                while ui.is_set() and time.monotonic() < deadline:
                     nonlocal last_time
 
                     # _start_time = time.monotonic()
@@ -642,46 +577,6 @@ class ExploreWorkflow(AbstractWorkflow):
             return None
         return bbox.random
 
-    def __init_role_features(self):
-        role_features = []
-        logger.info("Loading resources")
-        start_time = time.monotonic()
-        for p in Resource.Unpacked.IconRoleHead150.glob("*.png"):
-            # logger.debug(p.absolute())
-            feature_image = img_util.read_img(p.absolute())
-            feature_data = self.matcher.build_feature_data_masked(feature_id=p.name, image=feature_image)
-            role_features.append(feature_data)
-        logger.info(f"Loading complete. (Duration: {time.monotonic() - start_time:.2f}s)")
-        return role_features
-
-    def member_count(self):
-        cc = Color.bgr(241, 241, 241)
-        points = [
-            [
-                AnchorPoint(1158, 146, Align.Top | Align.Right),
-                AnchorPoint(1160, 151, Align.Top | Align.Right),
-                AnchorPoint(1166, 143, Align.Top | Align.Right),
-                AnchorPoint(1166, 151, Align.Top | Align.Right),
-            ],
-            [
-                AnchorPoint(1159, 234, Align.Top | Align.Right),
-                AnchorPoint(1158, 240, Align.Top | Align.Right),
-                AnchorPoint(1167, 231, Align.Top | Align.Right),
-                AnchorPoint(1168, 240, Align.Top | Align.Right),
-            ],
-            [
-                AnchorPoint(1159, 322, Align.Top | Align.Right),
-                AnchorPoint(1158, 328, Align.Top | Align.Right),
-                AnchorPoint(1167, 319, Align.Top | Align.Right),
-                AnchorPoint(1168, 328, Align.Top | Align.Right),
-            ],
-        ]
-        img = self.ui.grap()
-        scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
-        result = [ColorRule().points(p).colors(cc, 20, RuleMode.ALL).match(img, scaler) for p in points]
-        white_count = sum(x for x in result)
-        return min(white_count + 1, 3)
-
     def _on_click(self, button, pressed):
         if not pressed:  # 忽略弹起信号
             return True
@@ -698,38 +593,24 @@ class ExploreWorkflow(AbstractWorkflow):
                     self.last_time = time.monotonic()
 
                     # 等待资源加载
-                    if self.role_features is None:
-                        with self.async_init_lock:
-                            if self.role_features is None:
-                                return True
+                    with self.async_init_lock:
+                        pass
 
                     img = self.ui.grap()
                     if not self.ui.is_on_homepage(img):
                         logger.warning(f"[{self.count:03d}] Not in the overworld")
                         # return True
 
-                    team_members = [None, None, None]
-                    scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
-                    for index, member_roi in enumerate(self.members_roi):
-                        cur_roi = scaler.as_bbox(member_roi)
-                        scene_image = img[cur_roi.as_slice()]
-                        results = self.matcher.identify_roles(scene_image, self.role_features, min_good_matches=3)
-                        logger.debug(f"identify_roles: {results}")
-                        if not results:
-                            continue
-                        avatar_key = self.avatar_map.get(results[0])
-                        if not avatar_key:
-                            continue
-                        team_members[index] = self.ctx.tr(avatar_key, lang=Language.ZH).raw
-                    logger.debug(f"team_members: {team_members}")
-
-                    member_count = self.member_count()
+                    member_count = TeamMember.get_size(img)
                     logger.debug(f"member_count: {member_count}")
 
+                    team_members = TeamMember.member_keys(img)
                     for i in range(3):
                         if i + 1 <= member_count:
-                            if team_members[i] is None:
+                            if not team_members[i] or not (tr_res := self.ctx.tr(team_members[i], lang=Language.ZH)):
                                 team_members[i] = "unknown"
+                                continue
+                            team_members[i] = tr_res.raw
                         else:
                             team_members[i] = None
 

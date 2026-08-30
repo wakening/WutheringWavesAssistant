@@ -20,7 +20,6 @@ from src.gui.common.style_sheet import StyleSheet
 from src.gui.view.home.echo import EchoWidget
 from src.gui.view.home.events import EventsWidget
 from src.gui.view.home.explore import ExploreWidget
-from src.gui.view.home.story import StoryWidget
 
 logger = logging.getLogger(__name__)
 

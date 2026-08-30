@@ -51,8 +51,14 @@ class YoloServiceImpl(ODService):
         )
 
     @timeit(ignore=3)
-    def search_echo(self, img: np.ndarray | None = None, confidence: float = None) -> tuple[int, int, int, int] | None:
-        boss_name = self._context.boss_task_ctx.lastBossName
+    def search_echo(
+            self,
+            img: np.ndarray | None = None,
+            confidence: float| None = None,
+            boss_name: str | None = None,
+    ) -> tuple[int, int, int, int] | None:
+        if not boss_name:
+            boss_name = self._context.boss_task_ctx.lastBossName
         if img is None:
             img = self._img_service.screenshot()
         # with self._rlock:
@@ -72,6 +78,35 @@ class YoloServiceImpl(ODService):
         logger.debug("box: %s, scores: %s, class_id: %s", box, score, class_id)
         # x1, y1, w, h = box
         return box
+
+    @timeit(ignore=3)
+    def search_echo_2(
+            self,
+            img: np.ndarray | None = None,
+            confidence: float | None = None,
+            boss_name: str | None = None,
+    ) -> Detection | None:
+        if not boss_name:
+            boss_name = self._context.boss_task_ctx.lastBossName
+        if img is None:
+            img = self._img_service.screenshot()
+        # with self._rlock:
+        model = self.get_model_by_boss_name(boss_name)
+        if self._current_model != model:
+            self._current_model = model
+            logger.debug("Switch model: %s", model.name)
+            timestamp = time.time()
+            self._session = self._create_session(self._current_model.path)
+            logger.debug("Session creation time: %s seconds", int(time.time() - timestamp))
+        if confidence is None or confidence <= 0:
+            confidence = model.confidence_thres
+        results = yolo_util.search_echo(self._session, img, confidence, model.iou_thres, model.half)
+        if results is None:
+            return None
+        box, score, class_id = results
+        logger.debug("box: %s, scores: %s, class_id: %s", box, score, class_id)
+        # x1, y1, w, h = box
+        return Detection.from_xywh(*box, score=score, class_id=class_id)
 
     @staticmethod
     def get_model_by_boss_name(boss_name: str):

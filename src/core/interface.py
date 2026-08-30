@@ -138,7 +138,21 @@ class ODService(ABC):
     """Object Detection（目标检测）"""
 
     @abstractmethod
-    def search_echo(self, img: np.ndarray | None = None, confidence: float = None) -> tuple[int, int, int, int] | None:
+    def search_echo(
+            self,
+            img: np.ndarray | None = None,
+            confidence: float | None = None,
+            boss_name: str | None = None,
+    ) -> tuple[int, int, int, int] | None:
+        pass
+
+    @abstractmethod
+    def search_echo_2(
+            self,
+            img: np.ndarray | None = None,
+            confidence: float | None = None,
+            boss_name: str | None = None,
+    ) -> Detection | None:
         pass
 
     @abstractmethod
