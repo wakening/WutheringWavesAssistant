@@ -898,43 +898,86 @@ class TeamMember:
         logger.debug(f"Loading complete. (Duration: {time.monotonic() - start_time:.2f}s)")
         return role_features
 
+    @staticmethod
+    def __spacing():
+        """右侧角色头像之间的间距，血条高度差"""
+        return 280 - 192
+
     @classmethod
-    def member_keys(cls, img: np.ndarray) -> list[str | None]:
+    def get_members_by_icon(cls, img: np.ndarray) -> list[str | None]:
+        """大世界通过右侧角色图标识别角色"""
         role_features = cls.load_role_features()
-        roi_members = [
-            AnchorBBox(
-                AnchorPoint(1140, 116, Align.Top | Align.Right),
-                AnchorPoint(1280, 210, Align.Top | Align.Right),
-            ),
-            AnchorBBox(
-                AnchorPoint(1140, 210, Align.Top | Align.Right),
-                AnchorPoint(1280, 300, Align.Top | Align.Right),
-            ),
-            AnchorBBox(
-                AnchorPoint(1130, 300, Align.Top | Align.Right),
-                AnchorPoint(1280, 400, Align.Top | Align.Right),
-            ),
-        ]
         matcher = SIFTFeatureMatcher()
         mappings = Resonator.avatar_mappings()
         scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
 
-        member_keys = [None, None, None]
-        for index, roi in enumerate(roi_members):
+        member_keys = []
+        spacing = cls.__spacing()
+        for i in range(3):
+            roi = AnchorBBox(
+                AnchorPoint(1140, 116 + spacing * i, Align.Top | Align.Right),
+                AnchorPoint(1280, 210 + spacing * i, Align.Top | Align.Right),
+            )
             scene_image = img[scaler.as_bbox(roi).as_slice()]
             res = matcher.identify_roles(scene_image, role_features, min_good_matches=3)
             logger.debug(f"identify_roles: {res}")
             if not res:
+                member_keys.append(None)
                 continue
-            avatar_key = mappings.get(res[0])
-            if not avatar_key:
-                continue
-            member_keys[index] = avatar_key
+            member_keys.append(mappings.get(res[0], None))
         logger.debug(f"member_keys: {member_keys}")
 
+        cls.__print_keys(member_keys)
+        return member_keys
+
+    @classmethod
+    def get_members_by_text(cls, ui) -> list[str | None]:
+        """编队里通过角色名称识别角色"""
+        res = []
+        img = ui.img
+        ctx = ui.ctx
+        meta = [
+            (
+                AnchorPoint(433, 569, Align.Center | Align.Middle),
+                AnchorBBox(
+                    AnchorPoint(200, 540, Align.Center | Align.Middle),
+                    AnchorPoint(510, 600, Align.Center | Align.Middle)
+                )
+            ),
+            (
+                AnchorPoint(810, 569, Align.Center | Align.Middle),
+                AnchorBBox(
+                    AnchorPoint(576, 540, Align.Center | Align.Middle),
+                    AnchorPoint(888, 600, Align.Center | Align.Middle)
+                )
+            ),
+            (
+                AnchorPoint(1187, 569, Align.Center | Align.Middle),
+                AnchorBBox(
+                    AnchorPoint(954, 540, Align.Center | Align.Middle),
+                    AnchorPoint(1280, 600, Align.Center | Align.Middle)
+                )
+            )
+        ]
+        keys = Resonator.i18n_keys()
+        for m in meta:
+            cr = ColorRule().points(m[0]).colors(Color.bgr(22, 18, 13))
+            # 有黑色就说明有角色
+            if not cr.match(img, ctx.scaler):
+                res.append(None)
+                continue
+            # 按名字逐个匹配，匹配不到就是漂子
+            result = next((k for k in keys if ui.search(ctx.tr(k), m[1])), I18nText.Rover)
+            res.append(result)
+
+        cls.__print_keys(res)
+        return res
+
+    @staticmethod
+    def __print_keys(keys):
         tr = I18nTr(Language.sys_lang())
         tr_keys = []
-        for key in member_keys:
+        for key in keys:
             if not key:
                 tr_keys.append(None)
                 continue
@@ -945,7 +988,31 @@ class TeamMember:
             tr_keys.append(res.raw)
         logger.debug(f"Members: {tr_keys}")
 
-        return member_keys
+    @classmethod
+    def downed(cls, img: np.ndarray, tolerance: int = 1, ratio: float = 0.5) -> list[bool]:
+        """
+        角色是否阵亡
+        判断区域内是否有足够比例的灰色像素。
+
+        img: BGR 图像，形状 (H, W, 3)
+        tolerance: BGR 三通道允许的最大差值
+        ratio: 灰色像素占比阈值，理论上是全灰，但刚阵亡时，可能有切人倒计时，那个数字不是灰的
+        """
+        spacing = cls.__spacing()
+        scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
+        res = []
+        for i in range(3):
+            roi = AnchorBBox(
+                AnchorPoint(1193, 162 + spacing * i, Align.Top | Align.Right),
+                AnchorPoint(1201, 170 + spacing * i, Align.Top | Align.Right),
+            )
+            cropped_img = img[scaler.as_bbox(roi).as_slice()]
+            diff = cropped_img.max(axis=2) - cropped_img.min(axis=2)
+            gray_ratio = np.mean(diff <= tolerance)
+            # logger.debug(f"gray_ratio: {gray_ratio}")
+            res.append(gray_ratio >= ratio)
+        # logger.info(f"downed: {res}")
+        return res
 
     # # def reset_state(self, member_keys: list, morph: Morph) -> bool:
     # def reset_state(self, morph: Morph) -> bool:
@@ -1011,4 +1078,5 @@ class TeamMember:
 if __name__ == '__main__':
     from src.util import file_util
     print(Resonator.from_key(I18nText.Cartethyia))
-    print(TeamMember.member_keys(img_util.read_img(file_util.get_temp_screenshot("screenshot_1787206343_88366840.png"))))
+    print(TeamMember.get_members_by_icon(img_util.read_img(file_util.get_temp_screenshot("screenshot_1787206343_88366840.png"))))
+    print(TeamMember.downed(img_util.read_img(file_util.get_temp_screenshot("screenshot_1788213527_21789223.png"))))

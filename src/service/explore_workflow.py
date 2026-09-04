@@ -1,6 +1,7 @@
 import ctypes
 import logging
 import random
+import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -86,21 +87,7 @@ class ExploreWorkflow(AbstractWorkflow):
         self.ui = UIOp(ctx)
         self.ctx = ctx
         self.matcher = SIFTFeatureMatcher()
-        self.members_roi = [
-            AnchorBBox(
-                AnchorPoint(1140, 116, Align.Top | Align.Right),
-                AnchorPoint(1280, 210, Align.Top | Align.Right),
-            ),
-            AnchorBBox(
-                AnchorPoint(1140, 210, Align.Top | Align.Right),
-                AnchorPoint(1280, 300, Align.Top | Align.Right),
-            ),
-            AnchorBBox(
-                AnchorPoint(1130, 300, Align.Top | Align.Right),
-                AnchorPoint(1280, 400, Align.Top | Align.Right),
-            ),
-        ]
-        self.pickup_texts = ctx.tr([
+        self.pickup_texts = [
             I18nText.PickAbsorb,
             I18nText.PickPickUp,
             # I18nText.PickActivate,
@@ -213,7 +200,8 @@ class ExploreWorkflow(AbstractWorkflow):
             I18nText.PickTidalSupplyChest,
             I18nText.PickTidalHeritage,
             I18nText.PickAdvancedSupplyPack,
-        ])
+        ]
+        self.pickup_mappings = {i: self.ctx.tr(i) for i in self.pickup_texts}
 
         self.count = 1
 
@@ -347,11 +335,11 @@ class ExploreWorkflow(AbstractWorkflow):
         )
         search_btn = lambda _img: self.__search_btn(
             _img, Icon.plotBtnSkip(), roi,
-            scale_min=0.238,  # 全屏：score=0.9217, scale=0.314，黑边；score=0.9108, scale=0.238
+            scale_min=0.238,  # 全屏：score=0.9217, scale=0.314；score=0.9398, scale=0.327；黑边；score=0.9108, scale=0.238
             scale_max=0.314,
             scale_step=0.314 - 0.238,
             early_score=0.85,
-            score_max=0.75,
+            score_max=0.72,
         )
         if not (icon_point := search_btn(img)):
             return False
@@ -469,7 +457,7 @@ class ExploreWorkflow(AbstractWorkflow):
 
             return False
 
-        # 锁被占用，控制并发
+        # 控制并发
         if not self.async_skip_lock.locked():
             # 锁未被占用，异步检查跳过剧情弹窗
             self.executor.submit(_)
@@ -543,12 +531,20 @@ class ExploreWorkflow(AbstractWorkflow):
         )
         ui.snapshot(img=img, roi=roi)
 
-        for text in self.pickup_texts:
+        for key, text in self.pickup_mappings.items():
             res = ui.search(text)
             if not res:
                 continue
             logger.info(text.raw)
-            ui.pick_up(times=max(3, min(5, len(res) + 1)), interval=round(random.uniform(0.06, 0.10), 3))
+            if key == I18nText.PickPremiumSupplyChest:
+                # 宝箱怪
+                ui.pick_up().sleep(0.1)
+                self.ctx.control_service.dash_dodge()
+            elif key == I18nText.PickSeaBunny:
+                ui.pick_up().sleep(0.1)
+                self.ctx.control_service.attack()
+            else:
+                ui.pick_up(times=max(3, min(5, len(res) + 1)), interval=round(random.uniform(0.06, 0.10), 3))
             return True
         return False
 
@@ -601,21 +597,23 @@ class ExploreWorkflow(AbstractWorkflow):
                         logger.warning(f"[{self.count:03d}] Not in the overworld")
                         # return True
 
-                    member_count = TeamMember.get_size(img)
-                    logger.debug(f"member_count: {member_count}")
-
-                    team_members = TeamMember.member_keys(img)
+                    member_size = TeamMember.get_size(img)
+                    logger.debug(f"member_size: {member_size}")
+                    member_keys = TeamMember.get_members_by_icon(img)
+                    pattern = re.compile(r"[·_-]")
+                    members = []
                     for i in range(3):
-                        if i + 1 <= member_count:
-                            if not team_members[i] or not (tr_res := self.ctx.tr(team_members[i], lang=Language.ZH)):
-                                team_members[i] = "unknown"
-                                continue
-                            team_members[i] = tr_res.raw
-                        else:
-                            team_members[i] = None
+                        if i + 1 > member_size:
+                            members.append(None)
+                            continue
+                        if member_keys[i] and (tr_res := self.ctx.tr(member_keys[i])):
+                            members.append(pattern.sub("", tr_res.raw))
+                            continue
+                        members.append("unknown")
+                    logger.info(f"team: {members}")
 
                     combat_system = CombatSystem(self.ctx.control_service, self.ctx.img_service)
-                    combat_system.set_resonators(team_members)
+                    combat_system.set_resonators(members, is_print=False)
                     combat_system.is_async = True
                     combat_system.check_boss_hp = False
                     combat_system.auto_pickup = True

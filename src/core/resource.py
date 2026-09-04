@@ -22,12 +22,12 @@ class Resource:
         ROOT = _ROOT / "assets/map"
 
         class Huanglong:
-            ROOT = _ROOT / "Huanglong"
+            ROOT = _ROOT / "assets/map/Huanglong"
             Jinzhou = ROOT / "Jinzhou"
             Mengzhou = ROOT / "Mengzhou"
 
         class RoyaFrostlands:
-            ROOT = _ROOT / "Roya Frostlands"
+            ROOT = _ROOT / "assets/map/Roya Frostlands"
             DimmrPlains = ROOT / "Dimmr Plains"
             FrostlandsSurface = ROOT / "Frostlands Surface"
             LahaiRoi = ROOT / "Lahai-Roi"

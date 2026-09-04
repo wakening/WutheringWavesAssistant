@@ -2021,7 +2021,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
                     ui.esc().sleep(1)
                     return False
-                scene_img = ui.img
+                scene_img = ui.sleep(0.3).grap()
                 result = matcher.match(scene_img, feature_data)
                 if result is None:
                     logger.warning("Feature match failed")
@@ -2036,7 +2036,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if not ui.sleep(0.5).wait().until(
                         lambda: ui.snapshot().click_text(
                             ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
-                    scene_img = ui.grap()
+                    scene_img = ui.sleep(0.3).grap()
                     result = matcher.match(scene_img, feature_data)
                     if result is None:
                         logger.warning("Feature match failed")
@@ -2048,7 +2048,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ctx.control_service.scroll_mouse(100, x, y)
                     ui.sleep(0.3)
 
-                    scene_img = ui.grap()
+                    scene_img = ui.sleep(0.3).grap()
                     result = matcher.match(scene_img, feature_data)
                     if result is None:
                         logger.warning("Feature match failed")

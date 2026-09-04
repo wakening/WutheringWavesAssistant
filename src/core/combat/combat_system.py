@@ -97,6 +97,7 @@ class CombatSystem:
 
         self.auto_pickup: bool = False
         self.check_boss_hp: bool = True
+        self.is_paused: bool = False
 
     # def get_resonators(self) -> list[BaseResonator]:
     #     resonators = []
@@ -150,6 +151,7 @@ class CombatSystem:
         while True:
             # 暂停
             # logger.debug("member: %s", index + 1)
+            self.is_paused = True
             # 主动暂停
             if not event.is_set():
                 # logger.info("暂停中，event.is_set()")
@@ -160,6 +162,7 @@ class CombatSystem:
                 # logger.info("暂停中，delay_time")
                 time.sleep(0.3)
                 continue
+            self.is_paused = False
 
             if last_time is None:
                 last_time = time.monotonic()
@@ -258,10 +261,17 @@ class CombatSystem:
                 if not t.is_alive():
                     break
 
-    def pause(self):
+    def pause(self, join: bool = False):
         with self._lock:
             self.event.clear()
             # logger.debug("combat pause")
+            if not join:
+                return
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                if self._thread is None or self.is_paused:
+                    return
+                time.sleep(0.1)
 
     def set_resonators(self, resonator_names_zh: list[str | None], is_print: bool = True):
         resonators: list[BaseResonator] = []

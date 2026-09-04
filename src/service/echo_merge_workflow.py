@@ -268,7 +268,7 @@ def doStandardMerge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return _fail_return()
         logger.info(f"Merge: {idx}")
         ui.click_text(select_all, delay=0.3)
-        ui.click_text(standard_merge, delay=0.2)
+        ui.click_text(standard_merge, delay=0.2, times=2, interval=0.2)
 
         # 等待合成结果
         if not ui.sleep(0.4).wait(8, 0.3).until(_wait_new_echo):

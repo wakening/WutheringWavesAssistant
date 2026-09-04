@@ -2,6 +2,7 @@ import logging
 import re
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from functools import cached_property
 from typing import Optional
 
@@ -13,7 +14,7 @@ from src.core.i18n import I18nText
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp
 from src.core.workflow import NodeContext
-from src.util import img_util, file_util, img_template_util
+from src.util import img_template_util
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +99,7 @@ class RoiEx:
         ))
 
     @cached_property
-    def guidebook_item(self) -> BBox:
+    def guidebook_menu(self) -> BBox:
         """索拉指南左侧选项区"""
         return self.scaler.as_bbox(AnchorBBox(
             AnchorPoint(0, 0, Align.Left | Align.Top),
@@ -151,41 +152,58 @@ def absorb_around_variant(ctx: NodeContext):
 
 
 class AsyncPickup:
+    """异步拾取，全局共享，不可并发使用"""
 
-    def __init__(self, ctx, *, delay: float = 0.0, event=None):
+    EXECUTOR = ThreadPoolExecutor(max_workers=1)
+
+    def __init__(self, ctx, *, delay: float = 0.0, event=None, interval: float = 0.05):
         self.ctx = ctx
         self.delay = max(0, min(delay, 60))
         self.event = event
         if self.event is None:
             self.event = threading.Event()
             self.event.set()
-
-        self.thread = threading.Thread(target=self._pickup)
-        self.thread.daemon = True
+        self.interval = max(0.05, interval)
+        self.future = None
 
     def _pickup(self):
-        t = 0.05
-        if self.delay > 0:
-            delay = self.delay
-            while self.event.is_set():
-                if delay - t > 0:
-                    time.sleep(t)
-                    delay -= t
-                    continue
-                time.sleep(delay)
-                break
+        self._sleep(self.delay)
         while self.event.is_set():
             self.ctx.control_service.pick_up()
+            self._sleep(self.interval)
+
+    def _sleep(self, seconds: float):
+        if seconds <= 0:
+            return
+        t = 0.05
+        while seconds > t:
+            if not self.event.is_set():
+                return
             time.sleep(t)
+            seconds -= t
+        if not self.event.is_set():
+            return
+        if seconds > 0:
+            time.sleep(seconds)
+        return
+
+    def start(self):
+        if self.future is not None:
+            return
+        self.future = self.EXECUTOR.submit(self._pickup)
+
+    def stop(self):
+        self.event.clear()
+        if self.future is not None:
+            self.future.result()
+            self.future = None
 
     def __enter__(self):
-        self.thread.start()
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        self.event.clear()
-        if self.thread.is_alive():
-            self.thread.join(timeout=1)
+        self.stop()
 
 
 def absorb_around_variant_blind(ctx: NodeContext):
@@ -383,6 +401,183 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
     return None, None
 
 
+class ObjectDetector:
+    """目标检测"""
+
+    # ---------- 内部辅助类 ----------
+    class _TargetTracker:
+        """目标位置跟踪器，带有简单容错机制"""
+
+        def __init__(self, max_tolerance: int = 1):
+            self.last_box = None
+            self.tolerance = max_tolerance
+            self.max_tolerance = max_tolerance
+
+        def update(self, detected_box):
+            """
+            输入本次检测到的目标框（可能为 None）。
+            返回应该使用的目标框（detected 或缓存的 last_box）。
+            """
+            if detected_box:
+                self.last_box = detected_box
+                self.tolerance = min(self.max_tolerance, self.tolerance + 1)
+                return detected_box
+            elif self.last_box is not None and self.tolerance > 0:
+                self.tolerance -= 1
+                return self.last_box
+            else:
+                self.last_box = None
+                return None
+
+    class _WanderHelper:
+        """无目标时的探索移动策略"""
+
+        def __init__(self, control, ui):
+            self.control = control
+            self.ui = ui
+            self.step_counter = 0
+            self.camera_reset_count = 0
+
+        def reset_step(self):
+            self.step_counter = 0
+
+        def wander_and_reset(self):
+            """执行一次探索移动，并重置视角，每8次触发特殊绕行"""
+            self.step_counter += 1
+
+            # 可能被遮挡，走开一段距离重新识别
+            if self.step_counter > 1 and self.step_counter % 5 == 0:
+                logger.debug("Special anti-block move: forward + left")
+                for _ in range(5):
+                    self.control.up(0.08)
+                    self.ui.sleep(0.08)
+                for _ in range(3):
+                    self.control.left(0.08)
+                self.ui.sleep(0.1)
+                return
+
+            # 转动视角
+            logger.debug("Wandering with WA + camera reset")
+            self.control.left(0.1)
+            self.ui.sleep(0.2).camera_reset().sleep(0.8)
+            self.camera_reset_count += 1
+            return
+
+        # def wander_and_reset2(self):
+        #     """执行一次探索移动，并重置视角，每8次触发特殊绕行"""
+        #     self.step_counter += 1
+        #
+        #     # 可能被遮挡，走开一段距离重新识别
+        #     if self.step_counter % self.batch_size == 0:
+        #         if self.step_counter >= self.batch_size * 2:
+        #             return
+        #         logger.debug("Special anti-block move: forward + left")
+        #         for _ in range(5):
+        #             self.control.up(0.08)
+        #             self.ui.sleep(0.08)
+        #         for _ in range(3):
+        #             self.control.left(0.08)
+        #         self.ui.sleep(0.1)
+        #         return
+        #
+        #     # 转动视角
+        #     logger.debug("Wandering with WA + camera reset")
+        #     if self.step_counter % self.batch_size == 0:
+        #         self.control.key_down("w")
+        #         self.control.key_down("a")
+        #         self.ui.sleep(0.1)
+        #         self.control.key_up("w")
+        #         self.control.key_up("a")
+        #     else:
+        #         self.control.key_down("a")
+        #         self.ui.sleep(0.1)
+        #         self.control.key_up("a")
+        #     self.ui.sleep(0.2).camera_reset().sleep(0.8)
+
+    def __init__(self, ctx: NodeContext):
+        self.ctx = ctx
+
+    def absorb_echoes(self, timeout: float = 20.0, enemy_name: Optional[str] = None):
+        """
+        持续搜索并移动到回声目标，直到出现“吸收”交互项并拾取。
+        返回是否成功吸收。
+        """
+        logger.debug("Absorb echoes")
+
+        ctx = self.ctx
+        ui = UIOp(ctx)
+        control = ctx.control_service
+        od = ctx.od_service
+        roi_dialogue = RoiEx(ctx).dialogue
+        window_half_width = ctx.window_service.window_bbox().width() // 2
+
+        ui.activate().camera_reset().sleep(0.5)
+
+        tracker = self._TargetTracker(max_tolerance=1)
+        wander = self._WanderHelper(control, ui)
+
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if self._try_pickup(ui, roi_dialogue):
+                return True
+            # 转两圈都没有就结束
+            if wander.camera_reset_count >= 8:
+                break
+
+            detected = od.search_echo_2(boss_name=enemy_name)
+            target_box = tracker.update(detected)
+
+            if target_box is None:
+                wander.wander_and_reset()
+            else:
+                wander.reset_step()
+                self._move_towards(target_box, control, ui, window_half_width)
+
+        logger.debug("Absorb echoes timeout")
+        return False
+
+    # ---------- 辅助方法 ----------
+    def _try_pickup(self, ui: "UIOp", roi) -> bool:
+        """检测并执行拾取操作，返回是否成功拾取"""
+        ui.snapshot(roi=roi)
+        absorb = ui.search(self.ctx.tr(I18nText.Absorb))
+        if not absorb:
+            return False
+
+        # 若“领取奖励”在“吸收”下方，需要滚动
+        claim = ui.search(self.ctx.tr(I18nText.ClaimRewards))
+        if claim and absorb[0].y1 > claim[0].y1:
+            logger.info("Scroll down to reveal absorb button")
+            self.ctx.control_service.scroll_mouse(-1)
+            ui.sleep(0.5)
+
+        ui.pick_up().sleep(0.5)
+        logger.info("Successfully absorbed!")
+        return True
+
+    def _move_towards(self, target, control, ui, half_width: int):
+        """根据目标框在屏幕上的位置，决定转向或前进"""
+        center_x = target.x1 + target.width() / 2
+        offset = center_x - half_width
+        dead_zone = half_width * 0.2  # 屏幕宽度的 20% 作为死区
+
+        if offset < -dead_zone:
+            logger.info("← Target on left, turning left")
+            control.left(0.08)
+        elif offset > dead_zone:
+            logger.info("→ Target on right, turning right")
+            control.right(0.08)
+        else:
+            logger.info("↑ Target centered, moving forward")
+            control.up(0.1)  # 一次前进，避免过度移动
+
+        ui.sleep(0.05)  # 每次移动后短暂停顿，让画面稳定
+
+    def claim_rewards(self, timeout: float = 20.0):
+        logger.debug("Claim rewards")
+        ctx = self.ctx
+
+
 def object_detection(
         ctx: NodeContext,
         search_echo: bool = False,
@@ -406,11 +601,11 @@ def object_detection(
     max_tolerance = 1
     tolerance = max_tolerance
     window_bbox = ctx.window_service.window_bbox()
-    dialogue_roi = bbox_dialogue(ctx)
+    roiex = RoiEx(ctx)
     camera_reset_count = 0
 
     while time.monotonic() < deadline:
-        ui.snapshot(roi=dialogue_roi)
+        ui.snapshot(roi=roiex.dialogue)
         absorb = ui.search(ctx.tr(I18nText.Absorb))
         claim_rewards = ui.search(ctx.tr(I18nText.ClaimRewards))
         logger.debug(f"absorb: {absorb}, claim_rewards: {claim_rewards}")
@@ -418,7 +613,7 @@ def object_detection(
         if search_echo:
             if absorb:
                 # 有领取奖励，吸收在下则滚动到下方
-                if claim_rewards and absorb[0].y1 < claim_rewards[0].y1:
+                if claim_rewards and absorb[0].y1 > claim_rewards[0].y1:
                     logger.info("Scroll down")
                     ctx.control_service.scroll_mouse(-1)
                     time.sleep(0.5)
@@ -487,7 +682,7 @@ def object_detection(
             for _ in range(5):
                 ctx.control_service.up(0.1)
                 # ctx.control_service.pick_up(0.001)
-                if ui.snapshot(roi=dialogue_roi).search(ctx.tr(I18nText.ClaimRewards)):
+                if ui.snapshot(roi=roiex.dialogue).search(ctx.tr(I18nText.ClaimRewards)):
                     continue
                 ui.sleep(0.05)
             ui.sleep(0.5)
@@ -597,89 +792,69 @@ class RateLimiter:
         return round(wait, 6)
 
 
-class LinearSpacing:
+class Slider:
+    """滑块"""
 
-    def __init__(self, ctx):
-        self.ctx = ctx
-
-    @staticmethod
-    def horizontal(start: int, end: int, num_points: int, offset=None):
-        """
-        线性插值（支持整体偏移）
-        :param start: 起始位置（第一个点的坐标）
-        :param end: 结束位置（最后一个点的坐标）
-        :param num_points: 点的总数（>= 2）
-        :param offset: 整体偏移量（可选）
-                   - None: 返回主点位置
-                   - 数值: 返回 [p + offset for p in 主点位置]
-        :return: 所有点的位置坐标
-        """
-        if num_points < 2:
-            raise ValueError("num_points 必须 >= 2")
-
-        # 计算等分位置
-        segments = num_points - 1
-        positions = []
-
-        for i in range(num_points):
-            t = i / segments  # 0 到 1 之间的比例
-            pos = start + (end - start) * t
-            positions.append(int(pos))
-
-        # 应用偏移
-        if offset is not None:
-            positions = [p + offset for p in positions]
-
-        return positions
+    # @staticmethod
+    # def __find_bar_bottom(point: Point, img: np.ndarray):
+    #     """滑块底部的点"""
+    #     column = img[point.y:, point.x]
+    #     # bgr 219 221 203
+    #     is_white = np.all(column > 185, axis=1)
+    #     indices = np.flatnonzero(~is_white)
+    #     y = point.y + indices[0] if indices.size else img.shape[0] - 1
+    #     return Point(point.x, y)
 
     @staticmethod
-    def vertical(p1: Point, p2: Point, p3: Point) -> list[Point]:
+    def __find_slider(point: Point, img: np.ndarray):
+        """查找滑块"""
+        column = img[point.y:, point.x]
+        is_white = np.all(column > 185, axis=1)
+        # 找白色起点
+        start_indices = np.flatnonzero(is_white)
+        if not start_indices.size:
+            return None, None
+        start = start_indices[0]
+        # 从白色起点开始，找第一个非白色点
+        end_indices = np.flatnonzero(~is_white[start:])
+        if end_indices.size:
+            end = start + end_indices[0] - 1
+        else:
+            end = img.shape[0] - 1
+        return (
+            Point(point.x, point.y + start),
+            Point(point.x, point.y + end),
+        )
+
+    @classmethod
+    def __points(cls, img: np.ndarray, top: Point, bottom: Point, rate: float) -> list[Point]:
         """
-        垂直插值
-        :param p1: 第一个点
-        :param p2: 第二个点
-        :param p3: 最后一个点
-        :return: 所有点
+        生成滑块移动轨迹点
+        :param img:
+        :param top: 滑轨起点，y大概就行
+        :param bottom: 滑轨终点
+        :param rate: 移动比例
+        :return:
         """
-        y_spacing = p2.y - p1.y
-        points = [p1]
-        next_point = p1
+        scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
+        slider_top = scaler.as_point(AnchorPoint(top.x, top.y, Align.Top | Align.Right))
+        # 找出滑块位置
+        slider_top, slider_bottom = cls.__find_slider(slider_top, img)
+        if not slider_top or not slider_bottom:
+            return []
+        step = (slider_bottom.y - slider_top.y) * rate
+        track_bottom = scaler.as_point(AnchorPoint(bottom.x, bottom.y, Align.Bottom | Align.Right))
+        points = [slider_bottom]
+        next_point = slider_bottom
         while True:
-            next_point = Point(next_point.x, next_point.y + y_spacing)
-            if next_point.y >= p3.y:
+            next_point = Point(next_point.x, int(next_point.y + step))
+            if next_point.y > track_bottom.y:
                 break
             points.append(next_point)
-        points.append(p3)
+        points.append(track_bottom)
         return points
 
-    @staticmethod
-    def __find_bar_bottom(point: Point, img: np.ndarray):
-        """滑块底部的点"""
-        column = img[point.y:, point.x]
-        # bgr 219 221 203
-        is_white = np.all(column > 185, axis=1)
-        indices = np.flatnonzero(~is_white)
-        y_end = point.y + indices[0] if indices.size else img.shape[0]
-        return Point(point.x, y_end)
-
-    def boss_challenge(self, img: np.ndarray):
-        # 滑块顶部(1245, 143)往下一些的一个点
-        top_point = self.ctx.scaler.as_point(AnchorPoint(1245, 146, Align.Top | Align.Right))
-        bottom_point = self.__find_bar_bottom(top_point, img)
-        p1 = self.ctx.scaler.as_point(AnchorPoint(1245, 233, Align.Top | Align.Right))
-        p2 = self.ctx.scaler.as_point(AnchorPoint(1245, 268, Align.Top | Align.Right))
-        p3 = self.ctx.scaler.as_point(AnchorPoint(1245, 630, Align.Bottom | Align.Right))
-        return self.vertical(
-            bottom_point,
-            Point(bottom_point.x, bottom_point.y + p2.y - p1.y),
-            p3,
-        )
-
-    def weekly_challenge(self):
-        return self.vertical(
-            self.ctx.scaler.as_point(AnchorPoint(1245, 351, Align.Top | Align.Right)),
-            self.ctx.scaler.as_point(AnchorPoint(1245, 443, Align.Top | Align.Right)),
-            self.ctx.scaler.as_point(AnchorPoint(1245, 630, Align.Bottom | Align.Right)),
-        )
-
-
+    @classmethod
+    def points(cls, img: np.ndarray) -> list[Point]:
+        """索拉指南素材获取页，通用右侧滑块移动轨迹点"""
+        return cls.__points(img, Point(1245, 100), Point(1245, 633), 0.4)

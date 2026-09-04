@@ -418,7 +418,22 @@ class BaseCombo:
             if not ignore_event and self.event is not None and not self.event.is_set():
                 raise StopError()
             # 后摇等待
-            time.sleep(wait_time)
+            self._sleep(wait_time, ignore_event)
+
+    def _sleep(self, seconds: float, ignore_event):
+        if seconds <= 0:
+            return
+        t = 0.05
+        while seconds > t:
+            if not ignore_event and self.event is not None and not self.event.is_set():
+                return
+            time.sleep(t)
+            seconds -= t
+        if not ignore_event and self.event is not None and not self.event.is_set():
+            return
+        if seconds > 0:
+            time.sleep(seconds)
+        return
 
 
 class CharClassEnum(Enum):
@@ -590,7 +605,6 @@ class BaseResonator(BaseCombo):
         # logger.debug("is_avatar_grey: %s", is_avatar_grey)
         return is_avatar_grey
 
-    # @classmethod
     def boss_hp(self, img: np.ndarray) -> float:
         """ boss剩余血条比例，归一 """
         if not self.check_boss_hp:
@@ -612,6 +626,17 @@ class BaseResonator(BaseCombo):
 
         logger.debug(f"boss_hp: {health}", stacklevel=2)
         return health
+
+    # def boss_hp(self, img: np.ndarray) -> float:
+    #     """ boss剩余血条比例，归一 """
+    #     if not self.check_boss_hp:
+    #         return 1.00
+    #     from src.core.enemy import EnemyHpBar
+    #     hp = EnemyHpBar.detect(img)
+    #     logger.debug(f"boss_hp: {hp}", stacklevel=2)
+    #     if hp is None:
+    #         return 0.00
+    #     return hp
 
     @classmethod
     def boss_immobilized_bar_exist(cls, img: np.ndarray) -> bool:

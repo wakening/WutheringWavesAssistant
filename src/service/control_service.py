@@ -84,8 +84,9 @@ class Win32GameControlServiceImpl(GameControlService, BaseControlService):
         return self
 
     def dash_dodge(self):
-        key = self._get_mapping_key("LEFT_SHIFT", win32con.VK_LSHIFT)
-        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        # key = self._get_mapping_key("LEFT_SHIFT", win32con.VK_LSHIFT)
+        # keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        keymouse_util.right_click(self._window_service.window, seconds=0.05)
         return self
 
     def pick_up(self, seconds: float = 0.05):

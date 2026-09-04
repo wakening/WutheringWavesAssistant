@@ -2,6 +2,7 @@ import ctypes
 import logging
 import re
 from enum import Enum
+from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class Language(str, Enum):
         return self.value
 
     @staticmethod
+    @lru_cache
     def sys_lang():
         buf = ctypes.create_unicode_buffer(85)
         ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, len(buf))
@@ -910,7 +912,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Lucilla$"), raw="Lucilla"),
     },
     I18nText.YangyangXuanling: {
-        Language.ZH: RegexStr(r"^秧秧.*?玄翎$", raw="秧秧·玄翎"),
+        Language.ZH: RegexStr(r"^秧秧.?玄翎$", raw="秧秧·玄翎"),
         Language.EN: RegexStr(flex_ws(r"^YangyangXuanling$"), raw="YangyangXuanling"),
     },
     I18nText.Suisui: {
@@ -2002,7 +2004,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"Limited-Time Early Access"), raw=r"Limited-Time Early Access")},
     I18nText.ArrivingAtTheDestination: {
-        Language.ZH: RegexStr(r"^提前到达目标位置可能影响剧情体验", raw="提前到达目标位置可能影响剧情体验"),
+        Language.ZH: RegexStr(r"^提前到达目标位置可能", raw="提前到达目标位置可能影响剧情体验"),
         Language.EN: RegexStr(
             flex_ws(r"^Arriving at the destination"),
             raw=r"Arriving at the destination in advance may influence your story experience")
@@ -2387,7 +2389,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"Silver Lotus$"), raw="Silver Lotus"),
     },
     I18nText.PickNova: {
-        Language.ZH: RegexStr(r"暂星$", raw="暂星"),
+        Language.ZH: RegexStr(r"[暂智雪]星$", raw="暂星"),
         Language.EN: RegexStr(flex_ws(r"Nova$"), raw="Nova"),
     },
     I18nText.PickAirsailer: {
@@ -2554,7 +2556,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"Foxtail Kelp$"), raw="Foxtail Kelp"),
     },
     I18nText.PickFrostwort: {
-        Language.ZH: RegexStr(r"寒(地星|星地)苔$", raw="寒地星苔", desc="寒星地苔"),
+        Language.ZH: RegexStr(r"寒(地星|星地)苔$", raw="寒地星苔", desc="寒地星苔"),
         Language.EN: RegexStr(flex_ws(r"Frostwort$"), raw="Frostwort"),
     },
     I18nText.PickDreamOfStars: {

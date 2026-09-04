@@ -969,10 +969,14 @@ class GlobalPage:
         """选择复苏物品"""
         if ui.search(self.ctx.tr(I18nText.SelectARevivalItem)):
             logger.info(f"{self.ctx.tr(I18nText.SelectARevivalItem).raw}")
-            return self.ActionStr(
-                self.SelectARevivalItem,
-                lambda: ui.sleep(0.3).esc().sleep(0.4)
-            )
+
+            def _func():
+                # ui.sleep(0.3).esc().sleep(0.4)
+                ui.sleep(0.3)
+                self.ctx.control_service.attack()
+                ui.sleep(0.4)
+            
+            return self.ActionStr(self.SelectARevivalItem, _func)
         return None
 
     def isReplenishWaveplate(self, *, ui: UIOp, **kwargs):

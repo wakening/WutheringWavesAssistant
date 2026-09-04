@@ -202,7 +202,7 @@ class Verina(BaseVerina):
     def EQ_fast(self):
         return [
             # EQ
-            ["E", 0.00, 0.00],
+            ["E", 0.05, 0.05],
             ["Q", 0.00, 0.00],
         ]
 

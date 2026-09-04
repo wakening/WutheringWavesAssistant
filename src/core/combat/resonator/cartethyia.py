@@ -476,7 +476,9 @@ class Cartethyia(BaseCartethyia):
             # ["a", 0.05, 1.20],  # 拆分
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
-            ["w", 0.00, 0.75],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.30],
         ]
 
     @combat_cache
@@ -549,21 +551,36 @@ class Cartethyia(BaseCartethyia):
             ["w", 0.00, 0.75],
         ]
 
+    # @combat_cache
+    # def cartethyia_zjEda(self):
+    #     return [
+    #         # zEa
+    #         # ["z", 0.90, 0.20],
+    #         ["z", 0.75, 0.25],
+    #         ["j", 0.05, 0.05],
+    #         # ["E", 0.05, 0.60],
+    #         ["E", 0.05, 0.10],
+    #         ["E", 0.05, 0.50],
+    #         ["d", 0.05, 0.00],
+    #         # ["a", 0.05, 1.00],
+    #         ["a", 0.05, 0.10],
+    #         ["a", 0.05, 0.10],
+    #         ["w", 0.00, 0.65],
+    #     ]
+
     @combat_cache
-    def cartethyia_zjEda(self):
+    def cartethyia_zjEa(self):
         return [
-            # zEa
-            # ["z", 0.90, 0.20],
-            ["z", 0.75, 0.25],
+            ["a_down", 0.00, 0.90],
             ["j", 0.05, 0.05],
-            # ["E", 0.05, 0.60],
-            ["E", 0.05, 0.10],
-            ["E", 0.05, 0.50],
-            ["d", 0.05, 0.00],
-            # ["a", 0.05, 1.00],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.25],
+            ["a_up", 0.00, 0.05],
             ["a", 0.05, 0.10],
-            ["a", 0.05, 0.10],
-            ["w", 0.00, 0.65],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.00],
+            ["w", 0.00, 0.60],
         ]
 
     @combat_cache
@@ -635,6 +652,37 @@ class Cartethyia(BaseCartethyia):
             ["a", 0.05, 0.25],
             ["a", 0.05, 0.25],
             ["a", 0.05, 0.30],
+        ]
+
+    @combat_cache
+    def fleurdelys_a4(self):
+        return [
+            # 大卡
+            # 普攻5a
+            # ["a", 0.05, 0.32],
+            # ["a", 0.05, 0.10],
+            # ["a", 0.05, 0.20],
+
+            # ["a", 0.05, 0.65],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.15],
+
+            # ["a", 0.05, 0.82],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.27],
+            ["a", 0.05, 0.30],
+
+            # ["a", 0.05, 1.02],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.22],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 0.90],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.00],
+            ["w", 0.00, 0.60],
         ]
 
     @combat_cache
@@ -886,14 +934,35 @@ class Cartethyia(BaseCartethyia):
 
             # ["a", 0.05, 1.20],
             ["a", 0.05, 0.25],
-            ["a", 0.05, 0.25],
             ["a", 0.05, 0.30],
+            ["E", 0.05, 0.25],
             ["E", 0.05, 0.20],
 
             # ["E", 0.05, 1.65],
             ["E", 0.05, 0.10],
             ["E", 0.05, 0.20],
             ["a", 0.05, 1.45],
+        ]
+
+    @combat_cache
+    def fleurdelys_EE(self):
+        return [
+            # 大卡
+            # EEaaa
+            # ["E", 0.05, 0.93],
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["E", 0.05, 0.13],
+            # ["E", 0.05, 1.65],
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.30],
         ]
 
     @combat_cache
@@ -977,6 +1046,8 @@ class Cartethyia(BaseCartethyia):
 
         # 化身·芙露德莉斯 狂澜，分割天地
         if is_resonance_liberation_blade_of_howling_squall_ready:
+            if is_resonance_skill_fleurdelys_ready:
+                self.combo_action(self.fleurdelys_EE(), False)
             # 有大开大
             self.combo_action(self.fleurdelys_R(), True)
             img = self.img_service.screenshot()
@@ -993,7 +1064,7 @@ class Cartethyia(BaseCartethyia):
                 if boss_hp <= 0.01:
                     return
                 time.sleep(0.15)
-                self.combo_action(self.cartethyia_zjEda(), False)
+                self.combo_action(self.cartethyia_zjEa(), False)
             return
 
         self.combo_action(self.Q(), False)
@@ -1003,16 +1074,16 @@ class Cartethyia(BaseCartethyia):
         if is_resonance_liberation_avatar_cartethyia_ready:
             # 打一套三剑下劈
             if is_resonance_skill_cartethyia_ready:
-                self.combo_action(self.cartethyia_a4(), False)
+                self.combo_action(self.cartethyia_a2_end(), False)
                 time.sleep(0.15)
                 img = self.img_service.screenshot()
                 boss_hp = self.boss_hp(img)
-                if boss_hp <= 0.01:
-                    return
+                # if boss_hp <= 0.01:
+                #     return
                 time.sleep(0.15)
-                self.combo_action(self.cartethyia_zjEda(), self.is_avatar_cartethyia_attack_done)
+                self.combo_action(self.cartethyia_zjEa(), self.is_avatar_cartethyia_attack_done)
             else:
-                self.combo_action(self.cartethyia_a4(), self.is_avatar_cartethyia_attack_done)
+                self.combo_action(self.cartethyia_a2_end(), self.is_avatar_cartethyia_attack_done)
             if boss_hp <= 0.01:
                 return
             # 合轴
@@ -1029,15 +1100,17 @@ class Cartethyia(BaseCartethyia):
                 self.is_avatar_cartethyia_attack_done = False
                 if self.random_float() < 0.5:
                     self.combo_action(self.avatar_cartethyia_to_fleurdelys_Ra3(), False)
-                    img = self.img_service.screenshot()
-                    boss_hp = self.boss_hp(img)
-                    if boss_hp <= 0.01:
-                        return
+                    # img = self.img_service.screenshot()
+                    # boss_hp = self.boss_hp(img)
+                    # if boss_hp <= 0.01:
+                    #     return
                 else:
                     self.combo_action(self.avatar_R(), True)
-                self.combo_action(self.fleurdelys_EaaE(), False)
+                self.combo_action(self.fleurdelys_EE(), True)
+                self.combo_action(self.fleurdelys_a4(), False)
             elif is_resonance_skill_fleurdelys_ready:
-                self.combo_action(self.fleurdelys_EaaE(), False)
+                self.combo_action(self.fleurdelys_EE(), True)
+                self.combo_action(self.fleurdelys_a4(), False)
             else:
                 if boss_hp <= 0.01:
                     self.combo_action(self.fleurdelys_a3(), False)
@@ -1049,9 +1122,9 @@ class Cartethyia(BaseCartethyia):
 
             # 检查E、R状态，有E打空中连，没有打普攻，补决意
             img = self.img_service.screenshot()
-            boss_hp = self.boss_hp(img)
-            if boss_hp <= 0.01:
-                return
+            # boss_hp = self.boss_hp(img)
+            # if boss_hp <= 0.01:
+            #     return
             is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(
                 img)
 
@@ -1071,7 +1144,7 @@ class Cartethyia(BaseCartethyia):
                     else:
                         self.combo_action(self.cartethyia_a4(), False)
                         time.sleep(0.3)
-                        self.combo_action(self.cartethyia_zjEda(), True)
+                        self.combo_action(self.cartethyia_zjEa(), True)
                         time.sleep(0.2)
             return
 
@@ -1083,25 +1156,22 @@ class Cartethyia(BaseCartethyia):
             if is_resonance_liberation_ready:
                 is_cartethyia_a4_attack_done = True
                 if not is_sword_of_divinity_existing:
-                    self.combo_action(self.cartethyia_a4(), False)
-                if not is_sword_of_virtue_existing and is_resonance_skill_cartethyia_ready:
-                    self.combo_action(self.cartethyia_zjEda(), True)
-                elif not is_sword_of_discord_existing:
-                    self.combo_action(self.cartethyia_z(), True)
-                    self.combo_action(self.cartethyia_ja(), True)
+                    self.combo_action(self.cartethyia_a2_end(), False)
+                if not is_sword_of_virtue_existing or not is_sword_of_discord_existing:
+                    self.combo_action(self.cartethyia_zjEa(), True)
             else:  # 没大，打一套普攻连
                 if not is_sword_of_divinity_existing:
-                    self.combo_action(self.cartethyia_a4(), False)
+                    self.combo_action(self.cartethyia_a2_end(), False)
                     is_cartethyia_a4_attack_done = True
 
                 img = self.img_service.screenshot()
-                boss_hp = self.boss_hp(img)
-                if boss_hp <= 0.01:
-                    return
+                # boss_hp = self.boss_hp(img)
+                # if boss_hp <= 0.01:
+                #     return
                 is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
                 # 检查E 收剑
                 if is_resonance_skill_cartethyia_ready:
-                    self.combo_action(self.cartethyia_zjEda(), True)
+                    self.combo_action(self.cartethyia_zjEa(), True)
                 else:
                     if not is_sword_of_discord_existing:
                         self.combo_action(self.cartethyia_z(), False)
@@ -1132,7 +1202,11 @@ class Cartethyia(BaseCartethyia):
             img = self.img_service.screenshot()
             is_resonance_skill_fleurdelys_ready = self.is_resonance_skill_fleurdelys_ready(img)
             if is_resonance_skill_fleurdelys_ready:
-                self.combo_action(self.fleurdelys_EaaE(), False)
+                if self.random_float() > 0.5:
+                    self.combo_action(self.fleurdelys_EE(), True)
+                    self.combo_action(self.fleurdelys_a4(), False)
+                else:
+                    self.combo_action(self.fleurdelys_EaaE(), False)
             else:
                 self.combo_action(self.fleurdelys_ja3(), False)
             if self.random_float() < 0.5:

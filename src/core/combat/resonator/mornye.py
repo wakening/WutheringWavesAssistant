@@ -347,7 +347,7 @@ class Mornye(BaseMornye):
     @combat_cache
     def Q(self):
         return [
-            ["Q", 0.05, 0.50],
+            ["Q", 0.01, 0.00],
         ]
 
     @combat_cache
@@ -363,11 +363,15 @@ class Mornye(BaseMornye):
 
     def exit_special_state(self, morph: Morph) -> bool:
         logger.debug("exit_special_state")
-        img = self.img_service.screenshot()
-        if not self.is_wide_field_observation_mode_ready(img):
-            return True
+        # img = self.img_service.screenshot()
+        # if not self.is_wide_field_observation_mode_ready(img):
+        #     return True
+        # quit_seq = [
+        #     ["j", 0.05, 2.00],
+        # ]
         quit_seq = [
-            ["j", 0.05, 2.00],
+            ["j", 0.05, 0.20],
+            ["a", 0.05, 1.20],
         ]
         self.combo_action(quit_seq, True, ignore_event=True)
         return True
