@@ -154,3 +154,31 @@ def test_print_mouse_position():
     except KeyboardInterrupt:
         logger.debug(f"client_rect_on_screen: {client_rect_on_screen}")
         logger.debug(f"client_center_on_screen: {((x1 + x2) // 2, (y1 + y2) // 2)}")
+
+
+def test_activate():
+    hwnd = hwnd_util.get_hwnd()
+    win32gui.PostMessage(
+        hwnd,
+        win32con.WM_NCACTIVATE,
+        1,
+        0,
+    )
+    win32gui.PostMessage(
+        hwnd,
+        win32con.WM_ACTIVATE,
+        win32con.WA_ACTIVE,
+        0,
+    )
+    win32gui.PostMessage(
+        hwnd,
+        win32con.WM_SETFOCUS,
+        0,
+        0,
+    )
+    win32gui.PostMessage(
+        hwnd,
+        win32con.WM_MOUSEACTIVATE,
+        win32con.MA_ACTIVATE,
+        0,
+    )

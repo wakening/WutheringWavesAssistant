@@ -4,8 +4,7 @@ from functools import cached_property
 from pathlib import Path
 
 from src.config.config import Config, BossConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
-from src.core.boss import BossNameEnum
-from src.core.enemy import Enemy
+from src.core.enemy import EnemyMeta
 from src.core.i18n import I18nText, Language
 from src.util import winreg_util
 
@@ -48,12 +47,12 @@ class BossRuntimeConfig:
     def bossName(self) -> list[str]:
         names = []
         if self._cfg.bossName:
-            enemies = Enemy.enemies()
+            enemies = EnemyMeta.KEY_ENEMIES
             for name in self._cfg.bossName:
                 if name in enemies:
                     names.append(name)
                     continue
-                logger.warning(f"Invalid boss name: '{name}'")
+                logger.warning(f"Invalid boss key: '{name}'")
         if not names:
             names.append(I18nText.EnemyDreamless)
         return names
@@ -261,7 +260,7 @@ class RuntimeConfig:
 
     def __init__(self, cfg):
         self._cfg: Config = self.format_config(cfg)
-        self.boss: BossRuntimeConfig = BossRuntimeConfig(self._cfg.boss)
+        self.boss: BossRuntimeConfig = BossRuntimeConfig(self._cfg.bossRush)
         self.daily: DailyRuntimeConfig = DailyRuntimeConfig(self._cfg.daily)
         self.explore: ExploreRuntimeConfig = ExploreRuntimeConfig(self._cfg.explore)
         self.game: GameRuntimeConfig = GameRuntimeConfig(self._cfg.game)

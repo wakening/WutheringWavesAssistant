@@ -7,9 +7,9 @@ from typing import Optional
 from src.core.color import ColorRule, Color, ColorMatch
 from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
-from src.core.enemy import Enemy, EnemyHpBar
+from src.core.enemy import Enemy, EnemyHpBar, EnemyMeta
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
-from src.core.i18n import I18nText
+from src.core.i18n import I18nText, I18nTr, Language
 from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp, GlobalPage
@@ -34,18 +34,18 @@ class TaskLocal:
             name="Root"
         )
 
+        # cfg
+        self.enemy: EnemyMeta = None
+
         # runtime
+        self.pattern = re.compile(r"[·_-]")
         self.downed = False
         self.members = ["unknown", None, None]
         self.combat_system: CombatSystem = None
-        # self.enemy_key = I18nText.EnemyMyriadSnareRustfireChassis
-        # self.enemy_key = I18nText.EnemyNightmareAdamSmasher
-        # self.enemy_key = I18nText.EnemyTheFalseSovereign
-        # self.enemy_key = I18nText.EnemyImpermanenceHeron
-        # self.enemy_key = I18nText.EnemyBellBorneGeochelone
-        self.enemy_key = I18nText.EnemyNightmareMourningAix
+        self.combat_count = 1
+        self.absorb_count = 0
 
-        self.pattern = re.compile(r"[·_-]")
+        # TODO 战斗计数、吸收计数、复苏计数、阵亡计数
 
 
 class NodeName:
@@ -105,6 +105,9 @@ def globalDispatcher(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[s
     """检查是否在有效页面（如：终端），不在则esc尝试离开（副本等）"""
     ui = UIOp(ctx)
     ui.activate().sleep(0.1).snapshot()
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"{ui.bbox_result}")
 
     page = GlobalPage(ctx)
 
@@ -259,7 +262,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     # 识别编队角色
     member_keys = TeamMember.get_members_by_text(ui)
     members = [local.pattern.sub("", ctx.tr(key).raw) if key else key for key in member_keys]
-    logger.info(f"team: {members}")
+    logger.info(f"Team: {members}")
     # 识别到至少一个角色才更新编队
     if any(members):
         local.member_keys = member_keys
@@ -299,12 +302,9 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         logger.warning(f"Page not found: {ctx.tr(I18nText.Guidebook).raw}")
         return None
 
-    # enemy_key = ctx.runtime.cfg.boss.bossName[0]
-    enemy_key = local.enemy_key
-    enemy_name = ctx.tr(enemy_key)
-    enemy = Enemy.from_key(enemy_key)
-    # logger.debug(f"Enemy: {enemy_name.raw}")
-    # logger.debug(f"Enemy: {enemy}")
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
 
     # 选择刷取入口
     # TODO 容错？直接挑战找不到就去敌迹探寻
@@ -330,137 +330,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
                 Icon.materialCollection(), materialCollection):
             return None
 
-        menu_key = enemy.quick_boss_meta.menu
-        menu = ctx.tr(menu_key)
-
-        if menu_key not in [I18nText.BossChallenge, I18nText.WeeklyChallenge]:
-            raise NotImplementedError(f"Unsupported menu: {menu.raw}")
-        logger.info(f"Menu: {menu.raw}")
-        logger.info(f"Enemy: {enemy_name.raw}")
-
-        if menu_key == I18nText.BossChallenge:
-            # 点击讨伐强敌
-            if not ui.sleep(0.2).wait().until(
-                    lambda: ui.snapshot().click_text(menu, roiex.guidebook_menu, times=2, interval=0.3)
-                            and ui.search(ctx.tr(I18nText.FilterToViewRewardsForEachPhase))):
-                return None
-
-            # 滑动寻找入口
-            slider_points = Slider.points(ui.grap())
-            for i, p in enumerate(slider_points):
-                if i > 0:
-                    logger.debug(f"Scroll point: {p}")
-                    ui.click_point(p, times=2, interval=0.2)
-                    ui.sleep(0.2).snapshot()
-                else:
-                    ui.snapshot()
-                if not (enemy_text := ui.search(enemy_name, roiex.guidebook_content)):
-                    continue
-                if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
-                    continue
-                challenge_list.sort(key=lambda x: x.y1)
-                if enemy_text[0].y1 > challenge_list[-1].y2:
-                    continue
-                if not (challenge_text := next((cl for cl in challenge_list if enemy_text[0].y1 < cl.y2), None)):
-                    return None
-                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
-                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
-                    continue
-                ui.click_bbox(challenge_text, times=2, interval=0.3)
-
-                # 点击提示弹窗
-                if not ui.sleep(0.2).wait().until(
-                        lambda: ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination))
-                                and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
-                                or ui.search(ctx.tr(I18nText.QuickSetup))
-                                and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
-                    return None
-
-                # 等待进入副本
-                if not ui.sleep(2).wait_back_home():
-                    return None
-
-                return I18nText.BossChallenge
-
-            logger.warning(f"Enemy not found: {enemy_name.raw}")
-            return None
-
-        elif menu_key == I18nText.WeeklyChallenge:
-            # 点击战歌重奏
-            if not ui.sleep(0.2).wait().until(
-                    lambda: ui.snapshot().click_text(menu, roiex.guidebook_menu, times=2, interval=0.3)
-                            and ui.search(ctx.tr(I18nText.RemainingWeeklyAttempts))):
-                return None
-
-            # 滑动寻找入口
-            dungeon_name = ctx.tr(enemy.quick_boss_meta.dungeon_name)
-            slider_points = Slider.points(ui.grap())
-            for i, p in enumerate(slider_points):
-                if i > 0:
-                    logger.debug(f"Scroll point: {p}")
-                    ui.click_point(p, times=2, interval=0.2)
-                    ui.sleep(0.2).snapshot()
-                else:
-                    ui.snapshot()
-                if not (enemy_text := ui.search(dungeon_name, roiex.guidebook_content)):
-                    continue
-                if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
-                    continue
-                challenge_list.sort(key=lambda x: x.y1)
-                if enemy_text[0].y1 > challenge_list[-1].y2:
-                    continue
-                if not (challenge_text := next((cl for cl in challenge_list if enemy_text[0].y1 < cl.y2), None)):
-                    return None
-                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
-                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
-                    continue
-                ui.click_bbox(challenge_text, times=2, interval=0.3)
-
-                def _wait_suggested_lv():
-                    if ui.snapshot().search(ctx.tr(I18nText.WeeklySuggestedLv)) and ui.search(
-                            ctx.tr(I18nText.WeeklySoloChallenge)):
-                        return True
-                    if ui.search(ctx.tr(I18nText.ArrivingAtTheDestination)):
-                        ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
-                    return False
-
-                # 点击提示弹窗
-                if not ui.sleep(0.2).wait(6, 0.3).until(_wait_suggested_lv):
-                    return None
-
-                # 选择最佳推荐等级
-                img = ui.sleep(0.2).grap()
-                lv_points: list[Point] = []
-                best_lv = None
-                for j, lv in enumerate(range(40, 90, 10)):
-                    p_lv = ctx.scaler.as_point(AnchorPoint(125, 125 + j * (160 - 104), Align.Left | Align.Top))
-                    if ColorRule().points(p_lv).colors(Color.bgr(88, 85, 77)).match(img, ctx.scaler):
-                        if len(lv_points) > 0:
-                            best_lv = lv_points[-1]
-                            logger.debug(f"Best LV: {lv - 10}")
-                        break
-                    lv_points.append(p_lv)
-                if best_lv:
-                    ui.click_point(best_lv, times=2, interval=0.2)
-
-                # 点击单人挑战
-                if not ui.sleep(0.1).click_text(ctx.tr(I18nText.WeeklySoloChallenge)):
-                    return None
-                # 点击开启挑战
-                if not ui.sleep(0.2).wait().until(
-                        lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup))
-                                and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
-                    return None
-                # 等待进入副本
-                if not ui.sleep(2).wait_back_home():
-                    return None
-
-                return I18nText.BossChallenge
-
-            logger.warning(f"Enemy not found: {dungeon_name.raw}")
-            return None
-
-        return None
+        return I18nText.MaterialCollection
 
     # 从敌迹探寻菜单进
     if not _click_icon(Icon.enemyTracing(), enemyTracing):
@@ -474,40 +344,233 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 
 
 @node(NodeName.doMaterialCollection)
-def doMaterialCollection(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
-    return None
+def doMaterialCollection(ctx: NodeContext, local: TaskLocal, **kwargs) -> str:
+    """素材获取 可直接挑战boss"""
+    menu_key = local.enemy.quick_boss_meta.menu
+
+    if menu_key not in [I18nText.BossChallenge, I18nText.WeeklyChallenge, I18nText.NightmarePurification]:
+        raise NotImplementedError(f"Unsupported menu: {ctx.tr(menu_key).raw}")
+
+    logger.info(f"{ctx.tr(menu_key).raw}: {ctx.tr(local.enemy.id).raw}")
+    return menu_key
 
 
 @node(NodeName.doBossChallenge)
 def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    return True
+    ui = UIOp(ctx)
+
+    roiex = RoiEx(ctx)
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    menu = ctx.tr(enemy.quick_boss_meta.menu)
+    logger.debug(f"Enemy: {enemy_name.raw}")
+
+    # 点击讨伐强敌
+    if not ui.sleep(0.2).wait().until(
+            lambda: ui.snapshot().click_text(menu, roiex.guidebook_menu, times=2, interval=0.3)
+                    and ui.search(ctx.tr(I18nText.FilterToViewRewardsForEachPhase))):
+        return False
+
+    # 滑动寻找入口
+    slider_points = Slider.points(ui.grap())
+    for i, p in enumerate(slider_points):
+        if i > 0:
+            logger.debug(f"Scroll point: {p}")
+            ui.click_point(p, times=2, interval=0.2)
+            ui.sleep(0.2).snapshot()
+        else:
+            ui.snapshot()
+        if not (enemy_text := ui.search(enemy_name, roiex.guidebook_content)):
+            continue
+        if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
+            continue
+        challenge_list.sort(key=lambda x: x.y1)
+        if enemy_text[0].y1 > challenge_list[-1].y2:
+            continue
+        if not (challenge_text := next((cl for cl in challenge_list if enemy_text[0].y1 < cl.y2), None)):
+            return False
+        # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+        if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+            continue
+        ui.click_bbox(challenge_text, times=2, interval=0.3)
+
+        # 点击提示弹窗
+        if not ui.sleep(0.2).wait().until(
+                lambda: ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination))
+                        and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
+                        or ui.search(ctx.tr(I18nText.QuickSetup))
+                        and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
+            return False
+
+        # 等待进入副本
+        if not ui.sleep(2).wait_back_home():
+            return False
+
+        return True
+
+    logger.warning(f"Enemy not found: {enemy_name.raw}")
+    return False
 
 
 @node(NodeName.doWeeklyChallenge)
 def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    return True
+    ui = UIOp(ctx)
+
+    roiex = RoiEx(ctx)
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    menu = ctx.tr(enemy.quick_boss_meta.menu)
+    logger.debug(f"Enemy: {enemy_name.raw}")
+
+    # 点击战歌重奏
+    if not ui.sleep(0.2).wait().until(
+            lambda: ui.snapshot().click_text(menu, roiex.guidebook_menu, times=2, interval=0.3)
+                    and ui.search(ctx.tr(I18nText.RemainingWeeklyAttempts))):
+        return False
+
+    # 滑动寻找入口
+    dungeon_name = ctx.tr(enemy.quick_boss_meta.dungeon_name)
+    slider_points = Slider.points(ui.grap())
+    for i, p in enumerate(slider_points):
+        if i > 0:
+            logger.debug(f"Scroll point: {p}")
+            ui.click_point(p, times=2, interval=0.2)
+            ui.sleep(0.2).snapshot()
+        else:
+            ui.snapshot()
+        if not (enemy_text := ui.search(dungeon_name, roiex.guidebook_content)):
+            continue
+        if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
+            continue
+        challenge_list.sort(key=lambda x: x.y1)
+        if enemy_text[0].y1 > challenge_list[-1].y2:
+            continue
+        if not (challenge_text := next((cl for cl in challenge_list if enemy_text[0].y1 < cl.y2), None)):
+            return False
+        # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+        if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+            continue
+        ui.click_bbox(challenge_text, times=2, interval=0.3)
+
+        def _wait_suggested_lv():
+            if ui.snapshot().search(ctx.tr(I18nText.WeeklySuggestedLv)) and ui.search(
+                    ctx.tr(I18nText.WeeklySoloChallenge)):
+                return True
+            if ui.search(ctx.tr(I18nText.ArrivingAtTheDestination)):
+                ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
+            return False
+
+        # 点击提示弹窗
+        if not ui.sleep(0.2).wait(6, 0.3).until(_wait_suggested_lv):
+            return False
+
+        # 选择最佳推荐等级
+        img = ui.sleep(0.2).grap()
+        lv_points: list[Point] = []
+        best_lv = None
+        for j, lv in enumerate(range(40, 91, 10)):
+            p_lv = ctx.scaler.as_point(AnchorPoint(125, 125 + j * (160 - 104), Align.Left | Align.Top))
+            if ColorRule().points(p_lv).colors(Color.bgr(88, 85, 77)).match(img, ctx.scaler):
+                if len(lv_points) > 0:
+                    best_lv = lv_points[-1]
+                    logger.info(f"{ctx.tr(I18nText.WeeklySuggestedLv).raw}: {lv - 10}")
+                break
+            lv_points.append(p_lv)
+        if best_lv:
+            ui.click_point(best_lv, times=2, interval=0.2)
+
+        # 点击单人挑战
+        if not ui.sleep(0.1).click_text(ctx.tr(I18nText.WeeklySoloChallenge)):
+            return False
+        # 点击开启挑战
+        if not ui.sleep(0.2).wait().until(
+                lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup))
+                        and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
+            return False
+        # 等待进入副本
+        if not ui.sleep(2).wait_back_home():
+            return False
+
+        return True
+
+    logger.warning(f"Enemy not found: {enemy_name.raw}")
+    return False
+
+
+@node(NodeName.doNightmarePurification)
+def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    ui = UIOp(ctx)
+
+    roiex = RoiEx(ctx)
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    menu = ctx.tr(enemy.quick_boss_meta.menu)
+    logger.debug(f"Enemy: {enemy_name.raw}")
+
+    # 点击梦魇祓除
+    if not ui.wait().until(
+            lambda: ui.click_point(AnchorPoint(458, 636, Align.Top | Align.Left), times=2, interval=0.2)
+                    and ui.sleep(0.2).snapshot().click_text(menu, roiex.guidebook_menu, times=2, interval=0.3)
+                    and ui.search(ctx.tr(I18nText.SonataSetFilter))):
+        return False
+
+    # 滑动寻找入口
+    slider_points = Slider.points(ui.grap())
+    for i, p in enumerate(slider_points):
+        if i > 0:
+            logger.debug(f"Scroll point: {p}")
+            ui.click_point(p, times=2, interval=0.2)
+            ui.sleep(0.2).snapshot()
+        else:
+            ui.snapshot()
+        if not (enemy_text := ui.search(enemy_name, roiex.guidebook_content)):
+            continue
+        if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
+            continue
+        challenge_list.sort(key=lambda x: x.y1)
+        if enemy_text[0].y1 > challenge_list[-1].y2:
+            continue
+        if not (challenge_text := next((cl for cl in challenge_list if enemy_text[0].y1 < cl.y2), None)):
+            return False
+        # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+        if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+            continue
+        ui.click_bbox(challenge_text, times=2, interval=0.3)
+
+        # 点击提示弹窗
+        if not ui.sleep(0.2).wait().until(
+                lambda: ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination))
+                        and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
+                        or ui.search(ctx.tr(I18nText.QuickSetup))
+                        and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
+            return False
+
+        # 等待进入副本
+        if not ui.sleep(2).wait_back_home():
+            return False
+
+        return True
+
+    logger.warning(f"Enemy not found: {enemy_name.raw}")
+    return False
 
 
 @node(NodeName.doEnemyTracing)
 def doEnemyTracing(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     ui = UIOp(ctx)
+
     roiex = RoiEx(ctx)
+    enemy_name = ctx.tr(local.enemy.id)
+    logger.debug(f"Enemy: {enemy_name.raw}")
 
     # 检查是否在敌迹探寻，双击搜索
     if not ui.snapshot().search(ctx.tr(I18nText.EnemyTracing), roiex.guidebook_title) or not ui.click_text(
             ctx.tr(I18nText.EnemyTracingSearch), roiex.guidebook_menu, times=2, interval=0.2):
         return False
 
-    # enemy_key = ctx.runtime.cfg.boss.bossName[0]
-    enemy_key = local.enemy_key
-    enemy_name = ctx.tr(enemy_key)
-    enemy = Enemy.from_key(enemy_key)
-    # TODO 提示抗性
-    logger.info(f"Enemy: {enemy_name.raw}")
-
     # 搜索敌人
     ui.sleep(0.1)
-    ctx.control_service.input_text(f"^{re.sub(r"[·_-]", ".", enemy_name.raw)}$")
+    ctx.control_service.input_text(f"^{local.pattern.sub(".", enemy_name.raw)}$")
     ui.sleep(0.2)
     ctx.control_service.enter()
 
@@ -548,12 +611,10 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if not ui.is_on_homepage():
         return False
 
-    # enemy_key = ctx.runtime.cfg.boss.bossName[0]
-    enemy_key = local.enemy_key
-    enemy_name = ctx.tr(enemy_key)
-    enemy = Enemy.from_key(enemy_key)
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
     # TODO 提示抗性
-    logger.debug(f"Enemy: {enemy_name.raw}")
 
     index = 1  # 挑战次数
     page = GlobalPage(ctx)
@@ -565,26 +626,29 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         local.combat_system.set_resonators(local.members, is_print=False)
         local.combat_system.is_async = True
         local.combat_system.check_boss_hp = True
+        local.combat_system.auto_pickup = False
     combat_system = local.combat_system
-    combat_system.auto_pickup = False
-    pickup = AsyncPickup(ctx, delay=0.2, interval=0.3)
+    pickup = AsyncPickup(ctx, delay=0.2, interval=lambda: round(random.uniform(0.3, 0.5), 2), timeout=10)
 
     # 循环刷取副本，直到需要离开副本
     while ui.is_set():
         # 跑向boss
         if enemy.routes:
             combat_system.exit_special_state(Morph.Prefer)
+            ui.sleep(0.2)
             RouteExecutor(ctx).execute(enemy.routes)
 
-        no_text_count = 3
+        no_text_count = 8 if enemy.auto_respawn else 3
         no_text_max = no_text_count
-        deadline = time.monotonic() + 10 * 60
+        deadline = time.monotonic() + 20 * 60
 
         found_complete = False
         heartbeat = RateLimiter(1 / 5)
 
         if index == 1:
             logger.info(f"R{index} - Combat engaged")
+        # 同步战斗次数
+        index = local.combat_count
 
         # 循环战斗，直到击败boss
         while ui.is_set():
@@ -593,28 +657,39 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 break
             if heartbeat() == 0:
                 logger.info(f"R{index} - In combat")
+                ui.activate()
 
             # 开启战斗
             combat_system.start(3.5)
 
             ui.sleep(1.5).snapshot()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"{ui.bbox_result}")
+
             is_home = ui.is_on_homepage(ui.img)
 
             # 开启拾取
             if enemy.auto_respawn:
                 pickup.start()
             else:
-                if is_home and (hp := EnemyHpBar.detect(ui.img)) and hp > 0.3:
-                    pickup.start()
+                if is_home and (hp := EnemyHpBar.detect(ui.img)):
+                    logger.debug(f"hp: {hp:.4f}")
+                    if hp > 0.3:
+                        pickup.start()
+                    else:
+                        pickup.stop()
                 else:
+                    logger.debug(f"hp: None")
                     pickup.stop()
 
             # 检查战斗结束文本：挑战成功、领取奖励
             if ui.search(ctx.tr(
                     [I18nText.ClaimRewards, I18nText.ForgeryChallengeComplete, I18nText.TacetFieldChallengeComplete])):
                 # 战斗次数，防止重复识别到
-                if not found_complete:
+                if enemy.auto_respawn and not found_complete:
+                    # 自动刷新的不退出战斗，只能在这里计数，不准
                     index += 1
+                    local.combat_count += 1
                 found_complete = True
 
                 # 自动刷新的不退出继续打
@@ -632,13 +707,23 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             found_complete = False
 
             # 检查战斗中文本：击败敌人、boss名等
-            # if any(ui.search(local.pattern.sub(".?", ctx.tr(key).raw)) for key in enemy.battle_text):
-            if ui.search(ctx.tr(enemy.battle_text)):
+            if res_battle_text := ui.search(ctx.tr(enemy.battle_text)):
+                logger.debug(f"R{index} - Text: {res_battle_text}")
                 no_text_count = no_text_max
+                continue
+            elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
+                logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
                 continue
             if is_home:
                 no_text_count -= 1
             logger.debug(f"R{index} - Text not found: {ctx.tr(enemy.battle_text)}")
+
+            # 自动拾取误触离开副本
+            if ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
+                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
+                ctx.control_service.attack()
+                ui.sleep(0.2)
+                continue
 
             if page_key := page.action(ui=ui):
                 if page_key == GlobalPage.Revive:
@@ -652,6 +737,11 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         continue
                     return False
                 elif page_key == GlobalPage.InternetDisconnecting:
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    ui.sleep(0.5)
+                    return False
+                elif page_key == GlobalPage.LeaveInstance:
                     pickup.stop()
                     combat_system.pause(join=True)
                     ui.sleep(0.5)
@@ -671,11 +761,17 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             if ui.is_on_homepage(img=img):
                 back_homepage = True
                 break
-            if page.action(ui=ui.snapshot(img=img)):
-                pass
-            elif ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+            # 领取奖励
+            if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
                     ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
                 ui.esc().sleep(0.1)
+            # 离开副本
+            elif ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
+                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
+                ui.esc().sleep(0.1)
+            # 其他
+            elif page.action(ui=ui.snapshot(img=img)):
+                pass
             ui.sleep(0.3)
         if not back_homepage:
             return False
@@ -700,8 +796,10 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 吸收声骸
             for i in range(2):
                 absorb_timeout = 20 if i == 0 else 3
-                if ObjectDetector(ctx).absorb_echoes(timeout=absorb_timeout, enemy_name=enemy_name):
-                    logger.info(f"R{index} - Absorbed")
+                if ObjectDetector(ctx).absorb_echoes(
+                        timeout=absorb_timeout, enemy_name=I18nTr(Language.ZH)(enemy.id).raw):
+                    local.absorb_count += 1
+                    logger.info(f"R{index} - Absorbed: {local.absorb_count}")
                     if ui.sleep(0.4).snapshot().search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
                             ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
                         ui.esc().sleep(0.3)
@@ -729,19 +827,23 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 return False
             break
 
+        # 不会自动刷新的的在战斗结束后计数
+        if not is_downed and not enemy.auto_respawn:
+            index += 1
+            local.combat_count += 1
+
         # 副本内esc重新挑战
         if enemy.is_dungeon and not page.isTerminal(ui=ui):
             # 退出副本，复活
             if is_downed:
-                logger.info(f"R{index} - Exit to Nexus")
+                logger.info(f"R{index} - Exit to nexus")
                 ui.click_text(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]), times=3, interval=0.3)
                 ui.sleep(1.5).wait_back_home()
                 ui.sleep(0.3)
                 return False
 
+            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}")
             ui.click_text(ctx.tr(I18nText.WeeklyRestart), pk=PointKind.RANDOM, times=3, interval=0.3)
-            index += 1
-            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}")
             ui.sleep(1.5).wait_back_home()
             ui.sleep(0.3)
 
@@ -776,6 +878,13 @@ class BossWorkflow(AbstractWorkflow):
             self.engine.run(self, local=self.local, **kwargs)
         except Exception as e:
             raise e
+        finally:
+            # logger.info(f"=== Summary ===")
+            # logger.info(f"Total: {self.local.combat_count}")
+            # if self.local.absorb_count > 0:
+            #     logger.info(f"Absorb: {self.local.absorb_count}")
+            # logger.info(f"===============")
+            pass
 
     def __init_task_local(self):
         """根据配置初始化任务状态"""
@@ -784,6 +893,9 @@ class BossWorkflow(AbstractWorkflow):
 
         self.local.rootFSM.set_enabled(True)
         self.local.teamFSM.set_enabled(True)
+
+        logger.info(f"Enemy: {cfg.bossName}")
+        self.local.enemy = Enemy.from_key(cfg.bossName[0])
 
         if not self.local.rootFSM.is_active:
             logger.warning('Task is not active')
@@ -817,15 +929,16 @@ class BossWorkflow(AbstractWorkflow):
 
         (
             self.engine.source(NodeName.doGuidebook)
-            .on(I18nText.BossChallenge).to(NodeName.doBossChallenge)
-            .on(I18nText.WeeklyChallenge).to(NodeName.doWeeklyChallenge)
+            .on(I18nText.MaterialCollection).to(NodeName.doMaterialCollection)
             .on(I18nText.EnemyTracing).to(NodeName.doEnemyTracing)
             .always().to(NodeName.globalDispatcher)
         )
 
         (
-            self.engine.source(NodeName.doEnemyTracing)
-            .on(True).to(NodeName.doCombat)
+            self.engine.source(NodeName.doMaterialCollection)
+            .on(I18nText.BossChallenge).to(NodeName.doBossChallenge)
+            .on(I18nText.WeeklyChallenge).to(NodeName.doWeeklyChallenge)
+            .on(I18nText.NightmarePurification).to(NodeName.doNightmarePurification)
             .always().to(NodeName.globalDispatcher)
         )
 
@@ -841,9 +954,18 @@ class BossWorkflow(AbstractWorkflow):
             .always().to(NodeName.globalDispatcher)
         )
 
-        self.engine.source(NodeName.doCombat).always().to(NodeName.globalDispatcher)
+        (
+            self.engine.source(NodeName.doNightmarePurification)
+            .on(True).to(NodeName.doCombat)
+            .always().to(NodeName.globalDispatcher)
+        )
 
-        # self.engine.source(NodeName.doBossChallenge).always().to(NodeName.globalDispatcher)
-        # self.engine.source(NodeName.doWeeklyChallenge).always().to(NodeName.globalDispatcher)
+        (
+            self.engine.source(NodeName.doEnemyTracing)
+            .on(True).to(NodeName.doCombat)
+            .always().to(NodeName.globalDispatcher)
+        )
+
+        self.engine.source(NodeName.doCombat).always().to(NodeName.globalDispatcher)
 
         self.engine.exception(NodeName.endNode)

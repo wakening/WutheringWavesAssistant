@@ -939,6 +939,7 @@ class GlobalPage:
                 and ui.search(self.ctx.tr([I18nText.Cancel, I18nText.Restart]))
                 and ui.search(self.ctx.tr([I18nText.Notice, I18nText.Note]))
                 and not ui.search(self.ctx.tr(I18nText.ClaimRewards))):
+            logger.info(f"Leave")
             return self.ActionStr(
                 self.LeaveInstance,
                 lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)

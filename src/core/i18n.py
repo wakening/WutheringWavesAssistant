@@ -230,7 +230,10 @@ class I18nText:
     EnemyCalamityEffigy = "EnemyCalamityEffigy"
 
     # boss战血条上方显示的名字
-    CombatNightmareMourningAix = "CombatNightmareMourningAix"
+    CombatDefeat = "CombatDefeat"
+    ContinueTheChallengeOrLeave = "ContinueTheChallengeOrLeave"
+    NightmareMourningAixFaceOfLust = "NightmareMourningAixFaceOfLust"
+    NightmareHecateClawsOfRegret = "NightmareHecateClawsOfRegret"
 
     # ------- Sonata -------
     FreezingFrost = "FreezingFrost"
@@ -294,6 +297,7 @@ class I18nText:
     Note = "Note"
     Confirm = "Confirm"
     Restart = "Restart"
+    LeaveNow = "LeaveNow"
     Exit = "Exit"
     Exit2 = "Exit2"
     Cancel = "Cancel"
@@ -312,6 +316,7 @@ class I18nText:
     PatchingCompleteTheGameIsRestarting = "PatchingCompleteTheGameIsRestarting"
     DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
     RequestTimedOut = "RequestTimedOut"
+    PleaseDontForgetToTakeABreak = "PleaseDontForgetToTakeABreak"
     AreYouSureYouWantToProceed = "AreYouSureYouWantToProceed"
     Summary = "Summary"
     SummarySkip = "SummarySkip"
@@ -703,14 +708,6 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^漂泊者$", raw="漂泊者"),
         Language.EN: RegexStr(flex_ws(r"^Rover$"), raw="Rover"),
     },
-    # I18nText.Generic: {
-    #     Language.ZH: RegexStr(r"^Generic$", raw="Generic"),
-    #     Language.EN: RegexStr(flex_ws(r"^Generic$"), raw="Generic"),
-    # },
-    # I18nText.Null: {
-    #     Language.ZH: RegexStr(r"^Null$", raw="Null"),
-    #     Language.EN: RegexStr(flex_ws(r"^Null$"), raw="Null"),
-    # },
     I18nText.Encore: {
         Language.ZH: RegexStr(r"^安可$", raw="安可"),
         Language.EN: RegexStr(flex_ws(r"^Encore$"), raw="Encore"),
@@ -1138,15 +1135,31 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Thousand.?Puppet Pavilion$"), raw="Thousand-Puppet Pavilion"),
     },
     I18nText.EnemyCalamityEffigy: {
-        Language.ZH: RegexStr(r"^天.劫煞$", raw="天傀劫煞"),
+        Language.ZH: RegexStr(r"^天.?劫煞$", raw="天傀劫煞"),
         Language.EN: RegexStr(flex_ws(r"^Calamity Effigy$"), raw="Calamity Effigy"),
     },
 
-    I18nText.CombatNightmareMourningAix: {
-        Language.ZH: RegexStr(r"梦.*?声.*?爱|爱欲之容$", raw="梦魇・哀声鸷・爱欲之容"),
+    # 战斗文本
+    I18nText.CombatDefeat: {
+        Language.ZH: RegexStr(r"击败", raw="击败"),
+        Language.EN: RegexStr(flex_ws(r"Defeat"), raw="Defeat"),
+    },
+    I18nText.ContinueTheChallengeOrLeave: {
+        Language.ZH: RegexStr(r"续挑战或离开$", raw="继续挑战或离开"),
+        Language.EN: RegexStr(flex_ws(r"ntinue the challenge or leave$"), raw="Continue the challenge or leave"),
+    },
+    I18nText.NightmareMourningAixFaceOfLust: {
+        Language.ZH: RegexStr(r"梦.*?声.*?[爱欲之容]|爱欲之容$", raw="梦魇・哀声鸷・爱欲之容"),
         Language.EN: RegexStr(
-            flex_ws(r"^Nightmare.*?Mourning Aix.*?Face of Lust$"),
+            flex_ws(r"Nightmare.*?Mourning Aix.*?|Face of Lust$"),
             raw="Nightmare: Mourning Aix- Face of Lust"
+        ),
+    },
+    I18nText.NightmareHecateClawsOfRegret: {
+        Language.ZH: RegexStr(r"梦.*?赫卡|遗恨之指$", raw="梦魇・赫卡忒・遗恨之指"),
+        Language.EN: RegexStr(
+            flex_ws(r"Nightmare.*?Hecate|Claws of Regret$"),
+            raw="Nightmare: Hecate- Claws of Regret"
         ),
     },
 
@@ -1380,6 +1393,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
         Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
     },
+    I18nText.LeaveNow: {
+        Language.ZH: RegexStr(r"^确认离开$", raw="确认离开"),
+        Language.EN: RegexStr(flex_ws(r"^Leave now.?$"), raw="Leave now?"),
+    },
     I18nText.Exit: {
         Language.ZH: RegexStr(r"^离开$", raw="离开"),
         Language.EN: RegexStr(flex_ws(r"^Exit$"), raw="Exit"),
@@ -1462,6 +1479,13 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"^Request timed out.*?Failed to"),
             raw="Request timed out. Failed to connect to the server. Please try again later."
+        ),
+    },
+    I18nText.PleaseDontForgetToTakeABreak: {
+        Language.ZH: RegexStr(r"您的游玩时长|请注意休息", raw="您的游玩时长已经达到3小时，请注意休息"),
+        Language.EN: RegexStr(
+            flex_ws(r"You have been playing|forget to take a break"),
+            raw="You have been playing for 3 hours. Please don't forget to take a break."
         ),
     },
     I18nText.AreYouSureYouWantToProceed: {
@@ -1863,8 +1887,8 @@ I18N_TEXT = {
     },
     # instance
     I18nText.EnterTheForgeryChallenge: {
-        Language.ZH: RegexStr(r"^进入.?凝素领域", raw="进入「凝素领域」"),
-        Language.EN: RegexStr(flex_ws(r"^Enter the .Forgery Challenge"), raw=r"Enter the \"Forgery Challenge\""),
+        Language.ZH: RegexStr(r"进入.?凝素领域", raw="进入「凝素领域」"),
+        Language.EN: RegexStr(flex_ws(r"Enter the.*?Forgery Challenge"), raw=r"Enter the \"Forgery Challenge\""),
     },
     I18nText.Level: {
         Language.ZH: RegexStr(r"等级\d[\do]", raw="等级", desc="等级40"),
@@ -1879,9 +1903,9 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Solo Challenge$"), raw=r"Solo Challenge"),
     },
     I18nText.DefeatTheEnemiesWithinTimeLimit: {
-        Language.ZH: RegexStr(r"^限时击败敌人", raw="限时击败敌人", desc="限时击败敌人: 1/5"),
+        Language.ZH: RegexStr(r"^.{0,2}时击败敌人", raw="限时击败敌人", desc="限时击败敌人: 1/5"),
         Language.EN: RegexStr(
-            flex_ws(r"^Defeat the enemies within time"), raw=r"Defeat the enemies within time limit"),
+            flex_ws(r"^.{0,2}efeat the (enemies|enemy) within"), raw=r"Defeat the enemies within time limit"),
     },
     I18nText.ForgeryChallengeComplete: {
         Language.ZH: RegexStr(r"^挑战成功$", raw="挑战成功"),
@@ -2098,7 +2122,7 @@ I18N_TEXT = {
     },
     I18nText.WeeklySuggestedLv: {
         Language.ZH: RegexStr(r"推荐等级.*\d+", raw="推荐等级", desc=r"推荐等级90"),
-        Language.EN: RegexStr(flex_ws(r"Suggested.*\d+"), raw=r"Suggested", desc=r"Suggested Lv.90"),
+        Language.EN: RegexStr(flex_ws(r"Suggested.*\d+"), raw=r"Suggested Lv", desc=r"Suggested Lv.90"),
     },
     I18nText.WeeklyRemainingAttempts: {
         Language.ZH: RegexStr(r"本周剩余可收取次数", raw="本周剩余可收取次数", desc="本周剩余可收取次数: 3/3"),

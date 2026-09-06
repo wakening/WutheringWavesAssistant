@@ -125,7 +125,7 @@ class SoarToTheBeatConfig(ConfigBase):
 
 
 class Config(ConfigBase):
-    boss: BossConfig = Field(default_factory=BossConfig)
+    bossRush: BossConfig = Field(default_factory=BossConfig)
     daily: DailyConfig = Field(default_factory=DailyConfig)
     explore: ExploreConfig = Field(default_factory=ExploreConfig)
     game: GameConfig = Field(default_factory=GameConfig)

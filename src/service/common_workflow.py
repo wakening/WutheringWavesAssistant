@@ -4,7 +4,8 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from functools import cached_property
-from typing import Optional
+from numbers import Number
+from typing import Optional, Callable
 
 import numpy as np
 
@@ -152,25 +153,36 @@ def absorb_around_variant(ctx: NodeContext):
 
 
 class AsyncPickup:
-    """异步拾取，全局共享，不可并发使用"""
+    """异步拾取，为防滥用，设置为全局共享"""
 
-    EXECUTOR = ThreadPoolExecutor(max_workers=1)
+    _EXECUTOR = ThreadPoolExecutor(max_workers=1)
 
-    def __init__(self, ctx, *, delay: float = 0.0, event=None, interval: float = 0.05):
+    def __init__(self, ctx, *, delay: float = 0.0, event=None,
+                 interval: float | Callable[[], float] = 0.05, timeout: float = 60.0):
         self.ctx = ctx
         self.delay = max(0, min(delay, 60))
         self.event = event
         if self.event is None:
             self.event = threading.Event()
-            self.event.set()
-        self.interval = max(0.05, interval)
-        self.future = None
+        self.interval = interval
+        self.timeout = timeout  # 防止忘了关，没续上就自动停
+        self._lock = threading.Lock()
+        self._deadline = None
 
     def _pickup(self):
-        self._sleep(self.delay)
-        while self.event.is_set():
-            self.ctx.control_service.pick_up()
-            self._sleep(self.interval)
+        if self.timeout > 0:
+            self._refresh_deadline()
+        with self._lock:
+            self._sleep(self.delay)
+            while self.event.is_set():
+                if self.timeout > 0 and self._deadline is not None and time.monotonic() >= self._deadline:
+                    break
+                self.ctx.control_service.pick_up()
+                # logger.info(f"async pickup")
+                if isinstance(self.interval, Number):
+                    self._sleep(self.interval)
+                else:
+                    self._sleep(self.interval())
 
     def _sleep(self, seconds: float):
         if seconds <= 0:
@@ -187,16 +199,23 @@ class AsyncPickup:
             time.sleep(seconds)
         return
 
+    def _refresh_deadline(self):
+        self._deadline = time.monotonic() + self.timeout
+
     def start(self):
-        if self.future is not None:
+        self.event.set()
+        self._refresh_deadline()
+        if not self._lock.acquire(blocking=False):
             return
-        self.future = self.EXECUTOR.submit(self._pickup)
+        try:
+            self._EXECUTOR.submit(self._pickup)
+        finally:
+            self._lock.release()
 
     def stop(self):
         self.event.clear()
-        if self.future is not None:
-            self.future.result()
-            self.future = None
+        with self._lock:
+            logger.debug(f"Stop async pickup")
 
     def __enter__(self):
         self.start()
@@ -448,12 +467,19 @@ class ObjectDetector:
             # 可能被遮挡，走开一段距离重新识别
             if self.step_counter > 1 and self.step_counter % 5 == 0:
                 logger.debug("Special anti-block move: forward + left")
-                for _ in range(5):
-                    self.control.up(0.08)
-                    self.ui.sleep(0.08)
-                for _ in range(3):
-                    self.control.left(0.08)
-                self.ui.sleep(0.1)
+                # for _ in range(5):
+                #     self.control.up(0.08)
+                #     self.ui.sleep(0.08)
+                # for _ in range(3):
+                #     self.control.left(0.08)
+                try:
+                    self.control.key_down("w")
+                    self.control.key_down("a")
+                    self.ui.sleep(0.8)
+                finally:
+                    self.control.key_up("w")
+                    self.control.key_up("a")
+                self.ui.camera_reset().sleep(0.6)
                 return
 
             # 转动视角
@@ -547,12 +573,12 @@ class ObjectDetector:
         # 若“领取奖励”在“吸收”下方，需要滚动
         claim = ui.search(self.ctx.tr(I18nText.ClaimRewards))
         if claim and absorb[0].y1 > claim[0].y1:
-            logger.info("Scroll down to reveal absorb button")
+            logger.debug("Scroll down to reveal absorb button")
             self.ctx.control_service.scroll_mouse(-1)
             ui.sleep(0.5)
 
         ui.pick_up().sleep(0.5)
-        logger.info("Successfully absorbed!")
+        logger.debug("Successfully absorbed!")
         return True
 
     def _move_towards(self, target, control, ui, half_width: int):
@@ -562,13 +588,13 @@ class ObjectDetector:
         dead_zone = half_width * 0.2  # 屏幕宽度的 20% 作为死区
 
         if offset < -dead_zone:
-            logger.info("← Target on left, turning left")
+            logger.debug("← Target on left, turning left")
             control.left(0.08)
         elif offset > dead_zone:
-            logger.info("→ Target on right, turning right")
+            logger.debug("→ Target on right, turning right")
             control.right(0.08)
         else:
-            logger.info("↑ Target centered, moving forward")
+            logger.debug("↑ Target centered, moving forward")
             control.up(0.1)  # 一次前进，避免过度移动
 
         ui.sleep(0.05)  # 每次移动后短暂停顿，让画面稳定
@@ -838,20 +864,24 @@ class Slider:
         """
         scaler = Scaler(cur_wh=(img.shape[1], img.shape[0]))
         slider_top = scaler.as_point(AnchorPoint(top.x, top.y, Align.Top | Align.Right))
-        # 找出滑块位置
-        slider_top, slider_bottom = cls.__find_slider(slider_top, img)
-        if not slider_top or not slider_bottom:
-            return []
-        step = (slider_bottom.y - slider_top.y) * rate
         track_bottom = scaler.as_point(AnchorPoint(bottom.x, bottom.y, Align.Bottom | Align.Right))
+
+        # 找出滑块位置，修正滑块顶端位置
+        new_slider_top, slider_bottom = cls.__find_slider(slider_top, img)
+        if not new_slider_top or not slider_bottom:
+            logger.warning(f"Slider not found")
+            return []
+
+        step = (slider_bottom.y - new_slider_top.y) * rate
         points = [slider_bottom]
-        next_point = slider_bottom
         while True:
-            next_point = Point(next_point.x, int(next_point.y + step))
-            if next_point.y > track_bottom.y:
+            p = Point(points[-1].x, int(points[-1].y + step))
+            if p.y >= track_bottom.y:
                 break
-            points.append(next_point)
+            points.append(p)
         points.append(track_bottom)
+
+        logger.debug(f"slider points: {points}")
         return points
 
     @classmethod

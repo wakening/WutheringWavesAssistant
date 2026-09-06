@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from threading import RLock
 
@@ -88,6 +89,7 @@ class YoloServiceImpl(ODService):
     ) -> Detection | None:
         if not boss_name:
             boss_name = self._context.boss_task_ctx.lastBossName
+        boss_name = re.sub(r"[·_-]", "", boss_name)
         if img is None:
             img = self._img_service.screenshot()
         # with self._rlock:
