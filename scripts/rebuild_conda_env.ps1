@@ -2,6 +2,8 @@ param (
     [string]$poetryExtra
 )
 
+Set-Location $PSScriptRoot\..
+
 try {
     $nvidiaInfo = nvidia-smi | Select-String "Driver Version"
     Write-Host "`n$nvidiaInfo`n"
@@ -13,7 +15,7 @@ if (-not $poetryExtra) {
     Write-Host "Please select an option:"
 #    nvidia-smi
     Write-Host "1: cu126, NVIDIA gpu RTX 40 Series, cuda12.6"
-#    Write-Host "2: dml, AMD gpu or intel gpu"
+    Write-Host "2: dml, AMD gpu or NVIDIA gpu"
     Write-Host "3: cpu"
     Write-Host "4: cu118, NVIDIA gpu RTX 10/20/30 Series, cuda11.8"
     Write-Host "5: cu129, NVIDIA gpu RTX 50 Series, cuda12.9"
@@ -25,10 +27,10 @@ if (-not $poetryExtra) {
         Write-Host "Invalid selection. Please choose 1, 2, 3, 4, 5, or 0."
         $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, 5, or 0)"
     }
-    if ($selectPoetryExtra -in "2") {
-        Write-Host "Unsupport..."
-        exit
-    }
+#    if ($selectPoetryExtra -in "2") {
+#        Write-Host "Unsupport..."
+#        exit
+#    }
     if ($selectPoetryExtra -eq "0") {
         Write-Host "exit..."
         exit
@@ -54,6 +56,10 @@ if ($poetryExtra -notin $poetryExtraAll) {
 $condaEnvNameSubfix = $poetryExtra
 if ($poetryExtra -in "cu126", "cu118", "cu129") {
     $condaEnvNameSubfix = "cuda"
+} elseif ($poetryExtra -in "dml") {
+    $condaEnvNameSubfix = "dml"
+} else {
+    $condaEnvNameSubfix = "cpu"
 }
 $condaEnvName = $condaEnvNamePrefix + "-" + $condaEnvNameSubfix
 Write-Host "Conda virtual environment: $condaEnvName"

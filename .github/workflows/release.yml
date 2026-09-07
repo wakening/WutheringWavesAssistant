@@ -35,7 +35,7 @@ jobs:
           # Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "assets/screenshot" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
           # Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
@@ -280,6 +280,52 @@ jobs:
           name: wwa-gpu-cu118
           path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
 
+      - name: 🧑‍💻 wwa dml版本 安装依赖并打包
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          
+          # 设置pip临时目录到当前目录下
+          $dTempDir = ".\pip_temp"
+          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
+          $absoluteTempPath = Resolve-Path $dTempDir
+          $env:TMP = $absoluteTempPath
+          $env:TEMP = $absoluteTempPath
+          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
+          
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E dml --no-root -v
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          7z a "..\wwa-dml-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+          
+          # 清理pip临时目录
+          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wwa-dml
+          path: "wwa-dml-${{ env.VERSION }}.7z"
+
       - name: 提取最新版本变更记录
         id: extract_changelog
         shell: pwsh
@@ -375,6 +421,7 @@ jobs:
           name: "Release ${{ env.VERSION }}"
           files: |
             wwa-${{ env.VERSION }}.7z
+            wwa-dml-${{ env.VERSION }}.7z
             wwa-gpu-cu118-${{ env.VERSION }}.7z
             wwa-gpu-cu126-${{ env.VERSION }}.7z
             wwa-gpu-cu129-${{ env.VERSION }}.7z.*
