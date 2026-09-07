@@ -90,12 +90,12 @@ class BasicSettingWidget(QWidget):
         ]
         self.device = [
             "Auto",
-            "CUDA",
+            "Auto",
             "CPU",
         ]
         self.deviceDesc = [
             "自动",
-            "GPU-CUDA",
+            "GPU",
             "CPU",
         ]
 

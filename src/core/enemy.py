@@ -7,7 +7,7 @@ import numpy as np
 
 from src.core.geometry import Scaler, AnchorPoint, Align
 from src.core.i18n import I18nText, Language, I18nTr
-from src.core.movement import Run, MoveStep
+from src.core.movement import Run, MoveStep, Walk
 from src.gui.common.boss import BossNameEnum
 
 logger = logging.getLogger(__name__)
@@ -153,7 +153,8 @@ class BossMeta:
     dungeon_name: Optional[str]  # 副本名称
     auto_respawn: bool  # 是否自动刷新
     enter_text: Optional[str]  # 进入 Boss 房文本
-    battle_text: List[str]  # Boss 战时特殊文本
+    battle_text: List[str]  # Boss 战进行时特殊文本
+    stop_text: List[str]  # Boss 战结束时特殊文本
     routes: List[MoveStep]  # 路线 (如 ["路线1", "路线2"])
 
 
@@ -164,7 +165,8 @@ class QuickBossMeta:
     menu: str  # 快捷挑战菜单标识 (如 "weekly_boss", "event_boss" 等)
     dungeon_name: str  # 副本名称
     auto_respawn: bool  # 是否自动刷新
-    battle_text: List[str]  # Boss 战时特殊文本
+    battle_text: List[str]  # Boss 战进行时特殊文本
+    stop_text: List[str]  # Boss 战结束时特殊文本
     routes: List[MoveStep]  # 路线 (如 ["路线1", "路线2"])
 
 
@@ -227,10 +229,17 @@ class EnemyMeta:
 
     @property
     def battle_text(self) -> List[str]:
-        """战斗文本，如左侧击败、顶部boss名"""
+        """战斗中文本，如左侧击败、顶部boss名"""
         if self.prefer_quick:
             return self.quick_boss_meta.battle_text
         return self.boss_meta.battle_text
+
+    @property
+    def stop_text(self) -> List[str]:
+        """战斗结束文本，如左侧击败、顶部boss名"""
+        if self.prefer_quick:
+            return self.quick_boss_meta.stop_text
+        return self.boss_meta.stop_text
 
     @property
     def auto_respawn(self) -> bool:
@@ -268,6 +277,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -275,8 +285,9 @@ class Enemy:
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.StatueOfTheCrownless,
             auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
-            routes=[],
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[Walk.forward(3), Run.forward(2.2)],
         ),
     )
 
@@ -299,6 +310,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -307,6 +319,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyFallacyOfNoReturn,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -330,6 +343,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -338,6 +352,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyLampylumenMyriad,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -361,6 +376,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -369,6 +385,7 @@ class Enemy:
             dungeon_name=I18nText.BellOfArchaicChants,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -392,6 +409,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -400,6 +418,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyInfernoRider,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -423,6 +442,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -431,6 +451,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyImpermanenceHeron,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[I18nText.ClaimRewards],
             routes=[],
         ),
     )
@@ -454,6 +475,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -462,6 +484,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyMechAbomination,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -485,6 +508,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -493,6 +517,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyMourningAix,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -516,6 +541,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -524,6 +550,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyThunderingMephis,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -547,6 +574,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -555,6 +583,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyTempestMephis,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -578,6 +607,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -586,6 +616,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyFeilianBeringal,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -609,6 +640,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -617,6 +649,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyCrownless,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -640,6 +673,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -648,6 +682,7 @@ class Enemy:
             dungeon_name=I18nText.TheFatedConfrontation,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -671,6 +706,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -679,6 +715,7 @@ class Enemy:
             dungeon_name=I18nText.EnemySentryConstruct,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -702,6 +739,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -710,6 +748,7 @@ class Enemy:
             dungeon_name=I18nText.BeyondTheCrimsonCurtain,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -733,6 +772,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -741,6 +781,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyLorelei,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -764,6 +805,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -772,6 +814,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyDragonOfDirge,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -795,6 +838,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -803,6 +847,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareFeilianBeringal,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -826,6 +871,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -834,6 +880,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareImpermanenceHeron,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -857,6 +904,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -865,6 +913,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareTempestMephis,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -888,6 +937,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -896,6 +946,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareThunderingMephis,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -919,6 +970,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -927,6 +979,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareCrownless,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -950,6 +1003,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -958,6 +1012,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareInfernoRider,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -981,6 +1036,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.NightmareMourningAixFaceOfLust],
+            stop_text=[],
             routes=[Run.forward(3.6)],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -989,6 +1045,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareMourningAix,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1012,6 +1069,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1020,6 +1078,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareLampylumenMyriad,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1043,6 +1102,7 @@ class Enemy:
             auto_respawn=True,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1051,6 +1111,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareKelpie,
             auto_respawn=True,
             battle_text=[I18nText.DefeatTheEnemies, I18nText.ContinueTheChallengeOrLeave],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1074,6 +1135,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1082,6 +1144,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyLionessOfGlory,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1105,6 +1168,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1113,7 +1177,8 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareHecate,
             auto_respawn=True,
             battle_text=[I18nText.NightmareHecateClawsOfRegret],
-            routes=[Run.forward(1.5)],
+            stop_text=[],
+            routes=[Run.forward(1.8)],
         ),
     )
 
@@ -1136,6 +1201,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1144,6 +1210,7 @@ class Enemy:
             dungeon_name=I18nText.TheWheelOfBrokenFate,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1167,6 +1234,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1175,7 +1243,8 @@ class Enemy:
             dungeon_name=I18nText.EnemyFenrico,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
-            routes=[],
+            stop_text=[],
+            routes=[Run.forward(1)],
         ),
     )
 
@@ -1198,6 +1267,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1206,6 +1276,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyTheFalseSovereign,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1229,6 +1300,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1236,8 +1308,9 @@ class Enemy:
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLadyOfTheSea,
             auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
-            routes=[],
+            battle_text=[I18nText.LadyOfTheSeaEmbersOfGlory],
+            stop_text=[],
+            routes=[Run.forward(1)],
         ),
     )
 
@@ -1260,6 +1333,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1268,6 +1342,7 @@ class Enemy:
             dungeon_name=I18nText.CinderniteApocalypse,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1291,6 +1366,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1299,6 +1375,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyReactorHusk,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1322,6 +1399,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1330,6 +1408,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyHyvatia,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1353,6 +1432,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1361,6 +1441,7 @@ class Enemy:
             dungeon_name=I18nText.GateOfTheLostStar,
             auto_respawn=False,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1384,6 +1465,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1392,6 +1474,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNamelessExplorer,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1415,6 +1498,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1423,6 +1507,7 @@ class Enemy:
             dungeon_name=I18nText.SeedOfIllusoryOrigin,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1446,6 +1531,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1454,6 +1540,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyNightmareAdamSmasher,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1477,6 +1564,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1485,6 +1573,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyMyriadSnareRustfireChassis,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1508,6 +1597,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1516,6 +1606,7 @@ class Enemy:
             dungeon_name=I18nText.CourtOfShackledSouls,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1539,6 +1630,7 @@ class Enemy:
             auto_respawn=False,
             enter_text=None,
             battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
             routes=[],
         ),
         quick_boss_meta=QuickBossMeta(
@@ -1547,6 +1639,7 @@ class Enemy:
             dungeon_name=I18nText.EnemyCalamityEffigy,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
             routes=[],
         ),
     )
@@ -1560,39 +1653,6 @@ class Enemy:
         return EnemyMeta.ID_ENEMIES.get(key)
 
 
-# class DailyEnemy:
-#     """每日任务专用敌人参数配置"""
-#
-#     NightmareHecate = EnemyMeta(
-#         id=I18nText.EnemyNightmareHecate,
-#         key=BossNameEnum.NightmareHecate,
-#         name=_tr(I18nText.EnemyNightmareHecate),
-#         species=EnemySpecies.NightmareTacetDiscord,
-#         rank=EnemyRank.CalamityClass,
-#         cost=EnemyCost.Cost4,
-#         icon=EnemyIcon.Icon1,
-#         version=EnemyVersion.V1_0,
-#         sonata=[SonataEffect.FreezingFrost],
-#         elements=[EnemyElement.Havoc],
-#         prefer_quick=True,
-#         boss_meta=BossMeta(
-#             name=_tr(I18nText.EnemyNightmareHecate),
-#             is_dungeon=False,
-#             dungeon_name=None,
-#             auto_respawn=False,
-#             enter_text=None,
-#             battle_text=[I18nText.CombatDefeat],
-#             routes=[],
-#         ),
-#         quick_boss_meta=QuickBossMeta(
-#             name=_tr(I18nText.EnemyNightmareHecate),
-#             menu=I18nText.WeeklyChallenge,
-#             dungeon_name=I18nText.BeyondTheCrimsonCurtain,
-#             auto_respawn=False,
-#             battle_text=[I18nText.DefeatTheEnemies],
-#             routes=[],
-#         ),
-#     )
 
 
 class EnemyHpBar:

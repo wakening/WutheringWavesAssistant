@@ -207,36 +207,45 @@ class AbstractOcrService(OCRService, ABC):
         self.ocr_use_gpu = self._device.is_gpu()
 
     def resolve_device(self) -> Device:
-        ocr_use_gpu = None
-        is_fall_back = False
-        if self._context.spec and self._context.spec.ocr_use_gpu is True:
-            if importlib.util.find_spec("paddle") and importlib.util.find_spec("onnxruntime"):
-                import paddle
-                import onnxruntime
-                if paddle.is_compiled_with_cuda() and "CUDAExecutionProvider" in onnxruntime.get_available_providers():
-                    ocr_use_gpu = True
-                    # logger.info("OCR is running on GPU ✅")
-            if ocr_use_gpu is None:
-                ocr_use_gpu = False
-                is_fall_back = True
-                # logger.warning("OCR expected GPU, falling back to CPU ⚠️")
-        if ocr_use_gpu is None:
-            ocr_use_gpu = False
-            # logger.info("OCR is running on CPU ✅")
+        # 配置主动设置为CPU模式
+        if self._device and self._device == Device.CPU:
+            logger.info("OCR forced to CPU")
+            return Device.CPU
+        # 任务参数未指定，默认CPU
+        if not self._context.spec or not self._context.spec.ocr_use_gpu:
+            logger.info("OCR defaults to CPU")
+            return Device.CPU
 
-        final_device = Device.CUDA if ocr_use_gpu else Device.CPU
-        if self._device.is_gpu():
-            if ocr_use_gpu:
-                logger.info("OCR using GPU ✅")
-            elif is_fall_back:
-                logger.warning("OCR expected GPU, falling back to CPU ⚠️")
-        elif self._device == Device.CPU:
-            if ocr_use_gpu:
-                logger.info("OCR expected GPU, CPU selected")
-                final_device = Device.CPU
-        else:
-            raise NotImplementedError()
-        return final_device
+        # GPU模式
+        is_cuda = None
+        is_dml = None
+
+        # importlib.util.find_spec("onnxruntime")
+        import onnxruntime
+        ort_providers = onnxruntime.get_available_providers()
+
+        # 检查cuda，pp-gpu + ort-gpu
+        if importlib.util.find_spec("paddle"):
+            import paddle
+            if paddle.is_compiled_with_cuda() and "CUDAExecutionProvider" in ort_providers:
+                is_cuda = True
+        # 检查dml，ort-dml
+        elif "DmlExecutionProvider" in ort_providers:
+            is_dml = True
+
+        # 没有GPU环境无法使用
+        if is_cuda is None and is_dml is None:
+            logger.warning("OCR expected GPU, falling back to CPU ⚠️")
+            return Device.CPU
+
+        if is_cuda:
+            logger.info("OCR using GPU ✅")
+            return Device.CUDA
+        elif is_dml:
+            logger.info("OCR using DML ✅")
+            return Device.DML
+
+        raise NotImplementedError()
 
 
 class RapidOcrServiceImpl(AbstractOcrService):
@@ -245,7 +254,8 @@ class RapidOcrServiceImpl(AbstractOcrService):
         logger.debug("Initializing %s", self.__class__.__name__)
         super().__init__(context, window_service, img_service)
 
-        self._engine = rapidocr_util.create_ocr(use_gpu=self.ocr_use_gpu)
+        self._engine = rapidocr_util.create_ocr(
+            use_gpu=self._device == Device.CUDA, use_dml=self._device == Device.DML)
         self._last_time = time.time()
 
     def search_text(self, results: list[TextPosition], target: str) -> TextPosition | None:
@@ -361,7 +371,7 @@ class PaddleOcrServiceImpl(AbstractOcrService):
         super().__init__(context, window_service, img_service)
 
         from src.util import paddleocr_util
-        self._engine = paddleocr_util.create_paddleocr(use_gpu=self.ocr_use_gpu)
+        self._engine = paddleocr_util.create_paddleocr(use_gpu=self._device == Device.CUDA)
         self._last_time = time.time()
 
     def search_text(self, results: list[TextPosition], target: str) -> TextPosition | None:

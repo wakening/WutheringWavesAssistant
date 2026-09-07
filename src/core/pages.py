@@ -940,10 +940,13 @@ class GlobalPage:
                 and ui.search(self.ctx.tr([I18nText.Notice, I18nText.Note]))
                 and not ui.search(self.ctx.tr(I18nText.ClaimRewards))):
             logger.info(f"Leave")
-            return self.ActionStr(
-                self.LeaveInstance,
-                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(1)
-            )
+
+            def _func():
+                ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3)
+                # 可能鼠标无法点击，但键盘有效
+                ui.sleep(0.2).esc().sleep(0.8)
+
+            return self.ActionStr(self.LeaveInstance, _func)
 
         # 周本消耗体力领取奖励后弹出页面
         if ((res := ui.search(self.ctx.tr(I18nText.WeeklyExit)))

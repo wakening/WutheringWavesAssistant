@@ -192,7 +192,7 @@ class ParamConfig(QConfig):
     # Game
     gameLanguage = ConfigItem("Game", "GameLanguage", None)
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
-    device = ConfigItem("Game", "Device", None, OptionsValidator([None, "GPU", "CPU"]))
+    device = ConfigItem("Game", "Device", None, OptionsValidator([None, "CPU"]))
 
 
     def save(self):

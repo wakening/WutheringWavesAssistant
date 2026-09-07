@@ -474,8 +474,12 @@ class ObjectDetector:
                 #     self.control.left(0.08)
                 try:
                     self.control.key_down("w")
+                    self.ui.sleep(0.4)
+                    self.control.key_up("w")
+                    self.ui.sleep(0.01)
+                    self.control.key_down("w")
                     self.control.key_down("a")
-                    self.ui.sleep(0.8)
+                    self.ui.sleep(0.1)
                 finally:
                     self.control.key_up("w")
                     self.control.key_up("a")
@@ -550,7 +554,8 @@ class ObjectDetector:
             if wander.camera_reset_count >= 8:
                 break
 
-            detected = od.search_echo_2(boss_name=enemy_name)
+            detected = od.search_echo_2(boss_name=enemy_name, confidence=0.5)
+            logger.debug(f"detected: {detected}")
             target_box = tracker.update(detected)
 
             if target_box is None:

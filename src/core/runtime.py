@@ -175,10 +175,11 @@ class ExploreRuntimeConfig:
 class Device(str, Enum):
     Auto = "Auto"
     CUDA = "CUDA"
+    DML = "DML"
     CPU = "CPU"
 
     def is_gpu(self):
-        return self in [Device.Auto, Device.CUDA]
+        return self not in [Device.CPU]
 
     def is_cpu(self):
         return not self.is_gpu()
@@ -235,11 +236,14 @@ class GameRuntimeConfig:
         if not device:
             logger.info(f"Device: '{Device.Auto.value}'")
             return Device.Auto
-        try:
-            device = Device(device)
-        except Exception:
-            logger.warning(f"Invalid device: '{self._cfg.device}', using default: {Device.Auto.value}")
-            return Device.Auto
+        if device.upper() == "GPU":
+            device = Device.Auto
+        else:
+            try:
+                device = Device(device)
+            except Exception:
+                logger.warning(f"Invalid device: '{self._cfg.device}', using default: {Device.Auto.value}")
+                return Device.Auto
         logger.info(f"Device: '{device.value}'")
         return device
 

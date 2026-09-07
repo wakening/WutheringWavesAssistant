@@ -234,6 +234,7 @@ class I18nText:
     ContinueTheChallengeOrLeave = "ContinueTheChallengeOrLeave"
     NightmareMourningAixFaceOfLust = "NightmareMourningAixFaceOfLust"
     NightmareHecateClawsOfRegret = "NightmareHecateClawsOfRegret"
+    LadyOfTheSeaEmbersOfGlory = "LadyOfTheSeaEmbersOfGlory"
 
     # ------- Sonata -------
     FreezingFrost = "FreezingFrost"
@@ -1160,6 +1161,13 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"Nightmare.*?Hecate|Claws of Regret$"),
             raw="Nightmare: Hecate- Claws of Regret"
+        ),
+    },
+    I18nText.LadyOfTheSeaEmbersOfGlory: {
+        Language.ZH: RegexStr(r"海之女|荣光的灰$", raw="海之女・荣光的灰烬"),
+        Language.EN: RegexStr(
+            flex_ws(r"Lady of the Sea|Embers of Glory$"),
+            raw="Lady of the Sea- Embers of Glory"
         ),
     },
 
