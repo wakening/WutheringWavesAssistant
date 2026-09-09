@@ -133,11 +133,11 @@ jobs:
           # 清理pip临时目录
           Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: 📂 上传 7z 文件作为 workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wwa
-          path: "wwa-${{ env.VERSION }}.7z"
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa
+#          path: "wwa-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
         shell: pwsh
@@ -179,11 +179,11 @@ jobs:
           # 清理pip临时目录
           Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: 📂 上传 7z 文件作为 workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wwa-gpu-cu126
-          path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-gpu-cu126
+#          path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa gpu cuda12.9版本 安装依赖并打包
         shell: pwsh
@@ -228,11 +228,17 @@ jobs:
           # 清理pip临时目录
           Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: 📂 上传 7z 文件作为 workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wwa-gpu-cu129
-          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.*"
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-gpu-cu129-001
+#          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.001"
+#
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-gpu-cu129-002
+#          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.002"
 
       - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
         shell: pwsh
@@ -274,11 +280,11 @@ jobs:
           # 清理pip临时目录
           Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: 📂 上传 7z 文件作为 workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wwa-gpu-cu118
-          path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-gpu-cu118
+#          path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa dml版本 安装依赖并打包
         shell: pwsh
@@ -320,11 +326,11 @@ jobs:
           # 清理pip临时目录
           Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: 📂 上传 7z 文件作为 workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wwa-dml
-          path: "wwa-dml-${{ env.VERSION }}.7z"
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-dml
+#          path: "wwa-dml-${{ env.VERSION }}.7z"
 
       - name: 提取最新版本变更记录
         id: extract_changelog
