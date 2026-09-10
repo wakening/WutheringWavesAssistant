@@ -571,7 +571,7 @@ class Cartethyia(BaseCartethyia):
     @combat_cache
     def cartethyia_zjEa(self):
         return [
-            ["a_down", 0.00, 0.90],
+            ["a_down", 0.00, 1.00],
             ["j", 0.05, 0.05],
             ["E", 0.05, 0.20],
             ["E", 0.05, 0.25],
@@ -941,7 +941,9 @@ class Cartethyia(BaseCartethyia):
             # ["E", 0.05, 1.65],
             ["E", 0.05, 0.10],
             ["E", 0.05, 0.20],
-            ["a", 0.05, 1.45],
+            ["E", 0.05, 0.20],
+            ["a", 0.05, 0.10],
+            ["w", 0.00, 1.10],
         ]
 
     @combat_cache
@@ -957,11 +959,10 @@ class Cartethyia(BaseCartethyia):
             ["E", 0.05, 0.13],
             # ["E", 0.05, 1.65],
             ["E", 0.05, 0.10],
-            ["E", 0.05, 0.10],
-            ["E", 0.05, 0.10],
-            ["a", 0.05, 0.25],
-            ["a", 0.05, 0.25],
-            ["a", 0.05, 0.25],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.30],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
         ]
 
@@ -970,7 +971,13 @@ class Cartethyia(BaseCartethyia):
         return [
             # ["R", 0.05, 3.60],
             ["R", 0.05, 0.20],
-            ["R", 0.05, 3.35],
+            ["R", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 1.25],
         ]
 
     @combat_cache
@@ -1206,7 +1213,7 @@ class Cartethyia(BaseCartethyia):
                     self.combo_action(self.fleurdelys_EE(), True)
                     self.combo_action(self.fleurdelys_a4(), False)
                 else:
-                    self.combo_action(self.fleurdelys_EaaE(), False)
+                    self.combo_action(self.fleurdelys_EaaE(), True)
             else:
                 self.combo_action(self.fleurdelys_ja3(), False)
             if self.random_float() < 0.5:

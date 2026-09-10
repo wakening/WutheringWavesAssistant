@@ -9,9 +9,10 @@ from typing import Optional, Callable
 
 import numpy as np
 
+from src.core.enemy import EnemyMeta, AbsorbMode
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, BBox, TextBox, Scaler, Point
-from src.core.i18n import I18nText
+from src.core.i18n import I18nText, Language, I18nTr
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp
 from src.core.workflow import NodeContext
@@ -215,7 +216,7 @@ class AsyncPickup:
     def stop(self):
         self.event.clear()
         with self._lock:
-            logger.debug(f"Stop async pickup")
+            logger.debug(f"Stop async pickup", stacklevel=2)
 
     def __enter__(self):
         self.start()
@@ -526,8 +527,65 @@ class ObjectDetector:
 
     def __init__(self, ctx: NodeContext):
         self.ctx = ctx
+        self._save_img = False
+        # self._save_img = True
 
-    def absorb_echoes(self, timeout: float = 20.0, enemy_name: Optional[str] = None):
+    def absorb_echoes(self, *, timeout: float = 20.0, enemy: EnemyMeta):
+        ui = UIOp(self.ctx)
+
+        if self.try_pickup():
+            return True
+
+        ui.activate().sleep(0.1).camera_reset().sleep(0.5)
+        enemy_name = I18nTr(Language.ZH)(enemy.id).raw  # 兼容历史
+
+        # 吸收方式，默认为混合模式
+        if not enemy.absorb or enemy.absorb == AbsorbMode.Hybrid:
+            # 粗判一次
+            detected = self.ctx.od_service.search_echo_2(boss_name=enemy_name, confidence=0.5)
+            logger.debug(f"detected: {detected}")
+            # 若有转两圈
+            if detected:
+                return self._absorb_od(timeout, enemy_name, camera_reset_count=8)
+            # 没有，先盲捡，再转一圈
+            if self._absorb_around_variant(self.ctx):
+                return True
+            ui.camera_reset().sleep(0.5)
+            return self._absorb_od(timeout, enemy_name, camera_reset_count=4)
+        elif enemy.absorb == AbsorbMode.Move:
+            return self._absorb_around_variant(self.ctx)
+        elif enemy.absorb == AbsorbMode.OD:
+            return self._absorb_od(timeout, enemy_name, camera_reset_count=8)
+
+        raise NotImplementedError()
+
+
+    def _absorb_around_variant(self, ctx: NodeContext):
+        """环绕吸收变体"""
+
+        if self.try_pickup():
+            return True
+
+        route = [
+            Run.forward(0.22), Run.forward(0.23), Run.left(0.22), Run.backward(0.27), Run.backward(0.27),
+            Run.right(0.22), Run.forward(0.27), Run.right(0.22), Run.forward(0.23), Run.backward(0.53)
+        ]
+
+        for i, step in enumerate(route):
+            key = step.direction.get_key()
+            # 点按停顿
+            if i > 0:
+                ctx.control_service.fight_tap(key, 0.05)
+                ctx.control_service.fight_tap(key, 0.05)
+            ctx.control_service.forward_run(step.duration, key)
+            # 等待惯性停止
+            time.sleep(0.75)
+            if self.try_pickup():
+                return True
+
+        return False
+
+    def _absorb_od(self, timeout: float = 20.0, enemy_name: Optional[str] = None, camera_reset_count=8):
         """
         持续搜索并移动到回声目标，直到出现“吸收”交互项并拾取。
         返回是否成功吸收。
@@ -537,54 +595,76 @@ class ObjectDetector:
         ctx = self.ctx
         ui = UIOp(ctx)
         control = ctx.control_service
-        od = ctx.od_service
-        roi_dialogue = RoiEx(ctx).dialogue
         window_half_width = ctx.window_service.window_bbox().width() // 2
 
-        ui.activate().camera_reset().sleep(0.5)
+        # ui.activate().camera_reset().sleep(0.5)
 
         tracker = self._TargetTracker(max_tolerance=1)
         wander = self._WanderHelper(control, ui)
 
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            if self._try_pickup(ui, roi_dialogue):
+            if self.try_pickup():
                 return True
             # 转两圈都没有就结束
-            if wander.camera_reset_count >= 8:
+            if wander.camera_reset_count >= camera_reset_count:
                 break
 
-            detected = od.search_echo_2(boss_name=enemy_name, confidence=0.5)
-            logger.debug(f"detected: {detected}")
+            detected = ctx.od_service.search_echo_2(boss_name=enemy_name, confidence=0.5)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.info(f"detected: {detected}")
             target_box = tracker.update(detected)
 
             if target_box is None:
                 wander.wander_and_reset()
             else:
+                self._save_train_img(ui)
                 wander.reset_step()
                 self._move_towards(target_box, control, ui, window_half_width)
 
         logger.debug("Absorb echoes timeout")
         return False
 
+    def _save_train_img(self, ui):
+        if not self._save_img:
+            return
+        from src.util import img_util
+        from src.util import file_util
+        img_name = self.ctx.runtime.cfg.boss.bossName[0]
+        img_path = file_util.create_img_path(prefix=img_name)
+        img_util.save_img(ui.grap(), img_path)
+
     # ---------- 辅助方法 ----------
-    def _try_pickup(self, ui: "UIOp", roi) -> bool:
+    def try_pickup(self) -> bool:
         """检测并执行拾取操作，返回是否成功拾取"""
+        ui = UIOp(self.ctx)
+        roi = RoiEx(self.ctx).dialogue
         ui.snapshot(roi=roi)
         absorb = ui.search(self.ctx.tr(I18nText.Absorb))
         if not absorb:
             return False
 
-        # 若“领取奖励”在“吸收”下方，需要滚动
-        claim = ui.search(self.ctx.tr(I18nText.ClaimRewards))
-        if claim and absorb[0].y1 > claim[0].y1:
-            logger.debug("Scroll down to reveal absorb button")
-            self.ctx.control_service.scroll_mouse(-1)
-            ui.sleep(0.5)
+        self._save_train_img(ui)
 
-        ui.pick_up().sleep(0.5)
-        logger.debug("Successfully absorbed!")
-        return True
+        # 吸收可能在领取奖励、重新挑战下方，需要滚动
+        keys = [
+            absorb,
+            ui.search(self.ctx.tr(I18nText.ClaimRewards)),
+            ui.search(self.ctx.tr(I18nText.ChallengeAgain)),
+        ]
+        keys.sort(key=lambda x: x[0].y1 if x else 1e10, reverse=False)
+        for i, k in enumerate(keys):
+            if not k or abs(k[0].y1 - absorb[0].y1) > 0.01:
+                continue
+            if i > 0:
+                logger.debug("Scroll down to reveal absorb button")
+                self.ctx.control_service.scroll_mouse(-1 * i)
+                ui.sleep(0.5)
+            ui.pick_up().sleep(0.5)
+            logger.debug("Successfully absorbed!")
+            return True
+
+        return False
 
     def _move_towards(self, target, control, ui, half_width: int):
         """根据目标框在屏幕上的位置，决定转向或前进"""
@@ -726,7 +806,7 @@ def match_remaining_attempts(result: list[TextBox] | None) -> tuple[Optional[int
         return None, None
     try:
         # 本周剩余可收取次数: 3/3
-        logger.info(f"{result[0].text}")
+        logger.info(f"{result[0].text}", stacklevel=2)
         match = re.search(r"([0-9o])/(\d)", result[0].text, flags=re.I)
         if not match:
             return None, None

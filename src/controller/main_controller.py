@@ -253,6 +253,7 @@ class TaskMonitor:
         if is_alive:
             return True
         logger.warning("开始重启游戏")
+        time.sleep(3)  # 等进程彻底结束
         self._restart_game()
         return False
 

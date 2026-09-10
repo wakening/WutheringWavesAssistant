@@ -390,7 +390,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         return None
 
     # 点击进入编队
-    if not ui.click_text(ctx.tr(I18nText.Team), bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
+    if not ui.click_text(ctx.tr(I18nText.Team), bbox_terminal_content(ctx), pk=PointKind.NEAR, delay=0.3):
         logger.warning(f"Text not found: {ctx.tr(I18nText.Team).raw}")
         return False
 
@@ -960,7 +960,6 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return False
     cost = 40
     if cur_waveplate < cost:
-        logger.info(f"⏭️ skip because: waveplate &lt; {cost}")
         cur_fsm.complete()
         return True
 
@@ -995,7 +994,6 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     next_point = scroll_p1
     while True:
         # 获取这页的副本
-        # textboxes = ui.sleep(0.1).snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
         textboxes = ui.sleep(0.1).snapshot().search(keywords, bbox_guidebook_content(ctx))
         if not textboxes:
             return _fail_return()
@@ -1267,7 +1265,6 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return False
         cost = 60
         if cur_waveplate < cost:
-            logger.info(f"⏭️ skip because: waveplate &lt; {cost}")
             cur_fsm.complete()
             return True
 
@@ -1290,7 +1287,6 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         keywords = ctx.tr([*tacets, I18nText.Go, I18nText.Challenge, I18nText.EchoSet])
         # 获取无音区
-        # textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
         textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
         if not textboxes:
             return _fail_return()
@@ -1581,19 +1577,16 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return False
     cost = 60
     if cur_waveplate < cost:
-        logger.info(f"⏭️ skip because: waveplate &lt; {cost}")
         cur_fsm.complete()
         return True
 
     # 本周剩余可收取次数: 3/3
     result = ui.sleep(0.2).wait().until(
         lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
-    # lambda: ui.snapshot(resize=False).search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
     remain, max_remain = match_remaining_attempts(result)
     if remain is None or not max_remain:
         return _fail_return()
     if remain == 0:
-        logger.info(f"⏭️ skip because: remaining attempts {remain}/{max_remain}")
         cur_fsm.complete()
         return True
 
@@ -1878,7 +1871,6 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
         keywords = ctx.tr([*tacets, I18nText.Go]) + [progress_pattern]
         # 获取聚落列表
-        # textboxes = ui.snapshot(resize=False).search(keywords, bbox_guidebook_content(ctx))
         textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
         textboxes.sort(key=lambda p: p.y1)
         logger.debug(f"textboxes: {textboxes}")

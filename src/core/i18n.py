@@ -111,6 +111,14 @@ class I18nText:
     # ------- Game -------
     WutheringWaves = "WutheringWaves"
 
+    # ------- Element -------
+    Aero = "Aero"
+    Electro = "Electro"
+    Fusion = "Fusion"
+    Spectro = "Spectro"
+    Havoc = "Havoc"
+    Glacio = "Glacio"
+
     # ------- Resonator -------
     Rover = "Rover"
     Generic = "Generic"
@@ -317,6 +325,7 @@ class I18nText:
     PatchingCompleteTheGameIsRestarting = "PatchingCompleteTheGameIsRestarting"
     DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
     RequestTimedOut = "RequestTimedOut"
+    ConnectionErrorReconnecting = "ConnectionErrorReconnecting"
     PleaseDontForgetToTakeABreak = "PleaseDontForgetToTakeABreak"
     AreYouSureYouWantToProceed = "AreYouSureYouWantToProceed"
     Summary = "Summary"
@@ -702,6 +711,32 @@ I18N_TEXT = {
     I18nText.WutheringWaves: {
         Language.ZH: "鸣潮  ",
         Language.EN: "Wuthering Waves  ",
+    },
+
+    # ------- Element -------
+    I18nText.Aero: {
+        Language.ZH: RegexStr(r"^气动$", raw="气动"),
+        Language.EN: RegexStr(flex_ws(r"^Aero$"), raw="Aero"),
+    },
+    I18nText.Electro: {
+        Language.ZH: RegexStr(r"^导电$", raw="导电"),
+        Language.EN: RegexStr(flex_ws(r"^Electro$"), raw="Electro"),
+    },
+    I18nText.Fusion: {
+        Language.ZH: RegexStr(r"^热熔$", raw="热熔"),
+        Language.EN: RegexStr(flex_ws(r"^Fusion$"), raw="Fusion"),
+    },
+    I18nText.Spectro: {
+        Language.ZH: RegexStr(r"^衍射$", raw="衍射"),
+        Language.EN: RegexStr(flex_ws(r"^Spectro$"), raw="Spectro"),
+    },
+    I18nText.Havoc: {
+        Language.ZH: RegexStr(r"^湮灭$", raw="湮灭"),
+        Language.EN: RegexStr(flex_ws(r"^Havoc$"), raw="Havoc"),
+    },
+    I18nText.Glacio: {
+        Language.ZH: RegexStr(r"^冷凝$", raw="冷凝"),
+        Language.EN: RegexStr(flex_ws(r"^Glacio$"), raw="Glacio"),
     },
 
     # ------- Resonator -------
@@ -1487,6 +1522,13 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"^Request timed out.*?Failed to"),
             raw="Request timed out. Failed to connect to the server. Please try again later."
+        ),
+    },
+    I18nText.ConnectionErrorReconnecting: {
+        Language.ZH: RegexStr(r"^网络异常.*?正在重新", raw="网络异常, 正在重新连接中"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Connection error.*?Rec"),
+            raw="Connection error. Reconnecting"
         ),
     },
     I18nText.PleaseDontForgetToTakeABreak: {

@@ -61,9 +61,9 @@ class ParamConfig(BaseModel):
             return pre_data
         bossRush = data.get("BossRush", {})
         pre_data["bossName"] = bossRush.get("BossName")
-        pre_data["bossLevel"] = bossRush.get("BossLevel")
+        pre_data["bossLevel"] = "Auto"
         pre_data["autoRestartPeriod"] = bossRush.get("AutoRestartPeriod")
-        pre_data["autoCombatBeta"] = bossRush.get("AutoCombatBetaV2")
+        pre_data["autoCombatBeta"] = True
 
         soarToTheBeat = data.get("SoarToTheBeat", {})
         pre_data["defaultTemplate"] = soarToTheBeat.get("DefaultTemplate")

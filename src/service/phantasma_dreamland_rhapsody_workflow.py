@@ -207,7 +207,7 @@ def __getWeeklyActivityPts(ctx: NodeContext, ui: UIOp, roi: Optional[BBox | Anch
     match = re.compile(regex, flags=re.I).search(result[0].text)
     logger.debug(f"match: {match.group(0)}")
     cur_pts = int(re.compile(r"[oO]").sub("0", match.group(1)))
-    logger.info(f"Weekly Activity Pts: {cur_pts}/{max_pts}")
+    logger.debug(f"Weekly Activity Pts: {cur_pts}/{max_pts}")
     return cur_pts
 
 
@@ -222,6 +222,7 @@ def doStart(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[bool]:
 
     ui = UIOp(ctx)
     ui.snapshot()
+    max_pts = 6000
 
     # 检查游戏主页
     if not ui.search(ctx.tr(I18nText.PdrDreamGallery)) or not ui.search(ctx.tr(I18nText.PdrWeeklyActivityPts)):
@@ -234,7 +235,8 @@ def doStart(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[bool]:
         AnchorPoint(235, 200, Align.Left | Align.Top)
     ))
     cur_pts = __getWeeklyActivityPts(ctx, ui, roi=pts_roi)
-    if cur_pts >= 6000:
+    logger.info(f"Weekly Activity Pts: {cur_pts}/{max_pts}")
+    if cur_pts >= max_pts:
         local.phantasmaDreamlandRhapsodyFSM.complete()
         return False
 
@@ -271,8 +273,8 @@ def doStart(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[bool]:
     # 乐园阶段目标
     if not ui.sleep(0.5).wait().until(
             lambda: ui.snapshot()
-                    and ui.click_text(ctx.tr(I18nText.PdrNewGame), delay=0.3) is not None  # 此处仅为以防万一，兼容继续游戏弹窗
-                    and ui.search(ctx.tr(I18nText.PdrCurrentPhase))
+                    and ui.click_text(ctx.tr(I18nText.PdrNewGame), delay=0.3)
+                    or ui.search(ctx.tr(I18nText.PdrCurrentPhase))
                     and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3)):
         return None
 
@@ -477,6 +479,7 @@ def doPlay(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info(f"{ctx.tr(I18nText.PdrChallengeComplete).raw}")
             cur_pts = __getWeeklyActivityPts(ctx, ui)
             if cur_pts >= max_pts:
+                logger.info(f"Weekly Activity Pts: {cur_pts}/{max_pts}")
                 local.phantasmaDreamlandRhapsodyFSM.complete()
                 ui.click_text(ctx.tr(I18nText.PdrReturn), delay=0.3)
                 ui.sleep(0.2)
@@ -490,6 +493,7 @@ def doPlay(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.info(f"{ctx.tr(I18nText.PdrChallengeFailed).raw}")
             cur_pts = __getWeeklyActivityPts(ctx, ui)
             if cur_pts >= max_pts:
+                logger.info(f"Weekly Activity Pts: {cur_pts}/{max_pts}")
                 local.phantasmaDreamlandRhapsodyFSM.complete()
                 ui.click_text(ctx.tr(I18nText.PdrReturn), delay=0.3)
                 ui.sleep(0.2)
@@ -502,6 +506,11 @@ def doPlay(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if ui.search(ctx.tr(I18nText.PdrDreamGallery)):
             ui.sleep(1.0)
             break
+
+        # 新游戏
+        if ui.search(ctx.tr(I18nText.PdrContinue)) and ui.click_text(ctx.tr(I18nText.PdrNewGame), delay=0.3):
+            ui.sleep(interval)
+            continue
 
         # 计数
         logger.debug(f"miss_count: {miss_count}")

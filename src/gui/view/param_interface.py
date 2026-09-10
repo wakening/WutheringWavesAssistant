@@ -1014,14 +1014,14 @@ class ParamInterface(ScrollArea):
         #     parent=self.bossGroup
         # )
 
-        self.bossLevelCard = BossLevelOptionsSettingCard(
-            paramConfig.bossLevel,
-            FIF.LABEL,
-            self.tr('Target Boss Level'),
-            self.tr('Default auto is the lowest boss level that drops Echo; changing it makes it faster'),
-            texts=["Lv 40", "Lv 50", "Lv 60", "Lv 70", "Lv 80", "Lv 90", "Auto"],
-            parent=self.bossGroup
-        )
+        # self.bossLevelCard = BossLevelOptionsSettingCard(
+        #     paramConfig.bossLevel,
+        #     FIF.LABEL,
+        #     self.tr('Target Boss Level'),
+        #     self.tr('Default auto is the lowest boss level that drops Echo; changing it makes it faster'),
+        #     texts=["Lv 40", "Lv 50", "Lv 60", "Lv 70", "Lv 80", "Lv 90", "Auto"],
+        #     parent=self.bossGroup
+        # )
 
         # self.comboSequenceCard = ComboSequenceSettingCard(
         #     paramConfig.comboSequence,
@@ -1043,13 +1043,13 @@ class ParamInterface(ScrollArea):
             self.bossGroup
         )
 
-        self.autoCombatCard = AutoCombatSwitchSettingCard(
-            FIF.LABEL,
-            self.tr('智能连招Beta'),
-            self.tr('默认开启，支持任意角色，不限人数，建议带一个奶。'),
-            configItem=paramConfig.autoCombat,
-            parent=self.bossGroup
-        )
+        # self.autoCombatCard = AutoCombatSwitchSettingCard(
+        #     FIF.LABEL,
+        #     self.tr('智能连招Beta'),
+        #     self.tr('默认开启，支持任意角色，不限人数，建议带一个奶。'),
+        #     configItem=paramConfig.autoCombat,
+        #     parent=self.bossGroup
+        # )
 
         # game folders
         self.gameGroup = SettingCardGroup(
@@ -1089,9 +1089,9 @@ class ParamInterface(ScrollArea):
         self.gameGroup.addSettingCard(self.gamePathCard)
 
         # self.bossGroup.addSettingCard(self.bossNameCard)
-        self.bossGroup.addSettingCard(self.bossLevelCard)
+        # self.bossGroup.addSettingCard(self.bossLevelCard)
         # self.bossGroup.addSettingCard(self.comboSequenceCard)
-        self.bossGroup.addSettingCard(self.autoCombatCard)
+        # self.bossGroup.addSettingCard(self.autoCombatCard)
         self.bossGroup.addSettingCard(self.autoRestartPeriodCard)
 
         # add setting card group to layout

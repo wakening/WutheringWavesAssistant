@@ -2,14 +2,16 @@ import logging
 import random
 import re
 import time
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
 from src.core.color import ColorRule, Color, ColorMatch
 from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
-from src.core.enemy import Enemy, EnemyHpBar, EnemyMeta
+from src.core.enemy import Enemy, EnemyHpBar, EnemyMeta, EnemyVsBar, AbsorbMode
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
-from src.core.i18n import I18nText, I18nTr, Language
+from src.core.i18n import I18nText
 from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk, RouteExecutor
 from src.core.pages import UIOp, GlobalPage
@@ -26,7 +28,16 @@ logger = logging.getLogger(__name__)
 
 class TaskLocal:
 
-    def __init__(self):
+    def __init__(self, ctx: NodeContext):
+        # cfg
+        cfg = ctx.runtime.cfg.boss
+        logger.debug(f"cfg: {cfg}")
+
+        logger.info(f"Enemy: {cfg.bossName}")
+        self.enemy = Enemy.from_key(cfg.bossName[0])
+        self.combat_count = ctx.ipc.combat_count
+        self.absorb_count = ctx.ipc.absorb_count
+
         self.teamFSM: TaskFSM = TaskFSM(name=I18nText.Team)
 
         self.rootFSM: TaskFSMGroup = TaskFSMGroup(
@@ -34,16 +45,17 @@ class TaskLocal:
             name="Root"
         )
 
-        # cfg
-        self.enemy: EnemyMeta = None
-
         # runtime
         self.pattern = re.compile(r"[·_-]")
+        # self.executor = ThreadPoolExecutor(max_workers=3)
+
+        # 状态
         self.downed = False
+        self.found_sol3phase = False
+
+        # 战斗
         self.members = ["unknown", None, None]
         self.combat_system: CombatSystem = None
-        self.combat_count = 1
-        self.absorb_count = 0
 
         # TODO 战斗计数、吸收计数、复苏计数、阵亡计数
 
@@ -235,7 +247,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         return None
 
     # 点击进入编队
-    if not ui.click_text(ctx.tr(I18nText.Team), RoiEx(ctx).terminal_content, pk=PointKind.NEAR, times=2, interval=0.2):
+    if not ui.click_text(ctx.tr(I18nText.Team), RoiEx(ctx).terminal_content, pk=PointKind.NEAR, delay=0.3):  # 不可多点
         logger.warning(f"Text not found: {ctx.tr(I18nText.Team).raw}")
         return False
 
@@ -250,6 +262,8 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
             logger.info(f"Team locked")
             return False
 
+    ui.sleep(0.3).snapshot()
+
     # 检查失去意识
     roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(0, 0, Align.Left | Align.Top),
@@ -263,10 +277,12 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     member_keys = TeamMember.get_members_by_text(ui)
     members = [local.pattern.sub("", ctx.tr(key).raw) if key else key for key in member_keys]
     logger.info(f"Team: {members}")
-    # 识别到至少一个角色才更新编队
-    if any(members):
-        local.member_keys = member_keys
-        local.members = members
+    if not members[0]:
+        ui.esc().sleep(2)
+        return None
+
+    local.member_keys = member_keys
+    local.members = members
 
     local.teamFSM.complete()
     ui.esc().sleep(1)
@@ -302,9 +318,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         logger.warning(f"Page not found: {ctx.tr(I18nText.Guidebook).raw}")
         return None
 
-    enemy = local.enemy
-    enemy_name = ctx.tr(local.enemy.id)
-    logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
+    logger.debug(f"Enemy: {local.enemy}, {ctx.tr(local.enemy.id).raw}")
 
     # 选择刷取入口
     # TODO 容错？直接挑战找不到就去敌迹探寻
@@ -325,7 +339,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         return True
 
     # 从素材获取菜单进
-    if enemy.prefer_quick:
+    if local.enemy.prefer_quick:
         if not ui.search(materialCollection, roiex.guidebook_title) and not _click_icon(
                 Icon.materialCollection(), materialCollection):
             return None
@@ -351,7 +365,8 @@ def doMaterialCollection(ctx: NodeContext, local: TaskLocal, **kwargs) -> str:
     if menu_key not in [I18nText.BossChallenge, I18nText.WeeklyChallenge, I18nText.NightmarePurification]:
         raise NotImplementedError(f"Unsupported menu: {ctx.tr(menu_key).raw}")
 
-    logger.info(f"{ctx.tr(menu_key).raw}: {ctx.tr(local.enemy.id).raw}")
+    elements = [ctx.tr(i.name).raw for i in local.enemy.elements]
+    logger.info(f"{ctx.tr(menu_key).raw}: {ctx.tr(local.enemy.id).raw}{elements or ''}")
     return menu_key
 
 
@@ -467,26 +482,39 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 选择最佳推荐等级
         img = ui.sleep(0.2).grap()
         lv_points: list[Point] = []
-        best_lv = None
         for j, lv in enumerate(range(40, 91, 10)):
-            p_lv = ctx.scaler.as_point(AnchorPoint(125, 125 + j * (160 - 104), Align.Left | Align.Top))
-            if ColorRule().points(p_lv).colors(Color.bgr(88, 85, 77)).match(img, ctx.scaler):
-                if len(lv_points) > 0:
-                    best_lv = lv_points[-1]
-                    logger.info(f"{ctx.tr(I18nText.WeeklySuggestedLv).raw}: {lv - 10}")
+            _p_lv = ctx.scaler.as_point(AnchorPoint(125, 125 + j * (160 - 104), Align.Left | Align.Top))
+            lv_points.append(_p_lv)
+            if ColorRule().points(_p_lv).colors(Color.bgr(88, 85, 77)).match(img, ctx.scaler):
                 break
-            lv_points.append(p_lv)
-        if best_lv:
-            ui.click_point(best_lv, times=2, interval=0.2)
+        solo_challenge = ui.search(ctx.tr(I18nText.WeeklySoloChallenge))
+        start_challenge = None
+        # 从低当前20级开始，选择能掉声骸的最低等级
+        for idx, k in enumerate(range(max(0, len(lv_points) - 1 - 2), len(lv_points))):
+            if idx == 0 and local.found_sol3phase:
+                continue
+            # 点击推荐等级
+            ui.click_point(lv_points[k], times=2, interval=0.2)
+            # 点击单人挑战
+            if not ui.sleep(0.1).click_bbox(solo_challenge):
+                return False
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup))
+                            # 点击开启挑战
+                            and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)
+                            # 关闭等级差距过大弹窗
+                            or ui.search(ctx.tr(I18nText.YourCurrentSol3Phase))
+                            and ui.click_text(ctx.tr(I18nText.Cancel), delay=0.3)):
+                return False
+            if start_challenge := ui.search(ctx.tr(I18nText.StartChallenge)):
+                logger.info(f"{ctx.tr(I18nText.WeeklySuggestedLv).raw}: {40 + k * 10}")
+                break
+            if ui.search(ctx.tr(I18nText.YourCurrentSol3Phase)):
+                local.found_sol3phase = True
+            ui.sleep(0.3)
+        if not start_challenge:
+            return False
 
-        # 点击单人挑战
-        if not ui.sleep(0.1).click_text(ctx.tr(I18nText.WeeklySoloChallenge)):
-            return False
-        # 点击开启挑战
-        if not ui.sleep(0.2).wait().until(
-                lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup))
-                        and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
-            return False
         # 等待进入副本
         if not ui.sleep(2).wait_back_home():
             return False
@@ -599,7 +627,7 @@ def doEnemyTracing(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         logger.warning(f"{ctx.tr(I18nText.DetectionTargetNotFound).raw}")
         return False
 
-    ui.wait_back_home(close_window=True)
+    ui.wait_back_home()
     ui.sleep(0.5)
     return True
 
@@ -614,11 +642,11 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     enemy = local.enemy
     enemy_name = ctx.tr(local.enemy.id)
     logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
-    # TODO 提示抗性
 
     index = 1  # 挑战次数
     page = GlobalPage(ctx)
     tm = TeamMember(ctx)
+    roiex = RoiEx(ctx)
 
     # 设置战斗参数
     if local.combat_system is None:
@@ -635,32 +663,43 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 设置停战文本
     stop_keyword = {
         I18nText.ClaimRewards, I18nText.ForgeryChallengeComplete, I18nText.TacetFieldChallengeComplete}
-    # 领取奖励不一定都有，挑战成功容易被动画卡掉，补充敌人特有的特殊文本
     if enemy.stop_text:
         stop_keyword.update(enemy.stop_text)
-    # 作用是让战斗精确且及时的停下来，方便计数等，而不是等到超时超次，进入异常处理流程
     stop_keyword = ctx.tr(list(stop_keyword))
 
     # 循环刷当前副本，直到需要离开副本
     while ui.is_set():
+        ui.activate()
+
         # 跑向boss
         if enemy.routes:
             combat_system.exit_special_state(Morph.Prefer)
             ui.sleep(0.2)
             RouteExecutor(ctx).execute(enemy.routes)
 
-        # 设置战斗结束参数
-        no_text_count = 8 if enemy.auto_respawn else 3
-        no_text_max = no_text_count
-        deadline = time.monotonic() + 20 * 60
-
         found_complete = False
         heartbeat = RateLimiter(1 / 5)
 
         if index == 1:
-            logger.info(f"R{index} - Combat engaged")
+            logger.info(f"R{local.combat_count.value} - Combat engaged")
+
+        # 开局躲技能
+        if enemy == Enemy.Denia:
+            _denia(ctx, local, index)
+        elif enemy == Enemy.Sigillum:
+            _sigillum(ctx, local)
+
         # 同步战斗次数
-        index = local.combat_count
+        if local.combat_count.value == 0:
+            local.combat_count.value = 1
+        index = local.combat_count.value
+
+        # 设置战斗结束参数
+        no_text_count = 8 if enemy.auto_respawn else 3
+        no_text_max = no_text_count
+        deadline = time.monotonic() + 20 * 60
+        combat_start_time = time.monotonic()
+        enemy_detect_history = deque(maxlen=3)
 
         # 循环战斗，直到击败boss
         while ui.is_set():
@@ -674,48 +713,69 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 开启战斗
             combat_system.start(3.5)
 
-            ui.sleep(1.5).snapshot()
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"{ui.bbox_result}")
+            # 控制检测频率
+            interval = 1.5
+            # 敌人阵亡时提高检测频率，更快停止战斗
+            if not enemy.auto_respawn and len(enemy_detect_history) > 0:
+                _enemy_det = enemy_detect_history[-1]
+                logger.debug(f"enemy_det: {_enemy_det}")
+                if (_enemy_det[0]
+                        and (_enemy_det[1] is None or _enemy_det[1] < 0.1)
+                        and 3 < time.monotonic() - combat_start_time < 40  # 设一个上限
+                        and _enemy_det[2] < 0.1):
+                    interval = 0.5
+                elif not _enemy_det[0]:
+                    interval = 1.0
 
-            is_home = ui.is_on_homepage(ui.img)
+            img = ui.sleep(interval).grap()
+            is_home = ui.is_on_homepage(img)
+
+            # 检查敌人血量，用于控制检测频率和拾取开关
+            enemy_hp = None
+            if not enemy.auto_respawn:
+                if is_home and (enemy_hp := EnemyHpBar.detect(img)):
+                    logger.debug(f"enemy_hp: {enemy_hp:.4f}")
+                else:
+                    logger.debug(f"enemy_hp: None")
+
+                enemy_detect_history.append((is_home, enemy_hp, EnemyVsBar.detect(img)))
 
             # 开启拾取
             if enemy.auto_respawn:
                 pickup.start()
             else:
-                if is_home and (hp := EnemyHpBar.detect(ui.img)):
-                    logger.debug(f"hp: {hp:.4f}")
-                    # 血量低不拾取，防止一直误点领取奖励
-                    if hp > 0.25:
-                        pickup.start()
-                    else:
-                        pickup.stop()
+                # 血量低不拾取，防止一直误点领取奖励
+                if enemy_hp and enemy_hp > 0.20:
+                    pickup.start()
                 else:
-                    logger.debug(f"hp: None")
                     pickup.stop()
 
-            # 战斗结束：领取奖励、挑战成功等
-            if ui.search(stop_keyword):
-                # 战斗次数，防止重复识别到
-                if enemy.auto_respawn and not found_complete:
-                    # 自动刷新的不退出战斗，只能在这里计数
-                    index += 1
-                    local.combat_count += 1
-                found_complete = True
+            # 检查文本
+            ui.snapshot(img=img)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"{ui.bbox_result}")
 
-                # 自动刷新的不退出继续打
-                if enemy.auto_respawn:
+            # 战斗结束：领取奖励、挑战成功等
+            if enemy.auto_respawn:
+                if ui.search(stop_keyword):
+                    # 战斗次数，防止重复识别到
+                    if not found_complete:
+                        # 自动刷新的不退出战斗，只能在这里计数
+                        index += 1
+                        local.combat_count.value += 1
+                    found_complete = True
+                    # 不退出继续打
                     ui.sleep(1)
                     continue
-
-                # 结束战斗
-                logger.info(f"R{index} - Combat ended")
-                pickup.stop()
-                combat_system.pause(join=True)
-                if ui.search(ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                    ui.esc().sleep(0.3)
-                break
+            else:
+                if ui.search(stop_keyword) or enemy.is_dungeon and ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue):
+                    # 结束战斗
+                    logger.info(f"R{index} - Combat ended")
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    if ui.search(ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                        ui.esc().sleep(0.3)
+                    break
             found_complete = False
 
             # 战斗中：击败敌人、boss名等
@@ -725,6 +785,7 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 continue
             elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
                 logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
+                pickup.stop()
                 continue
             if is_home:
                 no_text_count -= 1
@@ -737,6 +798,11 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(0.2)
                 continue
 
+            # 网络异常
+            if ui.search(ctx.tr(I18nText.ConnectionErrorReconnecting)):
+                ui.sleep(1)
+                continue
+
             # 容错，未知页面处理
             if page_key := page.action(ui=ui):
                 logger.debug(f"R{index} - GlobalPage: {page_key}")
@@ -747,7 +813,7 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     local.downed = False
                     # 直接挑战的复苏后还在副本里，可以接着打
                     if enemy.prefer_quick:
-                        ui.wait_back_home()
+                        ui.wait_back_home(close_window=True)
                         continue
                     return False
                 elif page_key == GlobalPage.InternetDisconnecting:
@@ -763,12 +829,14 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
         # 挑战完成，暂停战斗系统
         pickup.stop()
-        combat_system.pause(join=True)
+        combat_system.pause(join=True, timeout=10)
+        enemy_detect_history.clear()
         ui.sleep(1)
+        found_absorb = ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue)
 
         # 等待回到主页
         back_homepage = False
-        deadline = time.monotonic() + 10
+        deadline = time.monotonic() + 15
         img = ui.img
         while time.monotonic() < deadline:
             img = ui.grap()
@@ -778,17 +846,19 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 领取奖励
             if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
                     ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                ui.esc().sleep(0.1)
+                ui.esc()
             # 离开副本
             elif ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
                     ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
-                ui.esc().sleep(0.1)
+                ui.esc()
             # 其他
-            elif page.action(ui=ui.snapshot(img=img)):
-                pass
-            ui.sleep(0.3)
+            elif page_key := page.action(ui=ui.snapshot(img=img)):
+                if page_key == GlobalPage.InternetDisconnecting:
+                    return False
+            ui.sleep(0.5)
         if not back_homepage:
-            return False
+            logger.warning(f"R{index} - Return to overworld timeout")
+            return ui.wait_back_home(timeout=10)
 
         # 检查阵亡情况
         downed = tm.downed(img)
@@ -806,36 +876,49 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if enemy.auto_respawn:
             pass  # 自动刷新的边打边捡，保证效率
         else:
-            combat_system.exit_special_state(Morph.Prefer)
             # 吸收声骸
-            for i in range(2):
-                absorb_timeout = 20 if i == 0 else 3
-                if ObjectDetector(ctx).absorb_echoes(
-                        timeout=absorb_timeout, enemy_name=I18nTr(Language.ZH)(enemy.id).raw):
-                    # 吸收比例
-                    local.absorb_count += 1
-                    if local.combat_count <= 0 or local.absorb_count >= local.combat_count:
-                        absorb_rate = 100.00
-                    else:
-                        absorb_rate = (local.absorb_count / local.combat_count) * 100
-                    logger.info(f"R{index} - Absorbed: {local.absorb_count}, rate: {absorb_rate:.2f}%")
-
-                    # 检查是否误点领取奖励
-                    if ui.sleep(0.4).snapshot().search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+            absorbed = False
+            if found_absorb:
+                absorbed = ObjectDetector(ctx).try_pickup()
+            if not absorbed:
+                combat_system.exit_special_state(Morph.Prefer)
+                for i in range(2):
+                    absorbed = ObjectDetector(ctx).absorb_echoes(timeout=20, enemy=enemy)
+                    if not absorbed or enemy.absorb != AbsorbMode.OD:
+                        break
+                    if i > 0:
+                        break
+                    _check_img = ui.sleep(0.3).grap()
+                    if ui.is_on_homepage(img=_check_img):
+                        break
+                    if ui.snapshot(img=_check_img).search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
                             ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
                         ui.esc().sleep(0.3)
                         continue
-
-                    ui.sleep(0.3)
                     break
+            if absorbed:
+                # 吸收比例
+                local.absorb_count.value += 1
+                if local.combat_count.value <= 0 or local.absorb_count.value >= local.combat_count.value:
+                    absorb_rate = 100.00
                 else:
-                    logger.debug(f"R{index} - Not absorbed")
-                    break
+                    absorb_rate = (local.absorb_count.value / local.combat_count.value) * 100
+                logger.info(f"R{index} - Absorbed: {local.absorb_count.value}, rate: {absorb_rate:.2f}%")
+
+                # 检查是否误点领取奖励
+                if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+                        ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                    ui.esc().sleep(0.3)
+                    continue
+
+                ui.sleep(0.3)
+            else:
+                logger.debug(f"R{index} - Not absorbed")
 
         # esc准备进入下一轮
         found_quit = False
-        for _ in range(2):
-            if ui.esc().sleep(0.3).wait(3).until(
+        for k in range(2):
+            if ui.esc().sleep(0.3).wait(3 if k == 0 else 5).until(
                     # 副本敌人esc是重新挑战
                     lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyRestart))
                             and ui.search(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]))
@@ -850,10 +933,12 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if not found_quit:
             return False
 
+        # 此处开始算下一轮
+
         # 战斗次数
         if not enemy.auto_respawn:
             index += 1
-            local.combat_count += 1
+            local.combat_count.value += 1
 
         # 看情况离开或重新挑战
 
@@ -864,20 +949,52 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if is_downed:
             logger.info(f"R{index} - Exit to nexus")
             ui.click_text(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]), times=3, interval=0.3)
-            ui.sleep(1.5).wait_back_home()
+            ui.sleep(1.5).wait_back_home(close_window=True)
             ui.sleep(0.3)
             return False
         # 重新挑战
         if enemy.is_dungeon and ui.click_text(
                 ctx.tr(I18nText.WeeklyRestart), pk=PointKind.RANDOM, times=3, interval=0.3):
-            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}")
-            ui.sleep(1.5).wait_back_home()
+            elements = [ctx.tr(i.name).raw for i in local.enemy.elements]
+            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}{elements or ''}")
+            ui.sleep(1.5).wait_back_home(close_window=True)
             ui.sleep(0.3)
             continue
         # 未知
         break
 
     return False
+
+
+def _sigillum(ctx: NodeContext, local: TaskLocal):
+    logger.debug(f"Sigillum dodged")
+    ui = UIOp(ctx)
+    try:
+        ctx.control_service.key_down("w")
+        ui.sleep(0.05)
+        ctx.control_service.dash_dodge()
+        ui.sleep(0.2)
+        ctx.control_service.dash_dodge()
+        ui.sleep(0.05)
+    finally:
+        ctx.control_service.key_up("w")
+
+
+def _denia(ctx: NodeContext, local: TaskLocal, index: int):
+    logger.debug(f"Denia dodged")
+    ui = UIOp(ctx)
+    try:
+        ctx.control_service.key_down("w")
+        ui.sleep(0.05)
+        ctx.control_service.key_up("w")
+        ui.sleep(0.02)
+        ctx.control_service.key_down("w")
+        ui.sleep(0.02 if index <= 1 else 0.3)
+        for _ in range(3):
+            ctx.control_service.dash_dodge()
+            ui.sleep(0.2)
+    finally:
+        ctx.control_service.key_up("w")
 
 
 class BossWorkflow(AbstractWorkflow):
@@ -887,7 +1004,7 @@ class BossWorkflow(AbstractWorkflow):
 
         self.engine = WorkflowEngine()
         self.fsm = TaskFSM(name=self.__class__.__name__)
-        self.local = TaskLocal()
+        self.local = TaskLocal(ctx)
 
         self.__init_task_local()
         self.__init_workflow()
@@ -905,22 +1022,17 @@ class BossWorkflow(AbstractWorkflow):
             raise e
         finally:
             # logger.info(f"=== Summary ===")
-            # logger.info(f"Total: {self.local.combat_count}")
-            # if self.local.absorb_count > 0:
-            #     logger.info(f"Absorb: {self.local.absorb_count}")
+            # logger.info(f"Total: {self.local.combat_count.value}")
+            # if self.local.absorb_count.value > 0:
+            #     logger.info(f"Absorb: {self.local.absorb_count.value}")
             # logger.info(f"===============")
             pass
 
     def __init_task_local(self):
         """根据配置初始化任务状态"""
-        cfg = self.ctx.runtime.cfg.boss
-        logger.debug(f"cfg: {cfg}")
 
         self.local.rootFSM.set_enabled(True)
         self.local.teamFSM.set_enabled(True)
-
-        logger.info(f"Enemy: {cfg.bossName}")
-        self.local.enemy = Enemy.from_key(cfg.bossName[0])
 
         if not self.local.rootFSM.is_active:
             logger.warning('Task is not active')
@@ -946,11 +1058,7 @@ class BossWorkflow(AbstractWorkflow):
             .always().to(NodeName.globalDispatcher)
         )
 
-        (
-            self.engine.source(NodeName.doTravelToResonanceNexus)
-            .on(True).to(NodeName.globalDispatcher)
-            .always().to(NodeName.endNode)
-        )
+        self.engine.source(NodeName.doTravelToResonanceNexus).always().to(NodeName.globalDispatcher)
 
         (
             self.engine.source(NodeName.doGuidebook)
@@ -993,4 +1101,4 @@ class BossWorkflow(AbstractWorkflow):
 
         self.engine.source(NodeName.doCombat).always().to(NodeName.globalDispatcher)
 
-        self.engine.exception(NodeName.endNode)
+        # self.engine.exception(NodeName.endNode)

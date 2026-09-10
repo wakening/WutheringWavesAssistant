@@ -1,7 +1,6 @@
 import base64
 import logging
 import multiprocessing
-import queue
 import random
 import secrets
 import sys
@@ -104,7 +103,6 @@ class Services:
         return self._c.combat_service()
 
 
-# @dataclass(frozen=True)
 @dataclass
 class TaskSpec:
     """ Task Specification """
@@ -150,11 +148,27 @@ class TaskSpec:
         return trace_id
 
 
-@dataclass
 class IPCManager:
-    log_queue: Optional[multiprocessing.Queue] = None
-    event_queue: Optional[multiprocessing.Queue] | Optional[queue.Queue] = None
-    proc_queue: Optional[multiprocessing.Queue] = None
+    """
+    类型码	C 类型	Python 类型	大小（字节）	范围
+    'i'	signed int	int	4	-2,147,483,648 ~ 2,147,483,647
+    'I'	unsigned int	int	4	0 ~ 4,294,967,295
+    'l'	signed long	int	4 或 8（平台相关）	平台相关
+    'q'	signed long long	int	8	-9e18 ~ 9e18
+    'Q'	unsigned long long	int	8	0 ~ 1.8e19
+    'f'	float	float	4	~1e-38 ~ 1e38
+    'd'	double	float	8	~1e-308 ~ 1e308
+    'b'	signed char	int	1	-128 ~ 127
+    'B'	unsigned char	int	1	0 ~ 255
+    'u'	wchar_t	str	2 或 4	Unicode 字符
+    """
+
+    def __init__(self):
+        self.log_queue = None  # multiprocessing.Queue
+        self.event_queue = None  # multiprocessing.Queue | queue.Queue
+        self.proc_queue = None  # multiprocessing.Queue
+        self.combat_count = multiprocessing.Value("i", 0)
+        self.absorb_count = multiprocessing.Value("i", 0)
 
 
 @dataclass

@@ -261,13 +261,13 @@ class CombatSystem:
                 if not t.is_alive():
                     break
 
-    def pause(self, join: bool = False):
+    def pause(self, join: bool = False, timeout=5):
         with self._lock:
             self.event.clear()
             # logger.debug("combat pause")
             if not join:
                 return
-            deadline = time.monotonic() + 5
+            deadline = time.monotonic() + timeout
             while time.monotonic() < deadline:
                 if self._thread is None or self.is_paused:
                     return

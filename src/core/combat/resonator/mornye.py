@@ -300,12 +300,12 @@ class Mornye(BaseMornye):
         ]
 
     @combat_cache
-    def Eaaaz(self):
+    def EaRaz(self):
         return [
             ["E", 0.05, 0.50],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.25],
+            ["R", 0.05, 0.10],
+            ["a", 0.05, 0.25],
             ["z", 1.20, 0.20],
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
@@ -327,7 +327,7 @@ class Mornye(BaseMornye):
     def E(self):
         return [
             # 共鸣技能 E
-            ["E", 0.00, 0.20],
+            ["E", 0.01, 0.20],
         ]
 
     @combat_cache
@@ -419,7 +419,7 @@ class Mornye(BaseMornye):
 
             if is_resonance_skill_optimal_solution_ready:
                 if self.random_float() > 0.65:
-                    self.combo_action(self.Eaaaz(), True)
+                    self.combo_action(self.EaRaz(), True)
                 else:
                     self.combo_action(self.Eaa(), True)
                     self.combo_action(self.Q(), False)
@@ -430,10 +430,12 @@ class Mornye(BaseMornye):
             if is_heavy_attack_inversion_ready:
                 self.combo_action(self.zaa(), False)
             self.combo_action(self.Q(), False)
+            self.combo_action(self.E(), False)
             return
 
         if is_resonance_liberation_ready or is_resonance_liberation_2_ready:
             self.combo_action(self.R(), False)
         # self.combo_action(self.zaa(), False)
         self.combo_action(self.Q(), False)
+        self.combo_action(self.E(), False)
         return

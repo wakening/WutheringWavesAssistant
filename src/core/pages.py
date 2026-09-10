@@ -527,11 +527,6 @@ class UIOp:
     def __init__(self, ctx, page_service=None):
         self.ctx = ctx
         self.oq: OcrQuery = OcrQuery(self.ctx)
-        # 绑定页面，在指定页面内搜索，默认为全局公共页面
-        self.page_service = page_service
-
-        # runtime
-        self._route_executor = RouteExecutor(self.ctx)
 
     # --------- ocr相关 ---------
 
@@ -743,7 +738,7 @@ class UIOp:
         home_color_match = ColorMatch(Scaler(cur_wh=(img.shape[1], img.shape[0]))).rules(rule)
         return home_color_match.match(img)
 
-    def wait_back_home(self, timeout: int = 25, interval: float = 1.0, close_window: bool = False):
+    def wait_back_home(self, timeout: int = 30, interval: float = 1.0, close_window: bool = False):
         """循环等待回到主界面"""
         self.activate()
         deadline = time.monotonic() + timeout
@@ -788,7 +783,7 @@ class UIOp:
 
     def move(self, route: list[MoveStep]):
         """执行人物移动路线"""
-        self._route_executor.execute(route)
+        RouteExecutor(self.ctx).execute(route)
         return self
 
 

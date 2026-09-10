@@ -839,7 +839,15 @@ class TeamMemberSelector:
                 return None
             logger.debug("切换角色: %s", member)
             self.control_service.toggle_team_member(member)
-            time.sleep(0.5)
+            # time.sleep(0.5)
+            time.sleep(0.2)
+            if event is not None and not event.is_set():
+                return None
+            self.control_service.attack()
+            time.sleep(0.2)
+            if event is not None and not event.is_set():
+                return None
+            self.control_service.attack()
             img = self.img_service.screenshot()
             is_toggled = team_member_checker.check(img)
 

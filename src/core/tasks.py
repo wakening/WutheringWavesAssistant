@@ -14,6 +14,7 @@ import win32gui
 
 from src.config import logging_config
 from src.core import message
+from src.core.boss import BossNameEnum
 from src.core.contexts import Context
 from src.core.exceptions import ScreenshotError
 from src.core.geometry import AnchorPoint, Align
@@ -148,8 +149,7 @@ class MouseResetProcessTask(ProcessTask):
 
 class AutoBossProcessTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
-        # return boss_task
-        return auto_boss_task_run
+        return boss_task
 
 
 class AutoPickupProcessTask(ProcessTask):
@@ -709,25 +709,44 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 
 
 def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
+    cfg = RuntimeConfig(spec.user_config)
+    boss_names = cfg.boss.bossName
+    if len(boss_names) > 1 or boss_names[0] not in [
+        BossNameEnum.Hyvatia.name,
+        BossNameEnum.ReactorHusk.name,
+        BossNameEnum.Sigillum.name,
+        BossNameEnum.NamelessExplorer.name,
+        BossNameEnum.Denia.name,
+        BossNameEnum.NightmareAdamSmasher.name,
+        BossNameEnum.MyriadSnareRustfireChassis.name,
+        BossNameEnum.ThousandPuppetPavilion.name,
+        BossNameEnum.CalamityEffigy.name,
+    ]:
+        auto_boss_task_run(event, spec, ipc, **kwargs)
+        return
+    _boss_task(event, spec, ipc, **kwargs)
+
+def _boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     try:
 
         ctx, container = task_init(event, spec, ipc, source=MsgSource.BOSS_TASK, **kwargs)
         logger.info(f"刷boss任务开始运行, task_id: {spec.task_id}")
         ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
 
-        # 1. 先获取当前鼠标位置
-        original_x, original_y = keymouse_util.get_mouse_position()
-
         ctx.control_service.activate()
-        time.sleep(0.05)
+        time.sleep(0.2)
 
         if spec.gui_win_id is not None:
-            # 3. 取消游戏窗口的置顶状态
-            hwnd_util.set_window_not_topmost(ctx.window_service.window)
+            # 1. 先获取当前鼠标位置
+            original_x, original_y = keymouse_util.get_mouse_position()
             # 2. 释放鼠标限制（如果有）
             keymouse_util.set_mouse_unlocked()
-            # 4. 移动窗口
-            hwnd_util.set_window_below_another(ctx.window_service.window, spec.gui_win_id)
+            # # 3. 取消游戏窗口的置顶状态
+            # hwnd_util.set_window_not_topmost(window_service.window)
+            # # 4. 移动窗口
+            gui_win_id = spec.gui_win_id
+            # hwnd_util.set_window_left_top_and_below_another(window_service.window, gui_win_id)
+            hwnd_util.set_window_left_top(ctx.window_service.window)
             # 5. 将鼠标移回原位
             keymouse_util.set_mouse_position(original_x, original_y)
 
@@ -741,16 +760,21 @@ def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 
             wf = BossWorkflow(ctx)
             wf.execute()
-
+        except ScreenshotError as e:
+            try:
+                hwnd_util.force_close_process(ctx.window_service.window)
+            except Exception:
+                pass
+            raise e
         except KeyboardInterrupt as e:
             logger.warning(f"KeyboardInterrupt: {e}")
         except Exception as e:
             logger.exception(e)
             ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
 
-            ctx.ipc.event_queue.put({
-                "task": {"AutoBossProcessTask": ["failed"]}
-            }, block=True)
+            # ctx.ipc.event_queue.put({
+            #     "task": {"AutoBossProcessTask": ["failed"]}
+            # }, block=True)
             time.sleep(0.1)
         finally:
             logger.info(f"刷boss任务结束, task_id: {spec.task_id}")
