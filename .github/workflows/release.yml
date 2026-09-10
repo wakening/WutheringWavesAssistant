@@ -425,11 +425,11 @@ jobs:
           tag_name: "v${{ env.VERSION }}"
           name: "Release ${{ env.VERSION }}"
           files: |
-#            wwa-${{ env.VERSION }}.7z
             wwa-dml-${{ env.VERSION }}.7z
             wwa-cu118-${{ env.VERSION }}.7z
             wwa-cu126-${{ env.VERSION }}.7z
             wwa-cu129-${{ env.VERSION }}.7z.*
+#            wwa-${{ env.VERSION }}.7z
 #          body: |
 #            🎉 这是由 GitHub Actions 自动发布的版本！
 #            ${{ steps.changelog.outputs.changelog }}
