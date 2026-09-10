@@ -93,198 +93,51 @@ jobs:
           Invoke-WebRequest -Uri $gitUrl -OutFile $gitFile
           Expand-Archive -Path $gitFile -DestinationPath "$env:TEMP_WORKSPACE\git"
 
-      - name: 🧑‍💻 wwa cpu版本 安装依赖并打包
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # 设置pip临时目录到当前目录下
-          $dTempDir = ".\pip_temp"
-          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
-          $absoluteTempPath = Resolve-Path $dTempDir
-          $env:TMP = $absoluteTempPath
-          $env:TEMP = $absoluteTempPath
-          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
-          
-          # 解压 Python 到临时目录
-          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
-          
-          # 切入临时目录
-          Push-Location "$env:TEMP_WORKSPACE"
-          
-          # 安装依赖到便携 Python
-          & "py312\python.exe" -m pip install --upgrade pip
-          & "py312\python.exe" -m pip install setuptools wheel
-          & "py312\python.exe" -m pip install poetry==2.1.1
-          & "py312\python.exe" -m poetry config virtualenvs.create false
-          & "py312\python.exe" -m poetry install -E cpu --no-root -v
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          & "py312\python.exe" -m pip list
-          
-          # 打包到上一级目录
-          7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
-          
-          # 清理临时 Python
-          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
-          
-          # 回到原目录
-          Pop-Location
-          
-          # 清理pip临时目录
-          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
-
+#      - name: 🧑‍💻 wwa cpu版本 安装依赖并打包
+#        shell: pwsh
+#        run: |
+#          $ErrorActionPreference = "Stop"
+#
+#          # 设置pip临时目录到当前目录下
+#          $dTempDir = ".\pip_temp"
+#          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
+#          $absoluteTempPath = Resolve-Path $dTempDir
+#          $env:TMP = $absoluteTempPath
+#          $env:TEMP = $absoluteTempPath
+#          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
+#
+#          # 解压 Python 到临时目录
+#          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+#
+#          # 切入临时目录
+#          Push-Location "$env:TEMP_WORKSPACE"
+#
+#          # 安装依赖到便携 Python
+#          & "py312\python.exe" -m pip install --upgrade pip
+#          & "py312\python.exe" -m pip install setuptools wheel
+#          & "py312\python.exe" -m pip install poetry==2.1.1
+#          & "py312\python.exe" -m poetry config virtualenvs.create false
+#          & "py312\python.exe" -m poetry install -E cpu --no-root -v
+#          if ($LASTEXITCODE -ne 0) { exit 1 }
+#          & "py312\python.exe" -m pip list
+#
+#          # 打包到上一级目录
+#          7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+#
+#          # 清理临时 Python
+#          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+#
+#          # 回到原目录
+#          Pop-Location
+#
+#          # 清理pip临时目录
+#          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
+#
 #      - name: 📂 上传 7z 文件作为 workflow artifact
 #        uses: actions/upload-artifact@v4
 #        with:
 #          name: wwa
 #          path: "wwa-${{ env.VERSION }}.7z"
-
-      - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # 设置pip临时目录到当前目录下
-          $dTempDir = ".\pip_temp"
-          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
-          $absoluteTempPath = Resolve-Path $dTempDir
-          $env:TMP = $absoluteTempPath
-          $env:TEMP = $absoluteTempPath
-          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
-          
-          # 解压 Python 到临时目录
-          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
-
-          # 切入临时目录
-          Push-Location "$env:TEMP_WORKSPACE"
-
-          # 安装依赖到便携 Python
-          & "py312\python.exe" -m pip install --upgrade pip
-          & "py312\python.exe" -m pip install setuptools wheel
-          & "py312\python.exe" -m pip install poetry==2.1.1
-          & "py312\python.exe" -m poetry config virtualenvs.create false
-          & "py312\python.exe" -m poetry install -E cu126 --no-root -v
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          & "py312\python.exe" -m pip list
-
-          # 打包到上一级目录
-          7z a "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
-
-          # 清理临时 Python
-          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
-
-          # 回到原目录
-          Pop-Location
-          
-          # 清理pip临时目录
-          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
-
-#      - name: 📂 上传 7z 文件作为 workflow artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: wwa-gpu-cu126
-#          path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
-
-      - name: 🧑‍💻 wwa gpu cuda12.9版本 安装依赖并打包
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # 设置pip临时目录到当前目录下
-          $dTempDir = ".\pip_temp"
-          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
-          $absoluteTempPath = Resolve-Path $dTempDir
-          $env:TMP = $absoluteTempPath
-          $env:TEMP = $absoluteTempPath
-          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
-          
-          # 解压 Python 到临时目录
-          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
-
-          # 切入临时目录
-          Push-Location "$env:TEMP_WORKSPACE"
-
-          # 安装依赖到便携 Python
-          & "py312\python.exe" -m pip install --upgrade pip
-          & "py312\python.exe" -m pip install setuptools wheel
-          & "py312\python.exe" -m pip install poetry==2.1.1
-          & "py312\python.exe" -m poetry config virtualenvs.create false
-          & "py312\python.exe" -m poetry install -E cu129 --no-root -v
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          & "py312\python.exe" -m pip list
-
-          # 打包到上一级目录
-          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}-full.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
-          # 分割
-          7z a -v1500m "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "..\wwa-gpu-cu129-${{ env.VERSION }}-full.7z"
-
-          # 清理临时 Python
-          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item "..\wwa-gpu-cu129-${{ env.VERSION }}-full.7z" -Recurse -Force -ErrorAction SilentlyContinue
-
-          # 回到原目录
-          Pop-Location
-          
-          # 清理pip临时目录
-          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
-
-#      - name: 📂 上传 7z 文件作为 workflow artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: wwa-gpu-cu129-001
-#          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.001"
-#
-#      - name: 📂 上传 7z 文件作为 workflow artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: wwa-gpu-cu129-002
-#          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.002"
-
-      - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          
-          # 设置pip临时目录到当前目录下
-          $dTempDir = ".\pip_temp"
-          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
-          $absoluteTempPath = Resolve-Path $dTempDir
-          $env:TMP = $absoluteTempPath
-          $env:TEMP = $absoluteTempPath
-          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
-          
-          # 解压 Python 到临时目录
-          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
-
-          # 切入临时目录
-          Push-Location "$env:TEMP_WORKSPACE"
-
-          # 安装依赖到便携 Python
-          & "py312\python.exe" -m pip install --upgrade pip
-          & "py312\python.exe" -m pip install setuptools wheel
-          & "py312\python.exe" -m pip install poetry==2.1.1
-          & "py312\python.exe" -m poetry config virtualenvs.create false
-          & "py312\python.exe" -m poetry install -E cu118 --no-root -v
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          & "py312\python.exe" -m pip list
-
-          # 打包到上一级目录
-          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
-
-          # 清理临时 Python
-          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
-
-          # 回到原目录
-          Pop-Location
-          
-          # 清理pip临时目录
-          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
-
-#      - name: 📂 上传 7z 文件作为 workflow artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: wwa-gpu-cu118
-#          path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
 
       - name: 🧑‍💻 wwa dml版本 安装依赖并打包
         shell: pwsh
@@ -331,6 +184,153 @@ jobs:
 #        with:
 #          name: wwa-dml
 #          path: "wwa-dml-${{ env.VERSION }}.7z"
+
+      - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          
+          # 设置pip临时目录到当前目录下
+          $dTempDir = ".\pip_temp"
+          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
+          $absoluteTempPath = Resolve-Path $dTempDir
+          $env:TMP = $absoluteTempPath
+          $env:TEMP = $absoluteTempPath
+          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
+          
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu126 --no-root -v
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          7z a "..\wwa-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+          
+          # 清理pip临时目录
+          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
+
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-cu126
+#          path: "wwa-cu126-${{ env.VERSION }}.7z"
+
+      - name: 🧑‍💻 wwa gpu cuda12.9版本 安装依赖并打包
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          
+          # 设置pip临时目录到当前目录下
+          $dTempDir = ".\pip_temp"
+          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
+          $absoluteTempPath = Resolve-Path $dTempDir
+          $env:TMP = $absoluteTempPath
+          $env:TEMP = $absoluteTempPath
+          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
+          
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu129 --no-root -v
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          7z a "..\wwa-cu129-${{ env.VERSION }}-full.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+          # 分割
+          7z a -v1500m "..\wwa-cu129-${{ env.VERSION }}.7z" "..\wwa-cu129-${{ env.VERSION }}-full.7z"
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item "..\wwa-cu129-${{ env.VERSION }}-full.7z" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+          
+          # 清理pip临时目录
+          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
+
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-cu129-001
+#          path: "wwa-cu129-${{ env.VERSION }}.7z.001"
+#
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-cu129-002
+#          path: "wwa-cu129-${{ env.VERSION }}.7z.002"
+
+      - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          
+          # 设置pip临时目录到当前目录下
+          $dTempDir = ".\pip_temp"
+          New-Item -ItemType Directory -Force -Path $dTempDir | Out-Null
+          $absoluteTempPath = Resolve-Path $dTempDir
+          $env:TMP = $absoluteTempPath
+          $env:TEMP = $absoluteTempPath
+          Write-Host "Successfully set TMP/TEMP to current directory: $absoluteTempPath"
+          
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu118 --no-root -v
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          7z a "..\wwa-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+          
+          # 清理pip临时目录
+          Remove-Item "pip_temp" -Recurse -Force -ErrorAction SilentlyContinue
+
+#      - name: 📂 上传 7z 文件作为 workflow artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: wwa-cu118
+#          path: "wwa-cu118-${{ env.VERSION }}.7z"
 
       - name: 提取最新版本变更记录
         id: extract_changelog
@@ -389,14 +389,13 @@ jobs:
           $fixedDownloadText = @"
           
           #### 📦 下载说明：
-          - `wwa-${{ env.VERSION }}.7z` - 标准通用版本，适合所有windows电脑，如AMD显卡的用户  
-          - `wwa-gpu-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速通用版，适合旧N卡  
-          - `wwa-gpu-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，40系列显卡  
-          - `wwa-gpu-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，50系列显卡  
-            - 压缩包已分割为001、002两个文件，都要下载，放在同一个目录，对001进行解压即可  
-            - 5090太新还不支持，请使用标准版  
-          
-          **建议使用gpu版**，作者4070使用gpu-cu126版  
+          - `wwa-dml-${{ env.VERSION }}.7z` - 通用DirectML加速，适合所有显卡，如AMD  
+          - `wwa-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，适合旧N卡  
+          - `wwa-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，40系列显卡  
+          - `wwa-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，50系列显卡  
+            - wwa-cu129压缩包已分割为001、002两个文件，都要下载，放在同一个目录，对001进行解压即可  
+            - N卡建议使用专版，5090太新还不支持，请使用通用版  
+            - 仅支持windows系统  
           
           #### ▶️ 使用说明：
           **脚本免安装解压即可运行**  
@@ -426,11 +425,11 @@ jobs:
           tag_name: "v${{ env.VERSION }}"
           name: "Release ${{ env.VERSION }}"
           files: |
-            wwa-${{ env.VERSION }}.7z
+#            wwa-${{ env.VERSION }}.7z
             wwa-dml-${{ env.VERSION }}.7z
-            wwa-gpu-cu118-${{ env.VERSION }}.7z
-            wwa-gpu-cu126-${{ env.VERSION }}.7z
-            wwa-gpu-cu129-${{ env.VERSION }}.7z.*
+            wwa-cu118-${{ env.VERSION }}.7z
+            wwa-cu126-${{ env.VERSION }}.7z
+            wwa-cu129-${{ env.VERSION }}.7z.*
 #          body: |
 #            🎉 这是由 GitHub Actions 自动发布的版本！
 #            ${{ steps.changelog.outputs.changelog }}
