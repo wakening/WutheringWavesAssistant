@@ -1,4 +1,4 @@
-name: Sync to Git Mirror - CNB
+name: Sync to Mirror Repositories
 #on: [push]
 on:
   push:
@@ -29,12 +29,14 @@ jobs:
 
       - name: Sync to AtomGit
         run: |
+          git remote remove target || true
+          
           docker run --rm \
             -v ${{ github.workspace }}:${{ github.workspace }} \
             -w ${{ github.workspace }} \
             -e PLUGIN_TARGET_URL="https://atomgit.com/unwaking/WutheringWavesAssistant.git" \
             -e PLUGIN_AUTH_TYPE="https" \
-            -e PLUGIN_USERNAME="${{ secrets.SYNC_ATOMGIT_USERNAME }}" \
+            -e PLUGIN_USERNAME=${{ secrets.SYNC_ATOMGIT_USERNAME }} \
             -e PLUGIN_PASSWORD=${{ secrets.SYNC_ATOMGIT_TOKEN }} \
             -e PLUGIN_FORCE="true" \
             -e PLUGIN_PUSH_TAGS="true" \
