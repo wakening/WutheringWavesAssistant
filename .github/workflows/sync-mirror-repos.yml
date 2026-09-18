@@ -43,5 +43,6 @@ jobs:
             -e PLUGIN_USERNAME="${{ secrets.SYNC_ATOMGIT_USERNAME }}" \
             -e PLUGIN_PASSWORD="${{ secrets.SYNC_ATOMGIT_TOKEN }}" \
             -e PLUGIN_FORCE="true" \
-            -e PLUGIN_PUSH_TAGS="true" \
+            -e GIT_TRACE="1" \
+            -e GIT_CURL_VERBOSE="1" \
             tencentcom/git-sync
