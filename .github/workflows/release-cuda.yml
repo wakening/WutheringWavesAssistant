@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: 📥 检出代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0  # 获取所有分支和标签的完整历史记录

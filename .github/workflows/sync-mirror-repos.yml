@@ -10,7 +10,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: cnb
@@ -28,7 +28,7 @@ jobs:
             -e PLUGIN_PUSH_TAGS="true" \
             tencentcom/git-sync
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: atomgit
@@ -43,6 +43,5 @@ jobs:
             -e PLUGIN_USERNAME="${{ secrets.SYNC_ATOMGIT_USERNAME }}" \
             -e PLUGIN_PASSWORD="${{ secrets.SYNC_ATOMGIT_TOKEN }}" \
             -e PLUGIN_FORCE="true" \
-            -e GIT_TRACE="1" \
-            -e GIT_CURL_VERBOSE="1" \
+            -e PLUGIN_PUSH_TAGS="true" \
             tencentcom/git-sync
