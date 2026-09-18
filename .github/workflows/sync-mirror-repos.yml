@@ -13,31 +13,35 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          path: cnb
 
       - name: Sync to CNB Repository
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:${{ github.workspace }} \
-            -w ${{ github.workspace }} \
+            -v ${{ github.workspace }}/cnb:${{ github.workspace }}/cnb \
+            -w ${{ github.workspace }}/cnb \
             -e PLUGIN_TARGET_URL="https://cnb.cool/github.wakening/WutheringWavesAssistant.git" \
             -e PLUGIN_AUTH_TYPE="https" \
             -e PLUGIN_USERNAME="cnb" \
-            -e PLUGIN_PASSWORD=${{ secrets.SYNC_CNB_TOKEN }} \
+            -e PLUGIN_PASSWORD="${{ secrets.SYNC_CNB_TOKEN }}" \
             -e PLUGIN_FORCE="true" \
             -e PLUGIN_PUSH_TAGS="true" \
             tencentcom/git-sync
 
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: atomgit
+
       - name: Sync to AtomGit
         run: |
-          git remote remove target || true
-          
           docker run --rm \
-            -v ${{ github.workspace }}:${{ github.workspace }} \
-            -w ${{ github.workspace }} \
+            -v ${{ github.workspace }}/atomgit:${{ github.workspace }}/atomgit \
+            -w ${{ github.workspace }}/atomgit \
             -e PLUGIN_TARGET_URL="https://atomgit.com/unwaking/WutheringWavesAssistant.git" \
             -e PLUGIN_AUTH_TYPE="https" \
-            -e PLUGIN_USERNAME=${{ secrets.SYNC_ATOMGIT_USERNAME }} \
-            -e PLUGIN_PASSWORD=${{ secrets.SYNC_ATOMGIT_TOKEN }} \
+            -e PLUGIN_USERNAME="${{ secrets.SYNC_ATOMGIT_USERNAME }}" \
+            -e PLUGIN_PASSWORD="${{ secrets.SYNC_ATOMGIT_TOKEN }}" \
             -e PLUGIN_FORCE="true" \
             -e PLUGIN_PUSH_TAGS="true" \
             tencentcom/git-sync
