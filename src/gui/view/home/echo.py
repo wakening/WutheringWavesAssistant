@@ -98,25 +98,28 @@ class BossRushWidget(QWidget):
 
         self.flowLayout = FlowLayout(isTight=True)
         self.checkCards: dict[BossNameEnum, CheckCard] = {}
-        self.selectedBosses: dict[BossNameEnum, bool] = {}
+        self.firstEnemy = ""
+        self.enemyGroup = QButtonGroup(self)
+        self.enemyGroup.setExclusive(True)
 
         self.toolbarLayout = QHBoxLayout()
         self.bossNameLabel = QLabel(self.tr("BOSS:"), self)
         self.lineEdit = SearchLineEdit(self)
         self.lineEdit.setEnabled(False)
-        self.multipleSelectButton = TogglePushButton(self.tr("多选"), self)
-        self.multipleSelectButton.setCheckable(True)
-        self.multipleSelectButton.setChecked(False)
         self.aboutButton = PushButton(self.tr("关于"), self)
 
         # for boss in BossNameEnum:
         new_boss = 1  # TODO 增加boss参数，根据版本区最新版本boss数量
         for i, boss in enumerate(reversed(list(BossNameEnum))):
+            if i == 0:
+                self.firstEnemy = boss
             checkCard = CheckCard(boss.value, parent=self)
+            checkCard.setChecked(False)
             if i < new_boss or boss == BossNameEnum.NightmareMourningAix:
                 checkCard.setBackground()
             self.checkCards[boss] = checkCard
             checkCard.setProperty("boss", boss)
+            self.enemyGroup.addButton(checkCard.checkbox)
 
         self.__initWidget()
 
@@ -143,7 +146,6 @@ class BossRushWidget(QWidget):
 
         self.toolbarLayout.addWidget(self.bossNameLabel)
         self.toolbarLayout.addWidget(self.lineEdit)
-        self.toolbarLayout.addWidget(self.multipleSelectButton)
         self.toolbarLayout.addWidget(self.aboutButton)
         self.toolbarLayout.setSpacing(8)
         self.toolbarLayout.addStretch()
@@ -157,47 +159,26 @@ class BossRushWidget(QWidget):
         for boss, card in self.checkCards.items():
             card.stateChanged.connect(lambda state, cb=card: self.__on_card_state_changed(cb, state))
 
-        self.multipleSelectButton.toggled.connect(self.__on_multiple_select_button_toggled)
         self.aboutButton.clicked.connect(self.__showAboutFlyout)
 
     def __loadConfig(self):
-        self.setValue(paramConfig.get(paramConfig.bossName))
+        value = paramConfig.get(paramConfig.bossName)
+        # logger.warning(f"{value}")
+        if value and len(value) > 0:
+            card = self.checkCards.get(value[0])
+            if len(value) > 1:
+                card.setChecked(True)
+            else:
+                card.blockSignals(True)
+                card.setChecked(True)
+                card.blockSignals(False)
+        else:
+            card = self.checkCards.get(BossNameEnum.Dreamless)
+            card.setChecked(True)
 
     def __on_card_state_changed(self, cb, state):
         logger.debug(f"checkbox: {cb.checkbox.text()}, isChecked: {cb.checkbox.isChecked()}")
-        if self.multipleSelectButton.isChecked():
-            for boss, card in self.checkCards.items():
-                if card.isChecked():
-                    self.selectedBosses[boss] = True
-                else:
-                    self.selectedBosses.pop(boss, None)
-        else:
-            for selectBoss, _ in self.selectedBosses.items():
-                card = self.checkCards.get(selectBoss)
-                if card != cb:
-                    card.blockSignals(True)
-                    card.setChecked(False)
-                    card.blockSignals(False)
-            self.selectedBosses.clear()
-            if cb.isChecked():
-                self.selectedBosses[cb.property("boss")] = True
-        selectedBosses = list(self.selectedBosses.keys())
-        # logger.debug(f"selectedBosses: {selectedBosses}")
-        paramConfig.set(paramConfig.bossName, selectedBosses)
-
-    def __on_multiple_select_button_toggled(self):
-        if self.multipleSelectButton.isChecked():
-            return
-        if len(self.selectedBosses) > 1:
-            self.__on_deselect_all_button_clicked()
-
-    def __on_deselect_all_button_clicked(self):
-        for boss, card in self.checkCards.items():
-            card.blockSignals(True)
-            card.setChecked(False)
-            card.blockSignals(False)
-        self.selectedBosses.clear()
-        paramConfig.set(paramConfig.bossName, [])
+        paramConfig.set(paramConfig.bossName, [cb.property("boss")])
 
     def __showAboutFlyout(self):
         Flyout.create(
@@ -206,28 +187,16 @@ class BossRushWidget(QWidget):
             content=self.tr(
                 '任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。'
                 '\n若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。'
-                '\n日常可刷梦魇哀声鸷，通过合成获取1c3c。不建议多选。'
-                '\n萌新建议降低索拉等级刷。'
+                '\n萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。'
             ),
             target=self.aboutButton,
             parent=self.window()
         )
 
-    def setValue(self, value):
-        # logger.warning(f"{value}")
-        if value is None:
-            value = []
-        self.selectedBosses.clear()
-        for boss, card in self.checkCards.items():
-            card.blockSignals(True)
-            card.setChecked(boss in value)
-            card.blockSignals(False)
-        for v in value:
-            self.selectedBosses[v] = True
-        if len(value) > 1:
-            self.multipleSelectButton.blockSignals(True)
-            self.multipleSelectButton.setChecked(True)
-            self.multipleSelectButton.blockSignals(False)
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self.flowLayout.invalidate()
+        self.flowLayout.activate()
 
 
 class EchoMergeTask(EchoTask):
@@ -284,7 +253,7 @@ class EchoWidget(ScrollArea):
 
     def __initWidget(self):
         # self.resize(1000, 800)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setViewportMargins(0, 0, 0, 0)
         self.setWidget(self.container)

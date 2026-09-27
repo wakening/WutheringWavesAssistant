@@ -4,6 +4,7 @@ import time
 import cv2
 
 from src.core.geometry import AnchorBBox, AnchorPoint, Align, Scaler
+from src.core.resource import Resource
 from src.util import hwnd_util, file_util, screenshot_util, img_util
 from src.util.img_sift_util import SIFTFeatureMatcher
 from src.util.img_tile_util import TileGrid
@@ -18,7 +19,8 @@ def test_SIFT():
     img = screenshot_util.screenshot(hwnd)
 
     # 今州城
-    MAP_PATH = file_util.get_assets_map("Huanglong/8_0_-1.png")
+    # MAP_PATH = file_util.get_assets_map("Huanglong/8_0_-1.png")
+    MAP_PATH = Resource.Map.Rinascita.Ragunna.FabricatoriumOfTheDeep / "905_-4_-2.png"
 
     matcher = SIFTFeatureMatcher()
 

@@ -1,6 +1,7 @@
 # coding:utf-8
 import json
 import logging
+import random
 import sys
 from copy import deepcopy
 from datetime import datetime
@@ -83,10 +84,14 @@ CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/CHANGELOG.m
 
 VERSION_URLS = [
     "https://cnb.cool/github.wakening/WutheringWavesAssistant/-/git/raw/main/src/__init__.py",
-    "https://ghfast.top/https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
-    "https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
-    "https://cdn.jsdelivr.net/gh/wakening/WutheringWavesAssistant@main/src/__init__.py",
+    "https://raw.atomgit.com/unwaking/WutheringWavesAssistant/raw/main/src/__init__.py",
 ]
+random.shuffle(VERSION_URLS)
+VERSION_URLS.extend([
+    "https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
+    "https://ghfast.top/https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
+    # "https://cdn.jsdelivr.net/gh/wakening/WutheringWavesAssistant@main/src/__init__.py",
+])
 
 
 cfg = Config()

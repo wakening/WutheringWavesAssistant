@@ -1,20 +1,16 @@
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, ClassVar
 
 import numpy as np
 
 from src.core.geometry import Scaler, AnchorPoint, Align
-from src.core.i18n import I18nText, Language, I18nTr
-from src.core.movement import Run, MoveStep, Walk
+from src.core.i18n import I18nText, I18nTr
+from src.core.movement import Run, MoveStep, Walk, Direction
 from src.gui.common.boss import BossNameEnum
 
 logger = logging.getLogger(__name__)
-
-
-def _tr(key: str) -> str:
-    return I18nTr(Language.sys_lang())(key).raw
 
 
 class EnemyElement(Enum):
@@ -151,34 +147,58 @@ class AbsorbMode(Enum):
     Hybrid = "Hybrid"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
+class EnemyRestartAction:
+    cycle: int
+    step: int
+    direction: Direction
+    check_text: Optional[list[str]]
+    check_hp_bar: bool
+    restart_text: list[str]
+
+
+@dataclass(frozen=True, kw_only=True)
+class EnemyRestart:
+    """
+    传送boss后，需要经过三个步骤才能开始刷
+    1、传送后跑向boss，定义如何跑
+    2、角色跑速不一致，第一步只能跑个大概，第二步需要一点一点移动并看是否有重新挑战等的提示，定义移动的最大次数、每次移动几步、方向、文本是什么等
+    3、点击重新挑战后，少数情况可能离boss较远，无法触发战斗，继续跑向boss，定义如何跑
+    """
+    after_travel: list[MoveStep]
+    restart: EnemyRestartAction
+    after_restart: list[MoveStep]
+
+
+@dataclass(frozen=True, kw_only=True)
 class BossMeta:
     """Boss 相关信息"""
-    name: str  # Boss 名称 (用于副本/活动显示)
+    localized_name: str  # Boss 名称 (用于副本/活动显示)
     is_dungeon: bool  # 是否在独立副本内 (True=副本内, False=野外)
-    dungeon_name: Optional[str]  # 副本名称
+    dungeon_name: Optional[str]  # 副本名称，目前无需填写，默认为敌迹探寻
     auto_respawn: bool  # 是否自动刷新
-    enter_text: Optional[str]  # 进入 Boss 房文本
-    battle_text: List[str]  # Boss 战进行时特殊文本
+    enter_text: Optional[str]  # 进入 Boss 房文本，如：进入声之领域
+    battle_text: List[str]  # Boss 战进行时特殊文本，如：击败、boss名
     stop_text: List[str]  # Boss 战结束时特殊文本
     routes: List[MoveStep]  # 路线 (如 ["路线1", "路线2"])
-    absorb: Optional[AbsorbMode]  # 吸收方式
+    absorb: Optional[AbsorbMode]  # 吸收声骸策略
+    restart: Optional[EnemyRestart]  # 重新挑战策略，吸收声骸策略需为Overworld
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class QuickBossMeta:
     """快速挑战 Boss 相关信息"""
-    name: str  # Boss 名称 (用于副本/活动显示)
+    localized_name: str  # Boss 名称 (用于副本/活动显示)
     menu: str  # 快捷挑战菜单标识 (如 "weekly_boss", "event_boss" 等)
     dungeon_name: str  # 副本名称
     auto_respawn: bool  # 是否自动刷新
-    battle_text: List[str]  # Boss 战进行时特殊文本
+    battle_text: List[str]  # Boss 战进行时特殊文本，如：击败、boss名
     stop_text: List[str]  # Boss 战结束时特殊文本
     routes: List[MoveStep]  # 路线 (如 ["路线1", "路线2"])
-    absorb: Optional[AbsorbMode]  # 吸收方式
+    absorb: Optional[AbsorbMode]  # 吸收声骸策略
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class EnemyMeta:
     """敌人元数据类 - 用于描述每个敌人"""
 
@@ -187,7 +207,7 @@ class EnemyMeta:
 
     id: str  # 后端唯一标识，I18nText.xxx
     key: Optional[BossNameEnum]  # 前端枚举key，配置文件保存的boss名称，值为BossNameEnum.xxx.name
-    name: str  # 显示名称，仅作开发调试用，将id翻译成系统语言，不可用于判断，得用id
+    localized_name: str  # 显示名称，仅作开发调试用，将id翻译成系统语言，不可用于判断，得用id
     species: EnemySpecies  # 物种/种族 (如呓语种、啸叫种等)
     rank: EnemyRank  # 阶级/等级 (如轻波级、巨浪级等)
     cost: EnemyCost  # 消耗值
@@ -280,10 +300,46 @@ class EnemyMeta:
 class Enemy:
     """刷声骸用的敌人参数配置"""
 
+    ScarAberrantNightmare = EnemyMeta(
+        id=I18nText.EnemyScarAberrantNightmare,
+        key=None,
+        localized_name=I18nTr.l10n(I18nText.EnemyScarAberrantNightmare),
+        species=EnemySpecies.Other,
+        rank=EnemyRank.OverlordClass,
+        cost=EnemyCost.Cost4,
+        icon=EnemyIcon.Icon1,
+        version=EnemyVersion.V1_0,
+        sonata=[],
+        elements=[EnemyElement.Fusion, EnemyElement.Spectro, EnemyElement.Havoc],
+        prefer_quick=True,
+        boss_meta=BossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyScarAberrantNightmare),
+            is_dungeon=False,
+            dungeon_name=None,
+            auto_respawn=False,
+            enter_text=None,
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[],
+            absorb=None,
+            restart=None,
+        ),
+        quick_boss_meta=QuickBossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyScarAberrantNightmare),
+            menu=I18nText.WeeklyChallenge,
+            dungeon_name=I18nText.ChaoticJuncture,
+            auto_respawn=False,
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[],
+            absorb=AbsorbMode.OD,
+        ),
+    )
+
     Dreamless = EnemyMeta(
         id=I18nText.EnemyDreamless,
         key=BossNameEnum.Dreamless,
-        name=_tr(I18nText.EnemyDreamless),
+        localized_name=I18nTr.l10n(I18nText.EnemyDreamless),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -293,7 +349,7 @@ class Enemy:
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyDreamless),
+            localized_name=I18nTr.l10n(I18nText.EnemyDreamless),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -302,58 +358,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyDreamless),
+            localized_name=I18nTr.l10n(I18nText.EnemyDreamless),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.StatueOfTheCrownless,
             auto_respawn=False,
             battle_text=[I18nText.CombatDefeat],
             stop_text=[],
-            routes=[Walk.forward(3), Run.forward(2.2)],
-            absorb=None,
-        ),
-    )
-
-    FallacyOfNoReturn = EnemyMeta(
-        id=I18nText.EnemyFallacyOfNoReturn,
-        key=BossNameEnum.FallacyOfNoReturn,
-        name=_tr(I18nText.EnemyFallacyOfNoReturn),
-        species=EnemySpecies.Special,
-        rank=EnemyRank.OverlordClass,
-        cost=EnemyCost.Cost4,
-        icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
-        sonata=[SonataEffect.FreezingFrost],
-        elements=[EnemyElement.Spectro],
-        prefer_quick=True,
-        boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyFallacyOfNoReturn),
-            is_dungeon=False,
-            dungeon_name=None,
-            auto_respawn=False,
-            enter_text=None,
-            battle_text=[I18nText.CombatDefeat],
-            stop_text=[],
-            routes=[],
-            absorb=None,
-        ),
-        quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyFallacyOfNoReturn),
-            menu=I18nText.BossChallenge,
-            dungeon_name=I18nText.EnemyFallacyOfNoReturn,
-            auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
-            stop_text=[],
-            routes=[],
-            absorb=None,
+            routes=[Walk.forward(3), Run.forward(2.0)],
+            absorb=AbsorbMode.OD,
         ),
     )
 
     LampylumenMyriad = EnemyMeta(
         id=I18nText.EnemyLampylumenMyriad,
         key=BossNameEnum.LampylumenMyriad,
-        name=_tr(I18nText.EnemyLampylumenMyriad),
+        localized_name=I18nTr.l10n(I18nText.EnemyLampylumenMyriad),
         species=EnemySpecies.Howler,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -363,7 +385,7 @@ class Enemy:
         elements=[EnemyElement.Glacio],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyLampylumenMyriad),
+            localized_name=I18nTr.l10n(I18nText.EnemyLampylumenMyriad),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -372,23 +394,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyLampylumenMyriad),
+            localized_name=I18nTr.l10n(I18nText.EnemyLampylumenMyriad),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLampylumenMyriad,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     BellBorneGeochelone = EnemyMeta(
         id=I18nText.EnemyBellBorneGeochelone,
         key=BossNameEnum.BellBorneGeochelone,
-        name=_tr(I18nText.EnemyBellBorneGeochelone),
+        localized_name=I18nTr.l10n(I18nText.EnemyBellBorneGeochelone),
         species=EnemySpecies.Howler,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -398,7 +421,7 @@ class Enemy:
         elements=[EnemyElement.Glacio],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyBellBorneGeochelone),
+            localized_name=I18nTr.l10n(I18nText.EnemyBellBorneGeochelone),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -407,23 +430,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyBellBorneGeochelone),
+            localized_name=I18nTr.l10n(I18nText.EnemyBellBorneGeochelone),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.BellOfArchaicChants,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     InfernoRider = EnemyMeta(
         id=I18nText.EnemyInfernoRider,
         key=BossNameEnum.InfernoRider,
-        name=_tr(I18nText.EnemyInfernoRider),
+        localized_name=I18nTr.l10n(I18nText.EnemyInfernoRider),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -433,7 +457,7 @@ class Enemy:
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyInfernoRider),
+            localized_name=I18nTr.l10n(I18nText.EnemyInfernoRider),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -442,23 +466,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyInfernoRider),
+            localized_name=I18nTr.l10n(I18nText.EnemyInfernoRider),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyInfernoRider,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     ImpermanenceHeron = EnemyMeta(
         id=I18nText.EnemyImpermanenceHeron,
         key=BossNameEnum.ImpermanenceHeron,
-        name=_tr(I18nText.EnemyImpermanenceHeron),
+        localized_name=I18nTr.l10n(I18nText.EnemyImpermanenceHeron),
         species=EnemySpecies.Howler,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -468,7 +493,7 @@ class Enemy:
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyImpermanenceHeron),
+            localized_name=I18nTr.l10n(I18nText.EnemyImpermanenceHeron),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -477,23 +502,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyImpermanenceHeron),
+            localized_name=I18nTr.l10n(I18nText.EnemyImpermanenceHeron),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyImpermanenceHeron,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[I18nText.ClaimRewards],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     MechAbomination = EnemyMeta(
         id=I18nText.EnemyMechAbomination,
         key=BossNameEnum.MechAbomination,
-        name=_tr(I18nText.EnemyMechAbomination),
+        localized_name=I18nTr.l10n(I18nText.EnemyMechAbomination),
         species=EnemySpecies.Clamorling,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -503,7 +529,7 @@ class Enemy:
         elements=[EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyMechAbomination),
+            localized_name=I18nTr.l10n(I18nText.EnemyMechAbomination),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -512,23 +538,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyMechAbomination),
+            localized_name=I18nTr.l10n(I18nText.EnemyMechAbomination),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMechAbomination,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     MourningAix = EnemyMeta(
         id=I18nText.EnemyMourningAix,
         key=BossNameEnum.MourningAix,
-        name=_tr(I18nText.EnemyMourningAix),
+        localized_name=I18nTr.l10n(I18nText.EnemyMourningAix),
         species=EnemySpecies.Howler,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -538,7 +565,7 @@ class Enemy:
         elements=[EnemyElement.Spectro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyMourningAix),
+            localized_name=I18nTr.l10n(I18nText.EnemyMourningAix),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -547,23 +574,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyMourningAix),
+            localized_name=I18nTr.l10n(I18nText.EnemyMourningAix),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMourningAix,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     ThunderingMephis = EnemyMeta(
         id=I18nText.EnemyThunderingMephis,
         key=BossNameEnum.ThunderingMephis,
-        name=_tr(I18nText.EnemyThunderingMephis),
+        localized_name=I18nTr.l10n(I18nText.EnemyThunderingMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -573,7 +601,7 @@ class Enemy:
         elements=[EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyThunderingMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyThunderingMephis),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -582,23 +610,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyThunderingMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyThunderingMephis),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyThunderingMephis,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     TempestMephis = EnemyMeta(
         id=I18nText.EnemyTempestMephis,
         key=BossNameEnum.TempestMephis,
-        name=_tr(I18nText.EnemyTempestMephis),
+        localized_name=I18nTr.l10n(I18nText.EnemyTempestMephis),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -608,7 +637,7 @@ class Enemy:
         elements=[EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyTempestMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyTempestMephis),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -617,23 +646,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyTempestMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyTempestMephis),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyTempestMephis,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     FeilianBeringal = EnemyMeta(
         id=I18nText.EnemyFeilianBeringal,
         key=BossNameEnum.FeilianBeringal,
-        name=_tr(I18nText.EnemyFeilianBeringal),
+        localized_name=I18nTr.l10n(I18nText.EnemyFeilianBeringal),
         species=EnemySpecies.Howler,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -643,7 +673,7 @@ class Enemy:
         elements=[EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyFeilianBeringal),
+            localized_name=I18nTr.l10n(I18nText.EnemyFeilianBeringal),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -652,23 +682,24 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyFeilianBeringal),
+            localized_name=I18nTr.l10n(I18nText.EnemyFeilianBeringal),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyFeilianBeringal,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     Crownless = EnemyMeta(
         id=I18nText.EnemyCrownless,
         key=BossNameEnum.Crownless,
-        name=_tr(I18nText.EnemyCrownless),
+        localized_name=I18nTr.l10n(I18nText.EnemyCrownless),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -678,7 +709,7 @@ class Enemy:
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyCrownless),
+            localized_name=I18nTr.l10n(I18nText.EnemyCrownless),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -687,33 +718,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyCrownless),
+            localized_name=I18nTr.l10n(I18nText.EnemyCrownless),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyCrownless,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     Jue = EnemyMeta(
         id=I18nText.EnemyJue,
         key=BossNameEnum.Jue,
-        name=_tr(I18nText.EnemyJue),
+        localized_name=I18nTr.l10n(I18nText.EnemyJue),
         species=EnemySpecies.Special,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V1_1,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Spectro, EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyJue),
+            localized_name=I18nTr.l10n(I18nText.EnemyJue),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -722,33 +754,70 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyJue),
+            localized_name=I18nTr.l10n(I18nText.EnemyJue),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.TheFatedConfrontation,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
+            absorb=AbsorbMode.OD,
+        ),
+    )
+
+    FallacyOfNoReturn = EnemyMeta(
+        id=I18nText.EnemyFallacyOfNoReturn,
+        key=BossNameEnum.FallacyOfNoReturn,
+        localized_name=I18nTr.l10n(I18nText.EnemyFallacyOfNoReturn),
+        species=EnemySpecies.Special,
+        rank=EnemyRank.OverlordClass,
+        cost=EnemyCost.Cost4,
+        icon=EnemyIcon.Icon1,
+        version=EnemyVersion.V1_3,
+        sonata=[SonataEffect.RejuvenatingGlow],
+        elements=[EnemyElement.Spectro],
+        prefer_quick=True,
+        boss_meta=BossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyFallacyOfNoReturn),
+            is_dungeon=False,
+            dungeon_name=None,
+            auto_respawn=False,
+            enter_text=None,
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[],
             absorb=None,
+            restart=None,
+        ),
+        quick_boss_meta=QuickBossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyFallacyOfNoReturn),
+            menu=I18nText.BossChallenge,
+            dungeon_name=I18nText.EnemyFallacyOfNoReturn,
+            auto_respawn=False,
+            battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
+            routes=[],
+            absorb=AbsorbMode.OD,
         ),
     )
 
     SentryConstruct = EnemyMeta(
         id=I18nText.EnemySentryConstruct,
         key=BossNameEnum.SentryConstruct,
-        name=_tr(I18nText.EnemySentryConstruct),
+        localized_name=I18nTr.l10n(I18nText.EnemySentryConstruct),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Glacio],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemySentryConstruct),
+            localized_name=I18nTr.l10n(I18nText.EnemySentryConstruct),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -757,33 +826,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemySentryConstruct),
+            localized_name=I18nTr.l10n(I18nText.EnemySentryConstruct),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemySentryConstruct,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     Hecate = EnemyMeta(
         id=I18nText.EnemyHecate,
         key=BossNameEnum.Hecate,
-        name=_tr(I18nText.EnemyHecate),
+        localized_name=I18nTr.l10n(I18nText.EnemyHecate),
         species=EnemySpecies.Special,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyHecate),
+            localized_name=I18nTr.l10n(I18nText.EnemyHecate),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -792,33 +862,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyHecate),
+            localized_name=I18nTr.l10n(I18nText.EnemyHecate),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.BeyondTheCrimsonCurtain,
             auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
+            battle_text=[I18nText.CombatDefeat],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     Lorelei = EnemyMeta(
         id=I18nText.EnemyLorelei,
         key=BossNameEnum.Lorelei,
-        name=_tr(I18nText.EnemyLorelei),
+        localized_name=I18nTr.l10n(I18nText.EnemyLorelei),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyLorelei),
+            localized_name=I18nTr.l10n(I18nText.EnemyLorelei),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -827,33 +898,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyLorelei),
+            localized_name=I18nTr.l10n(I18nText.EnemyLorelei),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLorelei,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     DragonOfDirge = EnemyMeta(
         id=I18nText.EnemyDragonOfDirge,
         key=BossNameEnum.DragonOfDirge,
-        name=_tr(I18nText.EnemyDragonOfDirge),
+        localized_name=I18nTr.l10n(I18nText.EnemyDragonOfDirge),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyDragonOfDirge),
+            localized_name=I18nTr.l10n(I18nText.EnemyDragonOfDirge),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -862,33 +934,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyDragonOfDirge),
+            localized_name=I18nTr.l10n(I18nText.EnemyDragonOfDirge),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyDragonOfDirge,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     NightmareFeilianBeringal = EnemyMeta(
         id=I18nText.EnemyNightmareFeilianBeringal,
         key=BossNameEnum.NightmareFeilianBeringal,
-        name=_tr(I18nText.EnemyNightmareFeilianBeringal),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareFeilianBeringal),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareFeilianBeringal),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareFeilianBeringal),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -897,9 +970,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareFeilianBeringal),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareFeilianBeringal),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareFeilianBeringal,
             auto_respawn=True,
@@ -913,17 +987,17 @@ class Enemy:
     NightmareImpermanenceHeron = EnemyMeta(
         id=I18nText.EnemyNightmareImpermanenceHeron,
         key=BossNameEnum.NightmareImpermanenceHeron,
-        name=_tr(I18nText.EnemyNightmareImpermanenceHeron),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareImpermanenceHeron),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareImpermanenceHeron),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareImpermanenceHeron),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -932,9 +1006,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareImpermanenceHeron),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareImpermanenceHeron),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareImpermanenceHeron,
             auto_respawn=True,
@@ -948,17 +1023,17 @@ class Enemy:
     NightmareTempestMephis = EnemyMeta(
         id=I18nText.EnemyNightmareTempestMephis,
         key=BossNameEnum.NightmareTempestMephis,
-        name=_tr(I18nText.EnemyNightmareTempestMephis),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareTempestMephis),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareTempestMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareTempestMephis),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -967,9 +1042,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareTempestMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareTempestMephis),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareTempestMephis,
             auto_respawn=True,
@@ -983,17 +1059,17 @@ class Enemy:
     NightmareThunderingMephis = EnemyMeta(
         id=I18nText.EnemyNightmareThunderingMephis,
         key=BossNameEnum.NightmareThunderingMephis,
-        name=_tr(I18nText.EnemyNightmareThunderingMephis),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareThunderingMephis),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareThunderingMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareThunderingMephis),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1002,9 +1078,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareThunderingMephis),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareThunderingMephis),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareThunderingMephis,
             auto_respawn=True,
@@ -1018,17 +1095,17 @@ class Enemy:
     NightmareCrownless = EnemyMeta(
         id=I18nText.EnemyNightmareCrownless,
         key=BossNameEnum.NightmareCrownless,
-        name=_tr(I18nText.EnemyNightmareCrownless),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareCrownless),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareCrownless),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareCrownless),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1037,9 +1114,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareCrownless),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareCrownless),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareCrownless,
             auto_respawn=True,
@@ -1053,17 +1131,17 @@ class Enemy:
     NightmareInfernoRider = EnemyMeta(
         id=I18nText.EnemyNightmareInfernoRider,
         key=BossNameEnum.NightmareInfernoRider,
-        name=_tr(I18nText.EnemyNightmareInfernoRider),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareInfernoRider),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareInfernoRider),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareInfernoRider),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1072,9 +1150,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareInfernoRider),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareInfernoRider),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareInfernoRider,
             auto_respawn=True,
@@ -1088,17 +1167,17 @@ class Enemy:
     NightmareMourningAix = EnemyMeta(
         id=I18nText.EnemyNightmareMourningAix,
         key=BossNameEnum.NightmareMourningAix,
-        name=_tr(I18nText.EnemyNightmareMourningAix),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareMourningAix),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.EternalRadiance],
         elements=[EnemyElement.Spectro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareMourningAix),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareMourningAix),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1107,9 +1186,10 @@ class Enemy:
             stop_text=[],
             routes=[Run.forward(3.6)],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareMourningAix),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareMourningAix),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareMourningAix,
             auto_respawn=True,
@@ -1123,17 +1203,17 @@ class Enemy:
     NightmareLampylumenMyriad = EnemyMeta(
         id=I18nText.EnemyNightmareLampylumenMyriad,
         key=BossNameEnum.NightmareLampylumenMyriad,
-        name=_tr(I18nText.EnemyNightmareLampylumenMyriad),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareLampylumenMyriad),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_0,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Glacio],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareLampylumenMyriad),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareLampylumenMyriad),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1142,9 +1222,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareLampylumenMyriad),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareLampylumenMyriad),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareLampylumenMyriad,
             auto_respawn=True,
@@ -1155,20 +1236,56 @@ class Enemy:
         ),
     )
 
+    Fleurdelys = EnemyMeta(
+        id=I18nText.EnemyFleurdelys,
+        key=BossNameEnum.Fleurdelys,
+        localized_name=I18nTr.l10n(I18nText.EnemyFleurdelys),
+        species=EnemySpecies.Special,
+        rank=EnemyRank.CalamityClass,
+        cost=EnemyCost.Cost4,
+        icon=EnemyIcon.Icon1,
+        version=EnemyVersion.V2_2,
+        sonata=[SonataEffect.FreezingFrost],
+        elements=[EnemyElement.Aero],
+        prefer_quick=True,
+        boss_meta=BossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyFleurdelys),
+            is_dungeon=False,
+            dungeon_name=None,
+            auto_respawn=False,
+            enter_text=None,
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[],
+            absorb=AbsorbMode.Move,
+            restart=AbsorbMode.Move,
+        ),
+        quick_boss_meta=QuickBossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemyFleurdelys),
+            menu=I18nText.WeeklyChallenge,
+            dungeon_name=I18nText.TheWheelOfBrokenFate,
+            auto_respawn=False,
+            battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
+            routes=[],
+            absorb=AbsorbMode.Move,
+        ),
+    )
+
     NightmareKelpie = EnemyMeta(
         id=I18nText.EnemyNightmareKelpie,
         key=BossNameEnum.NightmareKelpie,
-        name=_tr(I18nText.EnemyNightmareKelpie),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareKelpie),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_4,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Glacio, EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareKelpie),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareKelpie),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1177,9 +1294,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareKelpie),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareKelpie),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareKelpie,
             auto_respawn=True,
@@ -1193,17 +1311,17 @@ class Enemy:
     LionessOfGlory = EnemyMeta(
         id=I18nText.EnemyLionessOfGlory,
         key=BossNameEnum.LionessOfGlory,
-        name=_tr(I18nText.EnemyLionessOfGlory),
+        localized_name=I18nTr.l10n(I18nText.EnemyLionessOfGlory),
         species=EnemySpecies.Tranquilite,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_4,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyLionessOfGlory),
+            localized_name=I18nTr.l10n(I18nText.EnemyLionessOfGlory),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1212,33 +1330,34 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyLionessOfGlory),
+            localized_name=I18nTr.l10n(I18nText.EnemyLionessOfGlory),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLionessOfGlory,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
         ),
     )
 
     NightmareHecate = EnemyMeta(
         id=I18nText.EnemyNightmareHecate,
         key=BossNameEnum.NightmareHecate,
-        name=_tr(I18nText.EnemyNightmareHecate),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareHecate),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_5,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareHecate),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareHecate),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1247,9 +1366,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareHecate),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareHecate),
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareHecate,
             auto_respawn=True,
@@ -1260,72 +1380,49 @@ class Enemy:
         ),
     )
 
-    Fleurdelys = EnemyMeta(
-        id=I18nText.EnemyFleurdelys,
-        key=BossNameEnum.Fleurdelys,
-        name=_tr(I18nText.EnemyFleurdelys),
-        species=EnemySpecies.Special,
-        rank=EnemyRank.CalamityClass,
-        cost=EnemyCost.Cost4,
-        icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
-        sonata=[SonataEffect.FreezingFrost],
-        elements=[EnemyElement.Aero],
-        prefer_quick=True,
-        boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyFleurdelys),
-            is_dungeon=False,
-            dungeon_name=None,
-            auto_respawn=False,
-            enter_text=None,
-            battle_text=[I18nText.CombatDefeat],
-            stop_text=[],
-            routes=[],
-            absorb=AbsorbMode.Move,
-        ),
-        quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyFleurdelys),
-            menu=I18nText.WeeklyChallenge,
-            dungeon_name=I18nText.TheWheelOfBrokenFate,
-            auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
-            stop_text=[],
-            routes=[],
-            absorb=AbsorbMode.Move,
-        ),
-    )
-
     Fenrico = EnemyMeta(
         id=I18nText.EnemyFenrico,
         key=BossNameEnum.Fenrico,
-        name=_tr(I18nText.EnemyFenrico),
+        localized_name=I18nTr.l10n(I18nText.EnemyFenrico),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
-        version=EnemyVersion.V1_0,
+        version=EnemyVersion.V2_5,
         sonata=[SonataEffect.FreezingFrost],
         elements=[EnemyElement.Aero],
-        prefer_quick=True,
+        prefer_quick=False,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyFenrico),
+            localized_name=I18nTr.l10n(I18nText.EnemyFenrico),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
             enter_text=None,
-            battle_text=[I18nText.CombatDefeat],
-            stop_text=[],
+            battle_text=[I18nText.FenricoDeliveranceInTheDeep],
+            stop_text=[I18nText.HopeAndSalvationShallEndure],
             routes=[],
-            absorb=None,
+            absorb=AbsorbMode.OD,
+            restart=EnemyRestart(
+                after_travel=[Run.forward(0.78)],
+                restart=EnemyRestartAction(
+                    cycle=14,
+                    step=2,
+                    direction=Direction.FORWARD,
+                    check_text=[I18nText.FenricoDeliveranceInTheDeep],
+                    check_hp_bar=True,
+                    restart_text=[I18nText.ChallengeAgain, I18nText.Restart],
+                ),
+                after_restart=[Run.forward(3.4 - 2.0)],
+            ),
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyFenrico),
+            localized_name=I18nTr.l10n(I18nText.EnemyFenrico),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyFenrico,
             auto_respawn=False,
             battle_text=[I18nText.DefeatTheEnemies],
             stop_text=[],
-            routes=[Run.forward(1)],
+            routes=[Run.forward(0.85)],
             absorb=None,
         ),
     )
@@ -1333,17 +1430,17 @@ class Enemy:
     TheFalseSovereign = EnemyMeta(
         id=I18nText.EnemyTheFalseSovereign,
         key=BossNameEnum.TheFalseSovereign,
-        name=_tr(I18nText.EnemyTheFalseSovereign),
+        localized_name=I18nTr.l10n(I18nText.EnemyTheFalseSovereign),
         species=EnemySpecies.Tidespawn,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V2_6,
-        sonata=[SonataEffect.FreezingFrost],
+        sonata=[SonataEffect.CrownOfValor],
         elements=[EnemyElement.Havoc, EnemyElement.Electro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyTheFalseSovereign),
+            localized_name=I18nTr.l10n(I18nText.EnemyTheFalseSovereign),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1352,9 +1449,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
+            restart=AbsorbMode.OD,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyTheFalseSovereign),
+            localized_name=I18nTr.l10n(I18nText.EnemyTheFalseSovereign),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyTheFalseSovereign,
             auto_respawn=False,
@@ -1368,17 +1466,17 @@ class Enemy:
     LadyOfTheSea = EnemyMeta(
         id=I18nText.EnemyLadyOfTheSea,
         key=BossNameEnum.LadyOfTheSea,
-        name=_tr(I18nText.EnemyLadyOfTheSea),
+        localized_name=I18nTr.l10n(I18nText.EnemyLadyOfTheSea),
         species=EnemySpecies.Tidespawn,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V2_6,
-        sonata=[SonataEffect.FreezingFrost],
+        sonata=[SonataEffect.CrownOfValor],
         elements=[EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyLadyOfTheSea),
+            localized_name=I18nTr.l10n(I18nText.EnemyLadyOfTheSea),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1387,15 +1485,16 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
+            restart=AbsorbMode.OD,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyLadyOfTheSea),
+            localized_name=I18nTr.l10n(I18nText.EnemyLadyOfTheSea),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLadyOfTheSea,
             auto_respawn=False,
             battle_text=[I18nText.LadyOfTheSeaEmbersOfGlory],
             stop_text=[],
-            routes=[Run.forward(1)],
+            routes=[Run.forward(0.8)],
             absorb=AbsorbMode.OD,
         ),
     )
@@ -1403,17 +1502,17 @@ class Enemy:
     ThrenodianLeviathan = EnemyMeta(
         id=I18nText.EnemyThrenodianLeviathan,
         key=BossNameEnum.ThrenodianLeviathan,
-        name=_tr(I18nText.EnemyThrenodianLeviathan),
+        localized_name=I18nTr.l10n(I18nText.EnemyThrenodianLeviathan),
         species=EnemySpecies.Special,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
         icon=EnemyIcon.Icon1,
         version=EnemyVersion.V2_7,
-        sonata=[SonataEffect.FreezingFrost],
+        sonata=[SonataEffect.FlamewingShadow, SonataEffect.ThreadOfSeveredFate],
         elements=[EnemyElement.Havoc, EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyThrenodianLeviathan),
+            localized_name=I18nTr.l10n(I18nText.EnemyThrenodianLeviathan),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1422,9 +1521,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.Move,
+            restart=AbsorbMode.Move,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyThrenodianLeviathan),
+            localized_name=I18nTr.l10n(I18nText.EnemyThrenodianLeviathan),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.CinderniteApocalypse,
             auto_respawn=False,
@@ -1438,7 +1538,7 @@ class Enemy:
     ReactorHusk = EnemyMeta(
         id=I18nText.EnemyReactorHusk,
         key=BossNameEnum.ReactorHusk,
-        name=_tr(I18nText.EnemyReactorHusk),
+        localized_name=I18nTr.l10n(I18nText.EnemyReactorHusk),
         species=EnemySpecies.Exoswarm,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1448,7 +1548,7 @@ class Enemy:
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyReactorHusk),
+            localized_name=I18nTr.l10n(I18nText.EnemyReactorHusk),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1457,9 +1557,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyReactorHusk),
+            localized_name=I18nTr.l10n(I18nText.EnemyReactorHusk),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyReactorHusk,
             auto_respawn=False,
@@ -1473,7 +1574,7 @@ class Enemy:
     Hyvatia = EnemyMeta(
         id=I18nText.EnemyHyvatia,
         key=BossNameEnum.Hyvatia,
-        name=_tr(I18nText.EnemyHyvatia),
+        localized_name=I18nTr.l10n(I18nText.EnemyHyvatia),
         species=EnemySpecies.Special,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1483,7 +1584,7 @@ class Enemy:
         elements=[EnemyElement.Spectro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyHyvatia),
+            localized_name=I18nTr.l10n(I18nText.EnemyHyvatia),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1492,9 +1593,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyHyvatia),
+            localized_name=I18nTr.l10n(I18nText.EnemyHyvatia),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyHyvatia,
             auto_respawn=False,
@@ -1508,7 +1610,7 @@ class Enemy:
     Sigillum = EnemyMeta(
         id=I18nText.EnemySigillum,
         key=BossNameEnum.Sigillum,
-        name=_tr(I18nText.EnemySigillum),
+        localized_name=I18nTr.l10n(I18nText.EnemySigillum),
         species=EnemySpecies.Other,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -1518,7 +1620,7 @@ class Enemy:
         elements=[EnemyElement.Spectro],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemySigillum),
+            localized_name=I18nTr.l10n(I18nText.EnemySigillum),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1527,9 +1629,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemySigillum),
+            localized_name=I18nTr.l10n(I18nText.EnemySigillum),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.GateOfTheLostStar,
             auto_respawn=False,
@@ -1543,7 +1646,7 @@ class Enemy:
     NamelessExplorer = EnemyMeta(
         id=I18nText.EnemyNamelessExplorer,
         key=BossNameEnum.NamelessExplorer,
-        name=_tr(I18nText.EnemyNamelessExplorer),
+        localized_name=I18nTr.l10n(I18nText.EnemyNamelessExplorer),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1553,7 +1656,7 @@ class Enemy:
         elements=[EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNamelessExplorer),
+            localized_name=I18nTr.l10n(I18nText.EnemyNamelessExplorer),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1562,9 +1665,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNamelessExplorer),
+            localized_name=I18nTr.l10n(I18nText.EnemyNamelessExplorer),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyNamelessExplorer,
             auto_respawn=False,
@@ -1578,7 +1682,7 @@ class Enemy:
     Denia = EnemyMeta(
         id=I18nText.EnemyDenia,
         key=BossNameEnum.Denia,
-        name=_tr(I18nText.EnemyDenia),
+        localized_name=I18nTr.l10n(I18nText.EnemyDenia),
         species=EnemySpecies.Other,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -1588,7 +1692,7 @@ class Enemy:
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyDenia),
+            localized_name=I18nTr.l10n(I18nText.EnemyDenia),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1597,9 +1701,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyDenia),
+            localized_name=I18nTr.l10n(I18nText.EnemyDenia),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.SeedOfIllusoryOrigin,
             auto_respawn=False,
@@ -1613,7 +1718,7 @@ class Enemy:
     NightmareAdamSmasher = EnemyMeta(
         id=I18nText.EnemyNightmareAdamSmasher,
         key=BossNameEnum.NightmareAdamSmasher,
-        name=_tr(I18nText.EnemyNightmareAdamSmasher),
+        localized_name=I18nTr.l10n(I18nText.EnemyNightmareAdamSmasher),
         species=EnemySpecies.NightmareTacetDiscord,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1623,7 +1728,7 @@ class Enemy:
         elements=[],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyNightmareAdamSmasher),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareAdamSmasher),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1632,9 +1737,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyNightmareAdamSmasher),
+            localized_name=I18nTr.l10n(I18nText.EnemyNightmareAdamSmasher),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyNightmareAdamSmasher,
             auto_respawn=False,
@@ -1648,7 +1754,7 @@ class Enemy:
     MyriadSnareRustfireChassis = EnemyMeta(
         id=I18nText.EnemyMyriadSnareRustfireChassis,
         key=BossNameEnum.MyriadSnareRustfireChassis,
-        name=_tr(I18nText.EnemyMyriadSnareRustfireChassis),
+        localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
         species=EnemySpecies.Other,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1658,7 +1764,7 @@ class Enemy:
         elements=[EnemyElement.Fusion],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyMyriadSnareRustfireChassis),
+            localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1667,9 +1773,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
+            restart=AbsorbMode.OD,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyMyriadSnareRustfireChassis),
+            localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMyriadSnareRustfireChassis,
             auto_respawn=False,
@@ -1683,7 +1790,7 @@ class Enemy:
     ThousandPuppetPavilion = EnemyMeta(
         id=I18nText.EnemyThousandPuppetPavilion,
         key=BossNameEnum.ThousandPuppetPavilion,
-        name=_tr(I18nText.EnemyThousandPuppetPavilion),
+        localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
         species=EnemySpecies.Whisperin,
         rank=EnemyRank.CalamityClass,
         cost=EnemyCost.Cost4,
@@ -1693,7 +1800,7 @@ class Enemy:
         elements=[EnemyElement.Electro, EnemyElement.Havoc],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyThousandPuppetPavilion),
+            localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1702,9 +1809,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyThousandPuppetPavilion),
+            localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.CourtOfShackledSouls,
             auto_respawn=False,
@@ -1718,7 +1826,7 @@ class Enemy:
     CalamityEffigy = EnemyMeta(
         id=I18nText.EnemyCalamityEffigy,
         key=BossNameEnum.CalamityEffigy,
-        name=_tr(I18nText.EnemyCalamityEffigy),
+        localized_name=I18nTr.l10n(I18nText.EnemyCalamityEffigy),
         species=EnemySpecies.Other,
         rank=EnemyRank.OverlordClass,
         cost=EnemyCost.Cost4,
@@ -1728,7 +1836,7 @@ class Enemy:
         elements=[EnemyElement.Aero],
         prefer_quick=True,
         boss_meta=BossMeta(
-            name=_tr(I18nText.EnemyCalamityEffigy),
+            localized_name=I18nTr.l10n(I18nText.EnemyCalamityEffigy),
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1737,9 +1845,10 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=None,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
-            name=_tr(I18nText.EnemyCalamityEffigy),
+            localized_name=I18nTr.l10n(I18nText.EnemyCalamityEffigy),
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyCalamityEffigy,
             auto_respawn=False,
@@ -2010,13 +2119,12 @@ class EnemyVsBar:
 
         return float(np.clip(ratio, 0.0, 1.0))
 
-
-if __name__ == '__main__':
-    # print(Enemy.enemies())
-
-    import ctypes
-
-    buf = ctypes.create_unicode_buffer(85)
-    ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, 85)
-
-    print(buf.value)
+# if __name__ == '__main__':
+#     print(Enemy.enemies())
+#
+#     import ctypes
+#
+#     buf = ctypes.create_unicode_buffer(85)
+#     ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, 85)
+#
+#     print(buf.value)

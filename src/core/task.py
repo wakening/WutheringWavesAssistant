@@ -1,4 +1,5 @@
 import logging
+import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -244,6 +245,7 @@ class TaskFSM(FSM):
 
     def __init__(
             self,
+            *,
             name: str | None = None,
             task_id: str | None = None,
             status: TaskStatus = TaskStatus.PENDING,
@@ -319,6 +321,37 @@ class TaskFSM(FSM):
     @property
     def is_failed(self) -> bool:
         return self.status.is_failed
+
+
+class LatchTaskFSM(TaskFSM):
+    """CountDownLatch任务状态机"""
+
+    def __init__(
+            self,
+            *,
+            name: str | None = None,
+            task_id: str | None = None,
+            status: TaskStatus = TaskStatus.PENDING,
+            count: int = 3,
+    ):
+        super().__init__(name=name, task_id=task_id, status=status)
+        if count <= 0:
+            raise ValueError(f"count must be > 0")
+        self.max_count = count
+        self.count = count
+        self._lock = threading.Lock()
+
+    def start(self):
+        with self._lock:
+            if self.count <= 0 or self.is_terminal:
+                return False
+            if self.status == TaskStatus.PENDING:
+                super().start()
+            self.count = max(0, self.count - 1)
+            return True
+
+    def __str__(self) -> str:
+        return f"LatchTaskFSM(name='{self.name}', status={self.status}, count={self.count})"
 
 
 class TaskFSMGroup(FSM):

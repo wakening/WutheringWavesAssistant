@@ -215,7 +215,7 @@ class RunCard(CardWidget):
                             return
                         boss_name_list = [item.value for item in paramConfig.bossName.value]
                         msg = self.tr("{boss_name}").format(boss_name=str(boss_name_list))
-                        self.createTopRightInfoBar(self.tr('Boss Rush: '), msg, 5000)
+                        self.createTopRightInfoBar(self.tr('Enemy: '), msg, 5000)
                     except Exception:
                         pass
                 elif self.checked_task_name in self.task_start_notice:

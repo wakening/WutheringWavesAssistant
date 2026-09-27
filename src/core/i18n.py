@@ -194,6 +194,8 @@ class I18nText:
 
     # ------- Enemy Tracing -------
     # 加前缀是因为boss名、角色名有相同的，达妮娅
+    EnemyScarAberrantNightmare = "EnemyScarAberrantNightmare"
+
     EnemyDreamless = "EnemyDreamless"
     EnemyFallacyOfNoReturn = "EnemyFallacyOfNoReturn"
     EnemyLampylumenMyriad = "EnemyLampylumenMyriad"
@@ -237,12 +239,53 @@ class I18nText:
     EnemyThousandPuppetPavilion = "EnemyThousandPuppetPavilion"
     EnemyCalamityEffigy = "EnemyCalamityEffigy"
 
+    EnemyScar = "EnemyScar"
+
     # boss战血条上方显示的名字
     CombatDefeat = "CombatDefeat"
     ContinueTheChallengeOrLeave = "ContinueTheChallengeOrLeave"
     NightmareMourningAixFaceOfLust = "NightmareMourningAixFaceOfLust"
+    FenricoDeliveranceInTheDeep = "FenricoDeliveranceInTheDeep"
+    HopeAndSalvationShallEndure = "HopeAndSalvationShallEndure"
     NightmareHecateClawsOfRegret = "NightmareHecateClawsOfRegret"
     LadyOfTheSeaEmbersOfGlory = "LadyOfTheSeaEmbersOfGlory"
+
+    # ------- Resonator Ascension Material -------
+    ForgedEmpyreansSigh = "ForgedEmpyreansSigh"
+    SolidaritysLoneflame = "SolidaritysLoneflame"
+    NightmareFlashdrive = "NightmareFlashdrive"
+    OurChoice = "OurChoice"
+    SuncovetersReach = "SuncovetersReach"
+    BurningJudgment = "BurningJudgment"
+    AbyssalHusk = "AbyssalHusk"
+    BlightedCrownOfPuppetKing = "BlightedCrownOfPuppetKing"
+    TruthInLies = "TruthInLies"
+    UnfadingGlory = "UnfadingGlory"
+    BlazingBone = "BlazingBone"
+    CleansingConch = "CleansingConch"
+    PlatinumCore = "PlatinumCore"
+    TopologicalConfinement = "TopologicalConfinement"
+    StrifeTacetCore = "StrifeTacetCore"
+    HiddenThunderTacetCore = "HiddenThunderTacetCore"
+    ThunderingTacetCore = "ThunderingTacetCore"
+    RageTacetCore = "RageTacetCore"
+    RoaringRockFist = "RoaringRockFist"
+    ElegyTacetCore = "ElegyTacetCore"
+    GoldDissolvingFeather = "GoldDissolvingFeather"
+    SoundKeepingTacetCore = "SoundKeepingTacetCore"
+    GroupAbominationTacetCore = "GroupAbominationTacetCore"
+
+    # ------- Skill Upgrade Material -------
+    SkywardGlazedHeart = "SkywardGlazedHeart"
+    WeWhoQuestion = "WeWhoQuestion"
+    GoldInMemory = "GoldInMemory"
+    CurseOfTheAbyss = "CurseOfTheAbyss"
+    WhenIrisesBloom = "WhenIrisesBloom"
+    TheNetherworldsStare = "TheNetherworldsStare"
+    SentinelsDagger = "SentinelsDagger"
+    DreamlessFeather = "DreamlessFeather"
+    UnendingDestruction = "UnendingDestruction"
+    MonumentBell = "MonumentBell"
 
     # ------- Sonata -------
     FreezingFrost = "FreezingFrost"
@@ -294,6 +337,7 @@ class I18nText:
     EnableNavigation = "EnableNavigation"
     SwitchMap = "SwitchMap"
     RoyaFrostlands = "RoyaFrostlands"
+    LahaiRoi = "LahaiRoi"
     Rinascita = "Rinascita"
     TheBlackShores = "TheBlackShores"
     Huanglong = "Huanglong"
@@ -326,6 +370,8 @@ class I18nText:
     DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
     RequestTimedOut = "RequestTimedOut"
     ConnectionErrorReconnecting = "ConnectionErrorReconnecting"
+    StarpathsIntertwined = "StarpathsIntertwined"
+    ClaimStarpathGift = "ClaimStarpathGift"
     PleaseDontForgetToTakeABreak = "PleaseDontForgetToTakeABreak"
     AreYouSureYouWantToProceed = "AreYouSureYouWantToProceed"
     Summary = "Summary"
@@ -378,6 +424,7 @@ class I18nText:
     GuidebookMengzhou = "GuidebookMengzhou"
     GuidebookLahaiRoi = "GuidebookLahaiRoi"
     GuidebookRinascita = "GuidebookRinascita"
+    GuidebookTheBlackShores = "GuidebookTheBlackShores"
     GuidebookJinzhou = "GuidebookJinzhou"
 
     ## ------- Guidebook Activity -------
@@ -428,6 +475,60 @@ class I18nText:
     Broadblade = "Broadblade"
     Gauntlets = "Gauntlets"
     Pistols = "Pistols"
+    # reward
+    Polarizer = "Polarizer"
+    String = "String"
+    CarvedCrystal = "CarvedCrystal"
+    WavewornShard = "WavewornShard"
+    Combustor = "Combustor"
+    MetallicDrip = "MetallicDrip"
+    Helix = "Helix"
+    WavewornResidue = "WavewornResidue"
+    Cadence = "Cadence"
+    Phlogiston = "Phlogiston"
+
+    BrokenWingPolarizer = "BrokenWingPolarizer"
+    MonowingPolarizer = "MonowingPolarizer"
+    PolywingPolarizer = "PolywingPolarizer"
+    LayeredWingPolarizer = "LayeredWingPolarizer"
+    SplicedString = "SplicedString"
+    BrokenString = "BrokenString"
+    SolidifiedString = "SolidifiedString"
+    MelodicString = "MelodicString"
+    LFCarvedCrystal = "LFCarvedCrystal"
+    MFCarvedCrystal = "MFCarvedCrystal"
+    HFCarvedCrystal = "HFCarvedCrystal"
+    FFCarvedCrystal = "FFCarvedCrystal"
+    LFWavewornShard = "LFWavewornShard"
+    MFWavewornShard = "MFWavewornShard"
+    HFWavewornShard = "HFWavewornShard"
+    FFWavewornShard = "FFWavewornShard"
+    IncompleteCombustor = "IncompleteCombustor"
+    AftertuneCombustor = "AftertuneCombustor"
+    RemnantCombustor = "RemnantCombustor"
+    ReverbCombustor = "ReverbCombustor"
+    InertMetallicDrip = "InertMetallicDrip"
+    ReactiveMetallicDrip = "ReactiveMetallicDrip"
+    PolarizedMetallicDrip = "PolarizedMetallicDrip"
+    HeterizedMetallicDrip = "HeterizedMetallicDrip"
+    LentoHelix = "LentoHelix"
+    AdagioHelix = "AdagioHelix"
+    AndanteHelix = "AndanteHelix"
+    PrestoHelix = "PrestoHelix"
+    WavewornResidue210 = "WavewornResidue210"
+    WavewornResidue226 = "WavewornResidue226"
+    WavewornResidue235 = "WavewornResidue235"
+    WavewornResidue239 = "WavewornResidue239"
+    CadenceSeed = "CadenceSeed"
+    CadenceBud = "CadenceBud"
+    CadenceLeaf = "CadenceLeaf"
+    CadenceBlossom = "CadenceBlossom"
+    ImpurePhlogiston = "ImpurePhlogiston"
+    ExtractedPhlogiston = "ExtractedPhlogiston"
+    RefinedPhlogiston = "RefinedPhlogiston"
+    FlawlessPhlogiston = "FlawlessPhlogiston"
+
+    SortByWeaponType = "SortByWeaponType"
     EnterTheForgeryChallenge = "EnterTheForgeryChallenge"
     Level = "Level"
     Match = "Match"
@@ -447,6 +548,19 @@ class I18nText:
     TacetFieldMountGjallar = "TacetFieldMountGjallar"
     TacetFieldMawburrowDesert = "TacetFieldMawburrowDesert"
     TacetFieldStagnantRun = "TacetFieldStagnantRun"
+    TacetFieldMournfellCanyon = "TacetFieldMournfellCanyon"
+    TacetFieldBeohrWaters = "TacetFieldBeohrWaters"
+    TacetFieldRiccioliIslands = "TacetFieldRiccioliIslands"
+    TacetFieldFagaceaePeninsula = "TacetFieldFagaceaePeninsula"
+    TacetFieldPenitentsEnd = "TacetFieldPenitentsEnd"
+    TacetFieldCentralPlains = "TacetFieldCentralPlains"
+    TacetFieldDesorockHighlandI = "TacetFieldDesorockHighlandI"
+    TacetFieldTigersMaw = "TacetFieldTigersMaw"
+    TacetFieldWhiningAixsMire = "TacetFieldWhiningAixsMire"
+    TacetFieldPortCityOfGuixu = "TacetFieldPortCityOfGuixu"
+    TacetFieldDesorockHighlandII = "TacetFieldDesorockHighlandII"
+    TacetFieldDimForest = "TacetFieldDimForest"
+
     TacetField = "TacetField"
     EchoSet = "EchoSet"
     DefeatTheTdsInTheTacetField = "DefeatTheTdsInTheTacetField"
@@ -961,7 +1075,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Jingran$"), raw="Jingran"),
     },
     I18nText.Suoming: {
-        Language.ZH: RegexStr(r"^锁[暝冥]$", raw="锁暝"),
+        Language.ZH: RegexStr(r"^锁[暝冥]?$", raw="锁暝"),
         Language.EN: RegexStr(flex_ws(r"^Suoming$"), raw="Suoming"),
     },
     I18nText.Hsin: {
@@ -1006,12 +1120,17 @@ I18N_TEXT = {
     },
 
     # ------- Enemy Tracing -------
+    I18nText.EnemyScarAberrantNightmare: {
+        Language.ZH: RegexStr(r"^伤痕·异生梦魇$", raw="伤痕·异生梦魇"),
+        Language.EN: RegexStr(flex_ws(r"^Scar.*?Aberrant Nightmare$"), raw="Scar: Aberrant Nightmare"),
+    },
+
     I18nText.EnemyDreamless: {
         Language.ZH: RegexStr(r"^无妄者$", raw="无妄者"),
         Language.EN: RegexStr(flex_ws(r"^Dreamless$"), raw="Dreamless"),
     },
     I18nText.EnemyFallacyOfNoReturn: {
-        Language.ZH: RegexStr(r"^无归的谬误$", raw="无归的谬误"),
+        Language.ZH: RegexStr(r"^无归的.?误$", raw="无归的谬误"),
         Language.EN: RegexStr(flex_ws(r"^Fallacy of No Return$"), raw="Fallacy of No Return"),
     },
     I18nText.EnemyLampylumenMyriad: {
@@ -1023,11 +1142,11 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Bell.Borne Geochelone$"), raw="Bell-Borne Geochelone"),
     },
     I18nText.EnemyInfernoRider: {
-        Language.ZH: RegexStr(r"^燎照之骑$", raw="燎照之骑"),
+        Language.ZH: RegexStr(r"^.?照之骑$", raw="燎照之骑"),
         Language.EN: RegexStr(flex_ws(r"^Inferno Rider$"), raw="Inferno Rider"),
     },
     I18nText.EnemyImpermanenceHeron: {
-        Language.ZH: RegexStr(r"^无常凶鹭$", raw="无常凶鹭"),
+        Language.ZH: RegexStr(r"^无常凶.?$", raw="无常凶鹭"),
         Language.EN: RegexStr(flex_ws(r"^Impermanence Heron$"), raw="Impermanence Heron"),
     },
     I18nText.EnemyMechAbomination: {
@@ -1035,11 +1154,11 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Mech Abomination$"), raw="Mech Abomination"),
     },
     I18nText.EnemyMourningAix: {
-        Language.ZH: RegexStr(r"^哀声鸷$", raw="哀声鸷"),
+        Language.ZH: RegexStr(r"^[哀袁]声.?$", raw="哀声鸷"),
         Language.EN: RegexStr(flex_ws(r"^Mourning Aix$"), raw="Mourning Aix"),
     },
     I18nText.EnemyThunderingMephis: {
-        Language.ZH: RegexStr(r"^朔雷之鳞$", raw="朔雷之鳞"),
+        Language.ZH: RegexStr(r"^.?雷之鳞$", raw="朔雷之鳞"),
         Language.EN: RegexStr(flex_ws(r"^Thundering Mephis$"), raw="Thundering Mephis"),
     },
     I18nText.EnemyTempestMephis: {
@@ -1047,7 +1166,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Tempest Mephis$"), raw="Tempest Mephis"),
     },
     I18nText.EnemyFeilianBeringal: {
-        Language.ZH: RegexStr(r"^飞廉之猩$", raw="飞廉之猩"),
+        Language.ZH: RegexStr(r"^飞廉之.?$", raw="飞廉之猩"),
         Language.EN: RegexStr(flex_ws(r"^Feilian Beringal$"), raw="Feilian Beringal"),
     },
     I18nText.EnemyCrownless: {
@@ -1063,11 +1182,11 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Sentry Construct$"), raw="Sentry Construct"),
     },
     I18nText.EnemyHecate: {
-        Language.ZH: RegexStr(r"^赫卡.$", raw="赫卡忒"),
+        Language.ZH: RegexStr(r"^赫卡.?$", raw="赫卡忒"),
         Language.EN: RegexStr(flex_ws(r"^Hecate$"), raw="Hecate"),
     },
     I18nText.EnemyLorelei: {
-        Language.ZH: RegexStr(r"^罗蕾莱$", raw="罗蕾莱"),
+        Language.ZH: RegexStr(r"^罗.?莱$", raw="罗蕾莱"),
         Language.EN: RegexStr(flex_ws(r"^Lorelei$"), raw="Lorelei"),
     },
     I18nText.EnemyDragonOfDirge: {
@@ -1075,11 +1194,11 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Dragon of Dirge$"), raw="Dragon of Dirge"),
     },
     I18nText.EnemyNightmareFeilianBeringal: {
-        Language.ZH: RegexStr(r"^梦.*?飞廉之猩$", raw="梦魇·飞廉之猩"),
+        Language.ZH: RegexStr(r"^梦.*?飞廉之.?$", raw="梦魇·飞廉之猩"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Feilian Beringal$"), raw="Nightmare: Feilian Beringal"),
     },
     I18nText.EnemyNightmareImpermanenceHeron: {
-        Language.ZH: RegexStr(r"^梦.*?无常凶鹭$", raw="梦魇·无常凶鹭"),
+        Language.ZH: RegexStr(r"^梦.*?无常凶.?$", raw="梦魇·无常凶鹭"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Impermanence Heron$"), raw="Nightmare: Impermanence Heron"),
     },
     I18nText.EnemyNightmareTempestMephis: {
@@ -1087,7 +1206,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?TempestMephis$"), raw="Nightmare: Tempest Mephis"),
     },
     I18nText.EnemyNightmareThunderingMephis: {
-        Language.ZH: RegexStr(r"^梦.*?朔雷之鳞$", raw="梦魇·朔雷之鳞"),
+        Language.ZH: RegexStr(r"^梦.*?雷之鳞$", raw="梦魇·朔雷之鳞"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Thundering Mephis$"), raw="Nightmare: Thundering Mephis"),
     },
     I18nText.EnemyNightmareCrownless: {
@@ -1095,7 +1214,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Crownless$"), raw="Nightmare: Crownless"),
     },
     I18nText.EnemyNightmareInfernoRider: {
-        Language.ZH: RegexStr(r"^梦.*?燎照之骑$", raw="梦魇·燎照之骑"),
+        Language.ZH: RegexStr(r"^梦.*?照之骑$", raw="梦魇·燎照之骑"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Inferno Rider$"), raw="Nightmare: Inferno Rider"),
     },
     I18nText.EnemyNightmareMourningAix: {
@@ -1103,11 +1222,11 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Mourning Aix$"), raw="Nightmare: Mourning Aix"),
     },
     I18nText.EnemyNightmareLampylumenMyriad: {
-        Language.ZH: RegexStr(r"^梦.*?辉.军势$", raw="梦魇·辉萤军势"),
+        Language.ZH: RegexStr(r"^梦.*?辉.?军势$", raw="梦魇·辉萤军势"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare.*?Lampylumen Myriad$"), raw="Nightmare: Lampylumen Myriad"),
     },
     I18nText.EnemyFleurdelys: {
-        Language.ZH: RegexStr(r"^芙露德莉斯$", raw="芙露德莉斯"),
+        Language.ZH: RegexStr(r"^芙露德.?斯$", raw="芙露德莉斯"),
         Language.EN: RegexStr(flex_ws(r"^Fleurdelys$"), raw="Fleurdelys"),
     },
     I18nText.EnemyNightmareKelpie: {
@@ -1143,7 +1262,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Hyvatia$"), raw="Hyvatia"),
     },
     I18nText.EnemyReactorHusk: {
-        Language.ZH: RegexStr(r"^炉芯机骸$", raw="炉芯机骸"),
+        Language.ZH: RegexStr(r"^炉芯机.?$", raw="炉芯机骸"),
         Language.EN: RegexStr(flex_ws(r"^Reactor Husk$"), raw="Reactor Husk"),
     },
     I18nText.EnemySigillum: {
@@ -1151,7 +1270,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Sigillum$"), raw="Sigillum"),
     },
     I18nText.EnemyNamelessExplorer: {
-        Language.ZH: RegexStr(r"^无铭探索者$", raw="无铭探索者"),
+        Language.ZH: RegexStr(r"^无.?探索者$", raw="无铭探索者"),
         Language.EN: RegexStr(flex_ws(r"^Nameless Explorer$"), raw="Nameless Explorer"),
     },
     I18nText.EnemyDenia: {
@@ -1191,6 +1310,20 @@ I18N_TEXT = {
             raw="Nightmare: Mourning Aix- Face of Lust"
         ),
     },
+    I18nText.FenricoDeliveranceInTheDeep: {
+        Language.ZH: RegexStr(r"芬莱克.*异海|异海归途$", raw="芬莱克・异海归途"),
+        Language.EN: RegexStr(
+            flex_ws(r"Fenrico.*Deliverance|Deliverance in the Deep$"),
+            raw="Fenrico: Deliverance in the Deep"
+        ),
+    },
+    I18nText.HopeAndSalvationShallEndure: {
+        Language.ZH: RegexStr(r"即使形.*?仍可留下希望与", raw="即使形殁，仍可留下希望与救赎。"),
+        Language.EN: RegexStr(
+            flex_ws(r"Even with the body perished|hope and salvation shall endure"),
+            raw="Even with the body perished, hope and salvation shall endure."
+        ),
+    },
     I18nText.NightmareHecateClawsOfRegret: {
         Language.ZH: RegexStr(r"梦.*?赫卡|遗恨之指$", raw="梦魇・赫卡忒・遗恨之指"),
         Language.EN: RegexStr(
@@ -1204,6 +1337,142 @@ I18N_TEXT = {
             flex_ws(r"Lady of the Sea|Embers of Glory$"),
             raw="Lady of the Sea- Embers of Glory"
         ),
+    },
+
+    # ------- Resonator Ascension Material -------
+    I18nText.ForgedEmpyreansSigh: {
+        Language.ZH: RegexStr(r"^赝仙的嗟叹$", raw="赝仙的嗟叹"),
+        Language.EN: RegexStr(flex_ws(r"Forged Empyrean.?s Sigh$"), raw=r"Forged Empyrean's Sigh"),
+    },
+    I18nText.SolidaritysLoneflame: {
+        Language.ZH: RegexStr(r"^孤焰酬义$", raw="孤焰酬义"),
+        Language.EN: RegexStr(flex_ws(r"^Solidarity.?s Loneflame$"), raw=r"Solidarity's Loneflame"),
+    },
+    I18nText.NightmareFlashdrive: {
+        Language.ZH: RegexStr(r"^梦魇烬枢$", raw="梦魇烬枢"),
+        Language.EN: RegexStr(flex_ws(r"^Nightmare Flashdrive$"), raw=r"Nightmare Flashdrive"),
+    },
+    I18nText.OurChoice: {
+        Language.ZH: RegexStr(r"^我们的选择$", raw="我们的选择"),
+        Language.EN: RegexStr(flex_ws(r"^Our Choice$"), raw=r"Our Choice"),
+    },
+    I18nText.SuncovetersReach: {
+        Language.ZH: RegexStr(r"^觊日者的指尖$", raw="觊日者的指尖"),
+        Language.EN: RegexStr(flex_ws(r"^Suncoveter.?s Reach$"), raw=r"Suncoveter's Reach"),
+    },
+    I18nText.BurningJudgment: {
+        Language.ZH: RegexStr(r"^不熄的裁决$", raw="不熄的裁决"),
+        Language.EN: RegexStr(flex_ws(r"^Burning Judgment$"), raw=r"Burning Judgment"),
+    },
+    I18nText.AbyssalHusk: {
+        Language.ZH: RegexStr(r"^深海余蚀$", raw="深海余蚀"),
+        Language.EN: RegexStr(flex_ws(r"^Abyssal Husk$"), raw=r"Abyssal Husk"),
+    },
+    I18nText.BlightedCrownOfPuppetKing: {
+        Language.ZH: RegexStr(r"^群儡的秽冕$", raw="群儡的秽冕"),
+        Language.EN: RegexStr(flex_ws(r"^Blighted Crown of Puppet King$"), raw=r"Blighted Crown of Puppet King"),
+    },
+    I18nText.TruthInLies: {
+        Language.ZH: RegexStr(r"^箴言与谎言$", raw="箴言与谎言"),
+        Language.EN: RegexStr(flex_ws(r"^Truth in Lies$"), raw=r"Truth in Lies"),
+    },
+    I18nText.UnfadingGlory: {
+        Language.ZH: RegexStr(r"^不朽荣耀$", raw="不朽荣耀"),
+        Language.EN: RegexStr(flex_ws(r"^Unfading Glory$"), raw=r"Unfading Glory"),
+    },
+    I18nText.BlazingBone: {
+        Language.ZH: RegexStr(r"^焚磷厄骨$", raw="焚磷厄骨"),
+        Language.EN: RegexStr(flex_ws(r"^Blazing Bone$"), raw=r"Blazing Bone"),
+    },
+    I18nText.CleansingConch: {
+        Language.ZH: RegexStr(r"^涤罪音螺$", raw="涤罪音螺"),
+        Language.EN: RegexStr(flex_ws(r"^Cleansing Conch$"), raw=r"Cleansing Conch"),
+    },
+    I18nText.PlatinumCore: {
+        Language.ZH: RegexStr(r"^白金机心$", raw="白金机心"),
+        Language.EN: RegexStr(flex_ws(r"^Platinum Core$"), raw=r"Platinum Core"),
+    },
+    I18nText.TopologicalConfinement: {
+        Language.ZH: RegexStr(r"^幽囚拓扑$", raw="幽囚拓扑"),
+        Language.EN: RegexStr(flex_ws(r"^Topological Confinement$"), raw=r"Topological Confinement"),
+    },
+    I18nText.StrifeTacetCore: {
+        Language.ZH: RegexStr(r"^纷争声核$", raw="纷争声核"),
+        Language.EN: RegexStr(flex_ws(r"^Strife Tacet Core$"), raw=r"Strife Tacet Core"),
+    },
+    I18nText.HiddenThunderTacetCore: {
+        Language.ZH: RegexStr(r"^隐雷声核$", raw="隐雷声核"),
+        Language.EN: RegexStr(flex_ws(r"^Hidden Thunder Tacet Core$"), raw=r"Hidden Thunder Tacet Core"),
+    },
+    I18nText.ThunderingTacetCore: {
+        Language.ZH: RegexStr(r"^霍闪声核$", raw="霍闪声核"),
+        Language.EN: RegexStr(flex_ws(r"^Thundering Tacet Core$"), raw=r"Thundering Tacet Core"),
+    },
+    I18nText.RageTacetCore: {
+        Language.ZH: RegexStr(r"^怒号声核$", raw="怒号声核"),
+        Language.EN: RegexStr(flex_ws(r"^Rage Tacet Core$"), raw=r"Rage Tacet Core"),
+    },
+    I18nText.RoaringRockFist: {
+        Language.ZH: RegexStr(r"^呼啸岩拳$", raw="呼啸岩拳"),
+        Language.EN: RegexStr(flex_ws(r"^Roaring Rock Fist$"), raw=r"Roaring Rock Fist"),
+    },
+    I18nText.ElegyTacetCore: {
+        Language.ZH: RegexStr(r"^哀歌声核$", raw="哀歌声核"),
+        Language.EN: RegexStr(flex_ws(r"^Elegy Tacet Core$"), raw=r"Elegy Tacet Core"),
+    },
+    I18nText.GoldDissolvingFeather: {
+        Language.ZH: RegexStr(r"^销金之翎$", raw="销金之翎"),
+        Language.EN: RegexStr(flex_ws(r"^Gold.?Dissolving Feather$"), raw=r"Gold-Dissolving Feather"),
+    },
+    I18nText.SoundKeepingTacetCore: {
+        Language.ZH: RegexStr(r"^留音声核$", raw="留音声核"),
+        Language.EN: RegexStr(flex_ws(r"^Sound.?Keeping Tacet Core$"), raw=r"Sound-Keeping Tacet Core"),
+    },
+    I18nText.GroupAbominationTacetCore: {
+        Language.ZH: RegexStr(r"^群孽异核$", raw="群孽异核"),
+        Language.EN: RegexStr(flex_ws(r"^Group Abomination Tacet Core$"), raw=r"Group Abomination Tacet Core"),
+    },
+
+    # ------- Skill Upgrade Material -------
+    I18nText.SkywardGlazedHeart: {
+        Language.ZH: RegexStr(r"^天衢琉璃之心$", raw="天衢琉璃之心"),
+        Language.EN: RegexStr(flex_ws(r"^Skyward Glazed Heart$"), raw=r"Skyward Glazed Heart"),
+    },
+    I18nText.WeWhoQuestion: {
+        Language.ZH: RegexStr(r"^质问的我们$", raw="质问的我们"),
+        Language.EN: RegexStr(flex_ws(r"^We Who Question$"), raw=r"We Who Question"),
+    },
+    I18nText.GoldInMemory: {
+        Language.ZH: RegexStr(r"^忆中沉金$", raw="忆中沉金"),
+        Language.EN: RegexStr(flex_ws(r"^Gold in Memory$"), raw=r"Gold in Memory"),
+    },
+    I18nText.CurseOfTheAbyss: {
+        Language.ZH: RegexStr(r"^深洋的咒诅$", raw="深洋的咒诅"),
+        Language.EN: RegexStr(flex_ws(r"^Curse of the Abyss$"), raw=r"Curse of the Abyss"),
+    },
+    I18nText.WhenIrisesBloom: {
+        Language.ZH: RegexStr(r"^鸢尾盛开之日$", raw="鸢尾盛开之日"),
+        Language.EN: RegexStr(flex_ws(r"^When Irises Bloom$"), raw=r"When Irises Bloom"),
+    },
+    I18nText.TheNetherworldsStare: {
+        Language.ZH: RegexStr(r"^冥扉的欢觑$", raw="冥扉的欢觑"),
+        Language.EN: RegexStr(flex_ws(r"^The Netherworld.*?s Stare$"), raw=r"The Netherworld's Stare"),
+    },
+    I18nText.SentinelsDagger: {
+        Language.ZH: RegexStr(r"^岁时之角刃$", raw="岁时之角刃"),
+        Language.EN: RegexStr(flex_ws(r"^Sentinel.?s Dagger$"), raw=r"Sentinel's Dagger"),
+    },
+    I18nText.DreamlessFeather: {
+        Language.ZH: RegexStr(r"^无妄之羽$", raw="无妄之羽"),
+        Language.EN: RegexStr(flex_ws(r"^Dreamless Feather$"), raw=r"Dreamless Feather"),
+    },
+    I18nText.UnendingDestruction: {
+        Language.ZH: RegexStr(r"^不息坏灭$", raw="不息坏灭"),
+        Language.EN: RegexStr(flex_ws(r"^Unending Destruction$"), raw=r"Unending Destruction"),
+    },
+    I18nText.MonumentBell: {
+        Language.ZH: RegexStr(r"^碑趺古钟$", raw="碑趺古钟"),
+        Language.EN: RegexStr(flex_ws(r"^Monument Bell$"), raw=r"Monument Bell"),
     },
 
     # ------- Sonata -------
@@ -1383,8 +1652,8 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Fast Travel$"), raw="Fast Travel"),
     },
     I18nText.EnableNavigation: {
-        Language.ZH: RegexStr(r"^导航追踪$", raw="导航追踪"),
-        Language.EN: RegexStr(flex_ws(r"^Enable Navigation$"), raw="Enable Navigation"),
+        Language.ZH: RegexStr(r"^.?导航追踪$", raw="导航追踪"),
+        Language.EN: RegexStr(flex_ws(r"^.?Enable Navigation$"), raw="Enable Navigation"),
     },
     I18nText.SwitchMap: {
         Language.ZH: RegexStr(r"^切换地图$", raw="切换地图"),
@@ -1418,6 +1687,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^罗伊冰原$", raw="罗伊冰原"),
         Language.EN: RegexStr(flex_ws(r"^Roya Frostlands$"), raw="Roya Frostlands"),
     },
+    I18nText.LahaiRoi: {
+        Language.ZH: RegexStr(r"^拉海洛$", raw="拉海洛"),
+        Language.EN: RegexStr(flex_ws(r"^Lahai.*?Roi$"), raw="Lahai-Roi"),
+    },
 
     # ------- Notice -------
     I18nText.Notice: {
@@ -1433,8 +1706,8 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw="Confirm"),
     },
     I18nText.Restart: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Restart$"), raw="Restart"),
+        Language.ZH: RegexStr(r"^.{0,2}重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Restart$"), raw="Restart"),
     },
     I18nText.LeaveNow: {
         Language.ZH: RegexStr(r"^确认离开$", raw="确认离开"),
@@ -1531,6 +1804,14 @@ I18N_TEXT = {
             raw="Connection error. Reconnecting"
         ),
     },
+    I18nText.StarpathsIntertwined: {
+        Language.ZH: RegexStr(r"^长迹伴行$", raw="长迹伴行"),
+        Language.EN: RegexStr(flex_ws(r"^Starpaths Intertwined$"), raw="Starpaths Intertwined"),
+    },
+    I18nText.ClaimStarpathGift: {
+        Language.ZH: RegexStr(r"^领取伴行赠礼$", raw="领取伴行赠礼"),
+        Language.EN: RegexStr(flex_ws(r"^Claim Starpath Gift$"), raw="Claim Starpath Gift"),
+    },
     I18nText.PleaseDontForgetToTakeABreak: {
         Language.ZH: RegexStr(r"您的游玩时长|请注意休息", raw="您的游玩时长已经达到3小时，请注意休息"),
         Language.EN: RegexStr(
@@ -1560,16 +1841,16 @@ I18N_TEXT = {
 
     # ------- Dialogue -------
     I18nText.Absorb: {
-        Language.ZH: RegexStr(r"^吸收$", raw="吸收"),
-        Language.EN: RegexStr(flex_ws(r"^Absorb$"), raw="Absorb"),
+        Language.ZH: RegexStr(r"^.{0,1}吸收$", raw="吸收"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,1}Absorb$"), raw="Absorb"),
     },
     I18nText.ClaimRewards: {
         Language.ZH: RegexStr(r"^.{0,2}领取奖励$", raw="领取奖励"),
         Language.EN: RegexStr(flex_ws(r"^.{0,2}Claim Rewards$"), raw="Claim Rewards"),
     },
     I18nText.ChallengeAgain: {
-        Language.ZH: RegexStr(r"^重新挑战$", raw="重新挑战"),
-        Language.EN: RegexStr(flex_ws(r"^Challenge Again$"), raw="Challenge Again"),
+        Language.ZH: RegexStr(r"^.{0,2}重新挑战$", raw="重新挑战"),
+        Language.EN: RegexStr(flex_ws(r"^.{0,2}Challenge Again$"), raw="Challenge Again"),
     },
 
     # ------- Terminal -------
@@ -1755,6 +2036,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"黎那汐塔", raw="黎那汐塔", desc="黎那汐塔"),
         Language.EN: RegexStr(flex_ws(r"Rinascita"), raw="Rinascita", desc="Rinascita"),
     },
+    I18nText.GuidebookTheBlackShores: {
+        Language.ZH: RegexStr(r"^黑海岸$", raw="黑海岸"),
+        Language.EN: RegexStr(flex_ws(r"^The Black Shores$"), raw=r"The Black Shores"),
+    },
     I18nText.GuidebookJinzhou: {
         Language.ZH: RegexStr(r"今州", raw="今州", desc="瑝珑·今州"),
         Language.EN: RegexStr(flex_ws(r"Jinzhou"), raw="Jinzhou", desc="Huanglong: Jinzhou"),
@@ -1935,7 +2220,214 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"佩枪$", raw="佩枪"),
         Language.EN: RegexStr(flex_ws(r"Pistols$"), raw=r"Pistols"),
     },
+    # reward
+    # 奖励大类
+    I18nText.Polarizer: {
+        Language.ZH: RegexStr(r"偏振体$", raw="偏振体"),
+        Language.EN: RegexStr(flex_ws(r"Polarizer$"), raw=r"Polarizer"),
+    },
+    I18nText.String: {
+        Language.ZH: RegexStr(r"弦线$", raw="弦线"),
+        Language.EN: RegexStr(flex_ws(r"String$"), raw=r"String"),
+    },
+    I18nText.CarvedCrystal: {
+        Language.ZH: RegexStr(r"切削晶块$", raw="切削晶块"),
+        Language.EN: RegexStr(flex_ws(r"Carved Crystal$"), raw=r"Carved Crystal"),
+    },
+    I18nText.WavewornShard: {
+        Language.ZH: RegexStr(r"海蚀碎晶$", raw="海蚀碎晶"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Shard$"), raw=r"Waveworn Shard"),
+    },
+    I18nText.Combustor: {
+        Language.ZH: RegexStr(r"聚燃体$", raw="^聚燃体"),
+        Language.EN: RegexStr(flex_ws(r"Combustor$"), raw=r"Combustor"),
+    },
+    I18nText.MetallicDrip: {
+        Language.ZH: RegexStr(r"金属液滴$", raw="金属液滴"),
+        Language.EN: RegexStr(flex_ws(r"Metallic Drip$"), raw=r"Metallic Drip"),
+    },
+    I18nText.Helix: {
+        Language.ZH: RegexStr(r"^涡流$", raw="涡流"),
+        Language.EN: RegexStr(flex_ws(r"Helix$"), raw=r"Helix"),
+    },
+    I18nText.WavewornResidue: {
+        Language.ZH: RegexStr(r"海蚀嵌合体$", raw="海蚀嵌合体"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Residue$"), raw=r"Waveworn Residue"),
+    },
+    I18nText.Cadence: {
+        Language.ZH: RegexStr(r"声律$", raw="声律"),
+        Language.EN: RegexStr(flex_ws(r"Cadence$"), raw=r"Cadence"),
+    },
+    I18nText.Phlogiston: {
+        Language.ZH: RegexStr(r"晶化燃素$", raw="晶化燃素"),
+        Language.EN: RegexStr(flex_ws(r"Phlogiston$"), raw=r"Phlogiston"),
+    },
+    # 奖励细分
+    I18nText.BrokenWingPolarizer: {
+        Language.ZH: RegexStr(r"^残翼偏振体$", raw="残翼偏振体"),
+        Language.EN: RegexStr(flex_ws(r"^Broken Wing Polarizer$"), raw=r"Broken Wing Polarizer"),
+    },
+    I18nText.MonowingPolarizer: {
+        Language.ZH: RegexStr(r"^单翼偏振体$", raw="单翼偏振体"),
+        Language.EN: RegexStr(flex_ws(r"^Monowing Polarizer$"), raw=r"Monowing Polarizer"),
+    },
+    I18nText.PolywingPolarizer: {
+        Language.ZH: RegexStr(r"^多翼偏振体$", raw="多翼偏振体"),
+        Language.EN: RegexStr(flex_ws(r"^Polywing Polarizer$"), raw=r"Polywing Polarizer"),
+    },
+    I18nText.LayeredWingPolarizer: {
+        Language.ZH: RegexStr(r"^叠翼偏振体$", raw="叠翼偏振体"),
+        Language.EN: RegexStr(flex_ws(r"^Layered Wing Polarizer$"), raw=r"Layered Wing Polarizer"),
+    },
+    I18nText.SplicedString: {
+        Language.ZH: RegexStr(r"拼凑的弦线$", raw="拼凑的弦线"),
+        Language.EN: RegexStr(flex_ws(r"Spliced String$"), raw=r"Spliced String"),
+    },
+    I18nText.BrokenString: {
+        Language.ZH: RegexStr(r"断续的弦线$", raw="断续的弦线"),
+        Language.EN: RegexStr(flex_ws(r"Broken String$"), raw=r"Broken String"),
+    },
+    I18nText.SolidifiedString: {
+        Language.ZH: RegexStr(r"凝固的弦线$", raw="凝固的弦线"),
+        Language.EN: RegexStr(flex_ws(r"Solidified String$"), raw=r"Solidified String"),
+    },
+    I18nText.MelodicString: {
+        Language.ZH: RegexStr(r"如歌的弦线$", raw="如歌的弦线"),
+        Language.EN: RegexStr(flex_ws(r"Melodic String$"), raw=r"Melodic String"),
+    },
+    I18nText.LFCarvedCrystal: {
+        Language.ZH: RegexStr(r"低频切削晶块$", raw="低频切削晶块"),
+        Language.EN: RegexStr(flex_ws(r"LF Carved Crystal$"), raw=r"LF Carved Crystal"),
+    },
+    I18nText.MFCarvedCrystal: {
+        Language.ZH: RegexStr(r"中频切削晶块$", raw="中频切削晶块"),
+        Language.EN: RegexStr(flex_ws(r"MF Carved Crystal$"), raw=r"MF Carved Crystal"),
+    },
+    I18nText.HFCarvedCrystal: {
+        Language.ZH: RegexStr(r"高频切削晶块$", raw="高频切削晶块"),
+        Language.EN: RegexStr(flex_ws(r"HF Carved Crystal$"), raw=r"HF Carved Crystal"),
+    },
+    I18nText.FFCarvedCrystal: {
+        Language.ZH: RegexStr(r"全频切削晶块$", raw="全频切削晶块"),
+        Language.EN: RegexStr(flex_ws(r"FF Carved Crystal$"), raw=r"FF Carved Crystal"),
+    },
+    I18nText.LFWavewornShard: {
+        Language.ZH: RegexStr(r"低频海蚀碎晶$", raw="低频海蚀碎晶"),
+        Language.EN: RegexStr(flex_ws(r"LF Waveworn Shard$"), raw=r"LF Waveworn Shard"),
+    },
+    I18nText.MFWavewornShard: {
+        Language.ZH: RegexStr(r"中频海蚀碎晶$", raw="中频海蚀碎晶"),
+        Language.EN: RegexStr(flex_ws(r"MF Waveworn Shard$"), raw=r"MF Waveworn Shard"),
+    },
+    I18nText.HFWavewornShard: {
+        Language.ZH: RegexStr(r"高频海蚀碎晶$", raw="高频海蚀碎晶"),
+        Language.EN: RegexStr(flex_ws(r"HF Waveworn Shard$"), raw=r"HF Waveworn Shard"),
+    },
+    I18nText.FFWavewornShard: {
+        Language.ZH: RegexStr(r"全频海蚀碎晶$", raw="全频海蚀碎晶"),
+        Language.EN: RegexStr(flex_ws(r"FF Waveworn Shard$"), raw=r"FF Waveworn Shard"),
+    },
+    I18nText.IncompleteCombustor: {
+        Language.ZH: RegexStr(r"缺损聚燃体$", raw="缺损聚燃体"),
+        Language.EN: RegexStr(flex_ws(r"Incomplete Combustor$"), raw=r"Incomplete Combustor"),
+    },
+    I18nText.AftertuneCombustor: {
+        Language.ZH: RegexStr(r"余音聚燃体$", raw="余音聚燃体"),
+        Language.EN: RegexStr(flex_ws(r"Aftertune Combustor$"), raw=r"Aftertune Combustor"),
+    },
+    I18nText.RemnantCombustor: {
+        Language.ZH: RegexStr(r"残响聚燃体$", raw="残响聚燃体"),
+        Language.EN: RegexStr(flex_ws(r"Remnant Combustor$"), raw=r"Remnant Combustor"),
+    },
+    I18nText.ReverbCombustor: {
+        Language.ZH: RegexStr(r"回音聚燃体$", raw="回音聚燃体"),
+        Language.EN: RegexStr(flex_ws(r"Reverb Combustor$"), raw=r"Reverb Combustor"),
+    },
+    I18nText.InertMetallicDrip: {
+        Language.ZH: RegexStr(r"惰性金属液滴$", raw="惰性金属液滴"),
+        Language.EN: RegexStr(flex_ws(r"Inert Metallic Drip$"), raw=r"Inert Metallic Drip"),
+    },
+    I18nText.ReactiveMetallicDrip: {
+        Language.ZH: RegexStr(r"活性金属液滴$", raw="活性金属液滴"),
+        Language.EN: RegexStr(flex_ws(r"Reactive Metallic Drip$"), raw=r"Reactive Metallic Drip"),
+    },
+    I18nText.PolarizedMetallicDrip: {
+        Language.ZH: RegexStr(r"极化金属液滴$", raw="极化金属液滴"),
+        Language.EN: RegexStr(flex_ws(r"Polarized Metallic Drip$"), raw=r"Polarized Metallic Drip"),
+    },
+    I18nText.HeterizedMetallicDrip: {
+        Language.ZH: RegexStr(r"异构金属液滴$", raw="异构金属液滴"),
+        Language.EN: RegexStr(flex_ws(r"Heterized Metallic Drip$"), raw=r"Heterized Metallic Drip"),
+    },
+    I18nText.LentoHelix: {
+        Language.ZH: RegexStr(r"慢板涡流$", raw="慢板涡流"),
+        Language.EN: RegexStr(flex_ws(r"Lento Helix$"), raw=r"Lento Helix"),
+    },
+    I18nText.AdagioHelix: {
+        Language.ZH: RegexStr(r"柔板涡流$", raw="柔板涡流"),
+        Language.EN: RegexStr(flex_ws(r"Adagio Helix$"), raw=r"Adagio Helix"),
+    },
+    I18nText.AndanteHelix: {
+        Language.ZH: RegexStr(r"行板涡流$", raw="行板涡流"),
+        Language.EN: RegexStr(flex_ws(r"Andante Helix$"), raw=r"Andante Helix"),
+    },
+    I18nText.PrestoHelix: {
+        Language.ZH: RegexStr(r"急板涡流$", raw="急板涡流"),
+        Language.EN: RegexStr(flex_ws(r"Presto Helix$"), raw=r"Presto Helix"),
+    },
+    I18nText.WavewornResidue210: {
+        Language.ZH: RegexStr(r"海蚀嵌合体210$", raw="海蚀嵌合体210"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Residue 210$"), raw=r"Waveworn Residue 210"),
+    },
+    I18nText.WavewornResidue226: {
+        Language.ZH: RegexStr(r"海蚀嵌合体226$", raw="海蚀嵌合体226"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Residue 226$"), raw=r"Waveworn Residue 226"),
+    },
+    I18nText.WavewornResidue235: {
+        Language.ZH: RegexStr(r"海蚀嵌合体235$", raw="海蚀嵌合体235"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Residue 235$"), raw=r"Waveworn Residue 235"),
+    },
+    I18nText.WavewornResidue239: {
+        Language.ZH: RegexStr(r"海蚀嵌合体239$", raw="海蚀嵌合体239"),
+        Language.EN: RegexStr(flex_ws(r"Waveworn Residue 239$"), raw=r"Waveworn Residue 239"),
+    },
+    I18nText.CadenceSeed: {
+        Language.ZH: RegexStr(r"声律种核$", raw="声律种核"),
+        Language.EN: RegexStr(flex_ws(r"Cadence Seed$"), raw=r"Cadence Seed"),
+    },
+    I18nText.CadenceBud: {
+        Language.ZH: RegexStr(r"声律萌芽$", raw="声律萌芽"),
+        Language.EN: RegexStr(flex_ws(r"Cadence Bud$"), raw=r"Cadence Bud"),
+    },
+    I18nText.CadenceLeaf: {
+        Language.ZH: RegexStr(r"声律新叶$", raw="声律新叶"),
+        Language.EN: RegexStr(flex_ws(r"Cadence Leaf$"), raw=r"Cadence Leaf"),
+    },
+    I18nText.CadenceBlossom: {
+        Language.ZH: RegexStr(r"声律花蕾$", raw="声律花蕾"),
+        Language.EN: RegexStr(flex_ws(r"Cadence Blossom$"), raw=r"Cadence Blossom"),
+    },
+    I18nText.ImpurePhlogiston: {
+        Language.ZH: RegexStr(r"含杂晶化燃素$", raw="含杂晶化燃素"),
+        Language.EN: RegexStr(flex_ws(r"Impure Phlogiston$"), raw=r"Impure Phlogiston"),
+    },
+    I18nText.ExtractedPhlogiston: {
+        Language.ZH: RegexStr(r"粗萃晶化燃素$", raw="粗萃晶化燃素"),
+        Language.EN: RegexStr(flex_ws(r"Extracted Phlogiston$"), raw=r"Extracted Phlogiston"),
+    },
+    I18nText.RefinedPhlogiston: {
+        Language.ZH: RegexStr(r"精馏晶化燃素$", raw="精馏晶化燃素"),
+        Language.EN: RegexStr(flex_ws(r"Refined Phlogiston$"), raw=r"Refined Phlogiston"),
+    },
+    I18nText.FlawlessPhlogiston: {
+        Language.ZH: RegexStr(r"高纯晶化燃素$", raw="高纯晶化燃素"),
+        Language.EN: RegexStr(flex_ws(r"Flawless Phlogiston$"), raw=r"Flawless Phlogiston"),
+    },
     # instance
+    I18nText.SortByWeaponType: {
+        Language.ZH: RegexStr(r"^武器类型.?选$", raw="武器类型筛选"),
+        Language.EN: RegexStr(flex_ws(r"^Sort by Weapon Type$"), raw=r"Sort by Weapon Type"),
+    },
     I18nText.EnterTheForgeryChallenge: {
         Language.ZH: RegexStr(r"进入.?凝素领域", raw="进入「凝素领域」"),
         Language.EN: RegexStr(flex_ws(r"Enter the.*?Forgery Challenge"), raw=r"Enter the \"Forgery Challenge\""),
@@ -2007,6 +2499,57 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^陷足流川无音区$", raw="陷足流川无音区"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Stagnant"), raw=r"Tacet Field: Stagnant Run"),
     },
+    I18nText.TacetFieldMournfellCanyon: {
+        Language.ZH: RegexStr(r"^哀.?谷无音区$", raw="哀恸谷无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Mournfell Canyon"), raw=r"Tacet Field: Mournfell Canyon"),
+    },
+    I18nText.TacetFieldBeohrWaters: {
+        Language.ZH: RegexStr(r"^贝奥海域无音区$", raw="贝奥海域无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Beohr Waters"), raw=r"Tacet Field: Beohr Waters"),
+    },
+    I18nText.TacetFieldRiccioliIslands: {
+        Language.ZH: RegexStr(r"^.?乔利群岛无音区$", raw="黎乔利群岛无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Riccioli Islands"), raw=r"Tacet Field:  Riccioli Islands"),
+    },
+    I18nText.TacetFieldFagaceaePeninsula: {
+        Language.ZH: RegexStr(r"^.?生半岛无音区$", raw="槲生半岛无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Fagaceae Peninsula"), raw=r"Tacet Field: Fagaceae Peninsula"),
+    },
+    I18nText.TacetFieldPenitentsEnd: {
+        Language.ZH: RegexStr(r"^悲叹墓岛无音区$", raw="悲叹墓岛无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Penitent's End"), raw=r"Tacet Field: Penitent's End"),
+    },
+    I18nText.TacetFieldCentralPlains: {
+        Language.ZH: RegexStr(r"^中曲台地无音区$", raw="中曲台地无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Central Plains"), raw=r"Tacet Field: Central Plains"),
+    },
+    I18nText.TacetFieldDesorockHighlandI: {
+        Language.ZH: RegexStr(r"^荒石高地无音区[Ⅰ1I]$", raw="荒石高地无音区Ⅰ"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Tacet Field.*?Desorock Highland.?[Ⅰ1I]"), raw=r"Tacet Field: Desorock Highland I"),
+    },
+    I18nText.TacetFieldTigersMaw: {
+        Language.ZH: RegexStr(r"^虎口山脉无音区$", raw="虎口山脉无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Tiger's Maw"), raw=r"Tacet Field: Tiger's Maw"),
+    },
+    I18nText.TacetFieldWhiningAixsMire: {
+        Language.ZH: RegexStr(r"^怨鸟泽无音区$", raw="怨鸟泽无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Whining Aix's Mire"), raw=r"Tacet Field: Whining Aix's Mire"),
+    },
+    I18nText.TacetFieldPortCityOfGuixu: {
+        Language.ZH: RegexStr(r"^归墟港市无音区$", raw="归墟港市无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Port City of Guixu"), raw=r"Tacet Field: Port City of Guixu"),
+    },
+    I18nText.TacetFieldDesorockHighlandII: {
+        Language.ZH: RegexStr(r"^荒石高地无音区Ⅱ$", raw="荒石高地无音区Ⅱ"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Tacet Field.*?Desorock Highland II"), raw=r"Tacet Field: Desorock Highland II"),
+    },
+    I18nText.TacetFieldDimForest: {
+        Language.ZH: RegexStr(r"^无光之森无音区$", raw="无光之森无音区"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Dim Forest"), raw=r"Tacet Field: Dim Forest"),
+    },
+
     I18nText.EchoSet: {
         Language.ZH: RegexStr(r"^声骸套装$", raw="声骸套装"),
         Language.EN: RegexStr(flex_ws(r"^Echo Set$"), raw=r"Echo Set"),
@@ -2017,8 +2560,8 @@ I18N_TEXT = {
     },
     # 下面是进入无音区内的文本
     I18nText.DefeatTheTdsInTheTacetField: {
-        Language.ZH: RegexStr(r"清?理无音区中涌现的残象", raw="清理无音区中涌现的残象"),
-        Language.EN: RegexStr(flex_ws(r"Defeat the TDs in the"), raw=r"Defeat the TDs in the Tacet Field"),
+        Language.ZH: RegexStr(r"清?理无音区中涌现的", raw="清理无音区中涌现的残象"),
+        Language.EN: RegexStr(flex_ws(r"D?efeat the TDs in the"), raw=r"Defeat the TDs in the Tacet Field"),
     },
     I18nText.TacetFieldChallengeComplete: {
         Language.ZH: RegexStr(r"挑战达成", raw="挑战达成"),
@@ -2051,7 +2594,7 @@ I18N_TEXT = {
 
     ### ------- Guidebook MaterialCollection BossChallenge -------
     I18nText.FilterToViewRewardsForEachPhase: {
-        Language.ZH: RegexStr(r"^筛选查看各等级奖励$", raw="筛选查看各等级奖励"),
+        Language.ZH: RegexStr(r"^.?选查看各等级奖励$", raw="筛选查看各等级奖励"),
         Language.EN: RegexStr(
             flex_ws(r"^Filter to view rewards for each Phase$"),
             raw="Filter to view rewards for each Phase"
@@ -2139,7 +2682,7 @@ I18N_TEXT = {
     },
     I18nText.WeeklyBossThrenodianLeviathan: {
         Language.ZH: RegexStr(r"鸣式.?利维亚坦", raw="鸣式·利维亚坦"),
-        Language.EN: RegexStr(r"Threnodian.? Leviathan", raw="Threnodian: Leviathan"),
+        Language.EN: RegexStr(r"Threnodian.?Leviathan", raw="Threnodian: Leviathan"),
     },
     I18nText.WeeklyBossFleurdelys: {
         Language.ZH: RegexStr(r"芙露德.?斯", raw="芙露德莉斯"),
@@ -2985,3 +3528,7 @@ class I18nTr:
         if lang is None:
             lang = self._lang
         return lang_map.get(lang)
+
+    @classmethod
+    def l10n(cls, key: str) -> str:
+        return I18nTr(Language.sys_lang())(key).raw

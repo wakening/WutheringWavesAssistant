@@ -12,6 +12,8 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
                             LineEdit, SettingCard, ComboBox, ConfigItem,
                             PushButton, ToolButton, MessageBox, ToggleToolButton)
 
+from src.core.i18n import I18nText
+from src.core.resonator import Resonator
 from src.gui.common.config import paramConfig, BossNameEnum
 from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
@@ -62,15 +64,30 @@ class DailyWidget(ScrollArea):
         self.task = DailyTask(self)
 
         self.container = QWidget(self)
-        self.mainLayout = QVBoxLayout(self.container)
+        self.mainLayout = QHBoxLayout(self.container)
 
-        self.contentTitleLabel = QLabel(self.tr("任务设置"), self.container)
+        self.contentLayout = QVBoxLayout(self.container)
+        # self.contentTitleLabel = QLabel(self.tr("任务设置:"), self.container)
+
+        self.waveplateLabel = QLabel(self.tr("体力:"), self.container)
+        self.nestLabel = QLabel(self.tr("聚落:"), self.container)
+        self.claimRewardsLabel = QLabel(self.tr("领取奖励:"), self.container)
+
         self.gridLayout = QGridLayout()
         self.__initGridLayout()
 
         self.contentBottomLayout = QHBoxLayout()
         self.resetButton = PushButton(self.tr("重置"), self.container)
         self.aboutButton = PushButton(self.tr('关于'), self.container)
+
+        self.focusResonatorLayout = QVBoxLayout(self.container)
+        self.focusResonatorTitle = QLabel(self.tr("培养目标:"), self.container)
+        self.focusResonatorComboBox = ComboBox(self.container)
+        self.focusResonatorComboBox.addItem(self.tr("施工中"), userData=None)
+        self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
+        for resonator_id in reversed(Resonator.i18n_keys()):
+            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
+        self.focusResonatorComboBox.setEnabled(False)
 
         self.__initWidget()
 
@@ -144,6 +161,8 @@ class DailyWidget(ScrollArea):
             I18nText.MarigoldWoods,
         ]
         self.bossChallenge = [
+            I18nText.EnemyCalamityEffigy,
+            I18nText.EnemyThousandPuppetPavilion,
             I18nText.EnemyMyriadSnareRustfireChassis,
             I18nText.EnemyNightmareAdamSmasher,
             I18nText.EnemyNamelessExplorer,
@@ -166,6 +185,15 @@ class DailyWidget(ScrollArea):
             I18nText.EnemyLampylumenMyriad,
             I18nText.EnemyMechAbomination,
             I18nText.EnemyFallacyOfNoReturn,
+            I18nText.EnemyCrownless,
+            I18nText.EnemyThunderingMephis,
+            I18nText.EnemyTempestMephis,
+            I18nText.EnemyInfernoRider,
+            I18nText.EnemyFeilianBeringal,
+            I18nText.EnemyMourningAix,
+            I18nText.EnemyImpermanenceHeron,
+            I18nText.EnemyLampylumenMyriad,
+            I18nText.EnemyMechAbomination,
         ]
         self.tacetSuppression = [
             I18nText.WesternFangPeaksTacetField,
@@ -175,6 +203,18 @@ class DailyWidget(ScrollArea):
             I18nText.TacetFieldMountGjallar,
             I18nText.TacetFieldMawburrowDesert,
             I18nText.TacetFieldStagnantRun,
+            I18nText.TacetFieldMournfellCanyon,
+            I18nText.TacetFieldBeohrWaters,
+            I18nText.TacetFieldRiccioliIslands,
+            I18nText.TacetFieldFagaceaePeninsula,
+            I18nText.TacetFieldPenitentsEnd,
+            I18nText.TacetFieldCentralPlains,
+            I18nText.TacetFieldDesorockHighlandI,
+            I18nText.TacetFieldTigersMaw,
+            I18nText.TacetFieldWhiningAixsMire,
+            I18nText.TacetFieldPortCityOfGuixu,
+            I18nText.TacetFieldDesorockHighlandII,
+            I18nText.TacetFieldDimForest,
         ]
         self.tacetSuppressionTips = [
             [I18nText.WishesOfQuietSnowfall, I18nText.ReelOfSplicedMemories],
@@ -226,6 +266,18 @@ class DailyWidget(ScrollArea):
             I18nText.TacetFieldMountGjallar: I18nText.GuidebookLahaiRoi,
             I18nText.TacetFieldMawburrowDesert: I18nText.GuidebookLahaiRoi,
             I18nText.TacetFieldStagnantRun: I18nText.GuidebookLahaiRoi,
+            I18nText.TacetFieldMournfellCanyon: I18nText.GuidebookRinascita,
+            I18nText.TacetFieldBeohrWaters: I18nText.GuidebookRinascita,
+            I18nText.TacetFieldRiccioliIslands: I18nText.GuidebookRinascita,
+            I18nText.TacetFieldFagaceaePeninsula: I18nText.GuidebookRinascita,
+            I18nText.TacetFieldPenitentsEnd: I18nText.GuidebookRinascita,
+            I18nText.TacetFieldCentralPlains: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldDesorockHighlandI: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldTigersMaw: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldWhiningAixsMire: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldPortCityOfGuixu: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldDesorockHighlandII: I18nText.GuidebookJinzhou,
+            I18nText.TacetFieldDimForest: I18nText.GuidebookJinzhou,
 
             I18nText.SouthernYuanHillsTacetDiscordNest: I18nText.GuidebookMengzhou,
             I18nText.StarblindCrashsiteTacetDiscordNest: I18nText.GuidebookLahaiRoi,
@@ -245,8 +297,8 @@ class DailyWidget(ScrollArea):
             text = self.tr("{challenge} - {boss}").format(
                 challenge=self.i18ntr(self.weeklyChallenge[i]).raw, boss=self.i18ntr(self.weeklyBoss[i]).raw)
             self.weeklyChallengeComboBox.addItem(text, userData=self.weeklyChallenge[i])
-            if i > 3:
-                self.weeklyChallengeComboBox.setItemEnabled(self.weeklyChallengeComboBox.count() - 1, False)
+            # if i > 3:
+            #     self.weeklyChallengeComboBox.setItemEnabled(self.weeklyChallengeComboBox.count() - 1, False)
         self.weeklyChallengeComboBox.setCurrentIndex(0)
         # self.weeklyChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
@@ -259,7 +311,7 @@ class DailyWidget(ScrollArea):
                 region=self.i18ntr(self.guidebookRegionMap.get(self.tacetSuppression[i])).raw,
             )
             self.tacetSuppressionComboBox.addItem(text, userData=self.tacetSuppression[i])
-            if i > 3:
+            if self.tacetSuppression[i] in [I18nText.TacetFieldDesorockHighlandI, I18nText.TacetFieldDesorockHighlandII]:
                 self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, False)
         # self.tacetSuppressionSettingButton = ToggleToolButton(FIF.SETTING, self)
 
@@ -273,8 +325,8 @@ class DailyWidget(ScrollArea):
                 region=self.i18ntr(self.guidebookRegionMap.get(self.forgeryChallenge[i])).raw,
             )
             self.forgeryChallengeComboBox.addItem(text, userData=self.forgeryChallenge[i])
-            if i > len(self.weapon) * 3 - 1:
-                self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, False)
+            # if i > len(self.weapon) * 3 - 1:
+            #     self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, False)
         # self.forgeryChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.bossChallengeCheckBox = CheckBox(self.tr("共鸣者突破材料:"), self.container)
@@ -282,8 +334,8 @@ class DailyWidget(ScrollArea):
         self.bossChallengeComboBox.addItem(self.tr("不选择"), userData=None)
         for i in range(len(self.bossChallenge)):
             self.bossChallengeComboBox.addItem(self.i18ntr(self.bossChallenge[i]).raw, userData=self.bossChallenge[i])
-            if i > -1:
-                self.bossChallengeComboBox.setItemEnabled(self.bossChallengeComboBox.count() - 1, False)
+            # if i > -1:
+            #     self.bossChallengeComboBox.setItemEnabled(self.bossChallengeComboBox.count() - 1, False)
         # self.bossChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.nightmarePurificationCheckBox = CheckBox(self.tr("梦魇聚落:"), self.container)
@@ -312,7 +364,8 @@ class DailyWidget(ScrollArea):
         self.activityCheckBox = CheckBox(self.tr("活跃行迹:"), self.container)
         self.activityComboBox = ComboBox(self.container)
         # self.activityComboBox.addItem(self.tr("不选择"), userData=None)
-        self.activityComboBox.addItem(self.tr("自动"), userData="Auto")
+        # self.activityComboBox.addItem(self.tr("自动"), userData="Auto")
+        self.activityComboBox.addItem(self.tr("日活、周活、幻梦游园"), userData="Auto")
         # self.activitySettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.mailCheckBox = CheckBox(self.tr("邮件:"), self.container)
@@ -461,10 +514,21 @@ class DailyWidget(ScrollArea):
         self.contentBottomLayout.addWidget(self.aboutButton)
         self.contentBottomLayout.addStretch()
         self.contentBottomLayout.setSpacing(15)
-        self.contentBottomLayout.setContentsMargins(110, 0, 0, 0)
+        # self.contentBottomLayout.setContentsMargins(110, 0, 0, 0)
+        self.contentBottomLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.focusResonatorLayout.addWidget(self.focusResonatorTitle)
+        self.focusResonatorLayout.addWidget(self.focusResonatorComboBox)
+        self.focusResonatorLayout.addStretch()
+        self.focusResonatorLayout.setContentsMargins(0, 0, 0, 0)
 
         # grid
         row = 0
+
+        # self.gridLayout.addWidget(self.contentTitleLabel, row, 0, 1, 2)
+        self.gridLayout.addWidget(self.waveplateLabel, row, 0, 1, 2)
+
+        row += 1
         self.gridLayout.addWidget(self.weeklyChallengeCheckBox, row, 0)
         self.gridLayout.addWidget(self.weeklyChallengeComboBox, row, 1)
         # self.gridLayout.addWidget(self.weeklyChallengeSettingButton, row, 2)
@@ -485,6 +549,9 @@ class DailyWidget(ScrollArea):
         # self.gridLayout.addWidget(self.bossChallengeSettingButton, row, 2)
 
         row += 1
+        self.gridLayout.addWidget(self.nestLabel, row, 0, 1, 2)
+
+        row += 1
         self.gridLayout.addWidget(self.tacetDiscordNestCheckBox, row, 0)
         self.gridLayout.addWidget(self.tacetDiscordNestComboBox, row, 1)
         # self.gridLayout.addWidget(self.tacetDiscordNestSettingButton, row, 2)
@@ -493,6 +560,9 @@ class DailyWidget(ScrollArea):
         self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 0)
         self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 1)
         # self.gridLayout.addWidget(self.nightmarePurificationSettingButton, row, 2)
+
+        row += 1
+        self.gridLayout.addWidget(self.claimRewardsLabel, row, 0, 1, 2)
 
         row += 1
         self.gridLayout.addWidget(self.activityCheckBox, row, 0)
@@ -509,6 +579,12 @@ class DailyWidget(ScrollArea):
         self.gridLayout.addWidget(self.pioneerPodcastComboBox, row, 1)
         # self.gridLayout.addWidget(self.pioneerPodcastSettingButton, row, 2)
 
+        row += 1
+        self.gridLayout.addLayout(self.contentBottomLayout, row, 1)
+
+        # # 参数：row=0（从第0行开始）, column=2（第3列）, rowSpan=3（跨3行）, columnSpan=1（占1列）
+        # self.gridLayout.addLayout(self.focusResonatorLayout, 0, 3, row, 1)
+
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setHorizontalSpacing(10)
         # self.gridLayout.setVerticalSpacing(8)
@@ -521,10 +597,15 @@ class DailyWidget(ScrollArea):
         # self.gridLayout.setColumnStretch(3, 0)  # button
         # self.gridLayout.setColumnStretch(4, 2)  # description（最大吃空间）
 
-        self.mainLayout.addWidget(self.contentTitleLabel)
-        self.mainLayout.addLayout(self.gridLayout)
-        self.mainLayout.addLayout(self.contentBottomLayout)
-        self.mainLayout.addStretch()
+        # self.contentLayout.addWidget(self.contentTitleLabel)
+        self.contentLayout.addLayout(self.gridLayout)
+        # self.contentLayout.addLayout(self.contentBottomLayout)
+        self.contentLayout.addStretch()
+        self.contentLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.mainLayout.addLayout(self.contentLayout, 4)
+        self.mainLayout.addSpacing(12)
+        self.mainLayout.addLayout(self.focusResonatorLayout, 1)
         self.mainLayout.setContentsMargins(36, 10, 36, 10)
         # self.mainLayout.setAlignment(Qt.AlignTop)
 

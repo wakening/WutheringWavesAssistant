@@ -26,6 +26,14 @@ class Resource:
             Jinzhou = ROOT / "Jinzhou"
             Mengzhou = ROOT / "Mengzhou"
 
+        class Rinascita:
+            ROOT = _ROOT / "assets/map/Rinascita"
+
+            class Ragunna:
+                """拉古那"""
+                ROOT = _ROOT / "assets/map/Rinascita/Ragunna"
+                FabricatoriumOfTheDeep = ROOT / "Fabricatorium of the Deep"  # 隐海试验场
+
         class RoyaFrostlands:
             ROOT = _ROOT / "assets/map/Roya Frostlands"
             DimmrPlains = ROOT / "Dimmr Plains"

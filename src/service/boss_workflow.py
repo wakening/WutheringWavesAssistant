@@ -94,6 +94,346 @@ class NodeName:
     doCombat = "doCombat"
 
 
+@node(NodeName.doCombat)
+def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
+    ui = UIOp(ctx)
+
+    if not ui.is_on_homepage():
+        return False
+
+    enemy = local.enemy
+    enemy_name = ctx.tr(local.enemy.id)
+    logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
+
+    index = 1  # 挑战次数
+    page = GlobalPage(ctx)
+    tm = TeamMember(ctx)
+    roiex = RoiEx(ctx)
+
+    # 设置战斗参数
+    if local.combat_system is None:
+        local.combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+        local.combat_system.set_resonators(local.members, is_print=False)
+        local.combat_system.is_async = True
+        local.combat_system.check_boss_hp = True
+        local.combat_system.auto_pickup = False
+    combat_system = local.combat_system
+
+    # 设置自动拾取、处决
+    pickup = AsyncPickup(ctx, delay=0.2, interval=lambda: round(random.uniform(0.3, 0.5), 2), timeout=10)
+
+    # 设置停战文本
+    stop_keyword = {
+        I18nText.ClaimRewards, I18nText.ForgeryChallengeComplete, I18nText.TacetFieldChallengeComplete}
+    if enemy.stop_text:
+        stop_keyword.update(enemy.stop_text)
+    stop_keyword = ctx.tr(list(stop_keyword))
+
+    # 循环刷当前副本，直到需要离开副本
+    while ui.is_set():
+        ui.activate()
+
+        # 跑向boss
+        if enemy.routes:
+            combat_system.exit_special_state(Morph.Forced)
+            ui.sleep(0.2)
+            RouteExecutor(ctx).execute(enemy.routes)
+
+        found_complete = False
+        heartbeat = RateLimiter(1 / 5)
+
+        if index == 1:
+            logger.info(f"R{local.combat_count.value} - Combat engaged")
+
+        # 开局躲技能
+        if enemy == Enemy.Denia:
+            _denia(ctx, local, index)
+        elif enemy == Enemy.Sigillum:
+            _sigillum(ctx, local)
+
+        # 同步战斗次数
+        if local.combat_count.value == 0:
+            local.combat_count.value = 1
+        index = local.combat_count.value
+
+        # 设置战斗结束参数
+        no_text_count = 8 if enemy.auto_respawn else 3
+        no_text_max = no_text_count
+        deadline = time.monotonic() + 20 * 60
+        combat_start_time = time.monotonic()
+        enemy_detect_history = deque(maxlen=3)
+
+        # 循环战斗，直到击败boss
+        while ui.is_set():
+            if time.monotonic() > deadline or no_text_count < 0:
+                logger.info(f"R{index} - Out of combat")
+                break
+            if heartbeat() == 0:
+                logger.info(f"R{index} - In combat")
+                ui.activate()
+
+            # 开启战斗
+            combat_system.start(3.5)
+
+            # 控制检测频率
+            interval = 1.5
+            # 敌人阵亡时提高检测频率，更快停止战斗
+            if not enemy.auto_respawn and len(enemy_detect_history) > 0:
+                _enemy_det = enemy_detect_history[-1]
+                logger.debug(f"enemy_det: {_enemy_det}")
+                if (_enemy_det[0]
+                        and (_enemy_det[1] is None or _enemy_det[1] < 0.1)
+                        and 3 < time.monotonic() - combat_start_time < 40  # 设一个上限
+                        and _enemy_det[2] < 0.1):
+                    interval = 0.5
+                elif not _enemy_det[0]:
+                    interval = 1.0
+
+            img = ui.sleep(interval).grap()
+            is_home = ui.is_on_homepage(img)
+
+            # 检查敌人血量，用于控制检测频率和拾取开关
+            enemy_hp = None
+            if not enemy.auto_respawn:
+                if is_home and (enemy_hp := EnemyHpBar.detect(img)):
+                    logger.debug(f"enemy_hp: {enemy_hp:.4f}")
+                else:
+                    logger.debug(f"enemy_hp: None")
+
+                enemy_detect_history.append((is_home, enemy_hp, EnemyVsBar.detect(img)))
+
+            # 开启拾取
+            if enemy.auto_respawn:
+                pickup.start()
+            else:
+                # 血量低不拾取，防止一直误点领取奖励
+                if enemy_hp and enemy_hp > 0.20:
+                    pickup.start()
+                else:
+                    pickup.stop()
+
+            # 检查文本
+            ui.snapshot(img=img)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"{ui.bbox_result}")
+
+            # 战斗结束：领取奖励、挑战成功等
+            if enemy.auto_respawn:
+                if ui.search(stop_keyword):
+                    # 战斗次数，防止重复识别到
+                    if not found_complete:
+                        # 自动刷新的不退出战斗，只能在这里计数
+                        index += 1
+                        local.combat_count.value += 1
+                    found_complete = True
+                    # 不退出继续打
+                    ui.sleep(1)
+                    continue
+            else:
+                if ui.search(stop_keyword) or enemy.is_dungeon and ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue):
+                    # 结束战斗
+                    logger.info(f"R{index} - Combat ended")
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    if ui.search(ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                        ui.esc().sleep(0.3)
+                    break
+            found_complete = False
+
+            # 战斗中：击败敌人、boss名等
+            if res_battle_text := ui.search(ctx.tr(enemy.battle_text)):
+                logger.debug(f"R{index} - Text: {res_battle_text}")
+                no_text_count = no_text_max
+                continue
+            elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
+                logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
+                pickup.stop()
+                continue
+            # 不在主页，可能在播动画，忽略
+            if is_home:
+                # 敌人出场可能有延迟，忽略前几秒
+                if enemy.auto_respawn or time.monotonic() - combat_start_time > 5:
+                    no_text_count -= 1
+            logger.debug(f"R{index} - Text not found: {ctx.tr(enemy.battle_text)}")
+
+            # 自动拾取误触离开副本
+            if ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
+                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
+                ctx.control_service.attack()
+                ui.sleep(0.2)
+                continue
+
+            # 网络异常
+            if ui.search(ctx.tr(I18nText.ConnectionErrorReconnecting)):
+                ui.sleep(1)
+                continue
+
+            # 容错，未知页面处理
+            if page_key := page.action(ui=ui):
+                logger.debug(f"R{index} - GlobalPage: {page_key}")
+                if page_key == GlobalPage.Revive:
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    ui.sleep(0.5)
+                    local.downed = False
+                    # 直接挑战的复苏后还在副本里，可以接着打
+                    if enemy.prefer_quick:
+                        ui.wait_back_home(close_window=True)
+                        continue
+                    return False
+                elif page_key == GlobalPage.InternetDisconnecting:
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    ui.sleep(0.5)
+                    return False
+                elif page_key == GlobalPage.LeaveInstance:
+                    pickup.stop()
+                    combat_system.pause(join=True)
+                    ui.sleep(0.5)
+                    return False
+
+        # 挑战完成，暂停战斗系统
+        pickup.stop()
+        combat_system.pause(join=True, timeout=10)
+        enemy_detect_history.clear()
+        ui.sleep(1)
+        found_absorb = ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue)
+
+        # 等待回到主页
+        back_homepage = False
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline:
+            img = ui.grap()
+            if ui.is_on_homepage(img=img):
+                back_homepage = True
+                break
+            ui.snapshot(img=img)
+            # 领取奖励
+            if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+                    ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                ui.esc()
+            # 离开副本
+            elif ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
+                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
+                ui.esc()
+            # 其他
+            elif page_key := page.action(ui=ui):
+                if page_key == GlobalPage.InternetDisconnecting:
+                    return False
+            ui.sleep(0.5)
+        if not back_homepage:
+            logger.warning(f"R{index} - Return to overworld timeout")
+            return ui.wait_back_home(timeout=10)
+
+        # 检查阵亡情况
+        downed = tm.downed(ui.sleep(0.3).grap())
+        members_size = len(local.members)
+        for i in reversed(range(members_size)):
+            if local.members[i]:
+                break
+            members_size -= 1
+        if is_downed := any(downed[:members_size]):
+            logger.info(f"R{index} - Resonator downed")
+        local.downed = is_downed
+        logger.debug(f"downed: {downed}, is_downed: {is_downed}")
+
+        # 搜索和吸收声骸
+        if enemy.auto_respawn:
+            pass  # 自动刷新的边打边捡，保证效率
+        elif enemy == Enemy.Fenrico:
+            ui.sleep(3)
+            _fenrico(ctx, local)
+        else:
+            # 吸收声骸
+            absorbed = False
+            if found_absorb:
+                absorbed = ObjectDetector(ctx).try_pickup()
+            if not absorbed:
+                combat_system.exit_special_state(Morph.Prefer)
+                for i in range(2):
+                    absorbed = ObjectDetector(ctx).absorb_echoes(timeout=20, enemy=enemy)
+                    if not absorbed or enemy.absorb != AbsorbMode.OD:
+                        break
+                    if i > 0:
+                        break
+                    _check_img = ui.sleep(0.3).grap()
+                    if ui.is_on_homepage(img=_check_img):
+                        break
+                    if ui.snapshot(img=_check_img).search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+                            ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                        ui.esc().sleep(0.3)
+                        continue
+                    break
+            if absorbed:
+                # 吸收比例
+                local.absorb_count.value += 1
+                if local.combat_count.value <= 0 or local.absorb_count.value >= local.combat_count.value:
+                    absorb_rate = 100.00
+                else:
+                    absorb_rate = (local.absorb_count.value / local.combat_count.value) * 100
+                logger.info(f"R{index} - Absorbed: {local.absorb_count.value}, rate: {absorb_rate:.2f}%")
+
+                # 检查是否误点领取奖励
+                if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+                        ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                    ui.esc().sleep(0.3)
+                    continue
+
+                ui.sleep(0.3)
+            else:
+                logger.debug(f"R{index} - Not absorbed")
+
+        # esc准备进入下一轮
+        found_quit = False
+        for k in range(2):
+            if ui.esc().sleep(0.3).wait(3 if k == 0 else 5).until(
+                    # 副本敌人esc是重新挑战
+                    lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyRestart))
+                            and ui.search(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]))
+                            # 野外敌人esc是终端页
+                            or page.isTerminal(ui=ui)):
+                found_quit = True
+                break
+            # 以防万一，检查并关闭领取奖励弹窗
+            if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
+                    ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
+                ui.esc().sleep(0.5)
+        if not found_quit:
+            return False
+
+        # 此处开始算下一轮
+
+        # 战斗次数
+        if not enemy.auto_respawn:
+            index += 1
+            local.combat_count.value += 1
+
+        # 看情况离开或重新挑战
+
+        # 野外的直接走
+        if page.isTerminal(ui=ui):
+            return False
+        # 需复活，退出副本
+        if is_downed:
+            logger.info(f"R{index} - Exit to nexus")
+            ui.click_text(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]), times=3, interval=0.3)
+            ui.sleep(1.5).wait_back_home(close_window=True)
+            ui.sleep(0.3)
+            return False
+        # 重新挑战
+        if enemy.is_dungeon and ui.click_text(
+                ctx.tr(I18nText.WeeklyRestart), pk=PointKind.RANDOM, times=3, interval=0.3):
+            elements = [ctx.tr(i.name).raw for i in local.enemy.elements]
+            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}{elements or ''}")
+            ui.sleep(1.5).wait_back_home(close_window=True)
+            ui.sleep(0.3)
+            continue
+        # 未知
+        break
+
+    return False
+
+
 @node(NodeName.endNode)
 def endNode(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if local.rootFSM.is_finished:
@@ -170,10 +510,14 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
         # 大世界进入地图
         ctx.control_service.map()
 
-    # 点击切换地图
+    # 等待切换地图
     if not ui.sleep(0.5).wait(10, 0.4).until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.SwitchMap), delay=0.8)):
+            lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
         return False
+    # 放大地图
+    ui.click_point(AnchorPoint(1207, 241, Align.Right | Align.Middle), delay=0.8, times=2, interval=0.3)
+    # 点击切换地图
+    ui.click_text(ctx.tr(I18nText.SwitchMap), delay=0.2)
 
     # 选择瑝珑-今州
     regions_roi = ctx.scaler.as_bbox(AnchorBBox(
@@ -187,7 +531,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
             logger.warning(f"Text not found: {ctx.tr(I18nText.Huanglong).raw}")
             return False
         ui.sleep(0.4).snapshot()  # 修复文字未显示完全就识别导致少字，等动画结束，重新识别
-        if ui.search(ctx.tr(I18nText.Mengzhou)) or ui.search(ctx.tr(I18nText.Jinzhou)):
+        if ui.search(ctx.tr([I18nText.Mengzhou, I18nText.Jinzhou])):
             ui.click_text(ctx.tr(I18nText.Mengzhou), regions_roi, delay=0.4, times=2, interval=0.2)
             ui.click_text(ctx.tr(I18nText.Jinzhou), regions_roi, delay=0.1, times=2, interval=0.2)
             break
@@ -334,7 +678,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
             return False
         # 点击侧边栏图标
         ui.click_point(icon_point, times=2, interval=0.3)
-        if not ui.sleep(0.1).wait().until(lambda: ui.snapshot().search(_keyword, roiex.guidebook_title)):
+        if not ui.sleep(0.2).wait().until(lambda: ui.snapshot().search(_keyword, roiex.guidebook_title)):
             return False
         return True
 
@@ -599,15 +943,16 @@ def doEnemyTracing(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 搜索敌人
     ui.sleep(0.1)
     ctx.control_service.input_text(f"^{local.pattern.sub(".", enemy_name.raw)}$")
-    ui.sleep(0.2)
-    ctx.control_service.enter()
+    for i in range(2):
+        ui.sleep(0.2)
+        ctx.control_service.enter()
 
     # 点击敌人
     bbox_first_enemy = AnchorBBox(
         AnchorPoint(145, 134, Align.Left | Align.Top),
         AnchorPoint(430, 196, Align.Left | Align.Top)
     )
-    ui.click_bbox(bbox_first_enemy, pk=PointKind.NEAR, delay=0.2, times=2, interval=0.3)
+    ui.click_bbox(bbox_first_enemy, pk=PointKind.NEAR, delay=0.35, times=2, interval=0.3)
 
     # 点击探测
     if ui.sleep(0.1).snapshot().search(ctx.tr(I18nText.NoDetectableResult)):
@@ -629,24 +974,13 @@ def doEnemyTracing(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     ui.wait_back_home()
     ui.sleep(0.5)
-    return True
-
-
-@node(NodeName.doCombat)
-def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    ui = UIOp(ctx)
-
-    if not ui.is_on_homepage():
-        return False
 
     enemy = local.enemy
-    enemy_name = ctx.tr(local.enemy.id)
-    logger.debug(f"Enemy: {enemy}, {enemy_name.raw}")
+    if not enemy.boss_meta or not (enemy_restart := enemy.boss_meta.restart):
+        return True
 
-    index = 1  # 挑战次数
-    page = GlobalPage(ctx)
-    tm = TeamMember(ctx)
-    roiex = RoiEx(ctx)
+    # 开始执行重新挑战流程
+    ui.sleep(0.5)
 
     # 设置战斗参数
     if local.combat_system is None:
@@ -657,313 +991,126 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         local.combat_system.auto_pickup = False
     combat_system = local.combat_system
 
-    # 设置自动拾取、处决
-    pickup = AsyncPickup(ctx, delay=0.2, interval=lambda: round(random.uniform(0.3, 0.5), 2), timeout=10)
+    combat_system.exit_special_state(Morph.Forced)
 
-    # 设置停战文本
-    stop_keyword = {
-        I18nText.ClaimRewards, I18nText.ForgeryChallengeComplete, I18nText.TacetFieldChallengeComplete}
-    if enemy.stop_text:
-        stop_keyword.update(enemy.stop_text)
-    stop_keyword = ctx.tr(list(stop_keyword))
+    # 跑向敌人
+    executor = RouteExecutor(ctx)
+    executor.execute(enemy_restart.after_travel)
 
-    # 循环刷当前副本，直到需要离开副本
-    while ui.is_set():
-        ui.activate()
-
-        # 跑向boss
-        if enemy.routes:
-            combat_system.exit_special_state(Morph.Prefer)
-            ui.sleep(0.2)
-            RouteExecutor(ctx).execute(enemy.routes)
-
-        found_complete = False
-        heartbeat = RateLimiter(1 / 5)
-
-        if index == 1:
-            logger.info(f"R{local.combat_count.value} - Combat engaged")
-
-        # 开局躲技能
-        if enemy == Enemy.Denia:
-            _denia(ctx, local, index)
-        elif enemy == Enemy.Sigillum:
-            _sigillum(ctx, local)
-
-        # 同步战斗次数
-        if local.combat_count.value == 0:
-            local.combat_count.value = 1
-        index = local.combat_count.value
-
-        # 设置战斗结束参数
-        no_text_count = 8 if enemy.auto_respawn else 3
-        no_text_max = no_text_count
-        deadline = time.monotonic() + 20 * 60
-        combat_start_time = time.monotonic()
-        enemy_detect_history = deque(maxlen=3)
-
-        # 循环战斗，直到击败boss
-        while ui.is_set():
-            if time.monotonic() > deadline or no_text_count < 0:
-                logger.info(f"R{index} - Out of combat")
+    # 走向重新挑战
+    action = enemy_restart.restart
+    found_enemy = False
+    for i in range(action.cycle):
+        ui.sleep(0.2).snapshot()
+        # if logger.isEnabledFor(logging.DEBUG):
+        #     logger.debug(f"{ui.bbox_result}")
+        # 找到重新挑战
+        if ui.search(ctx.tr(action.restart_text)):
+            ObjectDetector(ctx).try_restart()
+            found_enemy = True
+            break
+        # 找到敌人名称、血条等，若有，说明敌人都出现了，就不用找重新挑战了
+        if action.check_text and ui.search(ctx.tr(action.check_text)):
+            found_enemy = True
+            break
+        if action.check_hp_bar:
+            hp = EnemyHpBar.detect(ui.img)
+            if hp and hp > 0.8:
+                found_enemy = True
                 break
-            if heartbeat() == 0:
-                logger.info(f"R{index} - In combat")
-                ui.activate()
+        # 啥也没有，继续走
+        executor.execute([Walk(direction=action.direction, steps=action.step)])
+    logger.debug(f"found_enemy: {found_enemy}")
+    if not found_enemy:
+        logger.warning(f"Enemy not found: {enemy_name.raw}")
+        return False
 
-            # 开启战斗
-            combat_system.start(3.5)
+    # 跑向敌人
+    executor.execute(enemy_restart.after_restart)
 
-            # 控制检测频率
-            interval = 1.5
-            # 敌人阵亡时提高检测频率，更快停止战斗
-            if not enemy.auto_respawn and len(enemy_detect_history) > 0:
-                _enemy_det = enemy_detect_history[-1]
-                logger.debug(f"enemy_det: {_enemy_det}")
-                if (_enemy_det[0]
-                        and (_enemy_det[1] is None or _enemy_det[1] < 0.1)
-                        and 3 < time.monotonic() - combat_start_time < 40  # 设一个上限
-                        and _enemy_det[2] < 0.1):
-                    interval = 0.5
-                elif not _enemy_det[0]:
-                    interval = 1.0
+    return True
 
-            img = ui.sleep(interval).grap()
-            is_home = ui.is_on_homepage(img)
 
-            # 检查敌人血量，用于控制检测频率和拾取开关
-            enemy_hp = None
-            if not enemy.auto_respawn:
-                if is_home and (enemy_hp := EnemyHpBar.detect(img)):
-                    logger.debug(f"enemy_hp: {enemy_hp:.4f}")
-                else:
-                    logger.debug(f"enemy_hp: None")
+def _fenrico(ctx: NodeContext, local: TaskLocal):
+    ui = UIOp(ctx)
 
-                enemy_detect_history.append((is_home, enemy_hp, EnemyVsBar.detect(img)))
+    tmpl_name = "905_-4_-2.png"
+    tmpl_img = img_util.read_img(Resource.Map.Rinascita.Ragunna.FabricatoriumOfTheDeep / "905_-4_-2.png")
+    matcher = SIFTFeatureMatcher()
+    feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
+    point = Point(643, 548)
 
-            # 开启拾取
-            if enemy.auto_respawn:
-                pickup.start()
-            else:
-                # 血量低不拾取，防止一直误点领取奖励
-                if enemy_hp and enemy_hp > 0.20:
-                    pickup.start()
-                else:
-                    pickup.stop()
+    if not ui.is_on_homepage():
+        return False
+    ctx.control_service.map()
+    if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
+        ui.esc().sleep(1)
+        return False
+    scene_img = ui.sleep(0.3).grap()
+    result = matcher.match(scene_img, feature_data)
+    if result is None:
+        logger.warning("Feature match failed")
+        ui.esc().sleep(1)
+        return False
 
-            # 检查文本
-            ui.snapshot(img=img)
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"{ui.bbox_result}")
+    scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
+    x = int(scene_point[0])
+    y = int(scene_point[1])
+    logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
+    ui.click(x, y)
+    if not ui.sleep(0.5).wait().until(
+            lambda: ui.snapshot().click_text(
+                ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
+        scene_img = ui.sleep(0.3).grap()
+        result = matcher.match(scene_img, feature_data)
+        if result is None:
+            logger.warning("Feature match failed")
+            ui.esc().sleep(1)
+            return False
+        scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
+        logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
+        ui.click(int(scene_point[0]), int(scene_point[1])).sleep(0.35)
+        ctx.control_service.scroll_mouse(100, x, y)
+        ui.sleep(0.3)
 
-            # 战斗结束：领取奖励、挑战成功等
-            if enemy.auto_respawn:
-                if ui.search(stop_keyword):
-                    # 战斗次数，防止重复识别到
-                    if not found_complete:
-                        # 自动刷新的不退出战斗，只能在这里计数
-                        index += 1
-                        local.combat_count.value += 1
-                    found_complete = True
-                    # 不退出继续打
-                    ui.sleep(1)
-                    continue
-            else:
-                if ui.search(stop_keyword) or enemy.is_dungeon and ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue):
-                    # 结束战斗
-                    logger.info(f"R{index} - Combat ended")
-                    pickup.stop()
-                    combat_system.pause(join=True)
-                    if ui.search(ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                        ui.esc().sleep(0.3)
-                    break
-            found_complete = False
-
-            # 战斗中：击败敌人、boss名等
-            if res_battle_text := ui.search(ctx.tr(enemy.battle_text)):
-                logger.debug(f"R{index} - Text: {res_battle_text}")
-                no_text_count = no_text_max
-                continue
-            elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
-                logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
-                pickup.stop()
-                continue
-            if is_home:
-                no_text_count -= 1
-            logger.debug(f"R{index} - Text not found: {ctx.tr(enemy.battle_text)}")
-
-            # 自动拾取误触离开副本
-            if ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
-                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
-                ctx.control_service.attack()
-                ui.sleep(0.2)
-                continue
-
-            # 网络异常
-            if ui.search(ctx.tr(I18nText.ConnectionErrorReconnecting)):
-                ui.sleep(1)
-                continue
-
-            # 容错，未知页面处理
-            if page_key := page.action(ui=ui):
-                logger.debug(f"R{index} - GlobalPage: {page_key}")
-                if page_key == GlobalPage.Revive:
-                    pickup.stop()
-                    combat_system.pause(join=True)
-                    ui.sleep(0.5)
-                    local.downed = False
-                    # 直接挑战的复苏后还在副本里，可以接着打
-                    if enemy.prefer_quick:
-                        ui.wait_back_home(close_window=True)
-                        continue
-                    return False
-                elif page_key == GlobalPage.InternetDisconnecting:
-                    pickup.stop()
-                    combat_system.pause(join=True)
-                    ui.sleep(0.5)
-                    return False
-                elif page_key == GlobalPage.LeaveInstance:
-                    pickup.stop()
-                    combat_system.pause(join=True)
-                    ui.sleep(0.5)
-                    return False
-
-        # 挑战完成，暂停战斗系统
-        pickup.stop()
-        combat_system.pause(join=True, timeout=10)
-        enemy_detect_history.clear()
-        ui.sleep(1)
-        found_absorb = ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue)
-
-        # 等待回到主页
-        back_homepage = False
-        deadline = time.monotonic() + 15
-        img = ui.img
-        while time.monotonic() < deadline:
-            img = ui.grap()
-            if ui.is_on_homepage(img=img):
-                back_homepage = True
-                break
-            # 领取奖励
-            if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
-                    ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                ui.esc()
-            # 离开副本
-            elif ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(
-                    ctx.tr(I18nText.Restart)) and ui.search(ctx.tr(I18nText.Confirm)):
-                ui.esc()
-            # 其他
-            elif page_key := page.action(ui=ui.snapshot(img=img)):
-                if page_key == GlobalPage.InternetDisconnecting:
-                    return False
-            ui.sleep(0.5)
-        if not back_homepage:
-            logger.warning(f"R{index} - Return to overworld timeout")
-            return ui.wait_back_home(timeout=10)
-
-        # 检查阵亡情况
-        downed = tm.downed(img)
-        members_size = len(local.members)
-        for i in reversed(range(members_size)):
-            if local.members[i]:
-                break
-            members_size -= 1
-        if is_downed := any(downed[:members_size]):
-            logger.info(f"R{index} - Resonator downed")
-        local.downed = is_downed
-        logger.debug(f"downed: {downed}, is_downed: {is_downed}")
-
-        # 搜索和吸收声骸
-        if enemy.auto_respawn:
-            pass  # 自动刷新的边打边捡，保证效率
-        else:
-            # 吸收声骸
-            absorbed = False
-            if found_absorb:
-                absorbed = ObjectDetector(ctx).try_pickup()
-            if not absorbed:
-                combat_system.exit_special_state(Morph.Prefer)
-                for i in range(2):
-                    absorbed = ObjectDetector(ctx).absorb_echoes(timeout=20, enemy=enemy)
-                    if not absorbed or enemy.absorb != AbsorbMode.OD:
-                        break
-                    if i > 0:
-                        break
-                    _check_img = ui.sleep(0.3).grap()
-                    if ui.is_on_homepage(img=_check_img):
-                        break
-                    if ui.snapshot(img=_check_img).search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
-                            ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                        ui.esc().sleep(0.3)
-                        continue
-                    break
-            if absorbed:
-                # 吸收比例
-                local.absorb_count.value += 1
-                if local.combat_count.value <= 0 or local.absorb_count.value >= local.combat_count.value:
-                    absorb_rate = 100.00
-                else:
-                    absorb_rate = (local.absorb_count.value / local.combat_count.value) * 100
-                logger.info(f"R{index} - Absorbed: {local.absorb_count.value}, rate: {absorb_rate:.2f}%")
-
-                # 检查是否误点领取奖励
-                if ui.sleep(0.5).snapshot().search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
-                        ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                    ui.esc().sleep(0.3)
-                    continue
-
-                ui.sleep(0.3)
-            else:
-                logger.debug(f"R{index} - Not absorbed")
-
-        # esc准备进入下一轮
-        found_quit = False
-        for k in range(2):
-            if ui.esc().sleep(0.3).wait(3 if k == 0 else 5).until(
-                    # 副本敌人esc是重新挑战
-                    lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyRestart))
-                            and ui.search(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]))
-                            # 野外敌人esc是终端页
-                            or page.isTerminal(ui=ui)):
-                found_quit = True
-                break
-            # 以防万一，检查并关闭领取奖励弹窗
-            if ui.search(ctx.tr(I18nText.ClaimRewards)) and ui.search(
-                    ctx.tr(I18nText.Confirm)) and ui.search(ctx.tr(I18nText.Cancel)):
-                ui.esc().sleep(0.5)
-        if not found_quit:
+        scene_img = ui.sleep(0.3).grap()
+        result = matcher.match(scene_img, feature_data)
+        if result is None:
+            logger.warning("Feature match failed")
+            ui.esc().sleep(1)
+            return False
+        scene_point = matcher.feature_to_scene(result, (float(point.x), float(point.y)))
+        logger.debug(f"模板点 {point} 映射到场景坐标: ({scene_point[0]:.1f}, {scene_point[1]:.1f})")
+        ui.click(int(scene_point[0]), int(scene_point[1]))
+        if not ui.sleep(0.5).wait().until(
+                lambda: ui.snapshot().click_text(
+                    ctx.tr(I18nText.FastTravel), delay=0.3, times=2, interval=0.2)):
+            ui.esc().sleep(1)
             return False
 
-        # 此处开始算下一轮
+    if not ui.sleep(0.5).wait_back_home():
+        return False
+    ui.sleep(0.7)
 
-        # 战斗次数
-        if not enemy.auto_respawn:
-            index += 1
-            local.combat_count.value += 1
+    local.combat_system.exit_special_state(Morph.Prefer)
 
-        # 看情况离开或重新挑战
+    executor = RouteExecutor(ctx)
+    executor.execute([Run.forward(4.0)])
+    roiex = RoiEx(ctx)
 
-        # 野外的直接走
-        if page.isTerminal(ui=ui):
-            return False
-        # 需复活，退出副本
-        if is_downed:
-            logger.info(f"R{index} - Exit to nexus")
-            ui.click_text(ctx.tr([I18nText.WeeklyExit, I18nText.Confirm]), times=3, interval=0.3)
-            ui.sleep(1.5).wait_back_home(close_window=True)
-            ui.sleep(0.3)
-            return False
-        # 重新挑战
-        if enemy.is_dungeon and ui.click_text(
-                ctx.tr(I18nText.WeeklyRestart), pk=PointKind.RANDOM, times=3, interval=0.3):
-            elements = [ctx.tr(i.name).raw for i in local.enemy.elements]
-            logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}{elements or ''}")
-            ui.sleep(1.5).wait_back_home(close_window=True)
-            ui.sleep(0.3)
+    for i in range(14):
+        if not ui.snapshot().search(ctx.tr(I18nText.Absorb), roiex.dialogue):
+            executor.execute([Walk.forward(2)])
+            ui.sleep(0.08)
             continue
-        # 未知
-        break
+        if ObjectDetector(ctx).absorb_echoes(timeout=20, enemy=Enemy.Fenrico):
+            for _ in range(2):
+                executor.execute([Walk.backward(1)])
+                ui.pick_up().sleep(0.05)
+            ui.sleep(0.5)
+            break
 
-    return False
+    return True
 
 
 def _sigillum(ctx: NodeContext, local: TaskLocal):

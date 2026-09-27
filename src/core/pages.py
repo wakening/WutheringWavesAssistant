@@ -786,6 +786,13 @@ class UIOp:
         RouteExecutor(self.ctx).execute(route)
         return self
 
+    # # --------- other ---------
+    # def false(self, *args):
+    #     return False
+    #
+    # def true(self, *args):
+    #     return True
+
 
 class GlobalPage:
 
@@ -805,6 +812,7 @@ class GlobalPage:
     PatchingCompletePleaseRestartTheGame = "PatchingCompletePleaseRestartTheGame"
     DevicesDriverIsOutdated = "DevicesDriverIsOutdated"
     RequestTimedOut = "RequestTimedOut"
+    ClaimStarpathGift = "ClaimStarpathGift"
     BreachTimeRemaining = "BreachTimeRemaining"
 
     PdrCurrentPhase = "PdrCurrentPhase"
@@ -842,6 +850,7 @@ class GlobalPage:
             self.PatchingCompleteTheGameIsRestarting: self.isPatchingCompleteTheGameIsRestarting,
             self.PatchingCompletePleaseRestartTheGame: self.isPatchingCompletePleaseRestartTheGame,
             self.DevicesDriverIsOutdated: self.isDevicesDriverIsOutdated,
+            self.ClaimStarpathGift: self.isClaimStarpathGift,
             self.RequestTimedOut: self.isRequestTimedOut,
             self.BreachTimeRemaining: self.isBreachTimeRemaining,
             self.PdrCurrentPhase: self.isPdrCurrentPhase,
@@ -903,7 +912,7 @@ class GlobalPage:
             logger.info(f"{self.ctx.tr(I18nText.LuniteSubscriptionReward).raw}")
             return self.ActionStr(
                 self.LuniteSubscriptionReward,
-                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=2, interval=0.3).sleep(0.3)
+                lambda: ui.click_bbox(res, pk=PointKind.NEAR, delay=0.3, times=3, interval=0.4).sleep(0.3)
             )
         return None
 
@@ -1137,6 +1146,17 @@ class GlobalPage:
             logger.info(f"{self.ctx.tr(I18nText.RequestTimedOut).raw}")
             return self.ActionStr(
                 self.RequestTimedOut,
+                lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
+            )
+        return None
+
+    def isClaimStarpathGift(self, *, ui: UIOp, **kwargs):
+        """领取伴行赠礼"""
+        if (ui.search(self.ctx.tr(I18nText.StarpathsIntertwined))
+                and (res := ui.search(self.ctx.tr(I18nText.ClaimStarpathGift)))):
+            logger.info(f"{self.ctx.tr(I18nText.ClaimStarpathGift).raw}")
+            return self.ActionStr(
+                self.ClaimStarpathGift,
                 lambda: ui.click_bbox(res, pk=PointKind.RANDOM, delay=0.3).sleep(2)
             )
         return None

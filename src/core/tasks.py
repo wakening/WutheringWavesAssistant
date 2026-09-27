@@ -1,6 +1,4 @@
-import json
 import logging
-import math
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -10,11 +8,9 @@ from multiprocessing import Process
 from typing import Iterable, Any, TypeVar, Callable, Mapping, Optional
 
 import psutil
-import win32gui
 
 from src.config import logging_config
 from src.core import message
-from src.core.boss import BossNameEnum
 from src.core.contexts import Context
 from src.core.exceptions import ScreenshotError
 from src.core.geometry import AnchorPoint, Align
@@ -142,24 +138,9 @@ class ThreadTask(ProcessTask):
         self._process.start()
 
 
-class MouseResetProcessTask(ProcessTask):
-    def get_task(self, *args) -> Callable[[...], None] | None:
-        return mouse_reset_task_run
-
-
 class AutoBossProcessTask(ProcessTask):
     def get_task(self, *args) -> Callable[..., None] | None:
         return boss_task
-
-
-class AutoPickupProcessTask(ProcessTask):
-    def get_task(self, *args) -> Callable[..., None] | None:
-        return auto_pickup_task_run
-
-
-class AutoStoryProcessTask(ProcessTask):
-    def get_task(self, *args) -> Callable[..., None] | None:
-        return auto_story_task_run
 
 
 class EchoMergeProcessTask(ProcessTask):
@@ -253,47 +234,6 @@ def create_mouse_reset_monitor(event, spec: TaskSpec, ipc: IPCManager, **kwargs)
     return monitor_thread
 
 
-def mouse_reset_task_run(event, spec, ipc, **kwargs):
-    logging_config.setup_logging(ipc.log_queue)
-    logger.info("鼠标重置任务开始运行")
-    from pynput.mouse import Controller
-    mouse = Controller()
-    last_position = mouse.position
-    hwnd = None
-    hwnd_util.enable_dpi_awareness()
-    try:
-        while event.is_set():
-            time.sleep(0.02)
-            try:
-                if not hwnd or not win32gui.IsWindow(hwnd):
-                    time.sleep(0.5)
-                    hwnd = hwnd_util.get_hwnd()
-                    continue
-            except Exception:
-                logger.warning("MouseReset: 获取窗口句柄时异常")
-                time.sleep(5)
-                continue
-            current_position = mouse.position
-            left, top, right, bottom = win32gui.GetClientRect(hwnd)
-            center_position = (left + right) / 2, (top + bottom) / 2
-            cur_pos_to_center_distance = math.sqrt(
-                (current_position[0] - center_position[0]) ** 2
-                + (current_position[1] - center_position[1]) ** 2
-            )
-            cur_pos_to_last_pos_distance = math.sqrt(
-                (current_position[0] - last_position[0]) ** 2
-                + (current_position[1] - last_position[1]) ** 2
-            )
-            if cur_pos_to_last_pos_distance > 200 and cur_pos_to_center_distance < 50:
-                mouse.position = last_position
-            else:
-                last_position = current_position
-    except KeyboardInterrupt:
-        pass
-    finally:
-        logger.info("鼠标重置任务结束")
-
-
 def auto_boss_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     try:
         from src.core.injector import Container
@@ -376,115 +316,6 @@ def auto_boss_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
             logger.info("刷boss任务进程结束")
     except Exception as e:
         logger.exception(e)
-
-
-def auto_pickup_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
-    from src.core.injector import Container
-
-    logging_config.setup_logging(ipc.log_queue)
-    # logger.debug(f"spec: {json.dumps(spec.__dict__)}")
-    logger.info("自动拾取任务进程开始运行")
-
-    context = Context()
-    context.spec = spec
-    # 从快照还原配置
-    context.param_config = spec.param_config
-    # 新旧配置兼容
-    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
-    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
-    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
-
-    container = Container.build(context)
-    logger.debug("Create application context")
-    window_service: WindowService = container.window_service()
-    # img_service: ImgService = container.img_service()
-    # ocr_service: OCRService = container.ocr_service()
-    control_service: ControlService = container.control_service()
-
-    # hwnd_util.set_window_left_top(window_service.window)
-    # time.sleep(0.2)
-    logger.debug(spec.game_path)
-    create_parent_monitor(event, spec.leader_pid)
-    # create_mouse_reset_monitor(event, spec, ipc, **kwargs)
-    clock_action = ClockAction(control_service.activate, 3.0)
-
-    page_event_service: PageEventService = container.auto_pickup_service()
-
-    try:
-        while event.is_set():
-            clock_action.action()
-            try:
-                page_event_service.execute()
-            except ScreenshotError:
-                logger.exception("截图失败")
-                time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("自动拾取任务进程结束")
-    except Exception as e:
-        logger.exception(e)
-    finally:
-        try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
-            keymouse_util.key_up(window_service.window, "W")
-        except Exception:
-            pass
-
-
-def auto_story_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
-    from src.core.injector import Container
-
-    logging_config.setup_logging(ipc.log_queue)
-    # logger.debug(f"spec: {json.dumps(spec.__dict__)}")
-    logger.info("自动剧情任务进程开始运行")
-
-    context = Context()
-    context.spec = spec
-    # 从快照还原配置
-    context.param_config = spec.param_config
-    # 新旧配置兼容
-    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
-    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
-    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
-
-    container = Container.build(context)
-    logger.debug("Create application context")
-    window_service: WindowService = container.window_service()
-    # img_service: ImgService = container.img_service()
-    # ocr_service: OCRService = container.ocr_service()
-    control_service: ControlService = container.control_service()
-
-    # hwnd_util.set_window_left_top(window_service.window)
-    # time.sleep(0.2)
-    logger.debug(spec.game_path)
-    create_parent_monitor(event, spec.leader_pid)
-    # create_mouse_reset_monitor(event, spec, ipc, **kwargs)
-    clock_action = ClockAction(control_service.activate, 3.0)
-
-    page_event_service: PageEventService = container.auto_story_service()
-    count = 0
-
-    try:
-        while event.is_set():
-            logger.debug("count: %s", count)
-            count += 1
-            clock_action.action()
-            try:
-                page_event_service.execute()
-            except ScreenshotError as e:
-                logger.exception("截图失败")
-                time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("自动剧情任务进程结束")
-    except Exception as e:
-        logger.exception(e)
-    finally:
-        try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
-            keymouse_util.key_up(window_service.window, "W")
-        except Exception:
-            pass
 
 
 def task_init(event, spec: TaskSpec, ipc: IPCManager, is_thread=False, source=None, **kwargs):
@@ -667,7 +498,6 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
         original_x, original_y = keymouse_util.get_mouse_position()
 
         ctx.control_service.activate()
-        time.sleep(0.05)
 
         if spec.gui_win_id is not None:
             # 3. 取消游戏窗口的置顶状态
@@ -711,17 +541,7 @@ def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
 def boss_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     cfg = RuntimeConfig(spec.user_config)
     boss_names = cfg.boss.bossName
-    if len(boss_names) > 1 or boss_names[0] not in [
-        BossNameEnum.Hyvatia.name,
-        BossNameEnum.ReactorHusk.name,
-        BossNameEnum.Sigillum.name,
-        BossNameEnum.NamelessExplorer.name,
-        BossNameEnum.Denia.name,
-        BossNameEnum.NightmareAdamSmasher.name,
-        BossNameEnum.MyriadSnareRustfireChassis.name,
-        BossNameEnum.ThousandPuppetPavilion.name,
-        BossNameEnum.CalamityEffigy.name,
-    ]:
+    if len(boss_names) > 1:
         auto_boss_task_run(event, spec, ipc, **kwargs)
         return
     _boss_task(event, spec, ipc, **kwargs)

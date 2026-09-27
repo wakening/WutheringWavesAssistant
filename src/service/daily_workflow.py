@@ -5,23 +5,24 @@ import time
 from typing import Optional
 
 from src.core.color import ColorRule, Color, ColorMatch
-from src.core.combat.combat_core import ResonatorNameEnum, Morph
+from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
+from src.core.dungeon import Dungeon
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
 from src.core.i18n import I18nText, Language, I18nTr
 from src.core.message import MsgType, MsgTaskStatus, MsgSource
 from src.core.movement import Run, Walk
 from src.core.pages import UIOp, GlobalPage
-from src.core.resonator import Resonator
-from src.core.resource import Icon
-from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
+from src.core.resonator import Resonator, TeamMember
+from src.core.resource import Icon, Resource
+from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup, LatchTaskFSM
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
     absorb_around_variant_blind, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
     match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
     object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_guidebook, bbox_dialogue,
-    bbox_guidebook_title, AsyncPickup,
+    bbox_guidebook_title, AsyncPickup, RoiEx, Slider,
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -33,51 +34,63 @@ class TaskLocal:
 
     def __init__(self):
         ### ------- Guidebook MaterialCollection ForgeryChallenge -------
-        self.wingfallChasmFSM: TaskFSM = TaskFSM(name=I18nText.WingfallChasm)
-        self.silentChasmFSM: TaskFSM = TaskFSM(name=I18nText.SilentChasm)
-        self.splitChasmFSM: TaskFSM = TaskFSM(name=I18nText.SplitChasm)
-        self.erodedChasmFSM: TaskFSM = TaskFSM(name=I18nText.ErodedChasm)
-        self.ashenChasmFSM: TaskFSM = TaskFSM(name=I18nText.AshenChasm)
-        self.fallenSanctumFSM: TaskFSM = TaskFSM(name=I18nText.FallenSanctum)
-        self.lessonInSunsetFSM: TaskFSM = TaskFSM(name=I18nText.LessonInSunset)
-        self.strickenSanctumFSM: TaskFSM = TaskFSM(name=I18nText.StrickenSanctum)
-        self.lessonInVoidFSM: TaskFSM = TaskFSM(name=I18nText.LessonInVoid)
-        self.lessonInEmbersFSM: TaskFSM = TaskFSM(name=I18nText.LessonInEmbers)
-        self.gardenOfSalvationFSM: TaskFSM = TaskFSM(name=I18nText.GardenOfSalvation)
-        self.abyssOfInitiationFSM: TaskFSM = TaskFSM(name=I18nText.AbyssOfInitiation)
-        self.gardenOfAdorationFSM: TaskFSM = TaskFSM(name=I18nText.GardenOfAdoration)
-        self.abyssOfSacrificeFSM: TaskFSM = TaskFSM(name=I18nText.AbyssOfSacrifice)
-        self.abyssOfConfessionFSM: TaskFSM = TaskFSM(name=I18nText.AbyssOfConfession)
-        self.flamingRemnantsFSM: TaskFSM = TaskFSM(name=I18nText.FlamingRemnants)
-        self.mistyForestFSM: TaskFSM = TaskFSM(name=I18nText.MistyForest)
-        self.erodedRuinsFSM: TaskFSM = TaskFSM(name=I18nText.ErodedRuins)
-        self.moonlitGrovesFSM: TaskFSM = TaskFSM(name=I18nText.MoonlitGroves)
-        self.marigoldWoodsFSM: TaskFSM = TaskFSM(name=I18nText.MarigoldWoods)
+        self.wingfallChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WingfallChasm)
+        self.silentChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SilentChasm)
+        self.splitChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SplitChasm)
+        self.erodedChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedChasm)
+        self.ashenChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AshenChasm)
+        self.fallenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FallenSanctum)
+        self.lessonInSunsetFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInSunset)
+        self.strickenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StrickenSanctum)
+        self.lessonInVoidFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInVoid)
+        self.lessonInEmbersFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInEmbers)
+        self.gardenOfSalvationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfSalvation)
+        self.abyssOfInitiationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfInitiation)
+        self.gardenOfAdorationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfAdoration)
+        self.abyssOfSacrificeFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfSacrifice)
+        self.abyssOfConfessionFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfConfession)
+        self.flamingRemnantsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FlamingRemnants)
+        self.mistyForestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MistyForest)
+        self.erodedRuinsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedRuins)
+        self.moonlitGrovesFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MoonlitGroves)
+        self.marigoldWoodsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MarigoldWoods)
 
         ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
         ### ------- Guidebook MaterialCollection BossChallenge -------
 
         ### ------- Guidebook MaterialCollection TacetSuppression -------
-        self.westernFangPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.WesternFangPeaksTacetField)
-        self.easternXuanPeaksTacetFieldFSM: TaskFSM = TaskFSM(name=I18nText.EasternXuanPeaksTacetField)
-        self.tacetFieldSolisiaLandingFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldSolisiaLanding)
-        self.tacetFieldFrostlandsTransitPortFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldFrostlandsTransitPort)
-        self.tacetFieldMountGjallarFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldMountGjallar)
-        self.tacetFieldMawburrowDesertFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldMawburrowDesert)
-        self.tacetFieldStagnantRunFSM: TaskFSM = TaskFSM(name=I18nText.TacetFieldStagnantRun)
+        self.westernFangPeaksTacetFieldFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WesternFangPeaksTacetField)
+        self.easternXuanPeaksTacetFieldFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EasternXuanPeaksTacetField)
+        self.tacetFieldSolisiaLandingFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldSolisiaLanding)
+        self.tacetFieldFrostlandsTransitPortFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldFrostlandsTransitPort)
+        self.tacetFieldMountGjallarFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldMountGjallar)
+        self.tacetFieldMawburrowDesertFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldMawburrowDesert)
+        self.tacetFieldStagnantRunFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldStagnantRun)
+        self.tacetFieldMournfellCanyonFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldMournfellCanyon)
+        self.tacetFieldBeohrWatersFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldBeohrWaters)
+        self.tacetFieldRiccioliIslandsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldRiccioliIslands)
+        self.tacetFieldFagaceaePeninsulaFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldFagaceaePeninsula)
+        self.tacetFieldPenitentsEndFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldPenitentsEnd)
+        self.tacetFieldCentralPlainsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldCentralPlains)
+        self.tacetFieldDesorockHighlandIFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldDesorockHighlandI)
+        self.tacetFieldTigersMawFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldTigersMaw)
+        self.tacetFieldWhiningAixsMireFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldWhiningAixsMire)
+        self.tacetFieldPortCityOfGuixuFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldPortCityOfGuixu)
+        self.tacetFieldDesorockHighlandIIFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldDesorockHighlandII)
+        self.tacetFieldDimForestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldDimForest)
 
         ### ------- Guidebook MaterialCollection WeeklyChallenge -------
-        self.courtOfShackledSoulsFSM: TaskFSM = TaskFSM(name=I18nText.CourtOfShackledSouls)
-        self.seedOfIllusoryOriginFSM: TaskFSM = TaskFSM(name=I18nText.SeedOfIllusoryOrigin)
-        self.gateOfTheLostStarFSM: TaskFSM = TaskFSM(name=I18nText.GateOfTheLostStar)
-        self.cinderniteApocalypseFSM: TaskFSM = TaskFSM(name=I18nText.CinderniteApocalypse)
-        self.theWheelOfBrokenFateFSM: TaskFSM = TaskFSM(name=I18nText.TheWheelOfBrokenFate)
-        self.beyondTheCrimsonCurtainFSM: TaskFSM = TaskFSM(name=I18nText.BeyondTheCrimsonCurtain)
-        self.theFatedConfrontationFSM: TaskFSM = TaskFSM(name=I18nText.TheFatedConfrontation)
-        self.statueOfTheCrownlessFSM: TaskFSM = TaskFSM(name=I18nText.StatueOfTheCrownless)
-        self.chaoticJunctureFSM: TaskFSM = TaskFSM(name=I18nText.ChaoticJuncture)
-        self.bellOfArchaicChantsFSM: TaskFSM = TaskFSM(name=I18nText.BellOfArchaicChants)
+        self.courtOfShackledSoulsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.CourtOfShackledSouls)
+        self.seedOfIllusoryOriginFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SeedOfIllusoryOrigin)
+        self.gateOfTheLostStarFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GateOfTheLostStar)
+        self.cinderniteApocalypseFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.CinderniteApocalypse)
+        self.theWheelOfBrokenFateFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TheWheelOfBrokenFate)
+        self.beyondTheCrimsonCurtainFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.BeyondTheCrimsonCurtain)
+        self.theFatedConfrontationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TheFatedConfrontation)
+        self.statueOfTheCrownlessFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StatueOfTheCrownless)
+        self.chaoticJunctureFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ChaoticJuncture)
+        self.bellOfArchaicChantsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.BellOfArchaicChants)
 
         ### ------- Guidebook MaterialCollection NightmarePurification -------
 
@@ -125,6 +138,18 @@ class TaskLocal:
             self.tacetFieldMountGjallarFSM,
             self.tacetFieldMawburrowDesertFSM,
             self.tacetFieldStagnantRunFSM,
+            self.tacetFieldMournfellCanyonFSM,
+            self.tacetFieldBeohrWatersFSM,
+            self.tacetFieldRiccioliIslandsFSM,
+            self.tacetFieldFagaceaePeninsulaFSM,
+            self.tacetFieldPenitentsEndFSM,
+            self.tacetFieldCentralPlainsFSM,
+            self.tacetFieldDesorockHighlandIFSM,
+            self.tacetFieldTigersMawFSM,
+            self.tacetFieldWhiningAixsMireFSM,
+            self.tacetFieldPortCityOfGuixuFSM,
+            self.tacetFieldDesorockHighlandIIFSM,
+            self.tacetFieldDimForestFSM,
             name=I18nText.TacetSuppression
         )
         self.weeklyChallengeFSM: TaskFSMGroup = TaskFSMGroup(
@@ -198,6 +223,13 @@ class TaskLocal:
         self.doubleDropForgeryChallengeFSM: TaskFSM = TaskFSM(name="DoubleDropForgeryChallenge")
         self.doubleDropSimulationChallengeFSM: TaskFSM = TaskFSM(name="DoubleDropSimulationChallenge")
         self.doubleDropTacetSuppressionFSM: TaskFSM = TaskFSM(name="DoubleDropTacetSuppression")
+
+        # runtime
+        self.pattern = re.compile(r"[·_-]")
+
+        # 战斗
+        self.members = ["unknown", None, None]
+        self.combat_system: CombatSystem = None
 
 
 class NodeName:
@@ -304,7 +336,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
 
     # 从终端进入地图
     if GlobalPage(ctx).isTerminal(ui=ui):
-        if not ui.click_text(ctx.tr(I18nText.Map), bbox_terminal_content(ctx), delay=0.2, times=2, interval=0.3):
+        if not ui.click_text(ctx.tr(I18nText.Map), RoiEx(ctx).terminal_content, delay=0.2, times=2, interval=0.3):
             ui.click_point(AnchorPoint(1197, 350, Align.Right | Align.Middle))
             if not ui.sleep(0.3).wait().until(
                     lambda: ui.snapshot().click_text(ctx.tr(I18nText.Map), delay=0.3, times=2, interval=0.3)):
@@ -313,10 +345,15 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
     else:
         # 大世界进入地图
         ctx.control_service.map()
-    # 点击切换地图
+
+    # 等待切换地图
     if not ui.sleep(0.5).wait(10, 0.4).until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.SwitchMap), delay=0.8)):
+            lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
         return False
+    # 放大地图
+    ui.click_point(AnchorPoint(1207, 241, Align.Right | Align.Middle), delay=0.8, times=2, interval=0.3)
+    # 点击切换地图
+    ui.click_text(ctx.tr(I18nText.SwitchMap), delay=0.2)
 
     # 选择瑝珑-今州
     regions_roi = ctx.scaler.as_bbox(AnchorBBox(
@@ -350,7 +387,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
 
     # 点击今州城传送点
     tmpl_name = "8_0_-1.png"
-    tmpl_img = img_util.read_img(file_util.get_assets_map("Huanglong/Jinzhou/8_0_-1.png"))
+    tmpl_img = img_util.read_img(Resource.Map.Huanglong.Jinzhou / "8_0_-1.png")
     scene_img = ui.sleep(0.8).grap()
     matcher = SIFTFeatureMatcher()
     feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
@@ -390,7 +427,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
         return None
 
     # 点击进入编队
-    if not ui.click_text(ctx.tr(I18nText.Team), bbox_terminal_content(ctx), pk=PointKind.NEAR, delay=0.3):
+    if not ui.click_text(ctx.tr(I18nText.Team), RoiEx(ctx).terminal_content, pk=PointKind.NEAR, delay=0.3):  # 不可多点
         logger.warning(f"Text not found: {ctx.tr(I18nText.Team).raw}")
         return False
 
@@ -405,102 +442,32 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
             logger.info(f"Team locked")
             return False
 
+    ui.sleep(0.3).snapshot()
+
     # 检查失去意识
     roi = ctx.scaler.as_bbox(AnchorBBox(
         AnchorPoint(0, 0, Align.Left | Align.Top),
         AnchorPoint(1280, 450, Align.Right | Align.Middle)
     ))
-    result = ui.search(ctx.tr(I18nText.ResonatorDowned), roi)
-    if result:
-        logger.info(f"resonator downed: {len(result)}")
+    if ui.search(ctx.tr(I18nText.ResonatorDowned), roi):
+        logger.info(f"resonator downed")
         if ui.esc().sleep(0.5).wait_back_home():
             ui.sleep(0.3)
         return False
 
-    # 匹配编队角色名
-    img = ui.img
+    # 识别编队角色
+    member_keys = TeamMember.get_members_by_text(ui)
+    members = [local.pattern.sub("", ctx.tr(key).raw) if key else key for key in member_keys]
+    logger.info(f"Team: {members}")
+    if not members[0]:
+        ui.esc().sleep(2)
+        return None
 
-    # 识别编队
-    members_info: list[list] = [
-        # 三个元素分别是：name、text、is_exist
-        [None, None, None], [None, None, None], [None, None, None]
-    ]
-    team_members = [ResonatorNameEnum.none.value for _ in range(3)]
+    local.member_keys = member_keys
+    local.members = members
 
-    # 编队角色名右侧一点黑色背景上取点
-    member_points = [
-        AnchorPoint(433, 569, Align.Center | Align.Middle),
-        AnchorPoint(810, 569, Align.Center | Align.Middle),
-        AnchorPoint(1187, 569, Align.Center | Align.Middle),
-    ]
-    member_boxes = [
-        AnchorBBox(
-            AnchorPoint(200, 550, Align.Center | Align.Middle),
-            AnchorPoint(510, 590, Align.Center | Align.Middle),
-        ),
-        AnchorBBox(
-            AnchorPoint(576, 550, Align.Center | Align.Middle),
-            AnchorPoint(888, 590, Align.Center | Align.Middle),
-        ),
-        AnchorBBox(
-            AnchorPoint(954, 550, Align.Center | Align.Middle),
-            AnchorPoint(1280, 590, Align.Center | Align.Middle),
-        ),
-    ]
-    member_points = [ctx.scaler.as_point(p) for p in member_points]
-    member_boxes = [ctx.scaler.as_bbox(box) for box in member_boxes]
-
-    color_matches = []
-    for p in member_points:
-        rule = ColorRule().points(p).colors(Color.bgr(22, 18, 13), 30)
-        color_matches.append(ColorMatch(ctx.scaler).rules(rule))
-
-    for i, match in enumerate(color_matches):
-        if match.match(img):
-            members_info[i][2] = True
-
-    keys = Resonator.i18n_keys()
-    lang = ctx.window_service.get_lang()
-
-    for text_box in ui.bbox_result:
-        if text_box.x2 < member_boxes[0].x1:
-            continue
-        if text_box.y2 < member_boxes[0].y1 or text_box.y2 > member_boxes[0].y2:
-            continue
-        for i, member_bbox in enumerate(member_boxes):
-            if not member_bbox.contains_bbox(text_box):
-                continue
-            if not members_info[i][2]:
-                continue
-            members_info[i][1] = text_box
-            if lang == Language.ZH:
-                # 通过名称匹配这个位置的角色名
-                enum_obj = ResonatorNameEnum.get_enum_by_ocr_text(text_box.text)
-                # 角色名都对不上，默认为主角
-                members_info[i][0] = enum_obj.value if enum_obj else ResonatorNameEnum.rover.value
-                team_members[i] = members_info[i][0]
-            elif lang == Language.EN:
-                key = next((k for k in keys if ui.match_key(k, text_box.text)), None)
-                if not key:
-                    key = I18nText.Rover
-                members_info[i][0] = I18nTr(Language.ZH)(key).raw
-                team_members[i] = members_info[i][0]
-
-            else:
-                raise NotImplementedError()
-            # logger.debug(f"team_members[{i}]: {team_members[i]}")
-
-    # logger.debug(f"members_info: {members_info}")
-    logger.info(f"team members: {team_members}")
-
-    ui.esc().sleep(1)
-    if not any(team_members):  # 兜底，留一个角色，至少能动
-        team_members = ["unknown", None, None]
-        logger.info(f"reset team members: {team_members}")
     local.teamFSM.complete()
-    ctx.shared.team_members = team_members
-    # ctx.shared.team_members = ["今汐", "长离", "守岸人"]
-
+    ui.esc().sleep(1)
     return True
 
 
@@ -546,16 +513,15 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     milestones = ctx.tr(I18nText.Milestones)
 
     titles = [activity, materialCollection, recurringChallenges, pathOfGrowth, enemyTracing, milestones]
-    title_roi = bbox_guidebook_title(ctx)
+    roiex = RoiEx(ctx)
 
-    if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(titles, title_roi)):
+    if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(titles, roiex.guidebook_title)):
         logger.warning(f"Page not found: {ctx.tr(I18nText.Guidebook).raw}")
         return None
 
     def _click_icon(_icon, _keyword):
         icon_point = None
-        for i in range(2):
-            # logger.info(f"click icon index: {i}")
+        for _ in range(2):
             if icon_point := search_icon_guidebook(ctx, icon=_icon):
                 break
             ui.sleep(0.3)
@@ -564,13 +530,13 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
             return False
         # 点击侧边栏图标
         ui.click_point(icon_point, times=2, interval=0.3)
-        if not ui.sleep(0.2).wait().until(lambda: ui.snapshot().search(_keyword, title_roi)):
+        if not ui.sleep(0.2).wait().until(lambda: ui.snapshot().search(_keyword, roiex.guidebook_title)):
             return False
         return True
 
     # 根据任务的开启状态分发任务
     if local.materialCollectionFSM.is_active:
-        if not ui.search(materialCollection, title_roi) and not _click_icon(
+        if not ui.search(materialCollection, roiex.guidebook_title) and not _click_icon(
                 Icon.materialCollection(), materialCollection):
             return None
         ui.sleep(0.3)
@@ -587,10 +553,10 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     if local.activityFSM.is_active:
         # 活跃行迹
         tab_text = ctx.tr([I18nText.ActivityDaily, I18nText.ActivityWeekly])
-        if not ui.search(activity, title_roi) or not ui.search(tab_text):
+        if not ui.search(activity, roiex.guidebook_title) or not ui.search(tab_text):
             ui.click_point(activitySidebar, times=2, interval=0.3)
             if not ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(activity, title_roi) and ui.search(tab_text)):
+                    lambda: ui.snapshot().search(activity, roiex.guidebook_title) and ui.search(tab_text)):
                 return None
         ui.sleep(0.3)
         return I18nText.Activity
@@ -867,326 +833,262 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return True
 
     ui = UIOp(ctx)
+    roiex = RoiEx(ctx)
     ui.activate().sleep(0.1)
 
-    tacets = [
-        I18nText.WingfallChasm,
-        I18nText.SilentChasm,
-        I18nText.SplitChasm,
-        I18nText.ErodedChasm,
-        I18nText.AshenChasm,
-        I18nText.FallenSanctum,
-        I18nText.LessonInSunset,
-        I18nText.StrickenSanctum,
-        I18nText.LessonInVoid,
-        I18nText.LessonInEmbers,
-        I18nText.GardenOfSalvation,
-        I18nText.AbyssOfInitiation,
-        I18nText.GardenOfAdoration,
-        I18nText.AbyssOfSacrifice,
-        I18nText.AbyssOfConfession,
-        I18nText.FlamingRemnants,
-        I18nText.MistyForest,
-        I18nText.ErodedRuins,
-        I18nText.MoonlitGroves,
-        I18nText.MarigoldWoods,
-    ]
-    tacets_fsm = [
-        local.wingfallChasmFSM,
-        local.silentChasmFSM,
-        local.splitChasmFSM,
-        local.erodedChasmFSM,
-        local.ashenChasmFSM,
-        local.fallenSanctumFSM,
-        local.lessonInSunsetFSM,
-        local.strickenSanctumFSM,
-        local.lessonInVoidFSM,
-        local.lessonInEmbersFSM,
-        local.gardenOfSalvationFSM,
-        local.abyssOfInitiationFSM,
-        local.gardenOfAdorationFSM,
-        local.abyssOfSacrificeFSM,
-        local.abyssOfConfessionFSM,
-        local.flamingRemnantsFSM,
-        local.mistyForestFSM,
-        local.erodedRuinsFSM,
-        local.moonlitGrovesFSM,
-        local.marigoldWoodsFSM,
-    ]
-    weapons = [
-        I18nText.Sword,
-        I18nText.Rectifier,
-        I18nText.Broadblade,
-        I18nText.Gauntlets,
-        I18nText.Pistols,
-    ]
-
-    # 任务选中的副本
-    index, cur_fsm = next(((i, x) for i, x in enumerate(tacets_fsm) if x.is_active), (None, None))
-    cur_instance: str = tacets[index]
-    logger.info(f"{ctx.tr(cur_instance).raw}")
-    if not cur_fsm:
-        return False
-
-    # 任务状态检查
-    if cur_fsm.status.is_terminal:
-        return True
-    in_progress = cur_fsm.status == TaskStatus.IN_PROGRESS
-    if cur_fsm.status == TaskStatus.PENDING:
-        cur_fsm.start()
-
-    def _fail_return():
-        ui.esc().sleep(1)
-        if in_progress:
-            cur_fsm.fail()
-            return True
-        return False
-
-    # 点击凝素领域
-    def _wait_content():
-        if ui.snapshot().search(ctx.tr(weapons), bbox_guidebook_content(ctx)):
-            return True
-        ui.click_text(
-            ctx.tr(I18nText.ForgeryChallenge), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
-        return False
-
-    # 确认已进入凝素领域
-    if not ui.wait().until(_wait_content):
-        return _fail_return()
-
-    # 检查体力
-    cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
-    if cur_waveplate is None or waveplate_crystal is None:
-        return False
-    cost = 40
-    if cur_waveplate < cost:
-        cur_fsm.complete()
-        return True
-
-    # 今日剩余双倍奖励次数: 3/3
-    # 无实际作用，仅用于页面上设置双倍次数未用完时，发送桌面通知
-    result = ui.search(ctx.tr(I18nText.DoubleDropChancesToday))
-    if result and local.doubleDropForgeryChallengeFSM.status == TaskStatus.NOT_REQUIRED:
-        logger.warning("there are double drop chances today")
-    elif local.doubleDropForgeryChallengeFSM.is_active:
-        if local.doubleDropForgeryChallengeFSM.status == TaskStatus.PENDING:
-            local.doubleDropForgeryChallengeFSM.start()
-        if result:
-            remain, max_remain = match_remaining_attempts(result)
-            if remain is None or not max_remain:
-                local.doubleDropForgeryChallengeFSM.fail()
-            elif remain == 0:
-                local.doubleDropForgeryChallengeFSM.complete()
-        else:
-            local.doubleDropForgeryChallengeFSM.complete()
-
-    keywords = ctx.tr([*tacets, I18nText.Go, I18nText.Challenge])
-
-    # 滑动条最下方所在的位置
-    scroll_p1 = ctx.scaler.as_point(AnchorPoint(1245, 250, Align.Top | Align.Right))
-    # 滑动条移动后的位置
-    scroll_p2 = ctx.scaler.as_point(AnchorPoint(1245, 325, Align.Top | Align.Right))
-    # 滑动条移动滑到底的位置
-    scroll_p3 = ctx.scaler.as_point(AnchorPoint(1245, 628, Align.Top | Align.Right))
-
-    # 两个一组分组
-    card = None
-    next_point = scroll_p1
-    while True:
-        # 获取这页的副本
-        textboxes = ui.sleep(0.1).snapshot().search(keywords, bbox_guidebook_content(ctx))
-        if not textboxes:
-            return _fail_return()
-        textboxes.sort(key=lambda p: p.y1)
-        logger.debug(f"textboxes: {textboxes}")
-
-        # 找出指定副本
-        for textbox in textboxes:
-            if re.search(ctx.tr(tacets[index]), textbox.text, re.I):
-                card = [textbox, None, False]
-                continue
-            if card is not None and re.search(ctx.tr(I18nText.Challenge), textbox.text, re.I):
-                card[1] = textbox
-                break
-            elif card is not None and re.search(ctx.tr(I18nText.Go), textbox.text, re.I):
-                card[1] = textbox
-                card[2] = True
-                break
-
-        # 已找到
-        if card and all(i is not None for i in card):
+    # fsm的name = 副本id
+    for fsm in local.forgeryChallengeFSM.children:
+        # 检查当前副本状态
+        if fsm.status.is_terminal:
+            continue
+        if not fsm.start():
             break
-        card = None
-
-        # 点击下一页
-        next_point = Point(next_point.x, next_point.y + scroll_p2.y - scroll_p1.y)
-        if next_point.y >= scroll_p3.y:
+        dungeon = Dungeon.ForgeryChallenge.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
             break
-        logger.debug(f"next_point: {next_point}")
-        ui.sleep(0.2).click_point(next_point, times=2, interval=0.2).sleep(0.3)
+        dungeon_name = ctx.tr(dungeon.id)
+        cost = dungeon.waveplate or 40
 
-    logger.debug(f"card: {card}")
-    if not card or any(i is None for i in card):
-        logger.debug(f"result: {ui.bbox_result}")
-        return _fail_return()
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
+                return True
+            if fsm.count == 0:
+                fsm.fail()
+                return True
+            return False
 
-    tbox, challenge, unlock = card
+        try:
+            # 点击凝素领域
+            if not ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.ForgeryChallenge), roiex.guidebook_menu,
+                                                     pk=PointKind.RANDOM, times=2, interval=0.2)
+                            and ui.search(ctx.tr(I18nText.SortByWeaponType), roiex.guidebook_content)):
+                return _fail()
 
-    # 检查副本未解锁
-    if unlock:
-        logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-        cur_fsm.complete()
-        return True
+            # 检查体力
+            cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
+            if cur_waveplate is None or waveplate_crystal is None:
+                return _fail()
+            # 体力不足
+            if cur_waveplate < cost:
+                fsm.complete()
+                return True
 
-    # 点击直接挑战
-    for _ in range(2):
-        # 有时ui反应太慢，点快了ui没跳转，再试一次
-        ui.sleep(0.4).click_bbox(challenge, times=2, interval=0.2)
-        if ui.sleep(1).wait(3, 0.3).until(lambda: not ui.snapshot().search(ctx.tr(weapons))):
-            break
-
-    # 进入副本
-    if not ui.sleep(0.3).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.SoloChallenge), delay=0.35)):
-        return _fail_return()
-    if not ui.sleep(0.3).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=2, interval=0.3)):
-        return _fail_return()
-
-    quest_roi = ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(0, 0, Align.Left | Align.Top), AnchorPoint(400, 720, Align.Left | Align.Bottom)))
-
-    # 循环刷
-    max_challenge = 12
-    for i in range(max_challenge):
-        if i == max_challenge - 1:
-            return _fail_return()
-
-        # 确认已进入副本
-        if not ui.sleep(3 if i > 0 else 0.1).wait(25, 0.5).until(
-                lambda: ui.is_on_homepage() and ui.snapshot().search(ctx.tr(I18nText.StartChallenge), quest_roi)):
-            return _fail_return()
-
-        # 开始挑战
-        if not move_and_scan_dialogue(ctx, ctx.tr(I18nText.StartChallenge), 15):
-            return _fail_return()
-        ui.pick_up(2, 0.2).sleep(0.3)
-
-        # 打
-        combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-        combat_system.set_resonators(ctx.shared.team_members, is_print=False)
-        combat_system.is_async = True
-        combat_system.check_boss_hp = False
-        combat_system.auto_pickup = False
-
-        timeout = 10 * 60
-        no_text_count = 3
-        no_text_max = no_text_count
-        deadline = time.monotonic() + timeout
-        hp_roi = bbox_hp_bar(ctx).as_tuple()
-
-        while ui.is_set() or time.monotonic() < deadline:
-            if no_text_count < 0:
-                break
-            combat_system.start(3.5)
-            ui.sleep(1.5)
-            ui.snapshot()
-            img = ui.img
-            if ui.is_on_homepage():
-                # 挑战成功
-                if ui.search(ctx.tr(I18nText.ForgeryChallengeComplete)):
-                    break
-                # 限时击败敌人
-                if ui.search(ctx.tr(I18nText.DefeatTheEnemiesWithinTimeLimit)):
-                    logger.debug("战斗中")
-                    no_text_count = no_text_max
-                    continue
+            # 今日剩余双倍奖励次数: 3/3
+            # 无实际作用，仅用于页面上设置双倍次数未用完时，发送桌面通知
+            result = ui.search(ctx.tr(I18nText.DoubleDropChancesToday))
+            if result and local.doubleDropForgeryChallengeFSM.status == TaskStatus.NOT_REQUIRED:
+                logger.warning("there are double drop chances today")
+            elif local.doubleDropForgeryChallengeFSM.is_active:
+                if local.doubleDropForgeryChallengeFSM.status == TaskStatus.PENDING:
+                    local.doubleDropForgeryChallengeFSM.start()
+                if result:
+                    remain, max_remain = match_remaining_attempts(result)
+                    if remain is None or not max_remain:
+                        local.doubleDropForgeryChallengeFSM.fail()
+                    elif remain == 0:
+                        local.doubleDropForgeryChallengeFSM.complete()
                 else:
-                    logger.debug(f"Text not found: {ctx.tr(I18nText.DefeatTheEnemiesWithinTimeLimit).raw}")
-                # boxes = img_util.detect_hp_bar(img, hp_roi)
-                # if boxes:
-                #     logger.debug("有血条，还在战斗中")
-                #     no_text_count = no_text_max
-                #     if logger.isEnabledFor(logging.DEBUG):
-                #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
-                #         img_util.save_img_in_temp(img_draw)
-                #     continue
-                no_text_count -= 1
+                    local.doubleDropForgeryChallengeFSM.complete()
 
-            if page_key := GlobalPage(ctx).action(ui=ui):
-                if page_key == GlobalPage.InternetDisconnecting:
-                    combat_system.stop(join=True)
-                    return False
+            # 滑动寻找入口
+            is_start_challenge = False
+            slider_points = Slider.points(ui.grap())
+            for i, p in enumerate(slider_points):
+                if i > 0:
+                    logger.debug(f"Scroll point: {p}")
+                    ui.click_point(p, times=2, interval=0.2)
+                    ui.sleep(0.2).snapshot()
+                else:
+                    ui.snapshot()
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
+                    continue
+                if not (
+                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
 
-        combat_system.stop(join=True)
+                # 点击直接挑战
+                ui.sleep(0.2)
+                for _ in range(2):
+                    # 若ui太卡，点快了没跳转，再试一次
+                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
+                    if ui.sleep(1).wait(3).until(
+                            lambda: not ui.snapshot().search(ctx.tr(I18nText.ForgeryChallenge), roiex.guidebook_menu)):
+                        break
 
-        ui.sleep(0.6).snapshot()
-        # 检查复苏弹窗
-        if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
-            ui.esc().sleep(0.5)
-        elif ui.search(ctx.tr(I18nText.ForgeryClaim)):
-            logger.info("Challenge Complete")
-            logger.debug(f"Found text: {ctx.tr(I18nText.ForgeryClaim)}")
-            ui.sleep(0.3)
-        else:
-            combat_system.exit_special_state(Morph.Prefer)
-            ui.sleep(0.3)
-            logger.info("Challenge Complete")
+                # 点击单人挑战
+                if not ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot().search(ctx.tr(I18nText.EnableNavigation))
+                                or ui.search(ctx.tr(I18nText.Match))
+                                and ui.click_text(ctx.tr(I18nText.SoloChallenge), delay=0.4)):
+                    return _fail()
 
-            # 寻找领取奖励交互点
-            if not object_detection(ctx, search_reward=True, timeout=25):
-                ui.esc()
+                # 副本未解锁
+                if ui.search(ctx.tr(I18nText.EnableNavigation)):
+                    logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
+                    fsm.fail()
+                    return _fail()
+
+                is_start_challenge = True
+                break
+
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
+
+            # 点击开始挑战
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=2,
+                                                     interval=0.3)):
+                return _fail()
+
+            quest_roi = ctx.scaler.as_bbox(AnchorBBox(
+                AnchorPoint(0, 0, Align.Left | Align.Top), AnchorPoint(400, 720, Align.Left | Align.Bottom)))
+
+            # 循环刷
+            max_challenge = 12
+            for i in range(max_challenge):
+                if i == max_challenge - 1:
+                    return _fail()
+
+                # 确认已进入副本
+                if not ui.sleep(3 if i > 0 else 0.1).wait(25, 0.5).until(
+                        lambda: ui.is_on_homepage()
+                                and ui.snapshot().search(ctx.tr(I18nText.StartChallenge), quest_roi)):
+                    return _fail()
+
+                # 开始挑战
+                if not move_and_scan_dialogue(ctx, ctx.tr(I18nText.StartChallenge), 15):
+                    return _fail()
+                ui.pick_up(2, 0.2).sleep(0.3)
+
+                # 打
+                combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+                combat_system.set_resonators(local.members, is_print=False)
+                combat_system.is_async = True
+                combat_system.check_boss_hp = False
+                combat_system.auto_pickup = False
+
+                timeout = 10 * 60
+                no_text_count = 3
+                no_text_max = no_text_count
+                deadline = time.monotonic() + timeout
+
+                while ui.is_set() or time.monotonic() < deadline:
+                    if no_text_count < 0:
+                        break
+                    combat_system.start(3.5)
+                    ui.sleep(1.5)
+                    ui.snapshot()
+                    if ui.is_on_homepage():
+                        # 挑战成功
+                        if ui.search(ctx.tr(I18nText.ForgeryChallengeComplete)):
+                            break
+                        # 限时击败敌人
+                        if ui.search(ctx.tr(I18nText.DefeatTheEnemiesWithinTimeLimit)):
+                            logger.debug("战斗中")
+                            no_text_count = no_text_max
+                            continue
+                        else:
+                            logger.debug(f"Text not found: {ctx.tr(I18nText.DefeatTheEnemiesWithinTimeLimit).raw}")
+                        no_text_count -= 1
+
+                    if page_key := GlobalPage(ctx).action(ui=ui):
+                        if page_key == GlobalPage.InternetDisconnecting:
+                            combat_system.stop(join=True)
+                            return False
+
+                combat_system.stop(join=True)
+
+                ui.sleep(0.6).snapshot()
+                # 检查复苏弹窗
+                if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
+                    ui.esc().sleep(0.5)
+                elif ui.search(ctx.tr(I18nText.ForgeryClaim)):
+                    logger.info("Challenge Complete")
+                    logger.debug(f"Found text: {ctx.tr(I18nText.ForgeryClaim)}")
+                    ui.sleep(0.3)
+                else:
+                    combat_system.exit_special_state(Morph.Prefer)
+                    ui.sleep(0.3)
+                    logger.info("Challenge Complete")
+
+                    # 寻找领取奖励交互点
+                    if not object_detection(ctx, search_reward=True, timeout=25):
+                        ui.esc()
+                        if ui.sleep(0.3).wait().until(
+                                lambda: ui.snapshot().click_text(
+                                    ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                            continue
+                        return _fail()
+
+                    # 领取奖励
+                    if not ui.pick_up(2, 0.2).sleep(0.3).wait().until(
+                            lambda: ui.snapshot().search(ctx.tr(I18nText.ForgeryClaim))):
+                        return _fail()
+
+                # 获取体力值
+                cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
+
+                if cur_waveplate is None or waveplate_crystal is None:
+                    return _fail()
+                if cur_waveplate < cost:
+                    fsm.complete()
+                    return True
+                # 根据体力选择双倍单倍
+                if cur_waveplate >= cost * 2:
+                    claim = I18nText.ForgeryClaimX2
+                    cur_waveplate -= cost * 2
+                else:
+                    claim = I18nText.ForgeryClaim
+                    cur_waveplate -= cost
+                if not ui.click_text(ctx.tr(claim), delay=0.4):
+                    return _fail()
+
+                # 此处仅打印日志用，打印剩余次数
+                match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
+
+                # 根据体力选择重新挑战还是离开
                 if ui.sleep(0.3).wait().until(
-                        lambda: ui.snapshot().click_text(
-                            ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
-                    continue
-                return _fail_return()
-
-            # 领取奖励
-            if not ui.pick_up(2, 0.2).sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(ctx.tr(I18nText.ForgeryClaim))):
-                return _fail_return()
-
-        # 获取体力值
-        cost = 40
-        cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
-
-        if cur_waveplate is None or waveplate_crystal is None:
-            return _fail_return()
-        if cur_waveplate < cost:
-            cur_fsm.complete()
-            return True
-        # 根据体力选择双倍单倍
-        if cur_waveplate >= cost * 2:
-            claim = I18nText.ForgeryClaimX2
-            cur_waveplate -= cost * 2
-        else:
-            claim = I18nText.ForgeryClaim
-            cur_waveplate -= cost
-        if not ui.click_text(ctx.tr(claim), delay=0.4):
-            return _fail_return()
-
-        # 此处仅打印日志用，打印剩余次数
-        match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
-
-        # 根据体力选择重新挑战还是离开
-        if ui.sleep(0.3).wait().until(
-                lambda: ui.snapshot().search(ctx.tr([I18nText.ForgeryExit, I18nText.ForgeryRestart]))):
-            if cur_waveplate >= cost:
-                if ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3):
-                    continue
+                        lambda: ui.snapshot().search(ctx.tr([I18nText.ForgeryExit, I18nText.ForgeryRestart]))):
+                    if cur_waveplate >= cost:
+                        if ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3):
+                            continue
+                        else:
+                            return _fail()
+                    else:
+                        ui.click_text(ctx.tr(I18nText.ForgeryExit), delay=0.3, times=2, interval=0.3)
                 else:
-                    return _fail_return()
-            else:
-                ui.click_text(ctx.tr(I18nText.ForgeryExit), delay=0.3, times=2, interval=0.3)
-        else:
-            if cur_waveplate >= cost:
-                return _fail_return()
-        cur_fsm.complete()
-        return True
+                    if cur_waveplate >= cost:
+                        return _fail()
+                fsm.complete()
+                return True
 
-    if not cur_fsm.is_terminal:
-        cur_fsm.fail()
+            if not fsm.is_terminal:
+                fsm.fail()
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
+
+    # 未知异常兜底，标记失败
+    for fsm in local.forgeryChallengeFSM.children:
+        if fsm.status == TaskStatus.PENDING:
+            fsm.start()
+            fsm.fail()
+        elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
+            fsm.fail()
     return False
 
 
@@ -1206,304 +1108,271 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return True
 
     ui = UIOp(ctx)
-    tacets = [
-        I18nText.WesternFangPeaksTacetField,
-        I18nText.EasternXuanPeaksTacetField,
-        I18nText.TacetFieldSolisiaLanding,
-        I18nText.TacetFieldFrostlandsTransitPort,
-        I18nText.TacetFieldMountGjallar,
-        I18nText.TacetFieldMawburrowDesert,
-        I18nText.TacetFieldStagnantRun,
-    ]
-    tacets_fsm = [
-        local.westernFangPeaksTacetFieldFSM,
-        local.easternXuanPeaksTacetFieldFSM,
-        local.tacetFieldSolisiaLandingFSM,
-        local.tacetFieldFrostlandsTransitPortFSM,
-        local.tacetFieldMountGjallarFSM,
-        local.tacetFieldMawburrowDesertFSM,
-        local.tacetFieldStagnantRunFSM,
-    ]
+    roiex = RoiEx(ctx)
 
-    # 任务选中的副本
-    index, cur_fsm = next(((i, x) for i, x in enumerate(tacets_fsm) if x.is_active), (None, None))
-    cur_instance: str = tacets[index]
-    logger.info(f"{ctx.tr(cur_instance).raw}")
-    if not cur_fsm:
-        return False
+    # fsm的name = 副本id
+    for fsm in local.tacetSuppressionFSM.children:
+        # 检查当前副本状态
+        if fsm.status.is_terminal:
+            continue
+        if not fsm.start():
+            break
+        dungeon = Dungeon.TacetSuppression.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            break
+        dungeon_name = ctx.tr(dungeon.id)
+        cost = dungeon.waveplate or 60
 
-    # 任务状态检查
-    if cur_fsm.status.is_terminal:
-        return True
-    in_progress = cur_fsm.status == TaskStatus.IN_PROGRESS
-    if cur_fsm.status == TaskStatus.PENDING:
-        cur_fsm.start()
-
-    def _fail_return():
-        ui.esc().sleep(1)
-        if in_progress:
-            cur_fsm.fail()
-            return True
-        return False
-
-    try:
-        # 点击无音清剿
-        def _wait_content():
-            if ui.snapshot().search(ctx.tr(I18nText.EchoSet), bbox_guidebook_content(ctx)):
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
                 return True
-            ui.click_text(
-                ctx.tr(I18nText.TacetSuppression), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
+            if fsm.count == 0:
+                fsm.fail()
+                return True
             return False
 
-        # 确认已进入无音清剿
-        if not ui.wait().until(_wait_content):
-            return _fail_return()
+        try:
+            # 点击无音清剿
+            if not ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetSuppression), roiex.guidebook_menu,
+                                                     pk=PointKind.RANDOM, times=2, interval=0.2)
+                            and ui.search(ctx.tr(I18nText.EchoSet), roiex.guidebook_content)):
+                return _fail()
 
-        # 检查体力
-        cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
-        if cur_waveplate is None or waveplate_crystal is None:
-            return False
-        cost = 60
-        if cur_waveplate < cost:
-            cur_fsm.complete()
-            return True
+            # 检查体力
+            cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
+            if cur_waveplate is None or waveplate_crystal is None:
+                return _fail()
+            # 体力不足
+            if cur_waveplate < cost:
+                fsm.complete()
+                return True
 
-        # 今日剩余双倍奖励次数: 3/3
-        # 无实际作用，仅用于页面上设置双倍次数未用完时，发送桌面通知
-        result = ui.search(ctx.tr(I18nText.DoubleDropChancesToday))
-        if result and local.doubleDropTacetSuppressionFSM.status == TaskStatus.NOT_REQUIRED:
-            logger.warning("there are double drop chances today")
-        elif local.doubleDropTacetSuppressionFSM.is_active:
-            if local.doubleDropTacetSuppressionFSM.status == TaskStatus.PENDING:
-                local.doubleDropTacetSuppressionFSM.start()
-            if result:
-                remain, max_remain = match_remaining_attempts(result)
-                if remain is None or not max_remain:
-                    local.doubleDropTacetSuppressionFSM.fail()
-                elif remain == 0:
+            # 今日剩余双倍奖励次数: 3/3
+            # 无实际作用，仅用于页面上设置双倍次数未用完时，发送桌面通知
+            result = ui.search(ctx.tr(I18nText.DoubleDropChancesToday))
+            if result and local.doubleDropTacetSuppressionFSM.status == TaskStatus.NOT_REQUIRED:
+                logger.warning("there are double drop chances today")
+            elif local.doubleDropTacetSuppressionFSM.is_active:
+                if local.doubleDropTacetSuppressionFSM.status == TaskStatus.PENDING:
+                    local.doubleDropTacetSuppressionFSM.start()
+                if result:
+                    remain, max_remain = match_remaining_attempts(result)
+                    if remain is None or not max_remain:
+                        local.doubleDropTacetSuppressionFSM.fail()
+                    elif remain == 0:
+                        local.doubleDropTacetSuppressionFSM.complete()
+                else:
                     local.doubleDropTacetSuppressionFSM.complete()
-            else:
-                local.doubleDropTacetSuppressionFSM.complete()
 
-        keywords = ctx.tr([*tacets, I18nText.Go, I18nText.Challenge, I18nText.EchoSet])
-        # 获取无音区
-        textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
-        if not textboxes:
-            return _fail_return()
-        textboxes.sort(key=lambda p: p.y1)
-        logger.debug(f"textboxes: {textboxes}")
+            # 滑动寻找入口
+            is_start_challenge = False
+            slider_points = Slider.points(ui.grap())
+            for i, p in enumerate(slider_points):
+                if i > 0:
+                    logger.debug(f"Scroll point: {p}")
+                    ui.click_point(p, times=2, interval=0.2)
+                    ui.sleep(0.2).snapshot()
+                else:
+                    ui.snapshot()
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
+                    continue
+                if not (challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
 
-        # 分组
-        cards = {}
-        for i, textbox in enumerate(textboxes):
-            found_tacet = next((x for x in tacets if re.search(ctx.tr(x), textbox.text, re.I)), None)
-            if not found_tacet:
-                continue
-            cur_card = [textbox, None, False]
-            cards[found_tacet] = cur_card
-            if i + 1 >= len(textboxes):
-                continue
-            # 直接挑战表示可以打，前往表示没解锁不能打
-            if re.search(ctx.tr(I18nText.Challenge), textboxes[i + 1].text, re.I):
-                cur_card[1] = textboxes[i + 1]
-            elif re.search(ctx.tr(I18nText.Go), textboxes[i + 1].text, re.I):
-                cur_card[1] = textboxes[i + 1]
-                cur_card[2] = True
-        logger.debug(f"cards: {cards}")
+                # 点击直接挑战
+                ui.sleep(0.2)
+                for _ in range(2):
+                    # 若ui太卡，点快了没跳转，再试一次
+                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
+                    if ui.sleep(1).wait(3).until(
+                            lambda: not ui.snapshot().search(ctx.tr(I18nText.TacetSuppression), roiex.guidebook_menu)):
+                        break
 
-        # 取出与选择同名的组
-        cur_card = cards.get(cur_instance)
-        logger.debug(f"cur_card: {cur_card}")
-        if not cur_card or any(i is None for i in cur_card):
-            return _fail_return()
+                # 点击开始挑战
+                if not ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot().search(ctx.tr(I18nText.EnableNavigation))
+                                or ui.search(ctx.tr(I18nText.QuickSetup))
+                                and ui.click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=3, interval=0.3)):
+                    return _fail()
 
-        tbox, challenge, unlock = cur_card
+                # 副本未解锁
+                if ui.search(ctx.tr(I18nText.EnableNavigation)):
+                    logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
+                    fsm.fail()
+                    return _fail()
 
-        # 检查副本未解锁
-        if unlock:
-            logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-            cur_fsm.complete()
-            return True
-
-        # 点击直接挑战
-        ui.sleep(0.5).click_bbox(tbox)
-        for _ in range(2):
-            # 有时ui反应太慢，点快了ui没跳转，再试一次
-            ui.sleep(0.2).click_bbox(challenge, times=2, interval=0.2)
-            if ui.sleep(1).wait(3, 0.3).until(
-                    lambda: not ui.snapshot().search(ctx.tr(I18nText.TacetSuppression), bbox_guidebook_item(ctx))):
+                is_start_challenge = True
                 break
 
-        # 点击开启挑战
-        if not ui.sleep(0.3).wait().until(
-                lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=2, interval=0.3)):
-            return _fail_return()
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
 
-        # 循环刷
-        max_challenge = 9
-        for i in range(max_challenge):
-            if i == max_challenge - 1:
-                return _fail_return()
+            # 循环刷
+            max_challenge = 9
+            for i in range(max_challenge):
+                if i == max_challenge - 1:
+                    return _fail()
 
-            # 进入副本
-            if ui.sleep(0.5).wait_back_home():
-                ui.sleep(1.0)
-            else:
-                return _fail_return()
-
-            # 检查战斗文本
-            keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
-            if not ui.snapshot().search(keyword):
-                ui.esc()
-                if ui.sleep(0.3).wait().until(
-                        lambda: ui.snapshot().click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
-                    continue
-                return _fail_return()
-
-            # 直接打，打起来才会有文字提示
-            combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-            combat_system.set_resonators(ctx.shared.team_members, is_print=False)
-            combat_system.is_async = True
-            combat_system.check_boss_hp = False
-            combat_system.auto_pickup = False
-            combat_system.exit_special_state(Morph.Forced)
-
-            timeout = 10 * 60
-            no_text_count = 3
-            no_text_max = no_text_count
-            deadline = time.monotonic() + timeout
-            hp_roi = bbox_hp_bar(ctx).as_tuple()
-
-            while ui.is_set() or time.monotonic() < deadline:
-                if no_text_count < 0:
-                    break
-                combat_system.start(3.5)
-                ui.sleep(1.5)
-                ui.snapshot()
-                img = ui.img
-                if ui.is_on_homepage():
-                    # 挑战达成
-                    if ui.search(ctx.tr(I18nText.TacetFieldChallengeComplete)):
-                        break
-                    # 清理无音区中涌现的残象
-                    if ui.search(keyword):
-                        logger.debug("战斗中")
-                        no_text_count = no_text_max
-                        continue
-                    else:
-                        logger.debug(f"Text not found: {ctx.tr(I18nText.TacetField).raw}")
-                    # boxes = img_util.detect_hp_bar(img, hp_roi)
-                    # if boxes:
-                    #     logger.debug("有血条，还在战斗中")
-                    #     no_text_count = no_text_max
-                    #     if logger.isEnabledFor(logging.DEBUG):
-                    #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
-                    #         img_util.save_img_in_temp(img_draw)
-                    #     continue
-                    no_text_count -= 1
-
-                if page_key := GlobalPage(ctx).action(ui=ui):
-                    if page_key == GlobalPage.InternetDisconnecting:
-                        combat_system.stop(join=True)
-                        return False
-
-            combat_system.stop(join=True)
-
-            ui.sleep(0.6).snapshot()
-            # 检查复苏弹窗
-            if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
-                ui.esc().sleep(0.5)
-            elif ui.search(ctx.tr(I18nText.TacetFieldClaim)):
-                logger.info("Challenge Complete")
-                logger.debug(f"Found text: {ctx.tr(I18nText.TacetFieldClaim)}")
-                ui.sleep(0.3)
-            else:
-                combat_system.exit_special_state(Morph.Prefer)
-                ui.sleep(0.3)
-                logger.info("Challenge Complete")
-
-                # 寻找领取奖励交互点
-                if not object_detection(ctx, search_reward=True, timeout=25):
-                    ui.esc()
-                    if ui.sleep(0.3).wait().until(
-                            lambda: ui.snapshot().click_text(
-                                ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
-                        continue
-                    return _fail_return()
-
-                # 领取奖励
-                if not ui.pick_up(2, 0.2).sleep(0.3).wait().until(
-                        lambda: ui.snapshot().search(ctx.tr(I18nText.TacetFieldClaim))):
-                    return _fail_return()
-
-            # 获取体力值
-            cost = 60
-            cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
-
-            if cur_waveplate is None or waveplate_crystal is None:
-                return _fail_return()
-            if cur_waveplate < cost:
-                cur_fsm.complete()
-                return True
-            # 根据体力选择双倍单倍
-            if cur_waveplate >= cost * 2:
-                claim = I18nText.TacetFieldClaimX2
-                cur_waveplate -= cost * 2
-            else:
-                claim = I18nText.TacetFieldClaim
-                cur_waveplate -= cost
-            if not ui.click_text(ctx.tr(claim), delay=0.4):
-                return _fail_return()
-
-            # 此处仅打印日志用，打印剩余次数
-            match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
-
-            # # 点击确认弹窗
-            # if not ui.sleep(0.5).wait().until(
-            #         lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetFieldConfirm), delay=0.3)):
-            #     return _fail_return()
-
-            ui.sleep(1)
-            # 容错，判断是否有体力不足是否继续弹窗
-            if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
-                if ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.2):
-                    ui.sleep(0.1)
-                if ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2):
-                    ui.sleep(0.4)
-                    cur_fsm.complete()
-                    return True
-
-            # 根据体力选择重新挑战还是离开
-            if ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(ctx.tr([I18nText.TacetFieldExit, I18nText.TacetFieldRestart]))):
-                if cur_waveplate >= cost:
-                    if ui.click_text(ctx.tr(I18nText.TacetFieldRestart), delay=0.3, times=2, interval=0.3):
-                        continue
-                    else:
-                        return _fail_return()
+                # 进入副本
+                if ui.sleep(0.5).wait_back_home():
+                    ui.sleep(1.0)
                 else:
-                    ui.click_text(ctx.tr(I18nText.TacetFieldExit), delay=0.3, times=2, interval=0.3)
-            else:
-                if cur_waveplate >= cost:
-                    return _fail_return()
-            cur_fsm.complete()
-            return True
+                    return _fail()
 
-        if not cur_fsm.is_terminal:
-            cur_fsm.complete()
-            return True
-    except (KeyboardInterrupt, StopError) as e:
-        raise e
-    except Exception as e:
-        logger.exception(e)
+                # 检查战斗文本
+                keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
+                if not ui.snapshot().search(keyword):
+                    if ui.esc().sleep(0.3).wait().until(
+                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                        continue
+                    return _fail()
 
-    for fsm in tacets_fsm:
+                # 直接打，打起来才会有文字提示
+                combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+                combat_system.set_resonators(local.members, is_print=False)
+                combat_system.is_async = True
+                combat_system.check_boss_hp = False
+                combat_system.auto_pickup = False
+                combat_system.exit_special_state(Morph.Forced)
+
+                timeout = 10 * 60
+                no_text_count = 3
+                no_text_max = no_text_count
+                deadline = time.monotonic() + timeout
+
+                while ui.is_set() or time.monotonic() < deadline:
+                    if no_text_count < 0:
+                        break
+                    combat_system.start(3.5)
+                    ui.sleep(1.5)
+                    ui.snapshot()
+                    if ui.is_on_homepage():
+                        # 挑战达成
+                        if ui.search(ctx.tr(I18nText.TacetFieldChallengeComplete)):
+                            break
+                        # 清理无音区中涌现的残象
+                        if ui.search(keyword):
+                            logger.debug("战斗中")
+                            no_text_count = no_text_max
+                            continue
+                        else:
+                            logger.debug(f"Text not found: {ctx.tr(I18nText.TacetField).raw}")
+                        no_text_count -= 1
+
+                    if page_key := GlobalPage(ctx).action(ui=ui):
+                        if page_key == GlobalPage.InternetDisconnecting:
+                            combat_system.stop(join=True)
+                            return False
+
+                combat_system.stop(join=True)
+
+                ui.sleep(0.6).snapshot()
+                # 检查复苏弹窗
+                if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
+                    ui.esc().sleep(0.5)
+                elif ui.search(ctx.tr(I18nText.TacetFieldClaim)):
+                    logger.info("Challenge Complete")
+                    logger.debug(f"Found text: {ctx.tr(I18nText.TacetFieldClaim)}")
+                    ui.sleep(0.3)
+                else:
+                    combat_system.exit_special_state(Morph.Prefer)
+                    ui.sleep(0.3)
+                    logger.info("Challenge Complete")
+
+                    # 寻找领取奖励交互点
+                    if not object_detection(ctx, search_reward=True, timeout=25):
+                        ui.esc()
+                        if ui.sleep(0.3).wait().until(
+                                lambda: ui.snapshot().click_text(
+                                    ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                            continue
+                        return _fail()
+
+                    # 领取奖励
+                    if not ui.pick_up(2, 0.2).sleep(0.3).wait().until(
+                            lambda: ui.snapshot().search(ctx.tr(I18nText.TacetFieldClaim))):
+                        return _fail()
+
+                # 获取体力值
+                cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
+
+                if cur_waveplate is None or waveplate_crystal is None:
+                    return _fail()
+                if cur_waveplate < cost:
+                    fsm.complete()
+                    return True
+                # 根据体力选择双倍单倍
+                if cur_waveplate >= cost * 2:
+                    claim = I18nText.TacetFieldClaimX2
+                    cur_waveplate -= cost * 2
+                else:
+                    claim = I18nText.TacetFieldClaim
+                    cur_waveplate -= cost
+                if not ui.click_text(ctx.tr(claim), delay=0.4):
+                    return _fail()
+
+                # 此处仅打印日志用，打印剩余次数
+                match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
+
+                # # 点击确认弹窗
+                # if not ui.sleep(0.5).wait().until(
+                #         lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetFieldConfirm), delay=0.3)):
+                #     return _fail()
+
+                ui.sleep(1)
+                # 容错，判断是否有体力不足是否继续弹窗
+                if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
+                    if ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.2):
+                        ui.sleep(0.1)
+                    if ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2):
+                        ui.sleep(0.4)
+                        fsm.complete()
+                        return True
+
+                # 根据体力选择重新挑战还是离开
+                if ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot().search(ctx.tr([I18nText.TacetFieldExit, I18nText.TacetFieldRestart]))):
+                    if cur_waveplate >= cost:
+                        if ui.click_text(ctx.tr(I18nText.TacetFieldRestart), delay=0.3, times=2, interval=0.3):
+                            continue
+                        else:
+                            return _fail()
+                    else:
+                        ui.click_text(ctx.tr(I18nText.TacetFieldExit), delay=0.3, times=2, interval=0.3)
+                else:
+                    if cur_waveplate >= cost:
+                        return _fail()
+                fsm.complete()
+                return True
+
+            if not fsm.is_terminal:
+                fsm.complete()
+                return True
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
+
+    # 未知异常兜底，标记失败
+    for fsm in local.tacetSuppressionFSM.children:
         if fsm.status == TaskStatus.PENDING:
             fsm.start()
             fsm.fail()
         elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
             fsm.fail()
-
     return False
 
 
@@ -1513,303 +1382,266 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return True
 
     ui = UIOp(ctx)
-    tacets = [
-        I18nText.CourtOfShackledSouls,
-        I18nText.SeedOfIllusoryOrigin,
-        I18nText.GateOfTheLostStar,
-        I18nText.CinderniteApocalypse,
-        I18nText.TheWheelOfBrokenFate,
-        I18nText.BeyondTheCrimsonCurtain,
-        I18nText.TheFatedConfrontation,
-        I18nText.StatueOfTheCrownless,
-        I18nText.ChaoticJuncture,
-        I18nText.BellOfArchaicChants,
-    ]
-    tacets_fsm = [
-        local.courtOfShackledSoulsFSM,
-        local.seedOfIllusoryOriginFSM,
-        local.gateOfTheLostStarFSM,
-        local.cinderniteApocalypseFSM,
-        local.theWheelOfBrokenFateFSM,
-        local.beyondTheCrimsonCurtainFSM,
-        local.theFatedConfrontationFSM,
-        local.statueOfTheCrownlessFSM,
-        local.chaoticJunctureFSM,
-        local.bellOfArchaicChantsFSM,
-    ]
+    roiex = RoiEx(ctx)
 
-    # 任务选中的副本
-    index, cur_fsm = next(((i, x) for i, x in enumerate(tacets_fsm) if x.is_active), (None, None))
-    cur_instance: str = tacets[index]
-    logger.info(f"{ctx.tr(cur_instance).raw}")
-    if not cur_fsm:
-        return False
-
-    # 任务状态检查
-    if cur_fsm.status.is_terminal:
-        return True
-    in_progress = cur_fsm.status == TaskStatus.IN_PROGRESS
-    if cur_fsm.status == TaskStatus.PENDING:
-        cur_fsm.start()
-
-    def _fail_return():
-        # ui.esc().sleep(0.5)
-        if in_progress:
-            cur_fsm.fail()
-            return True
-        return False
-
-    # 点击战歌重奏
-    def _wait_content():
-        if ui.snapshot().search(ctx.tr(I18nText.WeeklyChallengeWeeklyChallenge), bbox_guidebook_content(ctx)):
-            return True
-        ui.click_text(
-            ctx.tr(I18nText.WeeklyChallenge), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2, interval=0.1)
-        return False
-
-    # 确认已进入战歌重奏
-    if not ui.wait().until(_wait_content):
-        return _fail_return()
-
-    # 检查体力
-    cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
-    if cur_waveplate is None or waveplate_crystal is None:
-        return False
-    cost = 60
-    if cur_waveplate < cost:
-        cur_fsm.complete()
-        return True
-
-    # 本周剩余可收取次数: 3/3
-    result = ui.sleep(0.2).wait().until(
-        lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
-    remain, max_remain = match_remaining_attempts(result)
-    if remain is None or not max_remain:
-        return _fail_return()
-    if remain == 0:
-        cur_fsm.complete()
-        return True
-
-    # 获取这页的副本
-    keywords = ctx.tr([*tacets, I18nText.Go, I18nText.Challenge])
-    textboxes = ui.search(keywords, bbox_guidebook_content(ctx))
-    if not textboxes:
-        return _fail_return()
-    textboxes.sort(key=lambda p: p.y1)
-    logger.debug(f"textboxes: {textboxes}")
-
-    # 分组
-    cards = {}
-    for i, textbox in enumerate(textboxes):
-        found_tacet = next((x for x in tacets if re.search(ctx.tr(x), textbox.text, re.I)), None)
-        logger.debug(f"found_tacet: {found_tacet}")
-        if not found_tacet:
+    # fsm的name = 副本id
+    for fsm in local.weeklyChallengeFSM.children:
+        # 检查当前副本状态
+        if fsm.status.is_terminal:
             continue
-        cur_card = [textbox, None, False]
-        cards[found_tacet] = cur_card
-        if i + 1 >= len(textboxes):
-            continue
-        # 直接挑战表示可以打，前往表示没解锁不能打
-        if re.search(ctx.tr(I18nText.Challenge), textboxes[i + 1].text, re.I):
-            cur_card[1] = textboxes[i + 1]
-        elif re.search(ctx.tr(I18nText.Go), textboxes[i + 1].text, re.I):
-            cur_card[1] = textboxes[i + 1]
-            cur_card[2] = True
-    logger.debug(f"cards: {cards}")
-
-    # 取出与选择同名的组
-    cur_card = cards.get(cur_instance)
-    logger.debug(f"cur_card: {cur_card}")
-    if not cur_card or any(i is None for i in cur_card):
-        return _fail_return()
-
-    tbox, challenge, unlock = cur_card
-
-    # 检查副本未解锁
-    if unlock:
-        logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-        cur_fsm.complete()
-        return True
-
-    # 点击直接挑战
-    ui.sleep(0.5).click_bbox(tbox)
-    for _ in range(2):
-        # 有时ui反应太慢，点快了ui没跳转，再试一次
-        ui.sleep(0.2).click_bbox(challenge, times=2, interval=0.2)
-        if ui.sleep(1).wait(3, 0.3).until(
-                lambda: not ui.snapshot().search(ctx.tr(I18nText.WeeklyChallenge), bbox_guidebook_item(ctx))):
+        if not fsm.start():
             break
+        dungeon = Dungeon.WeeklyChallenge.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            break
+        dungeon_name = ctx.tr(dungeon.id)
+        cost = dungeon.waveplate or 60
 
-    # 点击可能影响剧情体验弹窗，点击单人挑战
-    for i in range(2):
-        waiting = i == 0 and not ui.search(ctx.tr([I18nText.SoloChallenge, I18nText.ArrivingAtTheDestination]))
-        if waiting or i > 0:
-            if not ui.sleep(0.3).wait().until(
-                    lambda: ui.snapshot().search(ctx.tr([I18nText.SoloChallenge, I18nText.ArrivingAtTheDestination]))):
-                return _fail_return()
-        if ui.search(ctx.tr(I18nText.ArrivingAtTheDestination)):
-            if not ui.click_text(ctx.tr(I18nText.Confirm), delay=0.2, times=2, interval=0.2):
-                return _fail_return()
-            ui.sleep(0.2)
-            continue
-        if not ui.click_text(ctx.tr(I18nText.SoloChallenge), delay=0.35):
-            return _fail_return()
-        break
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
+                return True
+            if fsm.count == 0:
+                fsm.fail()
+                return True
+            return False
 
-    # 点击开启挑战
-    if not ui.sleep(0.3).wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.2, times=2, interval=0.3)):
-        return _fail_return()
+        try:
+            # 点击战歌重奏
+            if not ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyChallenge), roiex.guidebook_menu,
+                                                     pk=PointKind.RANDOM, times=2, interval=0.2)
+                            and ui.search(ctx.tr(I18nText.FilterToViewRewardsForEachPhase), roiex.guidebook_content)):
+                return _fail()
 
-    # 循环刷
-    max_challenge = 9
-    for i in range(max_challenge):
-        if i == max_challenge - 1:
-            return _fail_return()
+            # 检查体力
+            cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
+            if cur_waveplate is None or waveplate_crystal is None:
+                return False
+            if cur_waveplate < cost:
+                fsm.complete()
+                return True
 
-        # 确认已进入副本
-        if not ui.sleep(3 if i == 0 else 0.1).wait(15, 0.2).until(lambda: ui.is_on_homepage()):
-            return _fail_return()
-        logger.info("已进入副本")
-        if cur_instance == I18nText.SeedOfIllusoryOrigin:
-            for _ in range(3):
-                ctx.control_service.dash_dodge()
-                ui.sleep(0.2)
-            ctx.control_service.attack()
-            ui.sleep(0.6)
+            # 本周剩余可收取次数: 3/3
+            result = ui.sleep(0.2).wait().until(
+                lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
+            remain, max_remain = match_remaining_attempts(result)
+            if remain is None or not max_remain:
+                return _fail()
+            if remain == 0:
+                fsm.complete()
+                return True
 
-        combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-        combat_system.set_resonators(ctx.shared.team_members, is_print=False)
-        combat_system.is_async = True
-        combat_system.check_boss_hp = True
-        combat_system.auto_pickup = False
-        combat_system.exit_special_state(Morph.Forced)
-
-        # 打
-        timeout = 10 * 60
-        no_text_count = 3
-        no_text_max = no_text_count
-        deadline = time.monotonic() + timeout
-        hp_roi = bbox_hp_bar(ctx).as_tuple()
-
-        while ui.is_set() or time.monotonic() < deadline:
-            if no_text_count < 0:
-                break
-            combat_system.start(3.5)
-            ui.sleep(1.5)
-            ui.snapshot()
-            img = ui.img
-            if ui.is_on_homepage():
-                # 领取奖励
-                if ui.search(ctx.tr(I18nText.WeeklyClaimRewards)):
-                    logger.debug("Weekly Claim Rewards")
-                    break
-                # 击败敌人
-                if ui.search(ctx.tr(I18nText.WeeklyDefeatTheEnemy)):
-                    logger.debug("Fight fight!")
-                    no_text_count = no_text_max
-                    continue
+            # 滑动寻找入口
+            is_start_challenge = False
+            slider_points = Slider.points(ui.grap())
+            for i, p in enumerate(slider_points):
+                if i > 0:
+                    logger.debug(f"Scroll point: {p}")
+                    ui.click_point(p, times=2, interval=0.2)
+                    ui.sleep(0.2).snapshot()
                 else:
-                    logger.debug(f"Text not found: {ctx.tr(I18nText.WeeklyDefeatTheEnemy).raw}")
-                # boxes = img_util.detect_hp_bar(img, hp_roi)
-                # if boxes:
-                #     logger.debug("有血条，还在战斗中")
-                #     no_text_count = no_text_max
-                #     if logger.isEnabledFor(logging.DEBUG):
-                #         img_draw = img_util.draw_detect_hp_bar(img, boxes)
-                #         img_util.save_img_in_temp(img_draw)
-                #     continue
-                no_text_count -= 1
+                    ui.snapshot()
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
+                    continue
+                if not (
+                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
 
-            if page_key := GlobalPage(ctx).action(ui=ui):
-                if page_key == GlobalPage.InternetDisconnecting:
-                    combat_system.stop(join=True)
-                    return False
+                # 点击直接挑战
+                ui.sleep(0.2)
+                for _ in range(2):
+                    # 若ui太卡，点快了没跳转，再试一次
+                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
+                    if ui.sleep(1).wait(3).until(
+                            lambda: not ui.snapshot().search(ctx.tr(I18nText.WeeklyChallenge), roiex.guidebook_menu)):
+                        break
 
-        combat_system.stop(join=True)
+                # 点击单人挑战
+                if not ui.sleep(0.3).wait().until(
+                        lambda: ui.snapshot().search(ctx.tr(I18nText.EnableNavigation))
+                                or ui.click_text(ctx.tr(I18nText.SoloChallenge), delay=0.4)):
+                    return _fail()
 
-        notice_keywords = ctx.tr([I18nText.WeeklyConfirm, I18nText.WeeklyExit])
-        ui.sleep(0.5).snapshot()
+                # 副本未解锁
+                if ui.search(ctx.tr(I18nText.EnableNavigation)):
+                    logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
+                    fsm.fail()
+                    return _fail()
 
-        # 检查复苏弹窗
-        if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
-            ui.esc().sleep(0.5)
-        elif ui.search(notice_keywords):
-            logger.debug(f"Found text: {notice_keywords}")
-            logger.info("Challenge Complete")
-            ui.sleep(0.3)
-        else:
-            combat_system.exit_special_state(Morph.Prefer)
-            ui.sleep(0.3)
+                is_start_challenge = True
+                break
 
-            logger.info("Challenge Complete")
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
 
-            # 寻找领取奖励交互点
-            if not object_detection(ctx, search_reward=True, timeout=40):
-                if ui.esc().sleep(0.5).wait().until(
-                        lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
-                    if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
+            # 点击开始挑战
+            if not ui.sleep(0.3).wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=2,
+                                                     interval=0.3)):
+                return _fail()
+
+            # 循环刷
+            max_challenge = 9
+            for i in range(max_challenge):
+                if i == max_challenge - 1:
+                    return _fail()
+
+                # 确认已进入副本
+                if not ui.sleep(3 if i == 0 else 0.1).wait(15, 0.2).until(lambda: ui.is_on_homepage()):
+                    return _fail()
+                logger.info("已进入副本")
+                if dungeon.id == I18nText.SeedOfIllusoryOrigin:
+                    for _ in range(3):
+                        ctx.control_service.dash_dodge()
+                        ui.sleep(0.2)
+                    ctx.control_service.attack()
+                    ui.sleep(0.6)
+
+                combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+                combat_system.set_resonators(local.members, is_print=False)
+                combat_system.is_async = True
+                combat_system.check_boss_hp = True
+                combat_system.auto_pickup = False
+                combat_system.exit_special_state(Morph.Forced)
+
+                # 打
+                timeout = 10 * 60
+                no_text_count = 3
+                no_text_max = no_text_count
+                deadline = time.monotonic() + timeout
+
+                while ui.is_set() or time.monotonic() < deadline:
+                    if no_text_count < 0:
+                        break
+                    combat_system.start(3.5)
+                    ui.sleep(1.5)
+                    ui.snapshot()
+                    if ui.is_on_homepage():
+                        # 领取奖励
+                        if ui.search(ctx.tr(I18nText.WeeklyClaimRewards)):
+                            logger.debug("Weekly Claim Rewards")
+                            break
+                        # 击败敌人
+                        if ui.search(ctx.tr(I18nText.WeeklyDefeatTheEnemy)):
+                            logger.debug("Fight fight!")
+                            no_text_count = no_text_max
+                            continue
+                        else:
+                            logger.debug(f"Text not found: {ctx.tr(I18nText.WeeklyDefeatTheEnemy).raw}")
+                        no_text_count -= 1
+
+                    if page_key := GlobalPage(ctx).action(ui=ui):
+                        if page_key == GlobalPage.InternetDisconnecting:
+                            combat_system.stop(join=True)
+                            return False
+
+                combat_system.stop(join=True)
+
+                notice_keywords = ctx.tr([I18nText.WeeklyConfirm, I18nText.WeeklyExit])
+                ui.sleep(0.5).snapshot()
+
+                # 检查复苏弹窗
+                if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
+                    ui.esc().sleep(0.5)
+                elif ui.search(notice_keywords):
+                    logger.debug(f"Found text: {notice_keywords}")
+                    logger.info("Challenge Complete")
+                    ui.sleep(0.3)
+                else:
+                    combat_system.exit_special_state(Morph.Prefer)
+                    ui.sleep(0.3)
+
+                    logger.info("Challenge Complete")
+
+                    # 寻找领取奖励交互点
+                    if not object_detection(ctx, search_reward=True, timeout=40):
+                        if ui.esc().sleep(0.5).wait().until(
+                                lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                            if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
+                                continue
+                            ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
+                        return _fail()
+
+                    # 领取奖励
+                    if not ui.pick_up(2, 0.2).sleep(0.5).wait().until(
+                            lambda: ui.snapshot().search(notice_keywords)):
+                        return _fail()
+
+                # 此处仅打印日志用，打印剩余次数
+                match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
+
+                # 检查是否达到次数上限
+                if ui.search(ctx.tr(I18nText.YouHaveReachedTheChallengeLimit)):
+                    logger.info(f"{ctx.tr(I18nText.YouHaveReachedTheChallengeLimit).raw}")
+                    fsm.complete()
+                    if ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4):
+                        if ui.sleep(2).wait_back_home():
+                            ui.sleep(0.5)
+                        else:
+                            return _fail()
+                    else:
+                        logger.warning(f"Text not found: {ctx.tr(I18nText.WeeklyExit).raw}")
+                    return True
+
+                cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
+
+                if cur_waveplate is None or waveplate_crystal is None:
+                    return _fail()
+                if cur_waveplate < cost:
+                    fsm.complete()
+                    return True
+
+                cur_waveplate -= cost
+                if not ui.click_text(ctx.tr(I18nText.WeeklyConfirm), delay=0.3):
+                    return _fail()
+
+                ui.sleep(1)
+                # 容错，判断是否有体力不足是否继续弹窗
+                if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
+                    ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
+                    ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
+                    fsm.complete()
+                    return True
+
+                if cur_waveplate >= cost:
+                    if ui.wait().until(
+                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
                         continue
-                    ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
-                return _fail_return()
+                    return _fail()
 
-            # 领取奖励
-            if not ui.pick_up(2, 0.2).sleep(0.5).wait().until(
-                    lambda: ui.snapshot().search(notice_keywords)):
-                return _fail_return()
-
-        # 此处仅打印日志用，打印剩余次数
-        match_remaining_attempts(ui.search(ctx.tr(I18nText.DoubleDropChancesToday)))
-
-        # 检查是否达到次数上限
-        if ui.search(ctx.tr(I18nText.YouHaveReachedTheChallengeLimit)):
-            logger.info(f"{ctx.tr(I18nText.YouHaveReachedTheChallengeLimit).raw}")
-            cur_fsm.complete()
-            if ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4):
+                ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2))
+                fsm.complete()
                 if ui.sleep(2).wait_back_home():
                     ui.sleep(0.5)
-                else:
-                    return _fail_return()
-            else:
-                logger.warning(f"Text not found: {ctx.tr(I18nText.WeeklyExit).raw}")
-            return True
+                return True
 
-        cost = 60
-        cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
+            if not fsm.is_terminal:
+                fsm.fail()
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
 
-        if cur_waveplate is None or waveplate_crystal is None:
-            return _fail_return()
-        if cur_waveplate < cost:
-            cur_fsm.complete()
-            return True
-
-        cur_waveplate -= cost
-        if not ui.click_text(ctx.tr(I18nText.WeeklyConfirm), delay=0.3):
-            return _fail_return()
-
-        ui.sleep(1)
-        # 容错，判断是否有体力不足是否继续弹窗
-        if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
-            ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
-            ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
-            cur_fsm.complete()
-            return True
-
-        if cur_waveplate >= cost:
-            if ui.wait().until(
-                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
-                continue
-            return _fail_return()
-
-        ui.wait().until(
-            lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2))
-        cur_fsm.complete()
-        if ui.sleep(2).wait_back_home():
-            ui.sleep(0.5)
-        return True
-
-    if not cur_fsm.is_terminal:
-        cur_fsm.fail()
+    # 未知异常兜底，标记失败
+    for fsm in local.weeklyChallengeFSM.children:
+        if fsm.status == TaskStatus.PENDING:
+            fsm.start()
+            fsm.fail()
+        elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
+            fsm.fail()
     return False
 
 
@@ -1970,7 +1802,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
             # 前往战斗区域
             combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-            combat_system.set_resonators(ctx.shared.team_members, is_print=False)
+            combat_system.set_resonators(local.members, is_print=False)
             combat_system.exit_special_state(Morph.Forced)
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
@@ -2071,7 +1903,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 # 没刷就打
                 if is_combat:
                     combat_system = CombatSystem(ctx.control_service, ctx.img_service)
-                    combat_system.set_resonators(ctx.shared.team_members, is_print=False)
+                    combat_system.set_resonators(local.members, is_print=False)
                     combat_system.is_async = True
                     combat_system.check_boss_hp = False
                     combat_system.auto_pickup = False
@@ -2410,6 +2242,18 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.tacetFieldMountGjallarFSM.set_enabled(cfg.tacetFieldMountGjallar)
         self.local.tacetFieldMawburrowDesertFSM.set_enabled(cfg.tacetFieldMawburrowDesert)
         self.local.tacetFieldStagnantRunFSM.set_enabled(cfg.tacetFieldStagnantRun)
+        self.local.tacetFieldMournfellCanyonFSM.set_enabled(cfg.tacetFieldMournfellCanyon)
+        self.local.tacetFieldBeohrWatersFSM.set_enabled(cfg.tacetFieldBeohrWaters)
+        self.local.tacetFieldRiccioliIslandsFSM.set_enabled(cfg.tacetFieldRiccioliIslands)
+        self.local.tacetFieldFagaceaePeninsulaFSM.set_enabled(cfg.tacetFieldFagaceaePeninsula)
+        self.local.tacetFieldPenitentsEndFSM.set_enabled(cfg.tacetFieldPenitentsEnd)
+        self.local.tacetFieldCentralPlainsFSM.set_enabled(cfg.tacetFieldCentralPlains)
+        self.local.tacetFieldDesorockHighlandIFSM.set_enabled(cfg.tacetFieldDesorockHighlandI)
+        self.local.tacetFieldTigersMawFSM.set_enabled(cfg.tacetFieldTigersMaw)
+        self.local.tacetFieldWhiningAixsMireFSM.set_enabled(cfg.tacetFieldWhiningAixsMire)
+        self.local.tacetFieldPortCityOfGuixuFSM.set_enabled(cfg.tacetFieldPortCityOfGuixu)
+        self.local.tacetFieldDesorockHighlandIIFSM.set_enabled(cfg.tacetFieldDesorockHighlandII)
+        self.local.tacetFieldDimForestFSM.set_enabled(cfg.tacetFieldDimForest)
 
         ### ------- Guidebook MaterialCollection WeeklyChallenge -------
         self.local.courtOfShackledSoulsFSM.set_enabled(cfg.courtOfShackledSouls)

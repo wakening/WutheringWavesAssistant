@@ -129,8 +129,6 @@ class TaskSpec:
     param_config_snapshot: Optional[str] = None
     param_config: Optional[ParamConfig] = None
     user_config: dict = field(default_factory=dict)
-    # 是否开启自动跳过
-    skip_is_open: Optional[bool] = None
     # ocr是否使用gpu
     ocr_use_gpu: Optional[bool] = None
 

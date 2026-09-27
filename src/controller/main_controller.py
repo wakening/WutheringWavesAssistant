@@ -244,7 +244,7 @@ class TaskMonitor:
         try:
             if crash_hwnd := hwnd_util.get_ue4_client_crash_hwnd():
                 is_alive = False
-                logger.warning("监测到UE4-Client Game已崩溃，关闭弹窗")
+                logger.warning(f"The UE4-Client Game has crashed and will close")
                 hwnd_util.force_close_process(crash_hwnd)
             elif hwnd_util.get_hwnd(self.game_path, force=True):
                 is_alive = True
@@ -362,16 +362,11 @@ class MainController:
     def __init__(self):
         logger.debug("Initializing %s", self.__class__.__name__)
 
-        from src.core.tasks import MouseResetProcessTask, AutoBossProcessTask, AutoPickupProcessTask, \
-            AutoStoryProcessTask, ProcessTask, SoarToTheBeatMacroReplayTask, \
+        from src.core.tasks import AutoBossProcessTask, SoarToTheBeatMacroReplayTask, \
             SoarToTheBeatMacroRecordTask, DailyTask, ExploreTask
 
         self.tasks = {
-            "MouseResetProcessTask": MouseResetProcessTask,
             "AutoBossProcessTask": AutoBossProcessTask,
-            "AutoPickupProcessTask": AutoPickupProcessTask,
-            "AutoStorySkipProcessTask": AutoStoryProcessTask,
-            "AutoStoryEnjoyProcessTask": AutoStoryProcessTask,
             "EchoMergeProcessTask": EchoMergeProcessTask,
             "SoarToTheBeatMacroReplayTask": SoarToTheBeatMacroReplayTask,
             "SoarToTheBeatMacroRecordTask": SoarToTheBeatMacroRecordTask,
@@ -423,7 +418,6 @@ class MainController:
         spec = TaskSpec()
         ipc = IPCManager()
 
-        # if task_name in ["SoarToTheBeatMacroReplayTask", "SoarToTheBeatMacroRecordTask"]:
         if task_name in []:
             ipc.log_queue = None
             ipc.event_queue = queue.Queue(maxsize=200)
@@ -455,11 +449,6 @@ class MainController:
         spec.param_config = ParamConfig.build(content=spec.param_config_snapshot)
         spec.param_config.gamePath = spec.game_path  # 旧版
         spec.user_config = Config.load_user_config().to_dict()
-        if task_name == "AutoStorySkipProcessTask":
-            spec.skip_is_open = True
-        elif task_name == "AutoStoryEnjoyProcessTask":
-            spec.skip_is_open = False
-        # if task_name in ["AutoBossProcessTask", "AutoPickupProcessTask"]:
         if task_name in ["AutoBossProcessTask", "EchoMergeProcessTask", "DailyTask"]:
             spec.ocr_use_gpu = True
         else:

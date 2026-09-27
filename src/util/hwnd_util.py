@@ -37,7 +37,7 @@ BILIBILI_LOGIN_HWND_CLASS_NAME = "CLoginDlg_P_8340_\\d{10}"  # CLoginDlg_P_8340_
 BILIBILI_LOGIN_HWND_TITLE = "bilibili游戏 登录_弹框"
 # UE4-Client崩溃窗口
 UE4_CLIENT_HWND_CLASS_NAME = "#32770"
-UE4_CLIENT_HWND_TITLE = "UE4-Client Game已崩溃，即将关闭"
+UE4_CLIENT_HWND_TITLES = ["UE4-Client Game已崩溃，即将关闭", "The UE4-Client Game has crashed and will close"]
 
 # dpi
 STANDARD_DPI = 96  # 96 是标准 DPI
@@ -236,7 +236,7 @@ def get_ue4_client_crash_hwnd():
     windows_list: list = get_all_hwnd()
     for hwnd in windows_list:
         title = win32gui.GetWindowText(hwnd)
-        if title is not None and title == UE4_CLIENT_HWND_TITLE:
+        if title and title in UE4_CLIENT_HWND_TITLES:
             return hwnd
     return None
 
@@ -245,13 +245,21 @@ def get_ue4_client_crash_hwnd():
 # noinspection PyUnresolvedReferences
 def force_close_process(hwnd):
     # 卡死时发送窗口消息无效
-    # win32gui.SendMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+    # win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
     # 根据窗口句柄获取进程ID
     _, pid = win32process.GetWindowThreadProcessId(hwnd)
-    # 获取进程句柄
-    handle = win32api.OpenProcess(win32con.PROCESS_TERMINATE, 0, pid)
-    win32api.TerminateProcess(handle, -1)
-    win32api.CloseHandle(handle)
+    # 打开进程，拿到句柄
+    handle = win32api.OpenProcess(
+        win32con.PROCESS_TERMINATE | win32con.SYNCHRONIZE,
+        False,
+        pid
+    )
+    try:
+        win32api.TerminateProcess(handle, -1)
+        # 等待进程真正结束，最多等 5 秒
+        win32event.WaitForSingleObject(handle, 5000)
+    finally:
+        win32api.CloseHandle(handle)  # 无论成功失败都关闭
 
 
 def window_activate(hwnd):
@@ -275,15 +283,6 @@ def enable_dpi_awareness():
         logger.exception("Failed to enable DPI awareness")
 
 
-# 窗口的大小和位置在不同的缩放设置下可能会分为“实际大小”和“逻辑大小”：
-#
-# 实际大小（Physical Size）：
-# 实际大小是根据显示器的物理像素来度量的尺寸。它考虑了系统的 DPI 设置（例如 100%, 150%, 200% 等）。在缩放较高的情况下，实际大小会相应变大，以适应更高的像素密度。
-# 逻辑大小（Logical Size）：
-#
-# 逻辑大小是应用程序内部使用的坐标系统，通常不受 DPI 缩放影响。它是按照设计时的标准像素（通常是 96 DPI）来计算的，不考虑显示器的缩放因子。
-# 在高 DPI 设置下，应用程序会将逻辑像素映射到实际的物理像素上。因此，逻辑像素看起来会更小，实际物理像素则会更大。
-# 获取窗口物理矩形
 def get_window_rect(hwnd) -> tuple[int, int, int, int]:
     """获取特定窗口的绝对坐标，左上右下，（包括标题栏、边框等非客户区"""
     return win32gui.GetWindowRect(hwnd)

@@ -233,13 +233,13 @@ class AbstractOcrService(OCRService, ABC):
         elif "DmlExecutionProvider" in ort_providers:
             is_dml = True
 
-        # 没有GPU环境无法使用
+        # 没有GPU环境，降级
         if is_cuda is None and is_dml is None:
             logger.warning("OCR expected GPU, falling back to CPU ⚠️")
             return Device.CPU
 
         if is_cuda:
-            logger.info("OCR using GPU ✅")
+            logger.info("OCR using CUDA ✅")
             return Device.CUDA
         elif is_dml:
             logger.info("OCR using DML ✅")

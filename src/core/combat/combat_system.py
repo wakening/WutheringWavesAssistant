@@ -323,6 +323,8 @@ class CombatSystem:
             for i, cur_member_number in enumerate(toggle_list):
                 # logger.debug(f"cur_member_number: {cur_member_number}")
                 resonator = self.resonators[cur_member_number - 1]
+                if not resonator:
+                    break
                 if i > 0:
                     img = self.img_service.screenshot()
                     if resonator.is_avatar_grey(img, cur_member_number):

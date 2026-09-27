@@ -24,6 +24,12 @@ logger = logging.getLogger(__name__)
 
 # ==================== 枚举定义 ====================
 
+
+class AscensionMaterial(Enum):
+
+    pass
+
+
 class Element(Enum):
     """元素属性"""
     GLACIO = "冷凝"
@@ -680,7 +686,7 @@ class Resonator(Enum):
 
 
     @staticmethod
-    def i18n_keys():
+    def i18n_keys() -> list[str]:
         return [
             I18nText.Encore,
             I18nText.Verina,

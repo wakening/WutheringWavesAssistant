@@ -13,10 +13,10 @@ from src.core.color import ColorRule, Color, RuleMode
 from src.core.combat.combat_system import CombatSystem
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, Scaler
-from src.core.i18n import I18nText, Language
+from src.core.i18n import I18nText
 from src.core.pages import UIOp
-from src.core.resonator import TeamMember, Resonator
-from src.core.resource import Resource, Icon
+from src.core.resonator import TeamMember
+from src.core.resource import Icon
 from src.core.workflow import NodeContext, AbstractWorkflow
 from src.service.common_workflow import RateLimiter
 from src.util import img_util, img_template_util
@@ -25,53 +25,150 @@ from src.util.img_sift_util import SIFTFeatureMatcher
 logger = logging.getLogger(__name__)
 
 
+# ---------- 修饰键掩码 ----------
+MOD_CTRL  = 1 << 0
+MOD_SHIFT = 1 << 1
+MOD_ALT   = 1 << 2
+MOD_WIN   = 1 << 3
+
+MOD_DEFS = {
+    "ctrl":  (MOD_CTRL,  [win32con.VK_LCONTROL, win32con.VK_RCONTROL]),
+    "shift": (MOD_SHIFT, [win32con.VK_LSHIFT,   win32con.VK_RSHIFT]),
+    "alt":   (MOD_ALT,   [win32con.VK_LMENU,    win32con.VK_RMENU]),
+    "win":   (MOD_WIN,   [win32con.VK_LWIN,     win32con.VK_RWIN]),
+}
+
+
 class KeyListener:
     def __init__(self, *, event, interval=0.001):
-        """
-        interval: 轮询间隔(秒)，建议 0.001~0.005
-        """
         self.interval = interval
         self.event = event
         self._running = False
         self._thread = None
 
-        self._callbacks = {}
-        self._last_state = {}
+        # 单键回调（用户通过 register 注册）
+        self._user_callbacks = {}      # vk -> callback(vk, is_down)
+        # 组合键主键回调（内部用，与用户回调分离，互不覆盖）
+        self._combo_keys = set()       # 已被组合键占用的主键 vk 集合
 
+        self._last_state = {}          # vk -> bool
+
+        self._combos = {}              # (mod_mask, main_vk) -> callback
+        self._combo_fired_vks = set()  # 当前已触发的主键 vk，防重复
+        self._mod_mask = 0
+        self._mod_keys = {}            # vk -> mod 位
+
+        self._lock = threading.Lock()
+
+    # ---------------- 单键注册 ----------------
     def register(self, vk, callback):
-        """
-        callback(vk, is_down)
-        """
-        self._callbacks[vk] = callback
-        self._last_state[vk] = False
+        with self._lock:
+            self._user_callbacks[vk] = callback
+            self._last_state.setdefault(vk, False)
 
+    # ---------------- 修饰键 ----------------
+    def _register_modifier(self, vk, mod_bit):
+        with self._lock:
+            self._mod_keys[vk] = mod_bit
+            self._last_state.setdefault(vk, False)
+
+    def _on_modifier(self, vk, down):
+        bit = self._mod_keys[vk]
+        if down:
+            self._mod_mask |= bit
+        else:
+            self._mod_mask &= ~bit
+
+    def _register_mods_by_name(self, mods):
+        mask = 0
+        for m in mods:
+            m = m.lower()
+            if m not in MOD_DEFS:
+                raise ValueError(f"不支持的修饰键: {m}")
+            bit, vk_list = MOD_DEFS[m]
+            mask |= bit
+            for vk in vk_list:
+                self._register_modifier(vk, bit)
+        return mask
+
+    # ---------------- 组合键注册 ----------------
+    def register_combo(self, mods, main_vk, callback):
+        mod_mask = self._register_mods_by_name(mods)
+        with self._lock:
+            self._combos[(mod_mask, main_vk)] = callback
+            self._combo_keys.add(main_vk)
+            self._last_state.setdefault(main_vk, False)
+
+    # ---------------- 统一分发（主循环调用） ----------------
+    def _dispatch(self, vk, down):
+        # 1) 修饰键
+        if vk in self._mod_keys:
+            self._on_modifier(vk, down)
+            return
+
+        # 2) 组合键主键
+        if vk in self._combo_keys:
+            if down:
+                with self._lock:
+                    cb = self._combos.get((self._mod_mask, vk))
+                    if cb is not None and vk not in self._combo_fired_vks:
+                        self._combo_fired_vks.add(vk)
+                    else:
+                        cb = None
+                if cb is not None:
+                    try:
+                        cb()
+                    except Exception as e:
+                        print(f"[combo callback error] {e}")
+            else:
+                with self._lock:
+                    self._combo_fired_vks.discard(vk)
+
+        # 3) 用户单键回调
+        with self._lock:
+            user_cb = self._user_callbacks.get(vk)
+        if user_cb is not None:
+            try:
+                user_cb(vk, down)
+            except Exception as e:
+                print(f"[user callback error] vk={vk:#x}: {e}")
+
+    # ---------------- 生命周期 ----------------
     def start(self):
         if self._running:
             return
-
         self._running = True
+        with self._lock:
+            self._last_state = {vk: False for vk in self._last_state}
+            self._mod_mask = 0
+            self._combo_fired_vks.clear()
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
 
     def stop(self):
         self._running = False
         if self._thread:
-            self._thread.join()
+            self._thread.join(timeout=1.0)
 
     def join(self, timeout=None):
         if self._thread:
             self._thread.join(timeout)
 
+    # ---------------- 主循环 ----------------
     def _loop(self):
         while self._running and self.event.is_set():
-            for vk, callback in self._callbacks.items():
+            # 收集所有需要轮询的 vk（用户单键 + 修饰键 + 组合键主键）
+            with self._lock:
+                vks = set(self._user_callbacks) | set(self._mod_keys) | self._combo_keys
+                states = dict(self._last_state)
+
+            for vk in vks:
                 down = bool(ctypes.windll.user32.GetAsyncKeyState(vk) & 0x8000)
-
-                last = self._last_state[vk]
-
+                last = states.get(vk, False)
                 if down != last:
-                    self._last_state[vk] = down
-                    callback(vk, down)
+                    with self._lock:
+                        self._last_state[vk] = down
+                    self._dispatch(vk, down)
 
             time.sleep(self.interval)
 
@@ -232,8 +329,15 @@ class ExploreWorkflow(AbstractWorkflow):
         listener = None
         if cfg.autoCombat:
             listener = KeyListener(event=self.ctx.runtime.stop_event, interval=0.005)
-            listener.register(win32con.VK_XBUTTON1, self._on_click)
+            listener.register(win32con.VK_XBUTTON1, lambda vk, pressed: self._on_click(vk, pressed, "XButton1"))
+            listener.register(win32con.VK_XBUTTON2, lambda vk, pressed: self._on_click(vk, pressed, "XButton2"))
+            listener.register(ord("5"), lambda vk, pressed: self._on_click(vk, pressed, "5"))
+            listener.register(0xC0, lambda vk, pressed: self._on_click(vk, pressed, "`~"))
             listener.register(win32con.VK_ESCAPE, self._on_press)
+
+            # listener.register_combo(["ctrl"], ord("C"), self._on_click_ctrl_c)
+            # listener.register_combo(["ctrl"], ord("V"), self._on_click_ctrl_v)
+
             listener.start()
 
         ui = UIOp(self.ctx)
@@ -573,19 +677,22 @@ class ExploreWorkflow(AbstractWorkflow):
             return None
         return bbox.random
 
-    def _on_click(self, button, pressed):
+    # def _on_click_ctrl_c(self):
+    #     return self._on_click_hotkey("Ctrl+C")
+
+    def _on_click(self, button, pressed, key_name):
         if not pressed:  # 忽略弹起信号
             return True
         try:
-            # logger.info(f"[{self.count:03d}] XButton1 在位置 ({x}, {y}) 被按下")
+            # logger.debug(f"[{self.count:03d}] '{key_name}' 被按下")
             with self.combat_lock:
+                if not self.ctx.window_service.is_foreground_window():
+                    logger.info(f"[{self.count:03d}] Not in foreground")
+                    return True
+
                 # 没启动就启动，已启动就停止
                 if self.combat_system is None:
-                    if not self.ctx.window_service.is_foreground_window():
-                        logger.info(f"[{self.count:03d}] Not in foreground")
-                        return True
-
-                    logger.info(f"[{self.count:03d}] XButton1 start")
+                    logger.info(f"[{self.count:03d}] '{key_name}' start")
                     self.last_time = time.monotonic()
 
                     # 等待资源加载
@@ -623,7 +730,7 @@ class ExploreWorkflow(AbstractWorkflow):
                     if time.monotonic() - self.last_time < self.click_cooldown:
                         logger.info(f"[{self.count:03d}] Click Cooldown")
                         return True
-                    logger.info(f"[{self.count:03d}] XButton1 stop")
+                    logger.info(f"[{self.count:03d}] '{key_name}' stop")
                     self.count += 1
                     combat_system = self.combat_system
                     self.combat_system = None

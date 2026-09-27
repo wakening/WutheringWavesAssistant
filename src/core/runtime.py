@@ -46,15 +46,16 @@ class BossRuntimeConfig:
     @cached_property
     def bossName(self) -> list[str]:
         names = []
+        enemies = EnemyMeta.KEY_ENEMIES
         if self._cfg.bossName:
-            enemies = EnemyMeta.KEY_ENEMIES
             for name in self._cfg.bossName:
                 if name in enemies:
                     names.append(name)
                     continue
                 logger.warning(f"Invalid boss key: '{name}'")
         if not names:
-            names.append(I18nText.EnemyDreamless)
+            from src.gui.common.boss import BossNameEnum
+            names.append(BossNameEnum.Dreamless.name)
         return names
 
 
@@ -112,6 +113,18 @@ class DailyRuntimeConfig:
         self.tacetFieldMountGjallar: bool = self._cfg.tacetSuppression == I18nText.TacetFieldMountGjallar
         self.tacetFieldMawburrowDesert: bool = self._cfg.tacetSuppression == I18nText.TacetFieldMawburrowDesert
         self.tacetFieldStagnantRun: bool = self._cfg.tacetSuppression == I18nText.TacetFieldStagnantRun
+        self.tacetFieldMournfellCanyon: bool = self._cfg.tacetSuppression == I18nText.TacetFieldMournfellCanyon
+        self.tacetFieldBeohrWaters: bool = self._cfg.tacetSuppression == I18nText.TacetFieldBeohrWaters
+        self.tacetFieldRiccioliIslands: bool = self._cfg.tacetSuppression == I18nText.TacetFieldRiccioliIslands
+        self.tacetFieldFagaceaePeninsula: bool = self._cfg.tacetSuppression == I18nText.TacetFieldFagaceaePeninsula
+        self.tacetFieldPenitentsEnd: bool = self._cfg.tacetSuppression == I18nText.TacetFieldPenitentsEnd
+        self.tacetFieldCentralPlains: bool = self._cfg.tacetSuppression == I18nText.TacetFieldCentralPlains
+        self.tacetFieldDesorockHighlandI: bool = self._cfg.tacetSuppression == I18nText.TacetFieldDesorockHighlandI
+        self.tacetFieldTigersMaw: bool = self._cfg.tacetSuppression == I18nText.TacetFieldTigersMaw
+        self.tacetFieldWhiningAixsMire: bool = self._cfg.tacetSuppression == I18nText.TacetFieldWhiningAixsMire
+        self.tacetFieldPortCityOfGuixu: bool = self._cfg.tacetSuppression == I18nText.TacetFieldPortCityOfGuixu
+        self.tacetFieldDesorockHighlandII: bool = self._cfg.tacetSuppression == I18nText.TacetFieldDesorockHighlandII
+        self.tacetFieldDimForest: bool = self._cfg.tacetSuppression == I18nText.TacetFieldDimForest
 
     def __init_forgeryChallenge(self):
         self.wingfallChasm: bool = self._cfg.forgeryChallenge == I18nText.WingfallChasm

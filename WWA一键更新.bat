@@ -83,15 +83,15 @@ git config --global --replace-all safe.directory "%ROOT_DIR%"
 :: 提示用户选择仓库
 echo.
 echo Please select a repository to update:
-echo [1] GitHub      %REPO_GITHUB%
+echo [1] GitHub       %REPO_GITHUB%
 echo [2] CN-腾讯云    %REPO_PROXY1%
-echo [3] CN-AtomGit	 %REPO_PROXY2%
+echo [3] CN-AtomGit   %REPO_PROXY2%
 :: echo [4] 国内加速3	 %REPO_PROXY3%
 
 :CHOICE
 set "REPO_URL="
 :: set /p choice="Enter your choice (1, 2, 3, or 4): "
-set /p choice="Enter your choice (1, or 2): "
+set /p choice="Enter your choice (1, 2, or 3): "
 
 if "%choice%"=="1" goto SET1
 if "%choice%"=="2" goto SET2

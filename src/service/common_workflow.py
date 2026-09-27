@@ -412,7 +412,7 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
         total_waveplate = int(zero_pattern.sub("0", match.group(2)))
         if total_waveplate != max_waveplate:
             return None, None
-        logger.info(f"waveplate: {waveplate_crystal}, {cur_waveplate}/{total_waveplate}")
+        logger.info(f"waveplate: {waveplate_crystal}, {cur_waveplate}/{total_waveplate}", stacklevel=2)
         return cur_waveplate, waveplate_crystal
     except (KeyboardInterrupt, StopError) as e:
         raise e
@@ -650,7 +650,7 @@ class ObjectDetector:
         keys = [
             absorb,
             ui.search(self.ctx.tr(I18nText.ClaimRewards)),
-            ui.search(self.ctx.tr(I18nText.ChallengeAgain)),
+            ui.search(self.ctx.tr([I18nText.ChallengeAgain, I18nText.Restart])),
         ]
         keys.sort(key=lambda x: x[0].y1 if x else 1e10, reverse=False)
         for i, k in enumerate(keys):
@@ -662,6 +662,35 @@ class ObjectDetector:
                 ui.sleep(0.5)
             ui.pick_up().sleep(0.5)
             logger.debug("Successfully absorbed!")
+            return True
+
+        return False
+
+    def try_restart(self) -> bool:
+        """检测并执行拾取操作，返回是否成功重新挑战"""
+        ui = UIOp(self.ctx)
+        roi = RoiEx(self.ctx).dialogue
+        ui.snapshot(roi=roi)
+        restart = ui.search(self.ctx.tr([I18nText.ChallengeAgain, I18nText.Restart]))
+        if not restart:
+            return False
+
+        # 重新挑战可能在领取奖励下方，需要滚动
+        keys = [
+            ui.search(self.ctx.tr(I18nText.Absorb)),
+            ui.search(self.ctx.tr(I18nText.ClaimRewards)),
+            restart,
+        ]
+        keys.sort(key=lambda x: x[0].y1 if x else 1e10, reverse=False)
+        for i, k in enumerate(keys):
+            if not k or abs(k[0].y1 - restart[0].y1) > 0.01:
+                continue
+            if i > 0:
+                logger.debug("Scroll down to reveal restart button")
+                self.ctx.control_service.scroll_mouse(-1 * i)
+                ui.sleep(0.5)
+            ui.pick_up().sleep(0.5)
+            logger.debug("Successfully restart!")
             return True
 
         return False

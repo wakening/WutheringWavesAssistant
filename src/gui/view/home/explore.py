@@ -62,8 +62,9 @@ class StoryExploreWidget(QWidget):
         self.autoCombatCheckBox = CheckBox(self.tr("自动战斗:"), self)
         self.autoCombatDescLabel = QLabel(
             self.tr(
-                "用法：启动脚本，回到游戏，点击鼠标侧键，将自动战斗，再次点击侧键或ESC键，可停止战斗。\n"
-                "适用于日常锄地，跑到怪附近，点侧键后挂机，打完点侧键停下，上车去下一个点。"
+                "快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。\n"
+                "用法：启动脚本，回到游戏，点击【快捷键】，将自动战斗，再次点击【快捷键】或【ESC】键，可停止战斗。\n"
+                "适用于锄地、剧情战斗、部分活动。"
             ),
             self
         )
@@ -95,7 +96,7 @@ class StoryExploreWidget(QWidget):
         self.autoDialogueCheckBox = CheckBox(self.tr("自动对话:"), self)
         self.autoDialogueDescLabel = QLabel(
             self.tr(
-                "触发剧情后可直接双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。"
+                "触发剧情后可双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。"
             ),
             self
         )
