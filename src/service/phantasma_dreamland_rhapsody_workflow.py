@@ -550,6 +550,9 @@ class PhantasmaDreamlandRhapsodyWorkflow(AbstractWorkflow):
 
     def __init_task_local(self):
         """根据配置初始化任务状态"""
+        self.local.rootFSM.set_enabled(True)
+        self.local.guidebookFSM.set_enabled(True)
+        self.local.activityFSM.set_enabled(True)
         self.local.phantasmaDreamlandRhapsodyFSM.set_enabled(True)
 
     def __init_workflow(self):

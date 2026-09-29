@@ -1,9 +1,11 @@
 import logging
+from typing import Optional
 
 from PySide6.QtCore import Qt, Signal, QSize, QEvent, QCoreApplication
 from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import (QWidget, QLabel, QFileDialog, QFrame, QVBoxLayout, QButtonGroup, QHBoxLayout,
-                               QPushButton, QApplication, QSizePolicy, QFormLayout, QCheckBox, QGridLayout)
+                               QPushButton, QApplication, QSizePolicy, QFormLayout, QCheckBox, QGridLayout,
+                               QGraphicsDropShadowEffect)
 from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSettingCard, SwitchButton, IndicatorPosition,
                             InfoBarPosition, FlowLayout, FluentIcon, Flyout, InfoBarIcon, ListWidget, TextEdit, InfoBar,
                             SettingCardGroup, ScrollArea, ExpandLayout, ExpandSettingCard, FluentIconBase,
@@ -73,21 +75,16 @@ class DailyWidget(ScrollArea):
         self.nestLabel = QLabel(self.tr("聚落:"), self.container)
         self.claimRewardsLabel = QLabel(self.tr("领取奖励:"), self.container)
 
+        self.upLabels = []
+        self.bountifulCrescendo = []
+        self.chordCleansing = []
+
         self.gridLayout = QGridLayout()
         self.__initGridLayout()
 
         self.contentBottomLayout = QHBoxLayout()
         self.resetButton = PushButton(self.tr("重置"), self.container)
         self.aboutButton = PushButton(self.tr('关于'), self.container)
-
-        self.focusResonatorLayout = QVBoxLayout(self.container)
-        self.focusResonatorTitle = QLabel(self.tr("培养目标:"), self.container)
-        self.focusResonatorComboBox = ComboBox(self.container)
-        self.focusResonatorComboBox.addItem(self.tr("施工中"), userData=None)
-        self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
-        for resonator_id in reversed(Resonator.i18n_keys()):
-            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
-        self.focusResonatorComboBox.setEnabled(False)
 
         self.__initWidget()
 
@@ -162,7 +159,6 @@ class DailyWidget(ScrollArea):
         ]
         self.bossChallenge = [
             I18nText.EnemyCalamityEffigy,
-            I18nText.EnemyThousandPuppetPavilion,
             I18nText.EnemyMyriadSnareRustfireChassis,
             I18nText.EnemyNightmareAdamSmasher,
             I18nText.EnemyNamelessExplorer,
@@ -175,25 +171,16 @@ class DailyWidget(ScrollArea):
             I18nText.EnemyDragonOfDirge,
             I18nText.EnemyLorelei,
             I18nText.EnemySentryConstruct,
-            I18nText.EnemyCrownless,
-            I18nText.EnemyThunderingMephis,
-            I18nText.EnemyTempestMephis,
-            I18nText.EnemyInfernoRider,
-            I18nText.EnemyFeilianBeringal,
-            I18nText.EnemyMourningAix,
-            I18nText.EnemyImpermanenceHeron,
-            I18nText.EnemyLampylumenMyriad,
-            I18nText.EnemyMechAbomination,
             I18nText.EnemyFallacyOfNoReturn,
             I18nText.EnemyCrownless,
-            I18nText.EnemyThunderingMephis,
-            I18nText.EnemyTempestMephis,
-            I18nText.EnemyInfernoRider,
             I18nText.EnemyFeilianBeringal,
+            I18nText.EnemyTempestMephis,
+            I18nText.EnemyThunderingMephis,
             I18nText.EnemyMourningAix,
-            I18nText.EnemyImpermanenceHeron,
-            I18nText.EnemyLampylumenMyriad,
             I18nText.EnemyMechAbomination,
+            I18nText.EnemyImpermanenceHeron,
+            I18nText.EnemyInfernoRider,
+            I18nText.EnemyLampylumenMyriad,
         ]
         self.tacetSuppression = [
             I18nText.WesternFangPeaksTacetField,
@@ -380,6 +367,20 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox.addItem(self.tr("自动"), userData="Auto")
         # self.pioneerPodcastSettingButton = ToggleToolButton(FIF.SETTING, self)
 
+        self.focusResonatorLayout = QHBoxLayout(self.container)
+        self.focusResonatorTitle = QLabel(self.tr("培养目标: "), self.container)
+        self.focusResonatorComboBox = ComboBox(self.container)
+        self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
+        self.focusResonatorComboBox.addItem(self.tr("心（施工中）"), userData=None)
+        for resonator_id in reversed(Resonator.i18n_keys()):
+            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
+        self.focusResonatorComboBox.setCurrentIndex(1)
+        self.focusResonatorComboBox.setEnabled(False)
+
+        self.focusWeeklyChallenge = QLabel(self.tr("天演溯心·衍律化形"), self.container)
+        self.focusForgeryChallenge = QLabel(self.tr("音感仪（梦州、拉海洛）"), self.container)
+        self.focusBossChallenge = QLabel(self.tr("万囮牢·朽躯"), self.container)
+
         self.buttonGroup = [
             self.tacetSuppressionCheckBox,
             self.forgeryChallengeCheckBox,
@@ -395,6 +396,26 @@ class DailyWidget(ScrollArea):
             self.forgeryChallengeComboBox,
             self.bossChallengeComboBox,
         ]
+
+    def __create_up_label(self, register: Optional[list] = None) -> QLabel:
+        upLabel = QLabel("UP↑", self.container)
+        upLabel.setVisible(False)
+        upLabel.setStyleSheet("""
+            QLabel {
+                color: #FDEF8E;
+                font-weight: bold;
+            }
+        """)
+        shadow = QGraphicsDropShadowEffect(upLabel)
+        shadow.setBlurRadius(12)  # 阴影模糊半径
+        # shadow.setColor(QColor("black"))  # 阴影颜色
+        shadow.setColor(QColor(0, 0, 0, 220))  # 阴影颜色
+        shadow.setOffset(1.2, 1.2)  # 阴影偏移量
+        upLabel.setGraphicsEffect(shadow)
+        self.upLabels.append(upLabel)
+        if register is not None:
+            register.append(upLabel)
+        return upLabel
 
     def __refreshGridLayout(self, index):
         from src.core.i18n import I18nText, I18nTr, Language
@@ -482,7 +503,7 @@ class DailyWidget(ScrollArea):
 
     def __initWidget(self):
         # self.resize(1000, 800)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setViewportMargins(0, 0, 0, 0)
         self.setWidget(self.container)
@@ -519,7 +540,6 @@ class DailyWidget(ScrollArea):
 
         self.focusResonatorLayout.addWidget(self.focusResonatorTitle)
         self.focusResonatorLayout.addWidget(self.focusResonatorComboBox)
-        self.focusResonatorLayout.addStretch()
         self.focusResonatorLayout.setContentsMargins(0, 0, 0, 0)
 
         # grid
@@ -527,60 +547,68 @@ class DailyWidget(ScrollArea):
 
         # self.gridLayout.addWidget(self.contentTitleLabel, row, 0, 1, 2)
         self.gridLayout.addWidget(self.waveplateLabel, row, 0, 1, 2)
+        self.gridLayout.addLayout(self.focusResonatorLayout, row, 3)
 
         row += 1
-        self.gridLayout.addWidget(self.weeklyChallengeCheckBox, row, 0)
-        self.gridLayout.addWidget(self.weeklyChallengeComboBox, row, 1)
+        self.gridLayout.addWidget(self.__create_up_label(), row, 0)
+        self.gridLayout.addWidget(self.weeklyChallengeCheckBox, row, 1)
+        self.gridLayout.addWidget(self.weeklyChallengeComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusWeeklyChallenge, row, 3)
         # self.gridLayout.addWidget(self.weeklyChallengeSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.tacetSuppressionCheckBox, row, 0)
-        self.gridLayout.addWidget(self.tacetSuppressionComboBox, row, 1)
+        self.gridLayout.addWidget(self.__create_up_label(self.chordCleansing), row, 0)
+        self.gridLayout.addWidget(self.tacetSuppressionCheckBox, row, 1)
+        self.gridLayout.addWidget(self.tacetSuppressionComboBox, row, 2)
         # self.gridLayout.addWidget(self.tacetSuppressionSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.forgeryChallengeCheckBox, row, 0)
-        self.gridLayout.addWidget(self.forgeryChallengeComboBox, row, 1)
+        self.gridLayout.addWidget(self.__create_up_label(self.bountifulCrescendo), row, 0)
+        self.gridLayout.addWidget(self.forgeryChallengeCheckBox, row, 1)
+        self.gridLayout.addWidget(self.forgeryChallengeComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusForgeryChallenge, row, 3)
         # self.gridLayout.addWidget(self.forgeryChallengeSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.bossChallengeCheckBox, row, 0)
-        self.gridLayout.addWidget(self.bossChallengeComboBox, row, 1)
+        self.gridLayout.addWidget(self.__create_up_label(), row, 0)
+        self.gridLayout.addWidget(self.bossChallengeCheckBox, row, 1)
+        self.gridLayout.addWidget(self.bossChallengeComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusBossChallenge, row, 3)
         # self.gridLayout.addWidget(self.bossChallengeSettingButton, row, 2)
 
         row += 1
         self.gridLayout.addWidget(self.nestLabel, row, 0, 1, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.tacetDiscordNestCheckBox, row, 0)
-        self.gridLayout.addWidget(self.tacetDiscordNestComboBox, row, 1)
+        self.gridLayout.addWidget(self.tacetDiscordNestCheckBox, row, 1)
+        self.gridLayout.addWidget(self.tacetDiscordNestComboBox, row, 2)
         # self.gridLayout.addWidget(self.tacetDiscordNestSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 0)
-        self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 1)
+        self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 1)
+        self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 2)
         # self.gridLayout.addWidget(self.nightmarePurificationSettingButton, row, 2)
 
         row += 1
         self.gridLayout.addWidget(self.claimRewardsLabel, row, 0, 1, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.activityCheckBox, row, 0)
-        self.gridLayout.addWidget(self.activityComboBox, row, 1)
+        self.gridLayout.addWidget(self.activityCheckBox, row, 1)
+        self.gridLayout.addWidget(self.activityComboBox, row, 2)
         # self.gridLayout.addWidget(self.activitySettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.mailCheckBox, row, 0)
-        self.gridLayout.addWidget(self.mailComboBox, row, 1)
+        self.gridLayout.addWidget(self.mailCheckBox, row, 1)
+        self.gridLayout.addWidget(self.mailComboBox, row, 2)
         # self.gridLayout.addWidget(self.mailSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addWidget(self.pioneerPodcastCheckBox, row, 0)
-        self.gridLayout.addWidget(self.pioneerPodcastComboBox, row, 1)
+        self.gridLayout.addWidget(self.pioneerPodcastCheckBox, row, 1)
+        self.gridLayout.addWidget(self.pioneerPodcastComboBox, row, 2)
         # self.gridLayout.addWidget(self.pioneerPodcastSettingButton, row, 2)
 
         row += 1
-        self.gridLayout.addLayout(self.contentBottomLayout, row, 1)
+        self.gridLayout.addLayout(self.contentBottomLayout, row, 2)
 
         # # 参数：row=0（从第0行开始）, column=2（第3列）, rowSpan=3（跨3行）, columnSpan=1（占1列）
         # self.gridLayout.addLayout(self.focusResonatorLayout, 0, 3, row, 1)
@@ -593,9 +621,8 @@ class DailyWidget(ScrollArea):
         # column stretch
         self.gridLayout.setColumnStretch(0, 0)
         self.gridLayout.setColumnStretch(1, 0)
-        # self.gridLayout.setColumnStretch(2, 1)
-        # self.gridLayout.setColumnStretch(3, 0)  # button
-        # self.gridLayout.setColumnStretch(4, 2)  # description（最大吃空间）
+        self.gridLayout.setColumnStretch(2, 7)
+        self.gridLayout.setColumnStretch(3, 3)
 
         # self.contentLayout.addWidget(self.contentTitleLabel)
         self.contentLayout.addLayout(self.gridLayout)
@@ -603,10 +630,11 @@ class DailyWidget(ScrollArea):
         self.contentLayout.addStretch()
         self.contentLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mainLayout.addLayout(self.contentLayout, 4)
-        self.mainLayout.addSpacing(12)
-        self.mainLayout.addLayout(self.focusResonatorLayout, 1)
-        self.mainLayout.setContentsMargins(36, 10, 36, 10)
+        self.mainLayout.addLayout(self.contentLayout)
+        # self.mainLayout.addSpacing(50)
+        # self.mainLayout.addStretch(1)
+        # self.mainLayout.addLayout(self.focusResonatorLayout, 4)
+        self.mainLayout.setContentsMargins(30, 10, 36, 10)
         # self.mainLayout.setAlignment(Qt.AlignTop)
 
     def __connectSignalToSlot(self):
@@ -647,6 +675,8 @@ class DailyWidget(ScrollArea):
 
         self.resetButton.clicked.connect(self.__onResetButtonClicked)
         self.aboutButton.clicked.connect(self.__showAboutFlyout)
+
+        globalSignal.doubleDropSignal.connect(self.__onDoubleDrop)
 
     def __loadConfig(self):
         self.weeklyChallengeCheckBox.setChecked(paramConfig.get(paramConfig.weeklyChallengeOpen))
@@ -734,3 +764,10 @@ class DailyWidget(ScrollArea):
             target=self.aboutButton,
             parent=self.window()
         )
+
+    def __onDoubleDrop(self, show_bountiful_crescendo: bool):
+        show_labels = self.bountifulCrescendo
+        if not show_bountiful_crescendo:
+            show_labels = self.chordCleansing
+        for label in show_labels:
+            label.setVisible(True)

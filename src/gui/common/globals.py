@@ -12,6 +12,8 @@ class GlobalSignal(QObject):
     paramConfigPathSignal = Signal(str)  # 参数配置文件的路径
     guiWinId = Signal(int)  # gui主窗口hwnd
 
+    doubleDropSignal = Signal(bool)  # 双倍掉落活动动态显示up文字
+
 
 class GlobalParam:
 

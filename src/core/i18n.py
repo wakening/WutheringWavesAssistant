@@ -249,6 +249,8 @@ class I18nText:
     HopeAndSalvationShallEndure = "HopeAndSalvationShallEndure"
     NightmareHecateClawsOfRegret = "NightmareHecateClawsOfRegret"
     LadyOfTheSeaEmbersOfGlory = "LadyOfTheSeaEmbersOfGlory"
+    ConfrontTheSentinelJue = "ConfrontTheSentinelJue"
+    LeaveTheTemporalLoop = "LeaveTheTemporalLoop"
 
     # ------- Resonator Ascension Material -------
     ForgedEmpyreansSigh = "ForgedEmpyreansSigh"
@@ -1336,6 +1338,20 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"Lady of the Sea|Embers of Glory$"),
             raw="Lady of the Sea- Embers of Glory"
+        ),
+    },
+    I18nText.ConfrontTheSentinelJue: {
+        Language.ZH: RegexStr(r"岁主.?角.?对战", raw="与岁主「角」对战"),
+        Language.EN: RegexStr(
+            flex_ws(r"onfront the Sentinel \"Jué\""),
+            raw="Confront the Sentinel \"Jué\""
+        ),
+    },
+    I18nText.LeaveTheTemporalLoop: {
+        Language.ZH: RegexStr(r"开时序之", raw="离开时序之寰"),
+        Language.EN: RegexStr(
+            flex_ws(r"eave the Temporal Loop"),
+            raw="Leave the Temporal Loop"
         ),
     },
 

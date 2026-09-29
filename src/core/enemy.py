@@ -761,8 +761,8 @@ class Enemy:
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.TheFatedConfrontation,
             auto_respawn=False,
-            battle_text=[I18nText.DefeatTheEnemies],
-            stop_text=[],
+            battle_text=[I18nText.ConfrontTheSentinelJue],
+            stop_text=[I18nText.LeaveTheTemporalLoop],
             routes=[],
             absorb=AbsorbMode.OD,
         ),
@@ -1773,7 +1773,7 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
-            restart=AbsorbMode.OD,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
@@ -2119,12 +2119,10 @@ class EnemyVsBar:
 
         return float(np.clip(ratio, 0.0, 1.0))
 
-# if __name__ == '__main__':
-#     print(Enemy.enemies())
-#
-#     import ctypes
-#
-#     buf = ctypes.create_unicode_buffer(85)
-#     ctypes.windll.kernel32.GetUserDefaultLocaleName(buf, 85)
-#
-#     print(buf.value)
+if __name__ == '__main__':
+    aaa = []
+    for k, v in EnemyMeta.ID_ENEMIES.items():
+        if v.quick_boss_meta and v.quick_boss_meta.menu == I18nText.BossChallenge:
+            print(v.id)
+            aaa.append(v.id)
+    print(aaa[::-1])

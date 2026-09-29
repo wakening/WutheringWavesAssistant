@@ -8,6 +8,7 @@ from src.core.color import ColorRule, Color, ColorMatch
 from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.dungeon import Dungeon
+from src.core.enemy import Enemy
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
 from src.core.i18n import I18nText, Language, I18nTr
@@ -58,6 +59,29 @@ class TaskLocal:
         ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
         ### ------- Guidebook MaterialCollection BossChallenge -------
+        self.enemyCalamityEffigyFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyCalamityEffigy)
+        self.enemyMyriadSnareRustfireChassisFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyMyriadSnareRustfireChassis)
+        self.enemyNightmareAdamSmasherFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyNightmareAdamSmasher)
+        self.enemyNamelessExplorerFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyNamelessExplorer)
+        self.enemyHyvatiaFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyHyvatia)
+        self.enemyReactorHuskFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyReactorHusk)
+        self.enemyLadyOfTheSeaFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyLadyOfTheSea)
+        self.enemyTheFalseSovereignFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyTheFalseSovereign)
+        self.enemyFenricoFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyFenrico)
+        self.enemyLionessOfGloryFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyLionessOfGlory)
+        self.enemyDragonOfDirgeFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyDragonOfDirge)
+        self.enemyLoreleiFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyLorelei)
+        self.enemySentryConstructFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemySentryConstruct)
+        self.enemyFallacyOfNoReturnFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyFallacyOfNoReturn)
+        self.enemyCrownlessFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyCrownless)
+        self.enemyFeilianBeringalFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyFeilianBeringal)
+        self.enemyTempestMephisFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyTempestMephis)
+        self.enemyThunderingMephisFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyThunderingMephis)
+        self.enemyMourningAixFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyMourningAix)
+        self.enemyMechAbominationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyMechAbomination)
+        self.enemyImpermanenceHeronFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyImpermanenceHeron)
+        self.enemyInfernoRiderFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyInfernoRider)
+        self.enemyLampylumenMyriadFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyLampylumenMyriad)
 
         ### ------- Guidebook MaterialCollection TacetSuppression -------
         self.westernFangPeaksTacetFieldFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WesternFangPeaksTacetField)
@@ -128,8 +152,35 @@ class TaskLocal:
             self.marigoldWoodsFSM,
             name=I18nText.ForgeryChallenge
         )
-        self.simulationChallengeFSM: TaskFSMGroup = TaskFSMGroup(name="SimulationChallenge")
-        self.bossChallengeFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.BossChallenge)
+        self.simulationChallengeFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.SimulationChallenge)
+
+        self.bossChallengeFSM: TaskFSMGroup = TaskFSMGroup(
+            self.enemyCalamityEffigyFSM,
+            self.enemyMyriadSnareRustfireChassisFSM,
+            self.enemyNightmareAdamSmasherFSM,
+            self.enemyNamelessExplorerFSM,
+            self.enemyHyvatiaFSM,
+            self.enemyReactorHuskFSM,
+            self.enemyLadyOfTheSeaFSM,
+            self.enemyTheFalseSovereignFSM,
+            self.enemyFenricoFSM,
+            self.enemyLionessOfGloryFSM,
+            self.enemyDragonOfDirgeFSM,
+            self.enemyLoreleiFSM,
+            self.enemySentryConstructFSM,
+            self.enemyFallacyOfNoReturnFSM,
+            self.enemyCrownlessFSM,
+            self.enemyFeilianBeringalFSM,
+            self.enemyTempestMephisFSM,
+            self.enemyThunderingMephisFSM,
+            self.enemyMourningAixFSM,
+            self.enemyMechAbominationFSM,
+            self.enemyImpermanenceHeronFSM,
+            self.enemyInfernoRiderFSM,
+            self.enemyLampylumenMyriadFSM,
+            name=I18nText.BossChallenge
+        )
+
         self.tacetSuppressionFSM: TaskFSMGroup = TaskFSMGroup(
             self.westernFangPeaksTacetFieldFSM,
             self.easternXuanPeaksTacetFieldFSM,
@@ -190,10 +241,10 @@ class TaskLocal:
             self.tacetDiscordNestFSM,
             name=I18nText.MaterialCollection
         )
-        self.recurringChallengesFSM: TaskFSMGroup = TaskFSMGroup(name="RecurringChallenges")
-        self.pathOfGrowthFSM: TaskFSMGroup = TaskFSMGroup(name="PathOfGrowth")
-        self.enemyTracingFSM: TaskFSMGroup = TaskFSMGroup(name="EnemyTracing")
-        self.milestonesFSM: TaskFSMGroup = TaskFSMGroup(name="Milestones")
+        self.recurringChallengesFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.RecurringChallenges)
+        self.pathOfGrowthFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.PathOfGrowth)
+        self.enemyTracingFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.EnemyTracing)
+        self.milestonesFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.Milestones)
 
         # ------- Root -------
         self.guidebookFSM: TaskFSMGroup = TaskFSMGroup(
@@ -1099,8 +1150,240 @@ def doSimulationChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
 @node(NodeName.doBossChallenge)
 def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    raise NotImplementedError
+    if local.bossChallengeFSM.is_terminal:
+        return True
 
+    ui = UIOp(ctx)
+    roiex = RoiEx(ctx)
+
+    # fsm的name = 副本id
+    for fsm in local.bossChallengeFSM.children:
+        # 检查当前副本状态
+        if fsm.status.is_terminal:
+            continue
+        if not fsm.start():
+            break
+        dungeon = Dungeon.BossChallenge.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            break
+        dungeon_name = ctx.tr(dungeon.id)
+        cost = dungeon.waveplate or 60
+
+        if not dungeon.enemy_id or not Enemy.from_id(dungeon.enemy_id):
+            logger.warning(f"Enemy '{dungeon.enemy_id}' not found")
+            break
+        enemy = Enemy.from_id(dungeon.enemy_id)
+        logger.info(f"{dungeon_name.raw}")
+
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
+                return True
+            if fsm.count == 0:
+                fsm.fail()
+                return True
+            return False
+
+        try:
+            # 点击讨伐强敌
+            if not ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.BossChallenge), roiex.guidebook_menu,
+                                                     pk=PointKind.RANDOM, times=2, interval=0.2)
+                            and ui.search(ctx.tr(I18nText.FilterToViewRewardsForEachPhase), roiex.guidebook_content)):
+                return _fail()
+
+            # 检查体力
+            cur_waveplate, waveplate_crystal = query_waveplate_guidebook(ctx)
+            if cur_waveplate is None or waveplate_crystal is None:
+                return False
+            if cur_waveplate < cost:
+                fsm.complete()
+                return True
+
+            # 滑动寻找入口
+            is_start_challenge = False
+            slider_points = Slider.points(ui.grap())
+            for i, p in enumerate(slider_points):
+                if i > 0:
+                    logger.debug(f"Scroll point: {p}")
+                    ui.click_point(p, times=2, interval=0.2)
+                    ui.sleep(0.2).snapshot()
+                else:
+                    ui.snapshot()
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
+                    continue
+                if not (
+                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
+
+                # 点击直接挑战
+                ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.3)
+
+                # 点击提示弹窗
+                # 有提示时不能选队伍，直接进入副本
+                # 没提示时进入队伍选择
+                if not ui.sleep(0.2).wait().until(
+                        lambda: ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination))
+                                and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)
+                                or ui.search(ctx.tr(I18nText.QuickSetup))
+                                and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)):
+                    return _fail()
+
+                is_start_challenge = True
+                break
+
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
+
+            # 循环刷
+            max_challenge = 9
+            for i in range(max_challenge):
+                if i == max_challenge - 1:
+                    return _fail()
+
+                # 确认已进入副本
+                if not ui.sleep(3 if i == 0 else 0.1).wait(15, 0.2).until(lambda: ui.is_on_homepage()):
+                    return _fail()
+                logger.info("已进入副本")
+                if dungeon.id == I18nText.SeedOfIllusoryOrigin:
+                    for _ in range(3):
+                        ctx.control_service.dash_dodge()
+                        ui.sleep(0.2)
+                    ctx.control_service.attack()
+                    ui.sleep(0.6)
+
+                combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+                combat_system.set_resonators(local.members, is_print=False)
+                combat_system.is_async = True
+                combat_system.check_boss_hp = True
+                combat_system.auto_pickup = False
+                combat_system.exit_special_state(Morph.Forced)
+
+                # 打
+                timeout = 10 * 60
+                no_text_count = 3
+                no_text_max = no_text_count
+                deadline = time.monotonic() + timeout
+
+                while ui.is_set() or time.monotonic() < deadline:
+                    if no_text_count < 0:
+                        break
+                    combat_system.start(3.5)
+                    ui.sleep(1.5)
+                    ui.snapshot()
+                    if ui.is_on_homepage():
+                        # 领取奖励
+                        stop_text = [I18nText.WeeklyClaimRewards]
+                        if enemy.quick_boss_meta.stop_text:
+                            stop_text.extend(enemy.quick_boss_meta.stop_text)
+                        if ui.search(ctx.tr(stop_text)):
+                            logger.debug("Weekly Claim Rewards")
+                            break
+                        # 击败敌人
+                        if ui.search(ctx.tr(enemy.quick_boss_meta.battle_text)):
+                            logger.debug("Fight fight!")
+                            no_text_count = no_text_max
+                            continue
+                        else:
+                            logger.debug(f"Text not found: {ctx.tr(I18nText.WeeklyDefeatTheEnemy).raw}")
+                        no_text_count -= 1
+
+                    if page_key := GlobalPage(ctx).action(ui=ui):
+                        if page_key == GlobalPage.InternetDisconnecting:
+                            combat_system.stop(join=True)
+                            return False
+
+                combat_system.stop(join=True)
+
+                notice_keywords = ctx.tr([I18nText.WeeklyConfirm, I18nText.WeeklyExit])
+                ui.sleep(0.5).snapshot()
+
+                # 检查复苏弹窗
+                if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
+                    ui.esc().sleep(0.5)
+                elif ui.search(notice_keywords):
+                    logger.debug(f"Found text: {notice_keywords}")
+                    logger.info("Challenge Complete")
+                    ui.sleep(0.3)
+                else:
+                    combat_system.exit_special_state(Morph.Prefer)
+                    ui.sleep(0.3)
+
+                    logger.info("Challenge Complete")
+
+                    # 寻找领取奖励交互点
+                    if not object_detection(ctx, search_reward=True, timeout=40):
+                        if ui.esc().sleep(0.5).wait().until(
+                                lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                            if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
+                                continue
+                            ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
+                        return _fail()
+
+                    # 领取奖励
+                    if not ui.pick_up(2, 0.2).sleep(0.5).wait().until(
+                            lambda: ui.snapshot().search(notice_keywords)):
+                        return _fail()
+
+                cur_waveplate, waveplate_crystal = query_waveplate_claim_rewards(ctx)
+
+                if cur_waveplate is None or waveplate_crystal is None:
+                    return _fail()
+                if cur_waveplate < cost:
+                    fsm.complete()
+                    return True
+
+                cur_waveplate -= cost
+                if not ui.click_text(ctx.tr(I18nText.WeeklyConfirm), delay=0.3):
+                    return _fail()
+
+                ui.sleep(1)
+                # 容错，判断是否有体力不足是否继续弹窗
+                if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
+                    ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
+                    ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
+                    fsm.complete()
+                    return True
+
+                if cur_waveplate >= cost:
+                    if ui.wait().until(
+                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
+                        continue
+                    return _fail()
+
+                ui.wait().until(
+                    lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2))
+                fsm.complete()
+                if ui.sleep(2).wait_back_home():
+                    ui.sleep(0.5)
+                return True
+
+            if not fsm.is_terminal:
+                fsm.fail()
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
+
+    # 未知异常兜底，标记失败
+    for fsm in local.bossChallengeFSM.children:
+        if fsm.status == TaskStatus.PENDING:
+            fsm.start()
+            fsm.fail()
+        elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
+            fsm.fail()
+    return False
 
 @node(NodeName.doTacetSuppression)
 def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
@@ -1398,6 +1681,12 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 60
 
+        if not dungeon.enemy_id or not Enemy.from_id(dungeon.enemy_id):
+            logger.warning(f"Enemy '{dungeon.enemy_id}' not found")
+            break
+        enemy = Enemy.from_id(dungeon.enemy_id)
+        logger.info(f"{dungeon_name.raw}['{ctx.tr(enemy.id).raw}']")
+
         def _fail():
             ui.esc().sleep(1.2)
             if fsm.is_terminal:
@@ -1530,11 +1819,14 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.snapshot()
                     if ui.is_on_homepage():
                         # 领取奖励
-                        if ui.search(ctx.tr(I18nText.WeeklyClaimRewards)):
+                        stop_text = [I18nText.WeeklyClaimRewards]
+                        if enemy.quick_boss_meta.stop_text:
+                            stop_text.extend(enemy.quick_boss_meta.stop_text)
+                        if ui.search(ctx.tr(stop_text)):
                             logger.debug("Weekly Claim Rewards")
                             break
                         # 击败敌人
-                        if ui.search(ctx.tr(I18nText.WeeklyDefeatTheEnemy)):
+                        if ui.search(ctx.tr(enemy.quick_boss_meta.battle_text)):
                             logger.debug("Fight fight!")
                             no_text_count = no_text_max
                             continue
@@ -2233,6 +2525,29 @@ class DailyWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
         ### ------- Guidebook MaterialCollection BossChallenge -------
+        self.local.enemyCalamityEffigyFSM.set_enabled(cfg.enemyCalamityEffigy)
+        self.local.enemyMyriadSnareRustfireChassisFSM.set_enabled(cfg.enemyMyriadSnareRustfireChassis)
+        self.local.enemyNightmareAdamSmasherFSM.set_enabled(cfg.enemyNightmareAdamSmasher)
+        self.local.enemyNamelessExplorerFSM.set_enabled(cfg.enemyNamelessExplorer)
+        self.local.enemyHyvatiaFSM.set_enabled(cfg.enemyHyvatia)
+        self.local.enemyReactorHuskFSM.set_enabled(cfg.enemyReactorHusk)
+        self.local.enemyLadyOfTheSeaFSM.set_enabled(cfg.enemyLadyOfTheSea)
+        self.local.enemyTheFalseSovereignFSM.set_enabled(cfg.enemyTheFalseSovereign)
+        self.local.enemyFenricoFSM.set_enabled(cfg.enemyFenrico)
+        self.local.enemyLionessOfGloryFSM.set_enabled(cfg.enemyLionessOfGlory)
+        self.local.enemyDragonOfDirgeFSM.set_enabled(cfg.enemyDragonOfDirge)
+        self.local.enemyLoreleiFSM.set_enabled(cfg.enemyLorelei)
+        self.local.enemySentryConstructFSM.set_enabled(cfg.enemySentryConstruct)
+        self.local.enemyFallacyOfNoReturnFSM.set_enabled(cfg.enemyFallacyOfNoReturn)
+        self.local.enemyCrownlessFSM.set_enabled(cfg.enemyCrownless)
+        self.local.enemyFeilianBeringalFSM.set_enabled(cfg.enemyFeilianBeringal)
+        self.local.enemyTempestMephisFSM.set_enabled(cfg.enemyTempestMephis)
+        self.local.enemyThunderingMephisFSM.set_enabled(cfg.enemyThunderingMephis)
+        self.local.enemyMourningAixFSM.set_enabled(cfg.enemyMourningAix)
+        self.local.enemyMechAbominationFSM.set_enabled(cfg.enemyMechAbomination)
+        self.local.enemyImpermanenceHeronFSM.set_enabled(cfg.enemyImpermanenceHeron)
+        self.local.enemyInfernoRiderFSM.set_enabled(cfg.enemyInfernoRider)
+        self.local.enemyLampylumenMyriadFSM.set_enabled(cfg.enemyLampylumenMyriad)
 
         ### ------- Guidebook MaterialCollection TacetSuppression -------
         self.local.westernFangPeaksTacetFieldFSM.set_enabled(cfg.westernFangPeaksTacetField)

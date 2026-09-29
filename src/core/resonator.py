@@ -818,6 +818,8 @@ class Resonator(Enum):
             "T_IconRoleHead150_73_Guest1_UI.png": I18nText.Qingxiao,
             "T_IconRoleHead150_73_UI.png": I18nText.Qingxiao,
             "T_IconRoleHead150_74_UI.png": I18nText.Jingran,
+            "T_IconRoleHead150_75_UI.png": I18nText.Hsin,
+            "T_IconRoleHead150_76_UI.png": I18nText.Suoming,
         }
 
 

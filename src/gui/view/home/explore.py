@@ -167,7 +167,7 @@ class ExploreWidget(ScrollArea):
         self.currentTask = self.storyExploreWidget.task
 
     def __initWidget(self):
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setViewportMargins(0, 0, 0, 0)
         self.setWidget(self.container)

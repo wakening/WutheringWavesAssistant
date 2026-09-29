@@ -152,7 +152,29 @@ class DailyRuntimeConfig:
         pass
 
     def __init_bossChallenge(self):
-        pass
+        self.enemyCalamityEffigy: bool = self._cfg.bossChallenge == I18nText.EnemyCalamityEffigy
+        self.enemyMyriadSnareRustfireChassis: bool = self._cfg.bossChallenge == I18nText.EnemyMyriadSnareRustfireChassis
+        self.enemyNightmareAdamSmasher: bool = self._cfg.bossChallenge == I18nText.EnemyNightmareAdamSmasher
+        self.enemyNamelessExplorer: bool = self._cfg.bossChallenge == I18nText.EnemyNamelessExplorer
+        self.enemyHyvatia: bool = self._cfg.bossChallenge == I18nText.EnemyHyvatia
+        self.enemyReactorHusk: bool = self._cfg.bossChallenge == I18nText.EnemyReactorHusk
+        self.enemyLadyOfTheSea: bool = self._cfg.bossChallenge == I18nText.EnemyLadyOfTheSea
+        self.enemyTheFalseSovereign: bool = self._cfg.bossChallenge == I18nText.EnemyTheFalseSovereign
+        self.enemyFenrico: bool = self._cfg.bossChallenge == I18nText.EnemyFenrico
+        self.enemyLionessOfGlory: bool = self._cfg.bossChallenge == I18nText.EnemyLionessOfGlory
+        self.enemyDragonOfDirge: bool = self._cfg.bossChallenge == I18nText.EnemyDragonOfDirge
+        self.enemyLorelei: bool = self._cfg.bossChallenge == I18nText.EnemyLorelei
+        self.enemySentryConstruct: bool = self._cfg.bossChallenge == I18nText.EnemySentryConstruct
+        self.enemyFallacyOfNoReturn: bool = self._cfg.bossChallenge == I18nText.EnemyFallacyOfNoReturn
+        self.enemyCrownless: bool = self._cfg.bossChallenge == I18nText.EnemyCrownless
+        self.enemyFeilianBeringal: bool = self._cfg.bossChallenge == I18nText.EnemyFeilianBeringal
+        self.enemyTempestMephis: bool = self._cfg.bossChallenge == I18nText.EnemyTempestMephis
+        self.enemyThunderingMephis: bool = self._cfg.bossChallenge == I18nText.EnemyThunderingMephis
+        self.enemyMourningAix: bool = self._cfg.bossChallenge == I18nText.EnemyMourningAix
+        self.enemyMechAbomination: bool = self._cfg.bossChallenge == I18nText.EnemyMechAbomination
+        self.enemyImpermanenceHeron: bool = self._cfg.bossChallenge == I18nText.EnemyImpermanenceHeron
+        self.enemyInfernoRider: bool = self._cfg.bossChallenge == I18nText.EnemyInfernoRider
+        self.enemyLampylumenMyriad: bool = self._cfg.bossChallenge == I18nText.EnemyLampylumenMyriad
 
     def __init_nightmarePurification(self):
         pass

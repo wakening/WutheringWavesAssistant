@@ -754,6 +754,8 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         ui.click_bbox(challenge_text, times=2, interval=0.3)
 
         # 点击提示弹窗
+        # 有提示时不能选队伍，直接进入副本
+        # 没提示时进入队伍选择
         if not ui.sleep(0.2).wait().until(
                 lambda: ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination))
                         and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=2, interval=0.2)

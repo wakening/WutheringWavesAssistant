@@ -336,15 +336,15 @@ class DungeonBossChallenge:
         rewards=[I18nText.ForgedEmpyreansSigh],
     )
 
-    EnemyThousandPuppetPavilion = DungeonMeta(
-        id=I18nText.EnemyThousandPuppetPavilion,
-        localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
+    EnemyMyriadSnareRustfireChassis = DungeonMeta(
+        id=I18nText.EnemyMyriadSnareRustfireChassis,
+        localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
         menu=I18nText.BossChallenge,
         register=[Dungeon.BossChallenge],
         icon=DungeonIcon.Icon1,
         region=I18nText.GuidebookMengzhou,
         waveplate=60,
-        enemy_id=I18nText.EnemyThousandPuppetPavilion,
+        enemy_id=I18nText.EnemyMyriadSnareRustfireChassis,
         rewards=[I18nText.SolidaritysLoneflame],
     )
 
