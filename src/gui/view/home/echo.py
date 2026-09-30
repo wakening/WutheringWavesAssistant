@@ -217,7 +217,7 @@ class EchoMergeWidget(QWidget):
         self.descLabel = QLabel(self.tr("融合背包内未锁定的声骸，任意分辨率"), self)
         self.descLabel.setWordWrap(True)
 
-        self.descLayout = QHBoxLayout(self)
+        self.descLayout = QHBoxLayout()
         self.descLayout.addWidget(self.descLabel)
         self.descLayout.setContentsMargins(16, 0, 0, 0)
 

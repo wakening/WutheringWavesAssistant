@@ -94,6 +94,7 @@ class DailyRuntimeConfig:
         self.__init_tacetDiscordNest()
 
     def __init_weeklyChallenge(self):
+        self.ordinanceOfTheInevitable: bool = self._cfg.weeklyChallenge == I18nText.OrdinanceOfTheInevitable
         self.courtOfShackledSouls: bool = self._cfg.weeklyChallenge == I18nText.CourtOfShackledSouls
         self.seedOfIllusoryOrigin: bool = self._cfg.weeklyChallenge == I18nText.SeedOfIllusoryOrigin
         self.gateOfTheLostStar: bool = self._cfg.weeklyChallenge == I18nText.GateOfTheLostStar
@@ -106,6 +107,8 @@ class DailyRuntimeConfig:
         self.bellOfArchaicChants: bool = self._cfg.weeklyChallenge == I18nText.BellOfArchaicChants
 
     def __init_tacetSuppression(self):
+        self.tacetFieldHeartOfStillness: bool = self._cfg.tacetSuppression == I18nText.TacetFieldHeartOfStillness
+        self.tacetFieldHeartOfFlames: bool = self._cfg.tacetSuppression == I18nText.TacetFieldHeartOfFlames
         self.westernFangPeaksTacetField: bool = self._cfg.tacetSuppression == I18nText.WesternFangPeaksTacetField
         self.easternXuanPeaksTacetField: bool = self._cfg.tacetSuppression == I18nText.EasternXuanPeaksTacetField
         self.tacetFieldSolisiaLanding: bool = self._cfg.tacetSuppression == I18nText.TacetFieldSolisiaLanding
@@ -181,6 +184,8 @@ class DailyRuntimeConfig:
 
     def __init_tacetDiscordNest(self):
         _all = "All"
+        self.simulacrumNexusTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
+            _all, I18nText.SimulacrumNexusTacetDiscordNest]
         self.southernYuanHillsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
             _all, I18nText.SouthernYuanHillsTacetDiscordNest]
         self.starblindCrashsiteTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [

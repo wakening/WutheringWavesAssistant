@@ -616,6 +616,30 @@ class DungeonBossChallenge:
 class DungeonTacetSuppression:
     # ------- TacetSuppression -------
 
+    TacetFieldHeartOfStillness = DungeonMeta(
+        id=I18nText.TacetFieldHeartOfStillness,
+        localized_name=I18nTr.l10n(I18nText.TacetFieldHeartOfStillness),
+        menu=I18nText.TacetSuppression,
+        register=[Dungeon.TacetSuppression],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookMengzhou,
+        waveplate=60,
+        enemy_id=None,
+        rewards=None,
+    )
+
+    TacetFieldHeartOfFlames = DungeonMeta(
+        id=I18nText.TacetFieldHeartOfFlames,
+        localized_name=I18nTr.l10n(I18nText.TacetFieldHeartOfFlames),
+        menu=I18nText.TacetSuppression,
+        register=[Dungeon.TacetSuppression],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookMengzhou,
+        waveplate=60,
+        enemy_id=None,
+        rewards=None,
+    )
+
     WesternFangPeaksTacetField = DungeonMeta(
         id=I18nText.WesternFangPeaksTacetField,
         localized_name=I18nTr.l10n(I18nText.WesternFangPeaksTacetField),
@@ -847,6 +871,18 @@ class DungeonTacetSuppression:
 
 class DungeonWeeklyChallenge:
     # ------- WeeklyChallenge -------
+
+    OrdinanceOfTheInevitable = DungeonMeta(
+        id=I18nText.OrdinanceOfTheInevitable,
+        localized_name=I18nTr.l10n(I18nText.OrdinanceOfTheInevitable),
+        menu=I18nText.WeeklyChallenge,
+        register=[Dungeon.WeeklyChallenge],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookMengzhou,
+        waveplate=60,
+        enemy_id=I18nText.EnemySuhsinTheInevitable,
+        rewards=[I18nText.SkywardGlazedHeart],
+    )
 
     CourtOfShackledSouls = DungeonMeta(
         id=I18nText.CourtOfShackledSouls,

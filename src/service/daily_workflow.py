@@ -84,6 +84,8 @@ class TaskLocal:
         self.enemyLampylumenMyriadFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EnemyLampylumenMyriad)
 
         ### ------- Guidebook MaterialCollection TacetSuppression -------
+        self.tacetFieldHeartOfStillnessFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldHeartOfStillness)
+        self.tacetFieldHeartOfFlamesFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldHeartOfFlames)
         self.westernFangPeaksTacetFieldFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WesternFangPeaksTacetField)
         self.easternXuanPeaksTacetFieldFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.EasternXuanPeaksTacetField)
         self.tacetFieldSolisiaLandingFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldSolisiaLanding)
@@ -105,6 +107,7 @@ class TaskLocal:
         self.tacetFieldDimForestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TacetFieldDimForest)
 
         ### ------- Guidebook MaterialCollection WeeklyChallenge -------
+        self.ordinanceOfTheInevitableFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.OrdinanceOfTheInevitable)
         self.courtOfShackledSoulsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.CourtOfShackledSouls)
         self.seedOfIllusoryOriginFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SeedOfIllusoryOrigin)
         self.gateOfTheLostStarFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GateOfTheLostStar)
@@ -119,6 +122,7 @@ class TaskLocal:
         ### ------- Guidebook MaterialCollection NightmarePurification -------
 
         ### ------- Guidebook MaterialCollection TacetDiscordNest -------
+        self.simulacrumNexusTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SimulacrumNexusTacetDiscordNest)
         self.southernYuanHillsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
         self.starblindCrashsiteTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
         self.rebirthUplandsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
@@ -182,6 +186,8 @@ class TaskLocal:
         )
 
         self.tacetSuppressionFSM: TaskFSMGroup = TaskFSMGroup(
+            self.tacetFieldHeartOfStillnessFSM,
+            self.tacetFieldHeartOfFlamesFSM,
             self.westernFangPeaksTacetFieldFSM,
             self.easternXuanPeaksTacetFieldFSM,
             self.tacetFieldSolisiaLandingFSM,
@@ -204,6 +210,7 @@ class TaskLocal:
             name=I18nText.TacetSuppression
         )
         self.weeklyChallengeFSM: TaskFSMGroup = TaskFSMGroup(
+            self.ordinanceOfTheInevitableFSM,
             self.courtOfShackledSoulsFSM,
             self.seedOfIllusoryOriginFSM,
             self.gateOfTheLostStarFSM,
@@ -218,6 +225,7 @@ class TaskLocal:
         )
         self.nightmarePurificationFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.NightmarePurification)
         self.tacetDiscordNestFSM: TaskFSMGroup = TaskFSMGroup(
+            self.simulacrumNexusTacetDiscordNestFSM,
             self.southernYuanHillsTacetDiscordNestFSM,
             self.starblindCrashsiteTacetDiscordNestFSM,
             self.rebirthUplandsTacetDiscordNestFSM,
@@ -1226,7 +1234,7 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     continue
 
                 # 点击直接挑战
-                ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.3)
+                ui.click_bbox(challenge_text, delay=0.4, times=2, interval=0.1)
 
                 # 点击提示弹窗
                 # 有提示时不能选队伍，直接进入副本
@@ -1484,13 +1492,13 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 # 点击开始挑战
                 if not ui.sleep(0.3).wait().until(
-                        lambda: ui.snapshot().search(ctx.tr(I18nText.EnableNavigation))
+                        lambda: ui.snapshot().search(ctx.tr([I18nText.EnableNavigation, I18nText.Track]))
                                 or ui.search(ctx.tr(I18nText.QuickSetup))
                                 and ui.click_text(ctx.tr(I18nText.StartChallenge), delay=0.3, times=3, interval=0.3)):
                     return _fail()
 
                 # 副本未解锁
-                if ui.search(ctx.tr(I18nText.EnableNavigation)):
+                if ui.search(ctx.tr([I18nText.EnableNavigation, I18nText.Track])):
                     logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
                     fsm.fail()
                     return _fail()
@@ -1747,24 +1755,18 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     continue
 
                 # 点击直接挑战
-                ui.sleep(0.2)
-                for _ in range(2):
-                    # 若ui太卡，点快了没跳转，再试一次
-                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
-                    if ui.sleep(1).wait(3).until(
-                            lambda: not ui.snapshot().search(ctx.tr(I18nText.WeeklyChallenge), roiex.guidebook_menu)):
-                        break
+                ui.click_bbox(challenge_text, delay=0.4, times=2, interval=0.1)
 
-                # 点击单人挑战
-                if not ui.sleep(0.3).wait().until(
-                        lambda: ui.snapshot().search(ctx.tr(I18nText.EnableNavigation))
-                                or ui.click_text(ctx.tr(I18nText.SoloChallenge), delay=0.4)):
-                    return _fail()
+                def _wait_solo_challenge():
+                    ui.snapshot()
+                    if ui.click_text(ctx.tr(I18nText.SoloChallenge), delay=0.4):
+                        return True
+                    if ui.snapshot().search(ctx.tr(I18nText.ArrivingAtTheDestination)):
+                        ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3)
+                    return False
 
-                # 副本未解锁
-                if ui.search(ctx.tr(I18nText.EnableNavigation)):
-                    logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
-                    fsm.fail()
+                # 点击提示弹窗
+                if not ui.sleep(0.2).wait(6).until(_wait_solo_challenge):
                     return _fail()
 
                 is_start_challenge = True
@@ -1949,16 +1951,18 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
     ui = UIOp(ctx)
     tacets = [
+        I18nText.SimulacrumNexusTacetDiscordNest,
         I18nText.SouthernYuanHillsTacetDiscordNest,
         I18nText.StarblindCrashsiteTacetDiscordNest,
         I18nText.RebirthUplandsTacetDiscordNest,
-        I18nText.StagnantRunTacetDiscordNest,
+        # I18nText.StagnantRunTacetDiscordNest,
     ]
     tacets_fsm = [
+        local.simulacrumNexusTacetDiscordNestFSM,
         local.southernYuanHillsTacetDiscordNestFSM,
         local.starblindCrashsiteTacetDiscordNestFSM,
         local.rebirthUplandsTacetDiscordNestFSM,
-        local.stagnantRunTacetDiscordNestFSM,
+        # local.stagnantRunTacetDiscordNestFSM,
     ]
     tacets_route = [
         [Run.forward(4.5)],
@@ -2073,14 +2077,15 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     break
 
             # 点击快速旅行
-            if not ui.search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation])):
+            if not ui.search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation, I18nText.Track])):
                 if not ui.wait().until(
-                        lambda: ui.snapshot().search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation]))):
+                        lambda: ui.snapshot().search(
+                            ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation, I18nText.Track]))):
                     if in_progress:
                         cur_fsm.fail()
                     return False
             # 检查副本未解锁
-            if ui.search(ctx.tr(I18nText.EnableNavigation)):
+            if ui.search(ctx.tr([I18nText.EnableNavigation, I18nText.Track])):
                 logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
                 cur_fsm.complete()
                 return True
@@ -2550,6 +2555,8 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.enemyLampylumenMyriadFSM.set_enabled(cfg.enemyLampylumenMyriad)
 
         ### ------- Guidebook MaterialCollection TacetSuppression -------
+        self.local.tacetFieldHeartOfStillnessFSM.set_enabled(cfg.tacetFieldHeartOfStillness)
+        self.local.tacetFieldHeartOfFlamesFSM.set_enabled(cfg.tacetFieldHeartOfFlames)
         self.local.westernFangPeaksTacetFieldFSM.set_enabled(cfg.westernFangPeaksTacetField)
         self.local.easternXuanPeaksTacetFieldFSM.set_enabled(cfg.easternXuanPeaksTacetField)
         self.local.tacetFieldSolisiaLandingFSM.set_enabled(cfg.tacetFieldSolisiaLanding)
@@ -2571,6 +2578,7 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.tacetFieldDimForestFSM.set_enabled(cfg.tacetFieldDimForest)
 
         ### ------- Guidebook MaterialCollection WeeklyChallenge -------
+        self.local.ordinanceOfTheInevitableFSM.set_enabled(cfg.ordinanceOfTheInevitable)
         self.local.courtOfShackledSoulsFSM.set_enabled(cfg.courtOfShackledSouls)
         self.local.seedOfIllusoryOriginFSM.set_enabled(cfg.seedOfIllusoryOrigin)
         self.local.gateOfTheLostStarFSM.set_enabled(cfg.gateOfTheLostStar)
@@ -2587,6 +2595,7 @@ class DailyWorkflow(AbstractWorkflow):
         ### ------- Guidebook MaterialCollection TacetDiscordNest -------
 
         ### ------- Guidebook MaterialCollection tacetDiscordNest -------
+        self.local.simulacrumNexusTacetDiscordNestFSM.set_enabled(cfg.simulacrumNexusTacetDiscordNest)
         self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)
         self.local.rebirthUplandsTacetDiscordNestFSM.set_enabled(cfg.rebirthUplandsTacetDiscordNest)

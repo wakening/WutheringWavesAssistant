@@ -273,6 +273,8 @@ class ExploreWorkflow(AbstractWorkflow):
             I18nText.PickOpusStone,
             I18nText.PickLeafweaver,
             I18nText.PickFloralCrestJade,
+            I18nText.PickBloomOfHearkening,
+            I18nText.PickMiasmicBranch,
             I18nText.PickSilverBandedLizard,
             I18nText.PickAzureLizard,
             I18nText.PickGreenPitLizard,

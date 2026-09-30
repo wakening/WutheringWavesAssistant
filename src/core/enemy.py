@@ -1859,6 +1859,42 @@ class Enemy:
         ),
     )
 
+    SuhsinTheInevitable = EnemyMeta(
+        id=I18nText.EnemySuhsinTheInevitable,
+        key=BossNameEnum.SuhsinTheInevitable,
+        localized_name=I18nTr.l10n(I18nText.EnemySuhsinTheInevitable),
+        species=EnemySpecies.Other,
+        rank=EnemyRank.OverlordClass,
+        cost=EnemyCost.Cost4,
+        icon=EnemyIcon.Icon1,
+        version=EnemyVersion.V3_7,
+        sonata=[SonataEffect.HeartOfEvilsPurge, SonataEffect.LampOfNetherRoad],
+        elements=[EnemyElement.Electro],
+        prefer_quick=True,
+        boss_meta=BossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemySuhsinTheInevitable),
+            is_dungeon=False,
+            dungeon_name=None,
+            auto_respawn=False,
+            enter_text=None,
+            battle_text=[I18nText.CombatDefeat],
+            stop_text=[],
+            routes=[],
+            absorb=None,
+            restart=None,
+        ),
+        quick_boss_meta=QuickBossMeta(
+            localized_name=I18nTr.l10n(I18nText.EnemySuhsinTheInevitable),
+            menu=I18nText.WeeklyChallenge,
+            dungeon_name=I18nText.OrdinanceOfTheInevitable,
+            auto_respawn=False,
+            battle_text=[I18nText.DefeatTheEnemies],
+            stop_text=[],
+            routes=[],
+            absorb=AbsorbMode.Move,
+        ),
+    )
+
     @classmethod
     def from_key(cls, key: str):
         return EnemyMeta.KEY_ENEMIES.get(key)

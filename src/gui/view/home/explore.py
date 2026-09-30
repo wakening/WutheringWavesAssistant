@@ -69,7 +69,7 @@ class StoryExploreWidget(QWidget):
             self
         )
         self.autoCombatDescLabel.setWordWrap(True)
-        self.autoCombatLayout = QHBoxLayout(self)
+        self.autoCombatLayout = QHBoxLayout()
         self.autoCombatLayout.addWidget(self.autoCombatDescLabel)
         self.autoCombatLayout.setContentsMargins(30, 0, 0, 0)
 
@@ -79,7 +79,7 @@ class StoryExploreWidget(QWidget):
             self
         )
         self.autoPickupDescLabel.setWordWrap(True)
-        self.autoPickupLayout = QHBoxLayout(self)
+        self.autoPickupLayout = QHBoxLayout()
         self.autoPickupLayout.addWidget(self.autoPickupDescLabel)
         self.autoPickupLayout.setContentsMargins(30, 0, 0, 0)
 
@@ -89,7 +89,7 @@ class StoryExploreWidget(QWidget):
             self
         )
         self.skipStoryDescLabel.setWordWrap(True)
-        self.skipStoryLayout = QHBoxLayout(self)
+        self.skipStoryLayout = QHBoxLayout()
         self.skipStoryLayout.addWidget(self.skipStoryDescLabel)
         self.skipStoryLayout.setContentsMargins(30, 0, 0, 0)
 
@@ -101,7 +101,7 @@ class StoryExploreWidget(QWidget):
             self
         )
         self.autoDialogueDescLabel.setWordWrap(True)
-        self.autoDialogueLayout = QHBoxLayout(self)
+        self.autoDialogueLayout = QHBoxLayout()
         self.autoDialogueLayout.addWidget(self.autoDialogueDescLabel)
         self.autoDialogueLayout.setContentsMargins(30, 0, 0, 0)
 

@@ -238,6 +238,7 @@ class I18nText:
     EnemyMyriadSnareRustfireChassis = "EnemyMyriadSnareRustfireChassis"
     EnemyThousandPuppetPavilion = "EnemyThousandPuppetPavilion"
     EnemyCalamityEffigy = "EnemyCalamityEffigy"
+    EnemySuhsinTheInevitable = "EnemySuhsinTheInevitable"
 
     EnemyScar = "EnemyScar"
 
@@ -337,6 +338,7 @@ class I18nText:
     # ------- Map -------
     FastTravel = "FastTravel"
     EnableNavigation = "EnableNavigation"
+    Track = "Track"
     SwitchMap = "SwitchMap"
     RoyaFrostlands = "RoyaFrostlands"
     LahaiRoi = "LahaiRoi"
@@ -543,6 +545,8 @@ class I18nText:
     ForgeryExit = "ForgeryExit"
 
     ### ------- Guidebook MaterialCollection TacetSuppression -------
+    TacetFieldHeartOfStillness = "TacetFieldHeartOfStillness"
+    TacetFieldHeartOfFlames = "TacetFieldHeartOfFlames"
     WesternFangPeaksTacetField = "WesternFangPeaksTacetField"
     EasternXuanPeaksTacetField = "EasternXuanPeaksTacetField"
     TacetFieldSolisiaLanding = "TacetFieldSolisiaLanding"
@@ -583,6 +587,7 @@ class I18nText:
     LimitedTimeEarlyAccess = "LimitedTimeEarlyAccess"
     ArrivingAtTheDestination = "ArrivingAtTheDestination"
     # 周本关卡名
+    OrdinanceOfTheInevitable = "OrdinanceOfTheInevitable"
     CourtOfShackledSouls = "CourtOfShackledSouls"
     SeedOfIllusoryOrigin = "SeedOfIllusoryOrigin"
     GateOfTheLostStar = "GateOfTheLostStar"
@@ -594,6 +599,7 @@ class I18nText:
     ChaoticJuncture = "ChaoticJuncture"
     BellOfArchaicChants = "BellOfArchaicChants"
     # 前端用关卡名不好认，使用boss名
+    WeeklyBossSuhsinTheInevitable = "WeeklyBossSuhsinTheInevitable"
     WeeklyBossThousandPuppetPavilion = "WeeklyBossThousandPuppetPavilion"
     WeeklyBossDenia = "WeeklyBossDenia"
     WeeklyBossSigillum = "WeeklyBossSigillum"
@@ -622,6 +628,7 @@ class I18nText:
     TacetDiscordNestTacetDiscordNest = "TacetDiscordNestTacetDiscordNest"
     SonataSetFilter = "SonataSetFilter"
     # LahaiRoi = "LahaiRoi"
+    SimulacrumNexusTacetDiscordNest = "SimulacrumNexusTacetDiscordNest"
     SouthernYuanHillsTacetDiscordNest = "SouthernYuanHillsTacetDiscordNest"
     StarblindCrashsiteTacetDiscordNest = "StarblindCrashsiteTacetDiscordNest"
     RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
@@ -752,6 +759,8 @@ class I18nText:
     PickOpusStone = "PickOpusStone"
     PickLeafweaver = "PickLeafweaver"
     PickFloralCrestJade = "PickFloralCrestJade"
+    PickBloomOfHearkening = "PickBloomOfHearkening"
+    PickMiasmicBranch = "PickMiasmicBranch"
     PickSilverBandedLizard = "PickSilverBandedLizard"
     PickAzureLizard = "PickAzureLizard"
     PickGreenPitLizard = "PickGreenPitLizard"
@@ -1295,6 +1304,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^天.?劫煞$", raw="天傀劫煞"),
         Language.EN: RegexStr(flex_ws(r"^Calamity Effigy$"), raw="Calamity Effigy"),
     },
+    I18nText.EnemySuhsinTheInevitable: {
+        Language.ZH: RegexStr(r"^天演.?心$", raw="天演溯心"),
+        Language.EN: RegexStr(flex_ws(r"^Suhsin the Inevitable$"), raw="Suhsin the Inevitable"),
+    },
 
     # 战斗文本
     I18nText.CombatDefeat: {
@@ -1670,6 +1683,10 @@ I18N_TEXT = {
     I18nText.EnableNavigation: {
         Language.ZH: RegexStr(r"^.?导航追踪$", raw="导航追踪"),
         Language.EN: RegexStr(flex_ws(r"^.?Enable Navigation$"), raw="Enable Navigation"),
+    },
+    I18nText.Track: {
+        Language.ZH: RegexStr(r"^追踪$", raw="追踪"),
+        Language.EN: RegexStr(flex_ws(r"^Track$"), raw="Track"),
     },
     I18nText.SwitchMap: {
         Language.ZH: RegexStr(r"^切换地图$", raw="切换地图"),
@@ -2487,6 +2504,14 @@ I18N_TEXT = {
     },
 
     ### ------- Guidebook MaterialCollection TacetSuppression -------
+    I18nText.TacetFieldHeartOfStillness: {
+        Language.ZH: RegexStr(r"^沉心域无音区$", raw="沉心域无音区"),
+        Language.EN: RegexStr(flex_ws(r"Stillness$"), raw=r"Tacet Field: Heart of Stillness"),
+    },
+    I18nText.TacetFieldHeartOfFlames: {
+        Language.ZH: RegexStr(r"^[^沉]?心域无音区$", raw="烬心域无音区"),
+        Language.EN: RegexStr(flex_ws(r"Flames$"), raw=r"Tacet Field: Heart of Flames"),
+    },
     I18nText.WesternFangPeaksTacetField: {
         Language.ZH: RegexStr(r"^方.?西峰无音区$", raw="方擎西峰无音区"),
         Language.EN: RegexStr(flex_ws(r"^Western Fang Peaks"), raw=r"Western Fang Peaks Tacet Field"),
@@ -2643,6 +2668,10 @@ I18N_TEXT = {
             raw=r"Arriving at the destination in advance may influence your story experience")
     },
     # 周本关卡名
+    I18nText.OrdinanceOfTheInevitable: {
+        Language.ZH: RegexStr(r"^定序.?理之律", raw="定序诸理之律", desc="定序诸理之律·战歌重奏"),
+        Language.EN: RegexStr(flex_ws(r"Ordinance of the Inevitable$"), raw=r"Ordinance of the Inevitable"),
+    },
     I18nText.CourtOfShackledSouls: {
         Language.ZH: RegexStr(r"^失坠困.?之庭", raw="失坠困咎之庭", desc="失坠困咎之庭·战歌重奏"),
         Language.EN: RegexStr(flex_ws(r"Court of Shackled Souls$"), raw=r"Court of Shackled Souls"),
@@ -2684,6 +2713,10 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"of Archaic Chants$"), raw=r"Bell of Archaic Chants"),
     },
     # 周本关卡boss名
+    I18nText.WeeklyBossSuhsinTheInevitable: {
+        Language.ZH: RegexStr(r"^天演.?心$", raw="天演溯心"),
+        Language.EN: RegexStr(flex_ws(r"^Suhsin the Inevitable$"), raw="Suhsin the Inevitable"),
+    },
     I18nText.WeeklyBossThousandPuppetPavilion: {
         Language.ZH: RegexStr(r"千.?重楼", raw="千傀重楼"),
         Language.EN: RegexStr(r"Thousand.?Puppet Pavilion", raw="Thousand-Puppet Pavilion"),
@@ -2790,6 +2823,10 @@ I18N_TEXT = {
     I18nText.SonataSetFilter: {
         Language.ZH: RegexStr(r"^合鸣套装.?选$", raw="合鸣套装筛选"),
         Language.EN: RegexStr(flex_ws(r"^Sonata set filter$"), raw="Sonata set filter"),
+    },
+    I18nText.SimulacrumNexusTacetDiscordNest: {
+        Language.ZH: RegexStr(r"梦.?天罗残象聚落$", raw="梦枢天罗残象聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Simulacrum Nexus"), raw=r"Simulacrum Nexus Tacet Discord Nest"),
     },
     I18nText.SouthernYuanHillsTacetDiscordNest: {
         Language.ZH: RegexStr(r"落.?南丘残象聚落$", raw="落渊南丘残象聚落"),
@@ -3251,6 +3288,15 @@ I18N_TEXT = {
     I18nText.PickFloralCrestJade: {
         Language.ZH: RegexStr(r".?华璧$", raw="玟华璧"),
         Language.EN: RegexStr(flex_ws(r"Floral Crest Jade$"), raw="Floral Crest Jade"),
+    },
+    # 3.7
+    I18nText.PickBloomOfHearkening: {
+        Language.ZH: RegexStr(r"倾念华$", raw="倾念华"),
+        Language.EN: RegexStr(flex_ws(r"Bloom of Hearkening$"), raw="Bloom of Hearkening"),
+    },
+    I18nText.PickMiasmicBranch: {
+        Language.ZH: RegexStr(r".?痕残株$", raw="瘴痕残株"),
+        Language.EN: RegexStr(flex_ws(r"Miasmic Branch$"), raw="Miasmic Branch"),
     },
     I18nText.PickSilverBandedLizard: {
         Language.ZH: RegexStr(r"银环蜥$", raw="银环蜥"),

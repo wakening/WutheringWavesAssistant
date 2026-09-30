@@ -379,7 +379,11 @@ class BottomWidget(CardWidget):
     def __tipsText(self) -> str:
         # 双倍提醒
         tipsText = ''
-        v = Version(re.search(r"\d+(?:\.\d+){0,2}", __version__).group())
+        try:
+            v = Version(re.search(r"\d+(?:\.\d+){0,2}", __version__).group())
+        except Exception as e:
+            logger.exception(e)
+            return tipsText
         if v.major > 3 or v.major == 3 and v.minor >= 7:
             if TimeRange.from_str("2026-10-15 04:00", "2026-10-22 04:00").contains():
                 tipsText = f'<b><font color="red">{self.tr("今日: 双倍养成材料")}</font></b>'

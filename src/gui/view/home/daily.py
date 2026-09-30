@@ -68,7 +68,7 @@ class DailyWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QHBoxLayout(self.container)
 
-        self.contentLayout = QVBoxLayout(self.container)
+        self.contentLayout = QVBoxLayout()
         # self.contentTitleLabel = QLabel(self.tr("任务设置:"), self.container)
 
         self.waveplateLabel = QLabel(self.tr("体力:"), self.container)
@@ -103,6 +103,7 @@ class DailyWidget(ScrollArea):
 
         # 周本副本名，保存用，后端用，倒叙，最新在前
         self.weeklyChallenge = [
+            I18nText.OrdinanceOfTheInevitable,
             I18nText.CourtOfShackledSouls,
             I18nText.SeedOfIllusoryOrigin,
             I18nText.GateOfTheLostStar,
@@ -116,6 +117,7 @@ class DailyWidget(ScrollArea):
         ]
         # 周本boss名，展示用，仅前端用
         self.weeklyBoss = [
+            I18nText.WeeklyBossSuhsinTheInevitable,
             I18nText.WeeklyBossThousandPuppetPavilion,
             I18nText.WeeklyBossDenia,
             I18nText.WeeklyBossSigillum,
@@ -183,6 +185,8 @@ class DailyWidget(ScrollArea):
             I18nText.EnemyLampylumenMyriad,
         ]
         self.tacetSuppression = [
+            I18nText.TacetFieldHeartOfStillness,
+            I18nText.TacetFieldHeartOfFlames,
             I18nText.WesternFangPeaksTacetField,
             I18nText.EasternXuanPeaksTacetField,
             I18nText.TacetFieldSolisiaLanding,
@@ -213,6 +217,7 @@ class DailyWidget(ScrollArea):
         self.nightmarePurification = [
         ]
         self.tacetDiscordNest = [
+            # I18nText.SimulacrumNexusTacetDiscordNest,
             I18nText.SouthernYuanHillsTacetDiscordNest,
             I18nText.StarblindCrashsiteTacetDiscordNest,
             I18nText.RebirthUplandsTacetDiscordNest,
@@ -246,6 +251,8 @@ class DailyWidget(ScrollArea):
             I18nText.MoonlitGroves: I18nText.GuidebookJinzhou,
             I18nText.MarigoldWoods: I18nText.GuidebookJinzhou,
 
+            I18nText.TacetFieldHeartOfStillness: I18nText.GuidebookMengzhou,
+            I18nText.TacetFieldHeartOfFlames: I18nText.GuidebookMengzhou,
             I18nText.WesternFangPeaksTacetField: I18nText.GuidebookMengzhou,
             I18nText.EasternXuanPeaksTacetField: I18nText.GuidebookMengzhou,
             I18nText.TacetFieldSolisiaLanding: I18nText.GuidebookLahaiRoi,
@@ -266,6 +273,7 @@ class DailyWidget(ScrollArea):
             I18nText.TacetFieldDesorockHighlandII: I18nText.GuidebookJinzhou,
             I18nText.TacetFieldDimForest: I18nText.GuidebookJinzhou,
 
+            I18nText.SimulacrumNexusTacetDiscordNest: I18nText.GuidebookMengzhou,
             I18nText.SouthernYuanHillsTacetDiscordNest: I18nText.GuidebookMengzhou,
             I18nText.StarblindCrashsiteTacetDiscordNest: I18nText.GuidebookLahaiRoi,
             I18nText.RebirthUplandsTacetDiscordNest: I18nText.GuidebookLahaiRoi,
@@ -346,6 +354,8 @@ class DailyWidget(ScrollArea):
                 region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNest[i])).raw,
             )
             self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNest[i])
+            if i > 2:
+                self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
         # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.activityCheckBox = CheckBox(self.tr("活跃行迹:"), self.container)
@@ -367,7 +377,7 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox.addItem(self.tr("自动"), userData="Auto")
         # self.pioneerPodcastSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.focusResonatorLayout = QHBoxLayout(self.container)
+        self.focusResonatorLayout = QHBoxLayout()
         self.focusResonatorTitle = QLabel(self.tr("培养目标: "), self.container)
         self.focusResonatorComboBox = ComboBox(self.container)
         self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
@@ -377,9 +387,12 @@ class DailyWidget(ScrollArea):
         self.focusResonatorComboBox.setCurrentIndex(1)
         self.focusResonatorComboBox.setEnabled(False)
 
-        self.focusWeeklyChallenge = QLabel(self.tr("天演溯心·衍律化形"), self.container)
+        self.focusWeeklyChallenge = QLabel(self.tr("天演溯心"), self.container)
+        self.focusTacetSuppression = QLabel(self.tr("沉心域、烬心域无音区"), self.container)
         self.focusForgeryChallenge = QLabel(self.tr("音感仪（梦州、拉海洛）"), self.container)
         self.focusBossChallenge = QLabel(self.tr("万囮牢·朽躯"), self.container)
+        self.focusGather = QLabel(self.tr("采集: 倾念华"), self.container)
+        self.focusTacetDiscordNest = QLabel(self.tr("梦枢天罗残象聚落"), self.container)
 
         self.buttonGroup = [
             self.tacetSuppressionCheckBox,
@@ -560,6 +573,7 @@ class DailyWidget(ScrollArea):
         self.gridLayout.addWidget(self.__create_up_label(self.chordCleansing), row, 0)
         self.gridLayout.addWidget(self.tacetSuppressionCheckBox, row, 1)
         self.gridLayout.addWidget(self.tacetSuppressionComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusTacetSuppression, row, 3)
         # self.gridLayout.addWidget(self.tacetSuppressionSettingButton, row, 2)
 
         row += 1
@@ -578,10 +592,12 @@ class DailyWidget(ScrollArea):
 
         row += 1
         self.gridLayout.addWidget(self.nestLabel, row, 0, 1, 2)
+        self.gridLayout.addWidget(self.focusGather, row, 3)
 
         row += 1
         self.gridLayout.addWidget(self.tacetDiscordNestCheckBox, row, 1)
         self.gridLayout.addWidget(self.tacetDiscordNestComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusTacetDiscordNest, row, 3)
         # self.gridLayout.addWidget(self.tacetDiscordNestSettingButton, row, 2)
 
         row += 1
