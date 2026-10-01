@@ -354,7 +354,7 @@ class DailyWidget(ScrollArea):
                 region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNest[i])).raw,
             )
             self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNest[i])
-            if i == 0 or i > 3:
+            if i > 3:
                 self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
         # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
 

@@ -55,6 +55,7 @@ class BossNameEnum(Enum):
     CourtOfShackledSouls = "失坠困咎之庭（限时提前开放）"
     ThousandPuppetPavilion = "千傀重楼"
     CalamityEffigy = "天傀劫煞"
+    SuhsinTheInevitable = "天演溯心"
 
     @staticmethod
     def enemies():

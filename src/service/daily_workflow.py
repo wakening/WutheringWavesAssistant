@@ -27,6 +27,7 @@ from src.service.common_workflow import (
 )
 from src.util import img_util, file_util
 from src.util.img_sift_util import SIFTFeatureMatcher
+from src.util.img_tile_util import TileGrid
 
 logger = logging.getLogger(__name__)
 
@@ -498,6 +499,16 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
             lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi) or ui.search(ctx.tr(
                 [I18nText.CannotPerformThisActionDuringBattle, I18nText.CannotAdjustTheTeamLineupInTheCurrentState]))):
         if not ui.search(ctx.tr(I18nText.QuickSetup), roi):
+            logger.info(f"Team locked")
+            return False
+
+    # 切换2D
+    img = ui.sleep(0.4).grap()
+    c3d = ColorRule().points(AnchorPoint(1081, 43, Align.Top | Align.Right)).colors(Color.bgr(195, 195, 195))
+    c2d = ColorRule().points(AnchorPoint(1158, 43, Align.Top | Align.Right)).colors(Color.bgr(10, 8, 6))
+    if c3d.match(img, ctx.scaler) and c2d.match(img, ctx.scaler):
+        ui.click_point(AnchorPoint(1146, 43, Align.Top | Align.Right))
+        if not ui.sleep(0.4).wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi)):
             logger.info(f"Team locked")
             return False
 
@@ -1965,10 +1976,11 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # local.stagnantRunTacetDiscordNestFSM,
     ]
     tacets_route = [
+        [Run.forward(2.5)],
         [Run.forward(4.5)],
         [Run.right(0.25), Run.forward(3.3)],
         [Run.forward(2.5)],
-        [Run.forward(5.5)],
+        # [Run.forward(5.5)],
     ]
 
     try:
@@ -2103,10 +2115,25 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             combat_system.exit_special_state(Morph.Forced)
             ui.move(tacets_route[_tacets_idx]).sleep(0.3)
 
-            if cur_instance == I18nText.SouthernYuanHillsTacetDiscordNest:
+            if cur_instance == I18nText.SimulacrumNexusTacetDiscordNest:
+                # 梦枢天罗
+                # 00 10
+                # 01 11
+                grid = TileGrid()
+                grid.add_tile(0, 0, img_util.read_img(
+                    Resource.Map.Huanglong.Mengzhou.SimulacrumNexusOfMengzhou / "912_0_1.png"))
+                grid.add_tile(1, 0, img_util.read_img(
+                    Resource.Map.Huanglong.Mengzhou.SimulacrumNexusOfMengzhou / "912_1_1.png"))
+                composite = grid.composite_region(min_x=0, min_y=0, max_x=1, max_y=0)
+                tmpl_name = str(int(time.monotonic()))
+                tmpl_img = composite.image
+                matcher = SIFTFeatureMatcher()
+                feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
+                point = Point(1024 + 7, 489)
+            elif cur_instance == I18nText.SouthernYuanHillsTacetDiscordNest:
                 # 落渊南丘
                 tmpl_name = "8_-7_1.png"
-                tmpl_img = img_util.read_img(file_util.get_assets_map("Huanglong/Mengzhou/8_-7_1.png"))
+                tmpl_img = img_util.read_img(Resource.Map.Huanglong.Mengzhou.ROOT / "8_-7_1.png")
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(135, 900)

@@ -606,6 +606,16 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
             logger.info(f"Team locked")
             return False
 
+    # 切换2D
+    img = ui.sleep(0.4).grap()
+    c3d = ColorRule().points(AnchorPoint(1081, 43, Align.Top | Align.Right)).colors(Color.bgr(195, 195, 195))
+    c2d = ColorRule().points(AnchorPoint(1158, 43, Align.Top | Align.Right)).colors(Color.bgr(10, 8, 6))
+    if c3d.match(img, ctx.scaler) and c2d.match(img, ctx.scaler):
+        ui.click_point(AnchorPoint(1146, 43, Align.Top | Align.Right))
+        if not ui.sleep(0.4).wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup), roi)):
+            logger.info(f"Team locked")
+            return False
+
     ui.sleep(0.3).snapshot()
 
     # 检查失去意识

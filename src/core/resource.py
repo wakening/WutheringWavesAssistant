@@ -24,7 +24,10 @@ class Resource:
         class Huanglong:
             ROOT = _ROOT / "assets/map/Huanglong"
             Jinzhou = ROOT / "Jinzhou"
-            Mengzhou = ROOT / "Mengzhou"
+
+            class Mengzhou:
+                ROOT = _ROOT / "assets/map/Huanglong/Mengzhou"
+                SimulacrumNexusOfMengzhou = ROOT / "Simulacrum Nexus of Mengzhou"
 
         class Rinascita:
             ROOT = _ROOT / "assets/map/Rinascita"
