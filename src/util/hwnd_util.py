@@ -91,6 +91,25 @@ def get_exe_path_from_hwnd(hwnd: int) -> str | None:
         return None
 
 
+def get_process_info_from_hwnd(hwnd: int) -> tuple:
+    # 获取进程 ID 和 命令行参数
+    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+
+    # 通过 psutil 获取进程路径
+    try:
+        proc = psutil.Process(pid)
+        exe_path = proc.exe()  # 可执行文件完整路径
+        cmdline = proc.cmdline()  # 启动参数列表
+        # cwd = proc.cwd()  # 工作目录
+        logger.debug(f"exe_path: {exe_path}")
+        logger.debug(f"cmdline: {cmdline}")
+        # logger.debug(f"cwd: {cwd}")
+        return exe_path, cmdline
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        pass
+    return None, None
+
+
 def _find_all_windows(class_name=None, titles=None):
     result = []
 
@@ -169,13 +188,16 @@ def get_wwg_path(path_str: str) -> Path | None:
     if not path_str:
         return None
     try:
+        if isinstance(path_str, Path):
+            path_str = str(path_str.resolve())
         # 兼容Wuthering Waves.exe 和 Client-Win64-Shipping.exe
         if path_str.endswith(WUTHERING_WAVES_EXE):
             return Path(path_str).parent
         if path_str.endswith(CLIENT_WIN64_SHIPPING_EXE):
             return Path(path_str).parent.parent.parent.parent
-    except Exception:
-        return None
+    except Exception as e:
+        logger.exception(e)
+    return None
 
 
 def get_ww_exe_path(path_str: str) -> str:

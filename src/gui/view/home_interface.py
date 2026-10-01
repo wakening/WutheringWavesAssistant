@@ -98,6 +98,16 @@ class BasicSettingWidget(QWidget):
             "GPU",
             "CPU",
         ]
+        self.resourceQuality = [
+            "UHD",
+            "HD",
+            "SD",
+        ]
+        self.resourceQualityDesc = [
+            "极致",
+            "高清（默认）",
+            "流畅",
+        ]
 
         self.mainLayout = QVBoxLayout(self)
 
@@ -115,6 +125,16 @@ class BasicSettingWidget(QWidget):
             self.langComboBox.addItem(self.tr("{text}").format(text=self.langDesc[i]), userData=self.lang[i].value)
             if i > 1:
                 self.langComboBox.setItemEnabled(self.langComboBox.count() - 1, False)
+
+        self.resourceQualityLayout = QHBoxLayout()
+        self.resourceQualityLabel = QLabel(self.tr("资源等级:"), self)
+        self.resourceQualityComboBox = ComboBox(self)
+        # self.resourceQualityComboBox.setPlaceholderText(self.tr("{text} {level}").format(
+        #     text=self.resourceQualityDesc[1], level=self.resourceQuality[1]))
+        for i in range(len(self.resourceQuality)):
+            self.resourceQualityComboBox.addItem(self.tr("{level} {text}").format(
+                text=self.resourceQualityDesc[i], level=self.resourceQuality[i]), userData=self.resourceQuality[i])
+        self.resourceQualityComboBox.setCurrentIndex(1)
 
         self.deviceLayout = QHBoxLayout()
         self.deviceLabel = QLabel(self.tr("运行设备:"), self)
@@ -154,6 +174,8 @@ class BasicSettingWidget(QWidget):
     def __initLayout(self):
         self.langLayout.addWidget(self.langLabel)
         self.langLayout.addWidget(self.langComboBox, 1)
+        self.resourceQualityLayout.addWidget(self.resourceQualityLabel)
+        self.resourceQualityLayout.addWidget(self.resourceQualityComboBox, 1)
         self.deviceLayout.addWidget(self.deviceLabel)
         self.deviceLayout.addWidget(self.deviceComboBox, 1)
         # self.langLayout.setContentsMargins(0, 0, 0, 0)
@@ -161,6 +183,7 @@ class BasicSettingWidget(QWidget):
 
         self.mainLayout.addWidget(self.titleLabel)
         self.mainLayout.addLayout(self.langLayout)
+        self.mainLayout.addLayout(self.resourceQualityLayout)
         self.mainLayout.addLayout(self.deviceLayout)
         self.mainLayout.addWidget(self.messageEdit, 1)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
@@ -168,12 +191,16 @@ class BasicSettingWidget(QWidget):
 
     def __connectSignalToSlot(self):
         self.langComboBox.currentIndexChanged.connect(self.__onLangComboBoxChanged)
+        self.resourceQualityComboBox.currentIndexChanged.connect(self.__onResourceQualityChanged)
         self.deviceComboBox.currentIndexChanged.connect(self.__onDeviceComboBoxChanged)
         signalBus.homeMessageSignal.connect(self.__onMessageChanged)
 
     def __onLangComboBoxChanged(self, index):
         paramConfig.set(paramConfig.gameLanguage, self.langComboBox.currentData())
         # self.__refreshGridLayout(index)
+
+    def __onResourceQualityChanged(self, index):
+        paramConfig.set(paramConfig.resourceQuality, self.resourceQualityComboBox.currentData())
 
     def __onDeviceComboBoxChanged(self, index):
         paramConfig.set(paramConfig.device, self.deviceComboBox.currentData())
@@ -188,6 +215,8 @@ class BasicSettingWidget(QWidget):
     def __loadConfig(self):
         self.langComboBox.setCurrentIndex(
             self.langComboBox.findData(paramConfig.get(paramConfig.gameLanguage)))
+        if resourceQuality := paramConfig.get(paramConfig.resourceQuality):
+            self.resourceQualityComboBox.setCurrentIndex(self.resourceQualityComboBox.findData(resourceQuality))
         self.deviceComboBox.setCurrentIndex(
             self.deviceComboBox.findData(paramConfig.get(paramConfig.device)))
 

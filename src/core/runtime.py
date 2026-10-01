@@ -225,6 +225,12 @@ class Device(str, Enum):
         return not self.is_gpu()
 
 
+class ResourceQuality(str, Enum):
+    UHD = "UHD"
+    HD = "HD"
+    SD = "SD"
+
+
 class GameRuntimeConfig:
 
     def __init__(self, cfg: GameConfig):
@@ -246,13 +252,24 @@ class GameRuntimeConfig:
         return lang
 
     @cached_property
+    def resourceQuality(self) -> ResourceQuality:
+        resourceQuality = ResourceQuality.HD
+        if self._cfg.resourceQuality:
+            try:
+                resourceQuality = ResourceQuality(self._cfg.resourceQuality)
+            except Exception:
+                return resourceQuality
+        logger.info(f"Resource Quality: '{resourceQuality}'")
+        return resourceQuality
+
+    @cached_property
     def gamePath(self) -> Path | None:
         gamePath = self._cfg.gamePath
         if gamePath and gamePath != "Auto":
             try:
                 path = Path(gamePath)
                 if path.is_file():
-                    logger.info(f"Using game path: '{path}'")
+                    logger.debug(f"Using game path: '{path}'")
                     return path
             except Exception:
                 pass
@@ -263,7 +280,7 @@ class GameRuntimeConfig:
             try:
                 path = Path(gamePath)
                 if path.is_file():
-                    logger.info(f"Using game path: '{path}'")
+                    logger.debug(f"Using game path: '{path}'")
                     return path
             except Exception:
                 pass

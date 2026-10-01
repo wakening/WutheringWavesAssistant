@@ -144,6 +144,39 @@ def test_get_hwnds():
     logger.debug(hwnds)
 
 
+def test_get_exe():
+    hwnds = hwnd_util.get_hwnds()
+    logger.debug(hwnds)
+    hwnd = hwnds[0]
+    """
+        根据窗口句柄获取 exe 路径和启动参数
+
+        参数:
+            hwnd: 窗口句柄 (int)
+
+        返回:
+            (exe_path, cmdline) 或 (None, None)
+        """
+    import psutil
+    import win32process
+    # 步骤1: 获取进程ID
+    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    if not pid:
+        return None, None
+
+    try:
+        # 步骤2: 通过psutil获取进程信息
+        proc = psutil.Process(pid)
+        exe_path = proc.exe()  # 可执行文件完整路径
+        cmdline = proc.cmdline()  # 启动参数列表
+        # return exe_path, cmdline
+        logger.debug(f"exe_path: {exe_path}")
+        logger.debug(f"cmdline: {cmdline}")
+    except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+        logger.debug(f"获取进程信息失败: {e}")
+        # return None, None
+
+
 def test_listen_click():
     import win32api
     import win32con

@@ -196,6 +196,7 @@ class ParamConfig(QConfig):
 
     # Game
     gameLanguage = ConfigItem("Game", "GameLanguage", None)
+    resourceQuality = ConfigItem("Game", "ResourceQuality", None, OptionsValidator([None, "UHD", "HD", "SD"]))
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
     device = ConfigItem("Game", "Device", None, OptionsValidator([None, "CPU"]))
 

@@ -114,6 +114,7 @@ class ExploreConfig(ConfigBase):
 
 class GameConfig(ConfigBase):
     gameLanguage: str | None = None
+    resourceQuality: str | None = None
     gamePath: str | None = None
     device: str | None = None
 

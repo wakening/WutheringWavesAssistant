@@ -16,8 +16,9 @@ from src.core import environs
 from src.core.contexts import Context
 from src.core.exceptions import StopError
 from src.core.message import ProcessBridge, MessageBus, MsgSource
+from src.core.runtime import RuntimeConfig
 from src.core.tasks import EchoMergeProcessTask
-from src.core.workflow import TaskSpec, IPCManager
+from src.core.workflow import TaskSpec, IPCManager, LaunchInfo
 from src.util import hwnd_util, file_util
 
 logger = logging.getLogger(__name__)
@@ -41,9 +42,12 @@ class TaskMonitor:
         # 参数快照
         self.param_config_snapshot = ParamConfig.snapshot(self.param_config_path)
         self.param_config = ParamConfig.build(content=self.param_config_snapshot)
+        self.rt_cfg = RuntimeConfig(Config.load_user_config())
 
-        self.game_path = self.get_game_path()  # 先找运行中的游戏
-        self.game_path = hwnd_util.get_ww_exe_path(self.game_path)
+        self.launch_info = self.get_launch_info()
+        self.game_path = self.launch_info.executable
+        # self.game_path = self.get_game_path()  # 先找运行中的游戏
+        # self.game_path = hwnd_util.get_ww_exe_path(self.game_path)
         logger.info("Path: %s", self.game_path)
 
         # 游戏定时重启参数
@@ -253,7 +257,8 @@ class TaskMonitor:
         if is_alive:
             return True
         logger.warning("开始重启游戏")
-        time.sleep(3)  # 等进程彻底结束
+        # 等进程彻底结束
+        self._sleep(8)
         self._restart_game()
         return False
 
@@ -272,7 +277,11 @@ class TaskMonitor:
             except Exception:
                 logger.error("游戏不存在")
             self._sleep(5)
-            subprocess.Popen([self.game_path],
+            popen_args = [self.game_path]
+            if self.launch_info.cmdline and len(self.launch_info.cmdline) > 1:
+                popen_args.extend(self.launch_info.cmdline[1:])
+            logger.debug(f"subprocess: {popen_args}")
+            subprocess.Popen(popen_args,
                              creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
             self._sleep(20)
             for i in range(10):
@@ -299,7 +308,11 @@ class TaskMonitor:
             if hwnd_util.get_hwnd(self.game_path, force=True):
                 return
             logger.warning("游戏不存在，开始启动游戏")
-            subprocess.Popen([self.game_path],
+            popen_args = [self.game_path]
+            if self.launch_info.cmdline and len(self.launch_info.cmdline) > 1:
+                popen_args.extend(self.launch_info.cmdline[1:])
+            logger.debug(f"subprocess: {popen_args}")
+            subprocess.Popen(popen_args,
                              creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
         except Exception as e:
             logger.exception(e)
@@ -330,10 +343,28 @@ class TaskMonitor:
         except Exception:
             return None
 
-    def get_game_path(self) -> str | None:
+    # def get_game_path(self) -> str | None:
+    #     hwnds = hwnd_util.get_hwnds()
+    #     if not hwnds:  # 没有运行中的游戏，则按配置来
+    #         return self.param_config.get_game_path()
+    #     if len(hwnds) == 1:
+    #         hwnd = hwnds[0]  # 运行中的最优先，不管配置
+    #     else:  # 多个游戏同时运行，优先选自定义配置的
+    #         hwnd = None
+    #         if self.param_config.gamePath and self.param_config.gamePath != "Auto":
+    #             hwnd = hwnd_util.filter_hwnds(hwnds, self.param_config.gamePath)
+    #         if not hwnd:
+    #             hwnd = hwnds[0]
+    #     return hwnd_util.get_exe_path_from_hwnd(hwnd)
+
+    def get_launch_info(self):
         hwnds = hwnd_util.get_hwnds()
         if not hwnds:  # 没有运行中的游戏，则按配置来
-            return self.param_config.get_game_path()
+            # exe_path = self.param_config.get_game_path()
+            exe_path = self.rt_cfg.game.gamePath
+            game_path = hwnd_util.get_ww_exe_path(exe_path)
+            # 极致uhd，高清hd，流畅sd
+            return LaunchInfo(game_path, [game_path, f"-krqlv={self.rt_cfg.game.resourceQuality.value.lower()}"])
         if len(hwnds) == 1:
             hwnd = hwnds[0]  # 运行中的最优先，不管配置
         else:  # 多个游戏同时运行，优先选自定义配置的
@@ -342,7 +373,22 @@ class TaskMonitor:
                 hwnd = hwnd_util.filter_hwnds(hwnds, self.param_config.gamePath)
             if not hwnd:
                 hwnd = hwnds[0]
-        return hwnd_util.get_exe_path_from_hwnd(hwnd)
+
+        exe_path, cmdline = hwnd_util.get_process_info_from_hwnd(hwnd)
+        game_path = hwnd_util.get_ww_exe_path(exe_path)
+
+        final_cmdline = None
+        if cmdline:
+            try:
+                for cmd_arg in cmdline:
+                    if cmd_arg and cmd_arg.startswith("-krqlv="):
+                        final_cmdline = [game_path, cmd_arg]
+                        break
+            except Exception as e:
+                logger.exception(e)
+        if not final_cmdline:
+            final_cmdline = [game_path, f"-krqlv={self.rt_cfg.game.resourceQuality.value.lower()}"]
+        return LaunchInfo(game_path, final_cmdline)
 
     def _sleep(self, sleep_seconds: float) -> None:
         if sleep_seconds <= 0:
@@ -444,6 +490,7 @@ class MainController:
         spec.gui_win_id = self.gui_win_id
         spec.cli_args = sys.argv
         spec.game_path = self.task_monitor.game_path
+        spec.launch_info = self.task_monitor.launch_info
         spec.param_config_path = self.param_config_path
         spec.param_config_snapshot = ParamConfig.snapshot(self.param_config_path)
         spec.param_config = ParamConfig.build(content=spec.param_config_snapshot)

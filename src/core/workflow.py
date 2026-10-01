@@ -10,7 +10,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import singledispatchmethod
-from typing import Callable, Dict, Optional, Any, List, Tuple
+from typing import Callable, Dict, Optional, Any, List, Tuple, Sequence
 
 from src.config.gui_config import ParamConfig
 from src.core.exceptions import StopError
@@ -22,6 +22,22 @@ from src.core.runtime import RuntimeConfig
 from src.core.task import TaskFSM
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class LaunchInfo:
+    executable: str | None
+    cmdline: Sequence[str]
+    # cwd: str | None = None
+
+    def __str__(self) -> str:
+        return (
+            f"LaunchInfo(\n"
+            f"  executable={self.executable!r},\n"
+            f"  cmdline={self.cmdline!r},\n"
+            # f"  cwd={self.cwd!r}\n"
+            f")"
+        )
 
 
 @dataclass
@@ -122,6 +138,8 @@ class TaskSpec:
     device: Optional[str] = None
     # 游戏路径，用于重启游戏
     game_path: Optional[str] = None
+    # 游戏参数（exe绝对路径、命令行参数），用于重启游戏
+    launch_info: Optional[LaunchInfo] = None
     # 游戏文本语言
     game_lang: Optional[str] = None
     # 配置文件
