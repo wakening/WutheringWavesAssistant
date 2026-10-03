@@ -854,13 +854,21 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 点击单人挑战
             if not ui.sleep(0.1).click_bbox(solo_challenge):
                 return False
-            if not ui.sleep(0.3).wait().until(
+            if not ui.sleep(0.3).wait(6).until(
                     lambda: ui.snapshot().search(ctx.tr(I18nText.QuickSetup))
                             # 点击开启挑战
                             and ui.click_text(ctx.tr(I18nText.StartChallenge), times=3, interval=0.3)
                             # 关闭等级差距过大弹窗
                             or ui.search(ctx.tr(I18nText.YourCurrentSol3Phase))
-                            and ui.click_text(ctx.tr(I18nText.Cancel), delay=0.3)):
+                            and ui.click_text(ctx.tr(I18nText.Cancel), delay=0.3)
+                            # 关闭结晶波片不足弹窗
+                            or ui.search(ctx.tr(I18nText.YouHaveInsufficientWaveplate))
+                            and ui.search(ctx.tr(I18nText.DoNotShowAgain))
+                            and ui.search(ctx.tr(I18nText.Confirm))
+                            # 保证文本都有才开始点
+                            and ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
+                            and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.2)
+                            and ui.false()):
                 return False
             if start_challenge := ui.search(ctx.tr(I18nText.StartChallenge)):
                 logger.info(f"{ctx.tr(I18nText.WeeklySuggestedLv).raw}: {40 + k * 10}")

@@ -786,10 +786,10 @@ class UIOp:
         RouteExecutor(self.ctx).execute(route)
         return self
 
-    # # --------- other ---------
-    # def false(self, *args):
-    #     return False
-    #
+    # --------- other ---------
+    def false(self):
+        return False
+
     # def true(self, *args):
     #     return True
 

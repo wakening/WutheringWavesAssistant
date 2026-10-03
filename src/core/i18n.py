@@ -616,6 +616,7 @@ class I18nText:
     WeeklyRemainingAttempts = "WeeklyRemainingAttempts"
     WeeklySoloChallenge = "WeeklySoloChallenge"
     YourCurrentSol3Phase = "YourCurrentSol3Phase"
+    YouHaveInsufficientWaveplate = "YouHaveInsufficientWaveplate"
     WeeklyDefeatTheEnemy = "WeeklyDefeatTheEnemy"
     WeeklyClaimRewards = "WeeklyClaimRewards"
     WeeklyConfirm = "WeeklyConfirm"
@@ -2780,6 +2781,12 @@ I18N_TEXT = {
         Language.EN: RegexStr(
             flex_ws(r"^Your current SOL3 Phase"),
             raw=r"Your current SOL3 Phase is significantly higher than the recommended level for this Sonoro Sphere"),
+    },
+    I18nText.YouHaveInsufficientWaveplate: {
+        Language.ZH: RegexStr(r"^结晶波片不足", raw="结晶波片不足，无法获取奖励，请确认是否继续进入？"),
+        Language.EN: RegexStr(
+            flex_ws(r"^You have insufficient Waveplate"),
+            raw=r"You have insufficient Waveplate and will not receive rewards. Continue anyway?"),
     },
     I18nText.WeeklyDefeatTheEnemy: {
         Language.ZH: RegexStr(r"击败", raw="击败", desc="击败敌人|击败辛吉勒姆"),
