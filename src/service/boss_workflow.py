@@ -875,7 +875,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 break
             if ui.search(ctx.tr(I18nText.YourCurrentSol3Phase)):
                 local.found_sol3phase = True
-            ui.sleep(0.3)
+            ui.sleep(0.4)
         if not start_challenge:
             return False
 
