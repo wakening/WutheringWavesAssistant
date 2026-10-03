@@ -74,7 +74,7 @@ cd /d "%ROOT_DIR%"
 
 :: 如果当前目录下 git\git.exe 存在，则加入 PATH 前面
 if exist "%ROOT_DIR%\git\cmd\git.exe" (
-    set "PATH=%ROOT_DIR%\git\cmd;%PATH%"
+    set "PATH=!ROOT_DIR!\git\cmd;!PATH!"
 )
 
 :: 设置 safe.directory 防止权限/信任问题
@@ -93,10 +93,10 @@ set "REPO_URL="
 :: set /p choice="Enter your choice (1, 2, 3, or 4): "
 set /p choice="Enter your choice (1, 2, or 3): "
 
-if "%choice%"=="1" goto SET1
-if "%choice%"=="2" goto SET2
-if "%choice%"=="3" goto SET3
-:: if "%choice%"=="4" goto SET4
+if "!choice!"=="1" goto SET1
+if "!choice!"=="2" goto SET2
+if "!choice!"=="3" goto SET3
+:: if "!choice!"=="4" goto SET4
 
 :: echo Invalid selection. Please choose 1, 2, 3, or 4.
 echo Invalid selection. Please choose 1, or 2.
@@ -119,7 +119,7 @@ set "REPO_URL=%REPO_PROXY3%"
 goto AFTER_CHOICE
 
 :AFTER_CHOICE
-echo Using repository [%choice%]: %REPO_URL%
+echo Using repository [!choice!]: %REPO_URL%
 
 :: =========================================
 :: 检查 Git 是否可用
@@ -137,12 +137,13 @@ git --version
 if not exist "%ROOT_DIR%\.git" (
     echo .git folder not found. Initializing repository...
     :: git config --global init.defaultBranch main
-    git init -b main
-    git remote add origin %REPO_URL%
+    git init
+    git checkout -b main
+    git remote add origin "%REPO_URL%"
     git fetch
     git checkout -f -b main origin/main
 ) else (
-    git remote set-url origin %REPO_URL%
+    git remote set-url origin "%REPO_URL%"
     git pull
 )
 
