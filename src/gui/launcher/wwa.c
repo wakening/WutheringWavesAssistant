@@ -1,70 +1,156 @@
 #include <windows.h>
 #include <io.h>
 #include <stdio.h>
-#include <string.h>
+#include <wchar.h>
 
 #pragma comment(lib, "User32.lib")
 
+// 启动更新脚本；失败时统一弹窗
+static BOOL LaunchUpdater(const wchar_t *root, int updateArg)
+{
+    wchar_t tempDir[MAX_PATH];
+    wchar_t source[MAX_PATH];
+    wchar_t target[MAX_PATH];
+    wchar_t cmdline[MAX_PATH * 3];
 
-int WINAPI WinMain(
+    if (swprintf_s(
+            tempDir, MAX_PATH,
+            L"%ls\\temp\\update", root) < 0 ||
+        swprintf_s(
+            source, MAX_PATH,
+            L"%ls\\scripts\\update.bat", root) < 0 ||
+        swprintf_s(
+            target, MAX_PATH,
+            L"%ls\\update.bat", tempDir) < 0)
+    {
+        goto failed;
+    }
+
+    // 创建 temp\update 目录；已存在则继续
+    if (!CreateDirectoryW(tempDir, NULL) &&
+        GetLastError() != ERROR_ALREADY_EXISTS)
+    {
+        goto failed;
+    }
+
+    // 确保路径确实是目录
+    DWORD attrs = GetFileAttributesW(tempDir);
+
+    if (attrs == INVALID_FILE_ATTRIBUTES ||
+        !(attrs & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        goto failed;
+    }
+
+    // 覆盖复制更新脚本
+    if (!CopyFileW(source, target, FALSE))
+        goto failed;
+
+    // 将个位数参数传递给 update.bat
+    // /k：脚本执行结束后保留控制台窗口
+    if (swprintf_s(
+            cmdline, MAX_PATH * 3,
+            L"cmd.exe /k \"\"%ls\" %d\"",
+            target, updateArg) < 0)
+    {
+        goto failed;
+    }
+
+    STARTUPINFOW si = { 0 };
+    PROCESS_INFORMATION pi = { 0 };
+    si.cb = sizeof(si);
+
+    if (!CreateProcessW(
+            NULL,
+            cmdline,
+            NULL,
+            NULL,
+            FALSE,
+            CREATE_NEW_CONSOLE,
+            NULL,
+            root,
+            &si,
+            &pi))
+    {
+        goto failed;
+    }
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return TRUE;
+
+failed:
+    MessageBoxW(
+        NULL,
+        L"Failed to start updater.",
+        L"Error",
+        MB_OK | MB_ICONERROR
+    );
+
+    return FALSE;
+}
+
+int WINAPI wWinMain(
     HINSTANCE hInstance,
     HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine,
-    int nCmdShow
-)
+    PWSTR lpCmdLine,
+    int nCmdShow)
 {
-    /*
-        设置当前目录为 WWA.exe 所在目录
-    */
-    char exePath[MAX_PATH];
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nCmdShow;
 
-    if (GetModuleFileNameA(NULL, exePath, MAX_PATH))
+    // 获取 WWA.exe 所在目录
+    wchar_t exePath[MAX_PATH];
+    wchar_t root[MAX_PATH] = { 0 };
+
+    DWORD len = GetModuleFileNameW(
+        NULL, exePath, MAX_PATH);
+
+    if (len > 0 && len < MAX_PATH)
     {
-        char* lastSlash = strrchr(exePath, '\\');
+        wchar_t *lastSlash = wcsrchr(exePath, L'\\');
 
-        if (lastSlash)
+        if (lastSlash != NULL)
         {
-            *lastSlash = '\0';
-            SetCurrentDirectoryA(exePath);
+            *lastSlash = L'\0';
+
+            if (swprintf_s(
+                    root, MAX_PATH, L"%ls", exePath) >= 0)
+            {
+                SetCurrentDirectoryW(root);
+            }
         }
     }
 
+    // 优先使用项目自带的 Python
+    const wchar_t *local_python = L"py312\\pythonw.exe";
 
-    /*
-        GUI 程序使用 pythonw.exe
-        不会创建控制台窗口
-    */
-    const char* local_python = "py312\\pythonw.exe";
-
-
-    STARTUPINFOA si = {0};
-    PROCESS_INFORMATION pi = {0};
-
+    STARTUPINFOW si = { 0 };
+    PROCESS_INFORMATION pi = { 0 };
     si.cb = sizeof(si);
 
+    wchar_t cmdline[1024];
 
-    char cmdline[1024];
-
-
-    if (_access(local_python, 0) == 0)
+    if (_waccess(local_python, 0) == 0)
     {
-        /*
-            本地 Python
+        if (swprintf_s(
+                cmdline, 1024,
+                L"\"%ls\" main.py",
+                local_python) < 0)
+        {
+            MessageBoxW(
+                NULL,
+                L"Failed to build Python command line.",
+                L"Error",
+                MB_OK | MB_ICONERROR
+            );
+            return 1;
+        }
 
-            WWA.exe
-                └── pythonw.exe
-                       └── main.py
-        */
-
-        snprintf(
-            cmdline,
-            sizeof(cmdline),
-            "\"%s\" main.py",
-            local_python
-        );
-
-
-        if (!CreateProcessA(
+        if (!CreateProcessW(
                 local_python,
                 cmdline,
                 NULL,
@@ -74,22 +160,20 @@ int WINAPI WinMain(
                 NULL,
                 NULL,
                 &si,
-                &pi
-        ))
+                &pi))
         {
-            char msg[256];
+            wchar_t msg[256];
 
-            snprintf(
-                msg,
-                sizeof(msg),
-                "Failed to start pythonw.exe.\nError code: %lu",
+            swprintf_s(
+                msg, 256,
+                L"Failed to start pythonw.exe.\nError code: %lu",
                 GetLastError()
             );
 
-            MessageBoxA(
+            MessageBoxW(
                 NULL,
                 msg,
-                "Error",
+                L"Error",
                 MB_OK | MB_ICONERROR
             );
 
@@ -98,21 +182,17 @@ int WINAPI WinMain(
     }
     else
     {
-        /*
-            保留你的 Conda 逻辑
-            不修改
-        */
+        // 保留 Conda 回退逻辑，并传递 Python 退出码
+        wchar_t powershellCmd[] =
+            L"powershell.exe -NoProfile -Command "
+            L"\"conda run -n wwa-cuda python main.py; "
+            L"$code = $LASTEXITCODE; "
+            L"if ($null -eq $code) { exit 1 }; "
+            L"exit $code\"";
 
-        snprintf(
-            cmdline,
-            sizeof(cmdline),
-            "powershell.exe -Command \"conda run -n wwa-cuda python main.py\""
-        );
-
-
-        if (!CreateProcess(
+        if (!CreateProcessW(
                 NULL,
-                cmdline,
+                powershellCmd,
                 NULL,
                 NULL,
                 FALSE,
@@ -120,22 +200,20 @@ int WINAPI WinMain(
                 NULL,
                 NULL,
                 &si,
-                &pi
-        ))
+                &pi))
         {
-            char msg[256];
+            wchar_t msg[256];
 
-            snprintf(
-                msg,
-                sizeof(msg),
-                "Failed to start conda.\nError code: %lu",
+            swprintf_s(
+                msg, 256,
+                L"Failed to start conda.\nError code: %lu",
                 GetLastError()
             );
 
-            MessageBoxA(
+            MessageBoxW(
                 NULL,
                 msg,
-                "Error",
+                L"Error",
                 MB_OK | MB_ICONERROR
             );
 
@@ -143,24 +221,42 @@ int WINAPI WinMain(
         }
     }
 
+    // 等待 Python / Conda 进程退出
+    DWORD waitResult = WaitForSingleObject(
+        pi.hProcess, INFINITE);
 
-    /*
-        等待 Python 退出
+    DWORD exitCode = 0;
+    BOOL gotExitCode = FALSE;
 
-        保持：
-
-        WWA.exe
-            └── pythonw.exe
-    */
-    WaitForSingleObject(
-        pi.hProcess,
-        INFINITE
-    );
-
+    if (waitResult == WAIT_OBJECT_0)
+    {
+        gotExitCode = GetExitCodeProcess(
+            pi.hProcess, &exitCode);
+    }
 
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
+    // 101～109 均触发更新，个位数作为脚本参数
+    if (gotExitCode && exitCode >= 101 && exitCode <= 109)
+    {
+        int updateArg = (int)(exitCode % 10);
 
+        if (root[0] != L'\0')
+        {
+            LaunchUpdater(root, updateArg);
+        }
+        else
+        {
+            MessageBoxW(
+                NULL,
+                L"Failed to locate the application directory.",
+                L"Error",
+                MB_OK | MB_ICONERROR
+            );
+        }
+    }
+
+    // 保留原版的启动器返回行为
     return 0;
 }

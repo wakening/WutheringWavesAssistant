@@ -1,6 +1,7 @@
 # coding:utf-8
 import logging
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -142,8 +143,18 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.vBoxLayout.addLayout(self.buttonLayout)
 
     def __connectSignalToSlot(self):
-        # TODO 渠道选择
+        self.confirmButton.clicked.connect(self.__onConfirmButtonClicked)
         self.cancelButton.clicked.connect(self.closed)
+
+    def __onConfirmButtonClicked(self):
+        code = 0
+        if self.githubCheckBox.isChecked():
+            code = 101
+        elif self.tencentCheckBox.isChecked():
+            code = 102
+        elif self.atomGitCheckBox.isChecked():
+            code = 103
+        sys.exit(code)
 
     def paintEvent(self, e):
         # 不绘制边框和背景
