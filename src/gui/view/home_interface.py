@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from PySide6.QtCore import Qt, Signal, QTimer
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup, QApplication
 from packaging.version import Version
 
 from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, IndeterminateProgressRing, ToggleToolButton,
@@ -154,7 +154,9 @@ class UpdateFlyoutView(FlyoutViewBase):
             code = 102
         elif self.atomGitCheckBox.isChecked():
             code = 103
-        sys.exit(code)
+        logger.debug(f"exit code: {code}")
+        # sys.exit(code)
+        QApplication.instance().exit(code)
 
     def paintEvent(self, e):
         # 不绘制边框和背景

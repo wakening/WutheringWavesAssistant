@@ -117,7 +117,10 @@ def wwa():
 
     set_foreground_window(w)
 
-    app.exec()
+    exit_code = app.exec()
+    logger.debug(f"exit code: {exit_code}")
+    if exit_code and exit_code in [101, 102, 103, 104, 105]:
+        sys.exit(exit_code)
 
 
 if __name__ == '__main__':
