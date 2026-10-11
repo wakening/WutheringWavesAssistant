@@ -216,9 +216,11 @@ class DailyWidget(ScrollArea):
         ]
         self.nightmarePurification = [
         ]
-        self.tacetDiscordNest = [
+        self.tacetDiscordNestMengzhou = [
             I18nText.SimulacrumNexusTacetDiscordNest,
             I18nText.SouthernYuanHillsTacetDiscordNest,
+        ]
+        self.tacetDiscordNestLahaiRoi = [
             I18nText.StarblindCrashsiteTacetDiscordNest,
             I18nText.RebirthUplandsTacetDiscordNest,
             I18nText.StagnantRunTacetDiscordNest,
@@ -348,14 +350,24 @@ class DailyWidget(ScrollArea):
         self.tacetDiscordNestComboBox = ComboBox(self.container)
         self.tacetDiscordNestComboBox.addItem(self.tr("不选择"), userData=None)
         self.tacetDiscordNestComboBox.addItem(self.tr("全选"), userData="All")
-        for i in range(len(self.tacetDiscordNest)):
+        self.tacetDiscordNestComboBox.addItem(self.tr("全选 - 梦州"), userData=I18nText.Mengzhou)
+        for i in range(len(self.tacetDiscordNestMengzhou)):
             text = self.tr("{challenge} - {region}").format(
-                challenge=self.i18ntr(self.tacetDiscordNest[i]).raw,
-                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNest[i])).raw,
+                challenge=self.i18ntr(self.tacetDiscordNestMengzhou[i]).raw,
+                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNestMengzhou[i])).raw,
             )
-            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNest[i])
-            if i > 3:
-                self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
+            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNestMengzhou[i])
+            # if i > 3:
+            #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
+        self.tacetDiscordNestComboBox.addItem(self.tr("全选 - 拉海洛"), userData=I18nText.LahaiRoi)
+        for i in range(len(self.tacetDiscordNestLahaiRoi)):
+            text = self.tr("{challenge} - {region}").format(
+                challenge=self.i18ntr(self.tacetDiscordNestLahaiRoi[i]).raw,
+                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNestLahaiRoi[i])).raw,
+            )
+            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNestLahaiRoi[i])
+            # if i > 3:
+            #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
         # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.activityCheckBox = CheckBox(self.tr("活跃行迹:"), self.container)

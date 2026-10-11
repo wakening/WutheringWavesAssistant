@@ -4,28 +4,26 @@ import re
 import time
 from typing import Optional
 
-from src.core.color import ColorRule, Color, ColorMatch
+from src.core.color import ColorRule, Color
 from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.dungeon import Dungeon
 from src.core.enemy import Enemy
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
-from src.core.i18n import I18nText, Language, I18nTr
+from src.core.i18n import I18nText
 from src.core.message import MsgType, MsgTaskStatus, MsgSource
-from src.core.movement import Run, Walk
 from src.core.pages import UIOp, GlobalPage
 from src.core.resonator import Resonator, TeamMember
 from src.core.resource import Icon, Resource
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup, LatchTaskFSM
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
 from src.service.common_workflow import (
-    absorb_around_variant_blind, bbox_terminal_content, bbox_guidebook_content, move_and_scan_dialogue,
-    match_remaining_attempts, linear_spacing, query_waveplate_guidebook, query_waveplate_claim_rewards,
-    object_detection, bbox_hp_bar, bbox_guidebook_item, search_icon_guidebook, bbox_dialogue,
-    bbox_guidebook_title, AsyncPickup, RoiEx, Slider,
+    absorb_around_variant_blind, move_and_scan_dialogue, match_remaining_attempts, linear_spacing,
+    query_waveplate_guidebook, query_waveplate_claim_rewards,
+    object_detection, search_icon_guidebook, AsyncPickup, RoiEx, Slider,
 )
-from src.util import img_util, file_util
+from src.util import img_util
 from src.util.img_sift_util import SIFTFeatureMatcher
 from src.util.img_tile_util import TileGrid
 
@@ -123,15 +121,15 @@ class TaskLocal:
         ### ------- Guidebook MaterialCollection NightmarePurification -------
 
         ### ------- Guidebook MaterialCollection TacetDiscordNest -------
-        self.simulacrumNexusTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SimulacrumNexusTacetDiscordNest)
-        self.southernYuanHillsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
-        self.starblindCrashsiteTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
-        self.rebirthUplandsTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
-        self.stagnantRunTacetDiscordNestFSM: TaskFSM = TaskFSM(name=I18nText.StagnantRunTacetDiscordNest)
+        self.simulacrumNexusTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SimulacrumNexusTacetDiscordNest)
+        self.southernYuanHillsTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SouthernYuanHillsTacetDiscordNest)
+        self.starblindCrashsiteTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StarblindCrashsiteTacetDiscordNest)
+        self.rebirthUplandsTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.RebirthUplandsTacetDiscordNest)
+        self.stagnantRunTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StagnantRunTacetDiscordNest)
 
         ## ------- Guidebook Activity -------
-        self.activityDailyFSM: TaskFSM = TaskFSM(name=I18nText.ActivityDaily)
-        self.activityWeeklyFSM: TaskFSM = TaskFSM(name=I18nText.ActivityWeekly)
+        self.activityDailyFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ActivityDaily)
+        self.activityWeeklyFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ActivityWeekly)
 
         ## ------- Guidebook MaterialCollection -------
         self.forgeryChallengeFSM: TaskFSMGroup = TaskFSMGroup(
@@ -265,9 +263,9 @@ class TaskLocal:
             self.milestonesFSM,
             name=I18nText.Guidebook
         )
-        self.teamFSM: TaskFSM = TaskFSM(name=I18nText.Team)
-        self.mailFSM: TaskFSM = TaskFSM(name=I18nText.Mail)
-        self.pioneerPodcastFSM: TaskFSM = TaskFSM(name=I18nText.PioneerPodcast)
+        self.teamFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.Team)
+        self.mailFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.Mail)
+        self.pioneerPodcastFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.PioneerPodcast)
 
         self.rootFSM: TaskFSMGroup = TaskFSMGroup(
             self.guidebookFSM,
@@ -407,8 +405,7 @@ def doTravelToResonanceNexus(ctx: NodeContext, local: TaskLocal, **kwargs) -> bo
         ctx.control_service.map()
 
     # 等待切换地图
-    if not ui.sleep(0.5).wait(10, 0.4).until(
-            lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
+    if not ui.sleep(0.5).wait(10, 0.4).until(lambda: ui.snapshot().search(ctx.tr(I18nText.SwitchMap))):
         return False
     # 放大地图
     ui.click_point(AnchorPoint(1207, 241, Align.Right | Align.Middle), delay=0.8, times=2, interval=0.3)
@@ -474,8 +471,7 @@ def doTeam(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool | None:
     """获取编队角色名"""
     if local.teamFSM.is_terminal:
         return True
-    if local.teamFSM.status == TaskStatus.PENDING:
-        local.teamFSM.start()
+    local.teamFSM.start()
 
     ui = UIOp(ctx)
     ui.activate().sleep(0.1).snapshot()
@@ -548,11 +544,12 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         return None
 
     ui = UIOp(ctx)
+    roiex = RoiEx(ctx)
 
     # 终端
     if GlobalPage(ctx).isTerminal(ui=ui.snapshot()):
         # 点击进入索拉指南
-        if not ui.click_text(ctx.tr(I18nText.Guidebook), bbox_terminal_content(ctx),
+        if not ui.click_text(ctx.tr(I18nText.Guidebook), roiex.terminal_content,
                              pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
             logger.warning(f"Text not found: {ctx.tr(I18nText.Guidebook).raw}")
             return None
@@ -647,26 +644,29 @@ def doActivity(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 @node(NodeName.doActivityDaily)
 def doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     """活跃度"""
-    if local.activityDailyFSM.is_terminal:
+    fsm = local.activityDailyFSM
+    if fsm.is_terminal:
         return True
-    in_progress = local.activityDailyFSM.status == TaskStatus.IN_PROGRESS
-    if local.activityDailyFSM.status == TaskStatus.PENDING:
-        local.activityDailyFSM.start()
+
+    def _fail():
+        # ui.esc().sleep(1)
+        if fsm.is_terminal:
+            return True
+        if fsm.count == 0:
+            fsm.fail()
+            return True
+        return False
+
+    if not fsm.start():
+        return _fail()
 
     ui = UIOp(ctx)
     ui.snapshot()
 
-    def _fail_return():
-        # ui.esc().sleep(1)
-        if in_progress:
-            local.activityDailyFSM.fail()
-            return True
-        return False
-
     # 校验是否在活跃度页面
-    if not ui.search(ctx.tr(I18nText.Activity), bbox_guidebook_title(ctx)):
+    if not ui.search(ctx.tr(I18nText.Activity), RoiEx(ctx).guidebook_title):
         logger.warning(f"Text not found: {ctx.tr(I18nText.Activity).raw}")
-        return _fail_return()
+        return _fail()
 
     # 上方活跃度、周度游历标签文字
     roi_tab = ctx.scaler.as_bbox(AnchorBBox(
@@ -678,9 +678,9 @@ def doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     # 可能在 活跃度 或 周度游历，切换到标签页
     if not ui.search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts):
         if not ui.click_text(ctx.tr(I18nText.ActivityDaily), roi_tab, delay=0.3, times=2, interval=0.3):
-            return _fail_return()
+            return _fail()
         if not ui.wait().until(lambda: ui.snapshot().search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts)):
-            return _fail_return()
+            return _fail()
 
     # 领取活跃点
     claim_roi = ctx.scaler.as_bbox(AnchorBBox(
@@ -700,34 +700,37 @@ def doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     result = __doClaimActivityPts(ctx, local, 6, 20)
 
     if not result:
-        return _fail_return()
+        return _fail()
     # 不管活跃度满没满都算完成
-    local.activityDailyFSM.complete()
+    fsm.complete()
     return True
 
 
 @node(NodeName.doActivityWeekly)
 def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[bool]:
     """周度游历"""
-    if local.activityWeeklyFSM.is_terminal:
+    fsm = local.activityWeeklyFSM
+    if fsm.is_terminal:
         return True
-    in_progress = local.activityWeeklyFSM.status == TaskStatus.IN_PROGRESS
-    if local.activityWeeklyFSM.status == TaskStatus.PENDING:
-        local.activityWeeklyFSM.start()
+
+    def _fail():
+        # ui.esc().sleep(1)
+        if fsm.is_terminal:
+            return True
+        if fsm.count == 0:
+            fsm.fail()
+        return True
+
+    if not fsm.start():
+        return _fail()
 
     ui = UIOp(ctx)
     ui.snapshot()
 
-    def _fail_return():
-        # ui.esc().sleep(1)
-        if in_progress:
-            local.activityWeeklyFSM.fail()
-        return True
-
     # 校验是否在活跃度页面
-    if not ui.search(ctx.tr(I18nText.Activity), bbox_guidebook_title(ctx)):
+    if not ui.search(ctx.tr(I18nText.Activity), RoiEx(ctx).guidebook_title):
         logger.warning(f"Text not found: {ctx.tr(I18nText.Activity).raw}")
-        return _fail_return()
+        return _fail()
 
     # 上方活跃度、周度游历标签文字
     roi_tab = ctx.scaler.as_bbox(AnchorBBox(
@@ -740,10 +743,10 @@ def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[b
     if ui.search(ctx.tr(I18nText.ActivityPts), roi_bottom_activity_pts) or not ui.search(
             ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts):
         if not ui.click_text(ctx.tr(I18nText.ActivityWeekly), roi_tab, delay=0.3, times=2, interval=0.3):
-            return _fail_return()
+            return _fail()
         if not ui.wait().until(
                 lambda: ui.snapshot().search(ctx.tr(I18nText.WeeklyActivityPts), roi_bottom_activity_pts)):
-            return _fail_return()
+            return _fail()
 
     # 领取活跃点奖励
     res_claim = __doClaimActivityPts(ctx, local, 7, 1000)
@@ -752,7 +755,7 @@ def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[b
     if not ui.wait().until(lambda: ui.snapshot().click_text(
             ctx.tr(I18nText.PhantasmaDreamlandRhapsody), delay=0.2, times=2, interval=0.2)):
         logger.warning(f"Text not found: {ctx.tr(I18nText.PhantasmaDreamlandRhapsody).raw}")
-        return _fail_return()
+        return _fail()
 
     # 等待游戏主页
     if not ui.sleep(0.3).wait().until(
@@ -760,7 +763,7 @@ def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[b
                     and ui.search(ctx.tr(I18nText.PdrDreamGallery))
                     and ui.search(ctx.tr(I18nText.PdrWeeklyActivityPts))):
         logger.warning(f"Text not found: {ctx.tr(I18nText.PdrDreamGallery).raw}")
-        return _fail_return()
+        return _fail()
 
     # 检查游历值
     pts_roi = ctx.scaler.as_bbox(AnchorBBox(
@@ -770,9 +773,9 @@ def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[b
     if ui.sleep(0.3).snapshot().search(ctx.tr(I18nText.PdrLimitReached), pts_roi):
         logger.info(f"Weekly Activity Pts: {ctx.tr(I18nText.PdrLimitReached).raw}")
         if res_claim:
-            local.activityWeeklyFSM.complete()
+            fsm.complete()
             return True
-        return _fail_return()
+        return _fail()
 
     # 刷幻梦游园·狂想
     return False
@@ -915,7 +918,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             break
         dungeon = Dungeon.ForgeryChallenge.get(fsm.name)
         if not dungeon:
-            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
             break
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 40
@@ -1184,7 +1187,7 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             break
         dungeon = Dungeon.BossChallenge.get(fsm.name)
         if not dungeon:
-            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
             break
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 60
@@ -1421,7 +1424,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             break
         dungeon = Dungeon.TacetSuppression.get(fsm.name)
         if not dungeon:
-            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
             break
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 60
@@ -1695,13 +1698,13 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             break
         dungeon = Dungeon.WeeklyChallenge.get(fsm.name)
         if not dungeon:
-            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not found")
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
             break
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 60
 
         if not dungeon.enemy_id or not Enemy.from_id(dungeon.enemy_id):
-            logger.warning(f"Enemy '{dungeon.enemy_id}' not found")
+            logger.warning(f"Enemy '{dungeon.enemy_id}' not configured")
             break
         enemy = Enemy.from_id(dungeon.enemy_id)
         logger.info(f"{dungeon_name.raw}['{ctx.tr(enemy.id).raw}']")
@@ -1733,7 +1736,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
             # 本周剩余可收取次数: 3/3
             result = ui.sleep(0.2).wait().until(
-                lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), bbox_guidebook_content(ctx)))
+                lambda: ui.snapshot().search(ctx.tr(I18nText.RemainingWeeklyAttempts), roiex.guidebook_content))
             remain, max_remain = match_remaining_attempts(result)
             if remain is None or not max_remain:
                 return _fail()
@@ -1961,146 +1964,122 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         return True
 
     ui = UIOp(ctx)
-    tacets = [
-        I18nText.SimulacrumNexusTacetDiscordNest,
-        I18nText.SouthernYuanHillsTacetDiscordNest,
-        I18nText.StarblindCrashsiteTacetDiscordNest,
-        I18nText.RebirthUplandsTacetDiscordNest,
-        # I18nText.StagnantRunTacetDiscordNest,
-    ]
-    tacets_fsm = [
-        local.simulacrumNexusTacetDiscordNestFSM,
-        local.southernYuanHillsTacetDiscordNestFSM,
-        local.starblindCrashsiteTacetDiscordNestFSM,
-        local.rebirthUplandsTacetDiscordNestFSM,
-        # local.stagnantRunTacetDiscordNestFSM,
-    ]
-    tacets_route = [
-        [Run.forward(2.5)],
-        [Run.forward(4.5)],
-        [Run.right(0.25), Run.forward(3.3)],
-        [Run.forward(2.5)],
-        # [Run.forward(5.5)],
-    ]
+    roiex = RoiEx(ctx)
 
-    try:
-        scrollbar = ctx.scaler.as_point(AnchorPoint(458, 636, Align.Top | Align.Left))
-        logger.debug(f"scrollbar point: {scrollbar}")
+    # 点击残像聚落
+    if not ui.wait().until(
+            lambda: ui.snapshot().click_text(ctx.tr(I18nText.TacetDiscordNest), roiex.guidebook_menu,
+                                             pk=PointKind.RANDOM, times=2, interval=0.2)
+                    and ui.search(ctx.tr(I18nText.SonataSetFilter), roiex.guidebook_content)):
+        ui.esc().sleep(1.2)
+        return False
 
-        # 点击残像聚落
-        def _wait_content():
-            if ui.snapshot().search(
-                    ctx.tr(I18nText.SonataSetFilter), bbox_guidebook_content(ctx)):
+    ui.sleep(0.3)
+    slider_points = Slider.points(ui.grap())
+
+    # fsm的name = 副本id
+    for fsm in local.tacetDiscordNestFSM.children:
+        # 检查当前副本状态
+        if fsm.is_terminal:
+            continue
+        if not fsm.start():
+            fsm.fail()
+            continue
+        dungeon = Dungeon.TacetDiscordNest.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
+            fsm.fail()
+            continue
+        dungeon_name = ctx.tr(dungeon.id)
+
+        logger.info(f"{dungeon_name.raw}")
+
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
                 return True
-            if not ui.click_text(
-                    ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx), pk=PointKind.RANDOM, times=2,
-                    interval=0.1):
-                ui.sleep(0.2).click_point(scrollbar, times=2, interval=0.1).sleep(0.3)
+            if fsm.count == 0:
+                fsm.fail()
+                return True
             return False
 
-        # 确认已进入残像聚落
-        if not ui.wait().until(_wait_content):
-            for fsm in tacets_fsm:
-                if fsm.status == TaskStatus.PENDING:
-                    fsm.start()
-                    fsm.fail()
-                elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
-                    fsm.fail()
-            return False
+        try:
+            # 滑动寻找入口
+            is_start_challenge = False
+            for i, p in enumerate(slider_points):
+                logger.debug(f"Scroll point: {p}")
+                ui.click_point(p, times=2, interval=0.2)
+                ui.sleep(0.2).snapshot()
 
-        progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
-        keywords = ctx.tr([*tacets, I18nText.Go]) + [progress_pattern]
-        # 获取聚落列表
-        textboxes = ui.snapshot().search(keywords, bbox_guidebook_content(ctx))
-        textboxes.sort(key=lambda p: p.y1)
-        logger.debug(f"textboxes: {textboxes}")
-
-        # 三个一组分组
-        tacets_idx = 0
-        cards_idx = 0
-        cards = []
-
-        for textbox in textboxes:
-            if tacets_idx < len(tacets) and re.search(ctx.tr(tacets[tacets_idx]), textbox.text, re.I):
-                cards.append([textbox, tacets_idx, None, None, None])
-                cards_idx = tacets_idx
-                tacets_idx += 1
-                continue
-            if re.search(ctx.tr(I18nText.Go), textbox.text, re.I):
-                cards[cards_idx][2] = textbox
-            match = re.search(progress_pattern, textbox.text, re.I)
-            logger.debug(f"match: {match}")
-            if match:
-                cards[cards_idx][3] = textbox
-                cards[cards_idx][4] = match
-
-        # 分组
-        cards = {}
-        for i, textbox in enumerate(textboxes):
-            found_tacet = next((x for x in tacets if re.search(ctx.tr(x), textbox.text, re.I)), None)
-            logger.debug(f"found_tacet: {found_tacet}")
-            if not found_tacet:
-                continue
-            cur_card = [textbox, tacets.index(found_tacet), None, None, None]
-            cards[found_tacet] = cur_card
-            if i + 2 >= len(textboxes):
-                continue
-            if re.search(ctx.tr(I18nText.Go), textboxes[i + 1].text, re.I):
-                cur_card[2] = textboxes[i + 1]
-            match = re.search(progress_pattern, textboxes[i + 2].text, re.I)
-            logger.debug(f"match: {match}")
-            if match:
-                cur_card[3] = textbox
-                cur_card[4] = match
-        logger.debug(f"cards: {cards}")
-
-        for cur_instance, card in cards.items():
-            # 跳过无法处理的空值
-            if any(t is None for t in card):
-                continue
-
-            logger.debug(f"card: {card}")
-            tbox, _tacets_idx, go, _progress, match = card
-            cur_fsm = tacets_fsm[_tacets_idx]
-
-            # 任务状态检查
-            if cur_fsm.status.is_terminal:
-                continue
-            try:
-                if cur_fsm.status == TaskStatus.PENDING and int(match.group(1)) == int(match.group(2)):
-                    cur_fsm.start()
-                    logger.info(f"{cur_fsm.name}: ⏭️ skip because: {match.group(0)}")
-                    cur_fsm.complete()
+                # 找副本名
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-            except Exception:
-                pass
-            # 已在执行中，说明是第二次来，已容错一次，为防止无限循环，这次必须转成终态
-            in_progress = cur_fsm.status == TaskStatus.IN_PROGRESS
-            if cur_fsm.status == TaskStatus.PENDING:
-                cur_fsm.start()
-            logger.info(f"{cur_fsm.name}: {match.group(0)}")
+                # 找前往
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
 
-            # 点击前往
-            for _ in range(2):
-                # 有时ui反应太慢，点快了ui没跳转，再试一次
-                ui.sleep(0.4).click_bbox(go, times=2, interval=0.2)
-                if ui.sleep(1).wait(3, 0.3).until(
-                        lambda: not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNest), bbox_guidebook_item(ctx))):
-                    break
+                # 检查数量进度
+                progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
+                if not (progress_list := ui.search(progress_pattern, roiex.guidebook_content)):
+                    return _fail()
+                progress_list.sort(key=lambda x: x.y1)
+                if not (progress_text := next((pl for pl in progress_list if dungeon_text[0].y1 < pl.y2), None)):
+                    return _fail()
+                match = re.search(progress_pattern, progress_text.text, re.I)
+                logger.debug(f"match: {match}")
+                try:
+                    # 进度已刷满
+                    if int(match.group(1)) == int(match.group(2)):
+                        logger.info(f"{fsm.name}: ⏭️ skip because: {match.group(0)}")
+                        fsm.complete()
+                        break
+                except Exception:
+                    pass
+                logger.info(f"{fsm.name}: {match.group(0)}")
+
+                # 点击前往
+                ui.sleep(0.2)
+                for _ in range(2):
+                    # 若ui太卡，点快了没跳转，再试一次
+                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
+                    if ui.sleep(1).wait(3).until(
+                            lambda: not ui.snapshot().search(ctx.tr(I18nText.TacetDiscordNest), roiex.guidebook_menu)):
+                        break
+
+                is_start_challenge = True
+                break
+
+            # 进度已刷满，刷下一个
+            if fsm.is_terminal:
+                continue
+
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
 
             # 点击快速旅行
             if not ui.search(ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation, I18nText.Track])):
                 if not ui.wait().until(
                         lambda: ui.snapshot().search(
                             ctx.tr([I18nText.FastTravel, I18nText.EnableNavigation, I18nText.Track]))):
-                    if in_progress:
-                        cur_fsm.fail()
-                    return False
+                    return _fail()
+
             # 检查副本未解锁
             if ui.search(ctx.tr([I18nText.EnableNavigation, I18nText.Track])):
-                logger.warning(f"Unlock instance: {ctx.tr(cur_instance).raw}")
-                cur_fsm.complete()
+                logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
+                fsm.complete()
                 return True
+
             # 点击快速旅行
             ui.click_text(ctx.tr(I18nText.FastTravel), delay=0.2, pk=PointKind.NEAR, times=2, interval=0.3)
 
@@ -2113,9 +2092,9 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             combat_system = CombatSystem(ctx.control_service, ctx.img_service)
             combat_system.set_resonators(local.members, is_print=False)
             combat_system.exit_special_state(Morph.Forced)
-            ui.move(tacets_route[_tacets_idx]).sleep(0.3)
+            ui.move(dungeon.routes).sleep(0.3)
 
-            if cur_instance == I18nText.SimulacrumNexusTacetDiscordNest:
+            if dungeon.id == I18nText.SimulacrumNexusTacetDiscordNest:
                 # 梦枢天罗
                 # 00 10
                 # 01 11
@@ -2130,31 +2109,31 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(1024 + 7, 489)
-            elif cur_instance == I18nText.SouthernYuanHillsTacetDiscordNest:
+            elif dungeon.id == I18nText.SouthernYuanHillsTacetDiscordNest:
                 # 落渊南丘
                 tmpl_name = "8_-7_1.png"
                 tmpl_img = img_util.read_img(Resource.Map.Huanglong.Mengzhou.ROOT / "8_-7_1.png")
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(135, 900)
-            elif cur_instance == I18nText.StarblindCrashsiteTacetDiscordNest:
+            elif dungeon.id == I18nText.StarblindCrashsiteTacetDiscordNest:
                 # 盲望之塌
                 tmpl_name = "8_-2_8.png"
-                tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Frostlands Surface/8_-2_8.png"))
+                tmpl_img = img_util.read_img(Resource.Map.RoyaFrostlands.FrostlandsSurface / "8_-2_8.png")
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(301, 194)
-            elif cur_instance == I18nText.RebirthUplandsTacetDiscordNest:
+            elif dungeon.id == I18nText.RebirthUplandsTacetDiscordNest:
                 # 复生丘原
                 tmpl_name = "906_-1_7.png"
-                tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Lahai-Roi/906_-1_7.png"))
+                tmpl_img = img_util.read_img(Resource.Map.RoyaFrostlands.LahaiRoi / "906_-1_7.png")
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(38, 335)
-            elif cur_instance == I18nText.StagnantRunTacetDiscordNest:
+            elif dungeon.id == I18nText.StagnantRunTacetDiscordNest:
                 # 陷足流川
                 tmpl_name = "906_0_6.png"
-                tmpl_img = img_util.read_img(file_util.get_assets_map("Roya Frostlands/Lahai-Roi/906_0_6.png"))
+                tmpl_img = img_util.read_img(Resource.Map.RoyaFrostlands.LahaiRoi / "906_0_6.png")
                 matcher = SIFTFeatureMatcher()
                 feature_data = matcher.build_feature_data(tmpl_name, tmpl_img)
                 point = Point(240, 138)
@@ -2237,7 +2216,6 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     deadline = time.monotonic() + timeout
                     no_text_max = 3
                     no_text_count = no_text_max
-                    hp_roi = bbox_hp_bar(ctx).as_tuple()
 
                     while ui.is_set() or time.monotonic() < deadline:
                         logger.debug(f"no_text_count: {no_text_count}")
@@ -2286,7 +2264,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.sleep(0.5)
 
                     # # 声骸刚好掉在脚下，直接吸收结束，不用后续操作
-                    # if ui.search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
+                    # if ui.search(ctx.tr(I18nText.Absorb), RoiEx(ctx).dialogue):
                     #     logger.info("Tacet Discord Nest Cleared")
                     #     ui.pick_up(2, 0.2)
                     #     cur_fsm.complete()
@@ -2296,19 +2274,19 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     # 重置位置
                     if not _map_fast_travel():
                         # 原地传送失败就结束
-                        if in_progress:
+                        if fsm.count == 0:
                             # 没找到吸收，再次来不管怎样都结束掉
-                            cur_fsm.complete()
+                            fsm.complete()
                         return True
                     # 前往战斗区域
                     with AsyncPickup(ctx, delay=1.0):
-                        ui.move(tacets_route[_tacets_idx])
+                        ui.move(dungeon.routes)
                     ui.sleep(0.3)
 
                     is_combat = not ui.snapshot().search(cleared_keyword)
                     if k == max_combat_range - 1:
                         # 打了几回都没打完，重新来
-                        if in_progress:
+                        if fsm.count == 0:
                             break
                         return True
                     continue
@@ -2318,7 +2296,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 #     logger.info("Tacet Discord Nest Cleared")
                 #
                 #     # 声骸刚好掉在脚下，直接吸收结束，不用后续操作
-                #     if ui.search(ctx.tr(I18nText.Absorb), bbox_dialogue(ctx)):
+                #     if ui.search(ctx.tr(I18nText.Absorb), RoiEx(ctx).dialogue):
                 #         ui.pick_up(2, 0.2)
                 #         cur_fsm.complete()
                 #         return True
@@ -2327,33 +2305,21 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             # 吸收
             absorb_around_variant_blind(ctx)
             # 不管怎样都结束掉
-            cur_fsm.complete()
+            fsm.complete()
             return True
 
-        # 标记剩余待完成的任务为失败
-        pending = 0
-        for fsm in tacets_fsm:
-            if fsm.status != TaskStatus.PENDING:
-                continue
-            if pending == 0:
-                logger.info("Marking remaining subtask as failed")
-            pending += 1
-            fsm.start()
-            fsm.fail()
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
 
-        return pending == 0
-    except (KeyboardInterrupt, StopError) as e:
-        raise e
-    except Exception as e:
-        logger.exception(e)
-
-    for fsm in tacets_fsm:
+    # 未知异常兜底，标记失败
+    for fsm in local.tacetDiscordNestFSM.children:
         if fsm.status == TaskStatus.PENDING:
             fsm.start()
             fsm.fail()
         elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
             fsm.fail()
-
     return False
 
 
@@ -2361,8 +2327,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 def doMail(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if local.mailFSM.is_terminal:
         return True
-    if local.mailFSM.status == TaskStatus.PENDING:
-        local.mailFSM.start()
+    local.mailFSM.start()
 
     ui = UIOp(ctx)
 
@@ -2401,12 +2366,24 @@ def doMail(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
 @node(NodeName.doPioneerPodcast)
 def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    if local.pioneerPodcastFSM.is_terminal:
+    fsm = local.pioneerPodcastFSM
+    if fsm.is_terminal:
         return True
-    if local.pioneerPodcastFSM.status == TaskStatus.PENDING:
-        local.pioneerPodcastFSM.start()
+
+    def _fail():
+        # ui.esc().sleep(1)
+        if fsm.is_terminal:
+            return True
+        if fsm.count == 0:
+            fsm.fail()
+        return True
+
+    if not fsm.start():
+        return _fail()
 
     ui = UIOp(ctx)
+    roiex = RoiEx(ctx)
+
     pioneerPodcast = ctx.tr(I18nText.PioneerPodcast)
     podcastTasks = ctx.tr(I18nText.PodcastTasks)
 
@@ -2417,17 +2394,17 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             return False
     elif not GlobalPage(ctx).isTerminal(ui=ui.snapshot()):
         return False
-    if not ui.click_text(ctx.tr(I18nText.TerminalPioneerPodcast),
-                         bbox_terminal_content(ctx), pk=PointKind.NEAR, times=2, interval=0.2):
+    if not ui.click_text(ctx.tr(I18nText.TerminalPioneerPodcast), roiex.terminal_content,
+                         pk=PointKind.NEAR, times=2, interval=0.2):
         return False
 
     pioneerPodcastUnavailable = ctx.tr(I18nText.PioneerPodcastUnavailable)
     maxLevelReached = ctx.tr(I18nText.MaxLevelReached)
     if not ui.sleep(1.2).wait().until(
             lambda: ui.snapshot().search([pioneerPodcast, pioneerPodcastUnavailable, maxLevelReached])):
-        return False
+        return _fail()
     if ui.search([pioneerPodcastUnavailable, maxLevelReached]):
-        local.pioneerPodcastFSM.complete()
+        fsm.complete()
         ui.sleep(0.3).esc().sleep(1)
         return True
 
@@ -2465,7 +2442,7 @@ def doPioneerPodcast(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         if ui.sleep(0.2).snapshot().click_text(ctx.tr(I18nText.PioneerPodcastClaimAll), times=2, interval=0.2):
             ui.sleep(2).wait(3, 0.3).until(lambda: ui.snapshot().click_text(confirm, delay=0.2, times=2, interval=0.2))
 
-    local.pioneerPodcastFSM.complete()
+    fsm.complete()
     ui.sleep(0.3).esc().sleep(1)
     return True
 
@@ -2626,8 +2603,7 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)
         self.local.rebirthUplandsTacetDiscordNestFSM.set_enabled(cfg.rebirthUplandsTacetDiscordNest)
-        # self.local.stagnantRunTacetDiscordNestFSM.set_enabled(cfg.stagnantRunTacetDiscordNest)
-        self.local.stagnantRunTacetDiscordNestFSM.set_enabled(False)
+        self.local.stagnantRunTacetDiscordNestFSM.set_enabled(cfg.stagnantRunTacetDiscordNest)
 
         # ---------------------------------------------------------------
 

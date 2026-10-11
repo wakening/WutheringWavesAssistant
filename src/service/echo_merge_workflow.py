@@ -9,7 +9,7 @@ from src.core.message import MsgType, MsgTaskStatus
 from src.core.pages import UIOp, GlobalPage
 from src.core.task import TaskFSM, TaskFSMGroup, TaskStatus
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
-from src.service.common_workflow import bbox_terminal_content
+from src.service.common_workflow import RoiEx
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +118,7 @@ def doDataBank(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
 
     # 从终端点击进入数据坞
     if GlobalPage(ctx).isTerminal(ui=ui):
-        if not ui.click_text(ctx.tr(I18nText.DataBank), bbox_terminal_content(ctx),
+        if not ui.click_text(ctx.tr(I18nText.DataBank), RoiEx(ctx).terminal_content,
                              pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
             logger.warning(f"Text not found: {ctx.tr(I18nText.DataBank).raw}")
             ui.esc().sleep(1)

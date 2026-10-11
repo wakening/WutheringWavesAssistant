@@ -1,7 +1,7 @@
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, ClassVar
+from typing import List, Optional
 
 import numpy as np
 
@@ -139,6 +139,9 @@ class SonataEffect(Enum):
     SongOfFeatheredTrace = "Song of Feathered Trace"  # 羽落空尘之歌
     HeartOfEvilsPurge = "Heart of Evil's Purge"  # 清邪荡煞之心
     LampOfNetherRoad = "Lamp of Nether Road"  # 冥途夜行之灯
+    HeartOfSwornVigil = "Heart of Sworn Vigil"  # 衔梦照世之心
+    FlashOfElectricReflection = "Flash of Electric Reflection"  # 镜影流电之瞬
+    FlowerOfTingedYearning = "Flower of Tinged Yearning"  # 茜染怀想之花
 
 
 class AbsorbMode(Enum):
@@ -174,6 +177,7 @@ class EnemyRestart:
 class BossMeta:
     """Boss 相关信息"""
     localized_name: str  # Boss 名称 (用于副本/活动显示)
+    register: List[dict[str, "EnemyMeta"]]
     is_dungeon: bool  # 是否在独立副本内 (True=副本内, False=野外)
     dungeon_name: Optional[str]  # 副本名称，目前无需填写，默认为敌迹探寻
     auto_respawn: bool  # 是否自动刷新
@@ -189,6 +193,7 @@ class BossMeta:
 class QuickBossMeta:
     """快速挑战 Boss 相关信息"""
     localized_name: str  # Boss 名称 (用于副本/活动显示)
+    register: List[dict[str, "EnemyMeta"]]
     menu: str  # 快捷挑战菜单标识 (如 "weekly_boss", "event_boss" 等)
     dungeon_name: str  # 副本名称
     auto_respawn: bool  # 是否自动刷新
@@ -201,9 +206,6 @@ class QuickBossMeta:
 @dataclass(frozen=True, kw_only=True)
 class EnemyMeta:
     """敌人元数据类 - 用于描述每个敌人"""
-
-    ID_ENEMIES: ClassVar[dict[str, "EnemyMeta"]] = {}
-    KEY_ENEMIES: ClassVar[dict[str, "EnemyMeta"]] = {}
 
     id: str  # 后端唯一标识，I18nText.xxx
     key: Optional[BossNameEnum]  # 前端枚举key，配置文件保存的boss名称，值为BossNameEnum.xxx.name
@@ -220,31 +222,40 @@ class EnemyMeta:
     quick_boss_meta: Optional[QuickBossMeta] = None  # 快速挑战 Boss 信息 (不支持快速挑战或非 Boss 为 None)
 
     def __post_init__(self):
+        # 必填id
+        if not self.id:
+            raise ValueError("id is empty")
+
+        # 快速入口 素材获取
         if self.prefer_quick:
             if not self.quick_boss_meta:
                 raise ValueError("quick_boss_meta is empty")
 
+            # 三个入口，常规boss、周本boss、梦魇boss
             if self.quick_boss_meta.menu not in [
                 I18nText.BossChallenge, I18nText.WeeklyChallenge, I18nText.NightmarePurification]:
                 raise ValueError(f"Unsupported menu: {self.quick_boss_meta.menu}")
+
+            for register in self.quick_boss_meta.register:
+                if self.id in register:
+                    raise ValueError(f"Duplicate enemy id: {self.id}")
+                register[self.id] = self
         else:
+            # 兜底入口，旧入口，敌迹探寻
             if not self.boss_meta:
                 raise ValueError("boss_meta is empty")
 
-        if not self.id:
-            raise ValueError("id is empty")
-        if self.id in self.ID_ENEMIES:
+            for register in self.boss_meta.register:
+                if self.id in register:
+                    raise ValueError(f"Duplicate enemy id: {self.id}")
+                register[self.id] = self
+
+        if self.id in EnemyGroup.ALL:
             raise ValueError(f"Duplicate enemy id: {self.id}")
+        EnemyGroup.ALL[self.id] = self
 
         # if not self.battle_text:
         #     raise ValueError("battle_text is empty")
-
-        self.ID_ENEMIES[self.id] = self
-
-        if self.key:
-            if self.key.name in self.KEY_ENEMIES:
-                raise ValueError(f"Duplicate enemy key: {self.key}")
-            self.KEY_ENEMIES[self.key.name] = self
 
     @property
     def is_dungeon(self) -> bool:
@@ -297,6 +308,14 @@ class EnemyMeta:
         return hash(self.id)
 
 
+class EnemyGroup:
+    ALL: dict[str, EnemyMeta] = {}
+    BossChallenge: dict[str, EnemyMeta] = {}
+    WeeklyChallenge: dict[str, EnemyMeta] = {}
+    NightmarePurification: dict[str, EnemyMeta] = {}
+    EnemyTracing: dict[str, EnemyMeta] = {}
+
+
 class Enemy:
     """刷声骸用的敌人参数配置"""
 
@@ -314,6 +333,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyScarAberrantNightmare),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -326,6 +346,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyScarAberrantNightmare),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.ChaoticJuncture,
             auto_respawn=False,
@@ -350,6 +371,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDreamless),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -362,6 +384,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDreamless),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.StatueOfTheCrownless,
             auto_respawn=False,
@@ -386,6 +409,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLampylumenMyriad),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -398,6 +422,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLampylumenMyriad),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLampylumenMyriad,
             auto_respawn=False,
@@ -422,6 +447,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyBellBorneGeochelone),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -434,6 +460,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyBellBorneGeochelone),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.BellOfArchaicChants,
             auto_respawn=False,
@@ -458,6 +485,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyInfernoRider),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -470,6 +498,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyInfernoRider),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyInfernoRider,
             auto_respawn=False,
@@ -494,6 +523,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyImpermanenceHeron),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -506,6 +536,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyImpermanenceHeron),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyImpermanenceHeron,
             auto_respawn=False,
@@ -530,6 +561,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMechAbomination),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -542,6 +574,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMechAbomination),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMechAbomination,
             auto_respawn=False,
@@ -566,6 +599,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMourningAix),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -578,6 +612,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMourningAix),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMourningAix,
             auto_respawn=False,
@@ -602,6 +637,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThunderingMephis),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -614,6 +650,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThunderingMephis),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyThunderingMephis,
             auto_respawn=False,
@@ -638,6 +675,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyTempestMephis),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -650,6 +688,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyTempestMephis),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyTempestMephis,
             auto_respawn=False,
@@ -674,6 +713,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFeilianBeringal),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -686,6 +726,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFeilianBeringal),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyFeilianBeringal,
             auto_respawn=False,
@@ -710,6 +751,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyCrownless),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -722,6 +764,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyCrownless),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyCrownless,
             auto_respawn=False,
@@ -746,6 +789,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyJue),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -758,6 +802,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyJue),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.TheFatedConfrontation,
             auto_respawn=False,
@@ -782,6 +827,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFallacyOfNoReturn),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -794,6 +840,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFallacyOfNoReturn),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyFallacyOfNoReturn,
             auto_respawn=False,
@@ -818,6 +865,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySentryConstruct),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -830,6 +878,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySentryConstruct),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemySentryConstruct,
             auto_respawn=False,
@@ -854,6 +903,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyHecate),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -866,6 +916,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyHecate),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.BeyondTheCrimsonCurtain,
             auto_respawn=False,
@@ -890,6 +941,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLorelei),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -902,6 +954,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLorelei),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLorelei,
             auto_respawn=False,
@@ -926,6 +979,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDragonOfDirge),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -938,6 +992,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDragonOfDirge),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyDragonOfDirge,
             auto_respawn=False,
@@ -962,6 +1017,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareFeilianBeringal),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -974,6 +1030,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareFeilianBeringal),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareFeilianBeringal,
             auto_respawn=True,
@@ -998,6 +1055,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareImpermanenceHeron),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1010,6 +1068,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareImpermanenceHeron),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareImpermanenceHeron,
             auto_respawn=True,
@@ -1034,6 +1093,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareTempestMephis),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1046,6 +1106,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareTempestMephis),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareTempestMephis,
             auto_respawn=True,
@@ -1070,6 +1131,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareThunderingMephis),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1082,6 +1144,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareThunderingMephis),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareThunderingMephis,
             auto_respawn=True,
@@ -1106,6 +1169,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareCrownless),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1118,6 +1182,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareCrownless),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareCrownless,
             auto_respawn=True,
@@ -1142,6 +1207,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareInfernoRider),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1154,6 +1220,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareInfernoRider),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareInfernoRider,
             auto_respawn=True,
@@ -1178,6 +1245,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareMourningAix),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1190,6 +1258,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareMourningAix),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareMourningAix,
             auto_respawn=True,
@@ -1214,6 +1283,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareLampylumenMyriad),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1226,6 +1296,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareLampylumenMyriad),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareLampylumenMyriad,
             auto_respawn=True,
@@ -1250,6 +1321,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFleurdelys),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1258,10 +1330,11 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.Move,
-            restart=AbsorbMode.Move,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFleurdelys),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.TheWheelOfBrokenFate,
             auto_respawn=False,
@@ -1286,6 +1359,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareKelpie),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=True,
@@ -1298,6 +1372,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareKelpie),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareKelpie,
             auto_respawn=True,
@@ -1322,6 +1397,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLionessOfGlory),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1334,6 +1410,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLionessOfGlory),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLionessOfGlory,
             auto_respawn=False,
@@ -1358,6 +1435,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareHecate),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1370,6 +1448,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareHecate),
+            register=[EnemyGroup.NightmarePurification],
             menu=I18nText.NightmarePurification,
             dungeon_name=I18nText.EnemyNightmareHecate,
             auto_respawn=True,
@@ -1394,6 +1473,7 @@ class Enemy:
         prefer_quick=False,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFenrico),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1417,6 +1497,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyFenrico),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyFenrico,
             auto_respawn=False,
@@ -1441,6 +1522,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyTheFalseSovereign),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1449,10 +1531,11 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
-            restart=AbsorbMode.OD,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyTheFalseSovereign),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyTheFalseSovereign,
             auto_respawn=False,
@@ -1477,6 +1560,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLadyOfTheSea),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1485,10 +1569,11 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.OD,
-            restart=AbsorbMode.OD,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyLadyOfTheSea),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyLadyOfTheSea,
             auto_respawn=False,
@@ -1513,6 +1598,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThrenodianLeviathan),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1521,10 +1607,11 @@ class Enemy:
             stop_text=[],
             routes=[],
             absorb=AbsorbMode.Move,
-            restart=AbsorbMode.Move,
+            restart=None,
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThrenodianLeviathan),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.CinderniteApocalypse,
             auto_respawn=False,
@@ -1549,6 +1636,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyReactorHusk),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1561,6 +1649,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyReactorHusk),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyReactorHusk,
             auto_respawn=False,
@@ -1585,6 +1674,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyHyvatia),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1597,6 +1687,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyHyvatia),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyHyvatia,
             auto_respawn=False,
@@ -1621,6 +1712,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySigillum),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1633,6 +1725,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySigillum),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.GateOfTheLostStar,
             auto_respawn=False,
@@ -1657,6 +1750,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNamelessExplorer),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1669,6 +1763,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNamelessExplorer),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyNamelessExplorer,
             auto_respawn=False,
@@ -1693,6 +1788,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDenia),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1705,6 +1801,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyDenia),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.SeedOfIllusoryOrigin,
             auto_respawn=False,
@@ -1729,6 +1826,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareAdamSmasher),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1741,6 +1839,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyNightmareAdamSmasher),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyNightmareAdamSmasher,
             auto_respawn=False,
@@ -1765,6 +1864,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1777,6 +1877,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyMyriadSnareRustfireChassis),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyMyriadSnareRustfireChassis,
             auto_respawn=False,
@@ -1801,6 +1902,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1813,6 +1915,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyThousandPuppetPavilion),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.CourtOfShackledSouls,
             auto_respawn=False,
@@ -1837,6 +1940,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyCalamityEffigy),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1849,6 +1953,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemyCalamityEffigy),
+            register=[EnemyGroup.BossChallenge],
             menu=I18nText.BossChallenge,
             dungeon_name=I18nText.EnemyCalamityEffigy,
             auto_respawn=False,
@@ -1873,6 +1978,7 @@ class Enemy:
         prefer_quick=True,
         boss_meta=BossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySuhsinTheInevitable),
+            register=[EnemyGroup.EnemyTracing],
             is_dungeon=False,
             dungeon_name=None,
             auto_respawn=False,
@@ -1885,6 +1991,7 @@ class Enemy:
         ),
         quick_boss_meta=QuickBossMeta(
             localized_name=I18nTr.l10n(I18nText.EnemySuhsinTheInevitable),
+            register=[EnemyGroup.WeeklyChallenge],
             menu=I18nText.WeeklyChallenge,
             dungeon_name=I18nText.OrdinanceOfTheInevitable,
             auto_respawn=False,
@@ -1897,11 +2004,14 @@ class Enemy:
 
     @classmethod
     def from_key(cls, key: str):
-        return EnemyMeta.KEY_ENEMIES.get(key)
+        for v in EnemyGroup.ALL.values():
+            if v and v.key and v.key.name == key:
+                return v
+        return None
 
     @classmethod
-    def from_id(cls, key: str):
-        return EnemyMeta.ID_ENEMIES.get(key)
+    def from_id(cls, id: str):
+        return EnemyGroup.ALL.get(id)
 
 
 class EnemyHpBar:
@@ -2157,8 +2267,8 @@ class EnemyVsBar:
 
 if __name__ == '__main__':
     aaa = []
-    for k, v in EnemyMeta.ID_ENEMIES.items():
-        if v.quick_boss_meta and v.quick_boss_meta.menu == I18nText.BossChallenge:
-            print(v.id)
-            aaa.append(v.id)
-    print(aaa[::-1])
+    # for k, v in EnemyGroup.ALL.items():
+    #     if v.quick_boss_meta and v.quick_boss_meta.menu == I18nText.BossChallenge:
+    #         print(v.id)
+    #         aaa.append(v.id)
+    # print(aaa[::-1])

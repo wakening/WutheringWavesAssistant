@@ -21,54 +21,6 @@ from src.util import img_template_util
 logger = logging.getLogger(__name__)
 
 
-def bbox_terminal_content(ctx: NodeContext) -> BBox:
-    """终端页右侧功能项所在区域，防止左侧昵称、签名等影响匹配"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(540, 0, Align.Left | Align.Top),
-        AnchorPoint(1280, 720, Align.Right | Align.Bottom)
-    ))
-
-
-def bbox_dialogue(ctx: NodeContext) -> BBox:
-    """对话框所在区域"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(788, 280, Align.Center | Align.Middle),
-        AnchorPoint(1100, 560, Align.Center | Align.Middle)
-    ))
-
-
-def bbox_guidebook_title(ctx: NodeContext) -> BBox:
-    """索拉指南左上角小标题"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(0, 0, Align.Top | Align.Left),
-        AnchorPoint(300, 100, Align.Top | Align.Left),
-    ))
-
-
-def bbox_guidebook_item(ctx: NodeContext) -> BBox:
-    """索拉指南左侧选项区"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(0, 0, Align.Left | Align.Top),
-        AnchorPoint(454, 720, Align.Left | Align.Bottom),
-    ))
-
-
-def bbox_guidebook_content(ctx: NodeContext) -> BBox:
-    """索拉指南右侧内容区，不包含上面的体力值和下面的uid"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(454, 75, Align.Left | Align.Top),
-        AnchorPoint(1280, 660, Align.Right | Align.Bottom),
-    ))
-
-
-def bbox_hp_bar(ctx: NodeContext) -> BBox:
-    """血条"""
-    return ctx.scaler.as_bbox(AnchorBBox(
-        AnchorPoint(180, 0, Align.Left | Align.Top),
-        AnchorPoint(1280, 612, Align.Right | Align.Bottom),
-    ))
-
-
 class RoiEx:
     """提供一些常用的roi，带缓存，方便在lambda中复用"""
 
@@ -127,7 +79,7 @@ class RoiEx:
 
 def absorb_around_variant(ctx: NodeContext):
     """环绕吸收变体"""
-    roi = bbox_dialogue(ctx)
+    roi = RoiEx(ctx).dialogue
     ui = UIOp(ctx)
 
     if ui.snapshot(roi=roi).search(ctx.tr(I18nText.Absorb)):
@@ -233,7 +185,7 @@ def absorb_around_variant_blind(ctx: NodeContext):
     :param ctx:
     :return:
     """
-    roi = bbox_dialogue(ctx)
+    roi = RoiEx(ctx).dialogue
     ui = UIOp(ctx)
 
     if ui.snapshot(roi=roi).search(ctx.tr(I18nText.Absorb)):
@@ -268,7 +220,7 @@ def absorb_and_claim_rewards(ctx: NodeContext) -> bool:
     """
     ctx.control_service.activate()
 
-    roi = bbox_dialogue(ctx)
+    roi = RoiEx(ctx).dialogue
     ui = UIOp(ctx)
 
     tried_empty_once = False
@@ -326,7 +278,7 @@ def absorb_and_claim_rewards(ctx: NodeContext) -> bool:
 
 def move_and_scan_dialogue(ctx: NodeContext, regex_str: str | list[str], loop: int, steps: int = 2):
     """移动并查找文本"""
-    roi = bbox_dialogue(ctx)
+    roi = RoiEx(ctx).dialogue
     ui = UIOp(ctx)
     executor = RouteExecutor(ctx)
     route = [Walk.forward(steps)]

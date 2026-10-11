@@ -325,6 +325,9 @@ class I18nText:
     SongOfFeatheredTrace = "SongOfFeatheredTrace"
     HeartOfEvilsPurge = "HeartOfEvilsPurge"
     LampOfNetherRoad = "LampOfNetherRoad"
+    HeartOfSwornVigil = "HeartOfSwornVigil"
+    FlashOfElectricReflection = "FlashOfElectricReflection"
+    FlowerOfTingedYearning = "FlowerOfTingedYearning"
 
     # ------- Login -------
     Bulletin = "Bulletin"
@@ -1641,6 +1644,18 @@ I18N_TEXT = {
     I18nText.LampOfNetherRoad: {
         Language.ZH: RegexStr(r"^冥途夜行之灯$", raw="冥途夜行之灯"),
         Language.EN: RegexStr(flex_ws(r"^Lamp of Nether Road$"), raw="Lamp of Nether Road"),
+    },
+    I18nText.HeartOfSwornVigil: {
+        Language.ZH: RegexStr(r"^衔梦照世之心$", raw="衔梦照世之心"),
+        Language.EN: RegexStr(flex_ws(r"^Heart of Sworn Vigil$"), raw="Heart of Sworn Vigil"),
+    },
+    I18nText.FlashOfElectricReflection: {
+        Language.ZH: RegexStr(r"^镜影流电之瞬$", raw="镜影流电之瞬"),
+        Language.EN: RegexStr(flex_ws(r"^Flash of Electric Reflection$"), raw="Flash of Electric Reflection"),
+    },
+    I18nText.FlowerOfTingedYearning: {
+        Language.ZH: RegexStr(r"^茜染怀想之花$", raw="茜染怀想之花"),
+        Language.EN: RegexStr(flex_ws(r"^Flower of Tinged Yearning$"), raw="Flower of Tinged Yearning"),
     },
 
     # ------- Login -------

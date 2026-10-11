@@ -12,9 +12,7 @@ from src.core.message import MsgType, MsgTaskStatus
 from src.core.pages import UIOp, GlobalPage
 from src.core.task import TaskFSM, TaskStatus, TaskFSMGroup
 from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflow
-from src.service.common_workflow import (
-    bbox_terminal_content, bbox_guidebook_title
-)
+from src.service.common_workflow import RoiEx
 
 logger = logging.getLogger(__name__)
 
@@ -137,8 +135,8 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
     # 终端
     if GlobalPage(ctx).isTerminal(ui=ui):
         # 点击进入索拉指南
-        if not ui.click_text(ctx.tr(I18nText.Guidebook),
-                             bbox_terminal_content(ctx), pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
+        if not ui.click_text(ctx.tr(I18nText.Guidebook), RoiEx(ctx).terminal_content,
+                             pk=PointKind.NEAR, delay=0.2, times=2, interval=0.2):
             logger.warning(f"Text not found: {ctx.tr(I18nText.Guidebook).raw}")
             return None
     else:
@@ -153,7 +151,7 @@ def doGuidebook(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[str]:
         I18nText.EnemyTracing,
         I18nText.Milestones,
     ])
-    title_roi = bbox_guidebook_title(ctx)
+    title_roi = RoiEx(ctx).guidebook_title
 
     if not ui.sleep(0.5).wait().until(lambda: ui.snapshot().search(titles, title_roi)):
         logger.warning(f"Page not found: {ctx.tr(I18nText.Guidebook).raw}")

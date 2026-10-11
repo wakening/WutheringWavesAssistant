@@ -192,6 +192,8 @@ jobs:
 
           # 切入临时目录
           Push-Location "$env:TEMP_WORKSPACE"
+          
+          Remove-Item "py312\Doc" -Recurse -Force -ErrorAction SilentlyContinue
 
           # 安装依赖到便携 Python
           & "py312\python.exe" -m pip install --upgrade pip
@@ -238,6 +240,8 @@ jobs:
 
           # 切入临时目录
           Push-Location "$env:TEMP_WORKSPACE"
+          
+          Remove-Item "py312\Doc" -Recurse -Force -ErrorAction SilentlyContinue
 
           # 安装依赖到便携 Python
           & "py312\python.exe" -m pip install --upgrade pip
@@ -293,6 +297,8 @@ jobs:
 
           # 切入临时目录
           Push-Location "$env:TEMP_WORKSPACE"
+          
+          Remove-Item "py312\Doc" -Recurse -Force -ErrorAction SilentlyContinue
 
           # 安装依赖到便携 Python
           & "py312\python.exe" -m pip install --upgrade pip

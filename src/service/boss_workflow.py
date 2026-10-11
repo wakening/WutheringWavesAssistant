@@ -868,7 +868,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             # 保证文本都有才开始点
                             and ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
                             and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.2)
-                            and ui.false()):
+                            and False):
                 return False
             if start_challenge := ui.search(ctx.tr(I18nText.StartChallenge)):
                 logger.info(f"{ctx.tr(I18nText.WeeklySuggestedLv).raw}: {40 + k * 10}")

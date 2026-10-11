@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Optional, List
 
 from src.core.i18n import I18nText, I18nTr
+from src.core.movement import MoveStep, Run
 
 
 class DungeonIcon(Enum):
@@ -48,12 +49,17 @@ class ForgeryChallengeMeta(DungeonMeta):
     weapon: str
 
 
+@dataclass(frozen=True)
+class TacetDiscordNestMeta(DungeonMeta):
+    routes: List[MoveStep]
+
+
 class Dungeon:
     ForgeryChallenge: dict[str, ForgeryChallengeMeta] = {}
     BossChallenge: dict[str, DungeonMeta] = {}
     TacetSuppression: dict[str, DungeonMeta] = {}
     WeeklyChallenge: dict[str, DungeonMeta] = {}
-    TacetDiscordNest: dict[str, DungeonMeta] = {}
+    TacetDiscordNest: dict[str, TacetDiscordNestMeta] = {}
     NightmarePurification: dict[str, DungeonMeta] = {}
 
 
@@ -993,20 +999,73 @@ class DungeonWeeklyChallenge:
     )
 
 
-# class DungeonTacetDiscordNest:
-#     # ------- TacetDiscordNest -------
-#
-#     CourtOfShackledSouls = DungeonMeta(
-#         id=I18nText.CourtOfShackledSouls,
-#         localized_name=I18nTr.l10n(I18nText.CourtOfShackledSouls),
-#         menu=I18nText.TacetDiscordNest,
-#         register=[Dungeon.TacetDiscordNest],
-#         icon=DungeonIcon.Icon1,
-#         region=I18nText.GuidebookMengzhou,
-#         waveplate=60,
-#         enemy_id=I18nText.EnemyThousandPuppetPavilion,
-#         rewards=[I18nText.SkywardGlazedHeart],
-#     )
+class DungeonTacetDiscordNest:
+    # ------- TacetDiscordNest -------
+
+    SimulacrumNexusTacetDiscordNest = TacetDiscordNestMeta(
+        id=I18nText.SimulacrumNexusTacetDiscordNest,
+        localized_name=I18nTr.l10n(I18nText.SimulacrumNexusTacetDiscordNest),
+        menu=I18nText.TacetDiscordNest,
+        register=[Dungeon.TacetDiscordNest],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookMengzhou,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        routes=[Run.forward(2.5)],
+    )
+
+    SouthernYuanHillsTacetDiscordNest = TacetDiscordNestMeta(
+        id=I18nText.SouthernYuanHillsTacetDiscordNest,
+        localized_name=I18nTr.l10n(I18nText.SouthernYuanHillsTacetDiscordNest),
+        menu=I18nText.TacetDiscordNest,
+        register=[Dungeon.TacetDiscordNest],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookMengzhou,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        routes=[Run.forward(4.5)],
+    )
+
+    StarblindCrashsiteTacetDiscordNest = TacetDiscordNestMeta(
+        id=I18nText.StarblindCrashsiteTacetDiscordNest,
+        localized_name=I18nTr.l10n(I18nText.StarblindCrashsiteTacetDiscordNest),
+        menu=I18nText.TacetDiscordNest,
+        register=[Dungeon.TacetDiscordNest],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookLahaiRoi,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        routes=[Run.right(0.25), Run.forward(3.5)],
+    )
+
+    RebirthUplandsTacetDiscordNest = TacetDiscordNestMeta(
+        id=I18nText.RebirthUplandsTacetDiscordNest,
+        localized_name=I18nTr.l10n(I18nText.RebirthUplandsTacetDiscordNest),
+        menu=I18nText.TacetDiscordNest,
+        register=[Dungeon.TacetDiscordNest],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookLahaiRoi,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        routes=[Run.forward(2.7)],
+    )
+
+    StagnantRunTacetDiscordNest = TacetDiscordNestMeta(
+        id=I18nText.StagnantRunTacetDiscordNest,
+        localized_name=I18nTr.l10n(I18nText.StagnantRunTacetDiscordNest),
+        menu=I18nText.TacetDiscordNest,
+        register=[Dungeon.TacetDiscordNest],
+        icon=DungeonIcon.Icon1,
+        region=I18nText.GuidebookLahaiRoi,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        routes=[Run.forward(5.5)],
+    )
 
 
 # class DungeonNightmarePurification:

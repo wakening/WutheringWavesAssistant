@@ -4,7 +4,7 @@ from functools import cached_property
 from pathlib import Path
 
 from src.config.config import Config, BossConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
-from src.core.enemy import EnemyMeta
+from src.core.enemy import EnemyGroup
 from src.core.i18n import I18nText, Language
 from src.util import winreg_util
 
@@ -46,7 +46,7 @@ class BossRuntimeConfig:
     @cached_property
     def bossName(self) -> list[str]:
         names = []
-        enemies = EnemyMeta.KEY_ENEMIES
+        enemies = {v.key.name: v for v in EnemyGroup.ALL.values() if v and v.key}
         if self._cfg.bossName:
             for name in self._cfg.bossName:
                 if name in enemies:
@@ -185,15 +185,15 @@ class DailyRuntimeConfig:
     def __init_tacetDiscordNest(self):
         _all = "All"
         self.simulacrumNexusTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
-            _all, I18nText.SimulacrumNexusTacetDiscordNest]
+            _all, I18nText.Mengzhou, I18nText.SimulacrumNexusTacetDiscordNest]
         self.southernYuanHillsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
-            _all, I18nText.SouthernYuanHillsTacetDiscordNest]
+            _all, I18nText.Mengzhou, I18nText.SouthernYuanHillsTacetDiscordNest]
         self.starblindCrashsiteTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
-            _all, I18nText.StarblindCrashsiteTacetDiscordNest]
+            _all, I18nText.LahaiRoi, I18nText.StarblindCrashsiteTacetDiscordNest]
         self.rebirthUplandsTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
-            _all, I18nText.RebirthUplandsTacetDiscordNest]
+            _all, I18nText.LahaiRoi, I18nText.RebirthUplandsTacetDiscordNest]
         self.stagnantRunTacetDiscordNest: bool = self._cfg.tacetDiscordNest in [
-            _all, I18nText.StagnantRunTacetDiscordNest]
+            _all, I18nText.LahaiRoi, I18nText.StagnantRunTacetDiscordNest]
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.__dict__})"

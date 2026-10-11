@@ -5,11 +5,15 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from PySide6.QtCore import Qt, Signal, QTimer
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup
 from packaging.version import Version
 
 from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, IndeterminateProgressRing, ToggleToolButton,
-                            FluentIcon, CardWidget, InfoBar, InfoBarPosition)
+                            FluentIcon, CardWidget, InfoBar, InfoBarPosition, SplitToolButton, RoundMenu, Action,
+                            PrimarySplitPushButton, SplitPushButton, PushButton, PopupTeachingTip, InfoBarIcon,
+                            TeachingTipTailPosition, TeachingTip, TeachingTipView, ToolButton, TransparentToolButton,
+                            FlyoutViewBase, BodyLabel, PrimaryPushButton, SubtitleLabel, TitleLabel, LargeTitleLabel,
+                            FluentStyleSheet, TransparentPushButton, CheckBox, FlowLayout)
 
 from src import __version__
 from src.gui.common.config import paramConfig
@@ -58,6 +62,156 @@ class BannerWidget(QWidget):
         self.mainLayout.addWidget(self.galleryLabel)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.setAlignment(Qt.AlignTop)
+
+
+class UpdateFlyoutView(FlyoutViewBase):
+
+    closed = Signal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.vBoxLayout = QVBoxLayout(self)
+        self.titleLabel = QLabel("*有新版本 3.7.6 Alpha", self)
+
+        # 更新日志
+        self.changelogScrollArea = ScrollArea()
+        self.changelogContainer = QWidget(self.changelogScrollArea)
+        self.changelogLayout = QVBoxLayout(self.changelogContainer)
+        self.changelogTitleLabel = QLabel(self.tr("更新日志:"), self.changelogContainer)
+        self.changelog = QLabel("略", self.changelogContainer)
+
+        # git渠道
+        self.channelLayout = QVBoxLayout()
+        self.channelLabel = QLabel(self.tr("选择更新渠道: "), self)
+        self.channelFlowlayout = FlowLayout()
+        self.githubCheckBox = CheckBox("GitHub", self)
+        self.tencentCheckBox = CheckBox("CN-Tencent", self)
+        self.tencentCheckBox.setChecked(True)
+        self.atomGitCheckBox = CheckBox("CN-AtomGit", self)
+
+        self.buttonGroup = QButtonGroup(self)
+        self.buttonGroup.addButton(self.githubCheckBox)
+        self.buttonGroup.addButton(self.tencentCheckBox)
+        self.buttonGroup.addButton(self.atomGitCheckBox)
+        self.buttonGroup.setExclusive(True)
+
+        self.channelTipLabel = QLabel('国内请选择CN源更新！', self)
+
+        self.buttonLayout = QHBoxLayout()
+        self.confirmButton = PrimaryPushButton('更新', self)
+        self.cancelButton = PushButton('取消', self)
+
+        self.__initWidgets()
+
+    def __initWidgets(self):
+        self.titleLabel.setObjectName('titleLabel')
+        # self.contentLabel.setObjectName('contentLabel')
+        FluentStyleSheet.TEACHING_TIP.apply(self)
+
+        self.__initLayout()
+        self.__connectSignalToSlot()
+
+    def __initLayout(self):
+        self.channelFlowlayout.addWidget(self.githubCheckBox)
+        self.channelFlowlayout.addWidget(self.tencentCheckBox)
+        self.channelFlowlayout.addWidget(self.atomGitCheckBox)
+        self.channelLayout.addWidget(self.channelLabel)
+        self.channelLayout.addLayout(self.channelFlowlayout)
+        # self.channelLayout.addStretch()
+
+        self.changelogLayout.addWidget(self.changelogTitleLabel)
+        self.changelogLayout.addWidget(self.changelog)
+        # self.changelogLayout.setContentsMargins(5, 5, 5, 5)
+        # self.changelogScrollArea.setMinimumHeight(0)
+        self.changelogScrollArea.setMaximumHeight(80)
+        self.changelogScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.changelogScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
+        self.confirmButton.setFixedWidth(140)
+        self.cancelButton.setFixedWidth(140)
+        self.buttonLayout.addWidget(self.confirmButton)
+        self.buttonLayout.addWidget(self.cancelButton)
+
+        self.vBoxLayout.setSpacing(12)
+        self.vBoxLayout.setContentsMargins(20, 16, 20, 16)
+        self.vBoxLayout.addWidget(self.titleLabel)
+        self.vBoxLayout.addWidget(self.changelogScrollArea)
+        self.vBoxLayout.addLayout(self.channelLayout)
+        self.vBoxLayout.addWidget(self.channelTipLabel)
+        self.vBoxLayout.addSpacing(8)
+        self.vBoxLayout.addLayout(self.buttonLayout)
+
+    def __connectSignalToSlot(self):
+        # TODO 渠道选择
+        self.cancelButton.clicked.connect(self.closed)
+
+    def paintEvent(self, e):
+        # 不绘制边框和背景
+        pass
+
+
+class ToolbarWidget(QWidget):
+    """ Toolbar widget """
+
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+
+        self.mainLayout = QHBoxLayout(self)
+
+        self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
+
+        self.__initWidget()
+
+    def __initWidget(self):
+        # initialize layout
+        self.__initLayout()
+        self.__connectSignalToSlot()
+
+    def __initLayout(self):
+        self.mainLayout.addWidget(self.updateToolButton)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setAlignment(Qt.AlignTop)
+
+    def __connectSignalToSlot(self):
+        self.updateToolButton.clicked.connect(self.showUpdateTeachingTip)
+
+    def showUpdateTeachingTip(self):
+        # view = TeachingTipView(
+        #     icon=None,
+        #     title='*有新版本 3.7.6 Alpha',
+        #     content="最短的捷径就是绕远路，绕远路才是我的最短捷径。",
+        #     # image='resource/Gyro.jpg',
+        #     # image='resource/boqi.gif',
+        #     isClosable=True,
+        #     tailPosition=TeachingTipTailPosition.BOTTOM,
+        # )
+        #
+        # # add widget to view
+        # button = PushButton('Action')
+        # button.setFixedWidth(120)
+        # view.addWidget(button, align=Qt.AlignRight)
+        #
+        # w = PopupTeachingTip.make(
+        #     target=self.updateToolButton,
+        #     view=view,
+        #     duration=-1,
+        #     tailPosition=TeachingTipTailPosition.TOP_RIGHT,
+        #     parent=self
+        # )
+        #
+        # view.closed.connect(w.close)
+
+        view = UpdateFlyoutView()
+
+        w = PopupTeachingTip.make(
+            target=self.updateToolButton,
+            view=view,
+            duration=-1,
+            tailPosition=TeachingTipTailPosition.RIGHT_TOP,
+            parent=self
+        )
+
+        view.closed.connect(w.close)
 
 
 class BasicSettingWidget(QWidget):
@@ -468,6 +622,8 @@ class HomeV2Interface(ScrollArea):
         self.container = QWidget(self)
 
         self.banner = BannerWidget(self)
+        self.toolbarWidget = ToolbarWidget(self)
+        self.topLayout = QHBoxLayout()
         self.middleLayout = QHBoxLayout()
 
         self.contentWidget = ContentWidget(self.container)
@@ -495,11 +651,15 @@ class HomeV2Interface(ScrollArea):
         self.__connectSignalToSlot()
 
     def __initLayout(self):
+        self.topLayout.addWidget(self.banner, 1)
+        # self.topLayout.addStretch()
+        self.topLayout.addWidget(self.toolbarWidget)
+
         self.middleLayout.addWidget(self.contentWidget, 3)
         self.middleLayout.addWidget(self.basicSettingWidget, 1)
         self.middleLayout.setContentsMargins(6, 0, 0, 0)
 
-        self.mainLayout.addWidget(self.banner)
+        self.mainLayout.addLayout(self.topLayout)
         self.mainLayout.addSpacing(12)
         self.mainLayout.addLayout(self.middleLayout, 1)
         self.mainLayout.addWidget(self.bottomWidget)
