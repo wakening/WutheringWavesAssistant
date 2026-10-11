@@ -8,12 +8,19 @@ echo WWA Updater
 echo ========================================
 echo.
 
-rem Check that the script is located in the temp directory
-for %%I in ("%~dp0.") do set "SCRIPT_DIR=%%~nxI"
-if /i not "%SCRIPT_DIR%"=="temp" goto invalid_directory
+rem Check that the script is located in temp\update
+for %%I in ("%~dp0.") do set "SCRIPT_DIR=%%~fI"
+for %%I in ("%SCRIPT_DIR%") do set "SCRIPT_DIR_NAME=%%~nxI"
+
+if /i not "%SCRIPT_DIR_NAME%"=="update" goto invalid_directory
+
+for %%I in ("%SCRIPT_DIR%\..") do set "PARENT_DIR=%%~fI"
+for %%I in ("%PARENT_DIR%") do set "PARENT_DIR_NAME=%%~nxI"
+
+if /i not "%PARENT_DIR_NAME%"=="temp" goto invalid_directory
 
 rem Return to project root
-cd /d "%~dp0.."
+cd /d "%SCRIPT_DIR%\..\.."
 if errorlevel 1 goto failed
 
 set "ROOT=%CD%"
@@ -60,7 +67,7 @@ echo WWA has been started.
 exit /b 0
 
 :invalid_directory
-echo [ERROR] update.bat must be located in the project's temp directory.
+echo [ERROR] update.bat must be located in the project's temp\update directory.
 goto failed
 
 :git_not_found
