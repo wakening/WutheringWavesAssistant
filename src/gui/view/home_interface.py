@@ -17,7 +17,7 @@ from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, Indeterminate
                             FluentStyleSheet, TransparentPushButton, CheckBox, FlowLayout)
 
 from src import __version__
-from src.gui.common.config import paramConfig
+from src.gui.common.config import paramConfig, VERSION
 from src.gui.common.globals import GlobalSignal, globalSignal
 from src.gui.common.signal_bus import signalBus
 from src.gui.view.home.daily import DailyWidget
@@ -69,10 +69,18 @@ class UpdateFlyoutView(FlyoutViewBase):
 
     closed = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, version, new_version, parent=None):
         super().__init__(parent)
+
+        self.version = version
+        self.new_version = new_version
+
         self.vBoxLayout = QVBoxLayout(self)
-        self.titleLabel = QLabel("*有新版本 3.7.6 Alpha", self)
+        if self.new_version:
+            title = f"有新版本 {self.version} -> {self.new_version}"
+        else:
+            title = f"暂无更新 {self.version}"
+        self.titleLabel = TransparentPushButton(FluentIcon.DOWNLOAD, title, self)
 
         # 更新日志
         self.changelogScrollArea = ScrollArea()
@@ -86,8 +94,8 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.channelLabel = QLabel(self.tr("选择更新渠道: "), self)
         self.channelFlowlayout = FlowLayout()
         self.githubCheckBox = CheckBox("GitHub", self)
-        self.tencentCheckBox = CheckBox("CN-Tencent", self)
-        self.tencentCheckBox.setChecked(True)
+        self.tencentCheckBox = CheckBox("CN-腾讯云", self)
+        # self.tencentCheckBox.setChecked(True)
         self.atomGitCheckBox = CheckBox("CN-AtomGit", self)
 
         self.buttonGroup = QButtonGroup(self)
@@ -96,7 +104,7 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.buttonGroup.addButton(self.atomGitCheckBox)
         self.buttonGroup.setExclusive(True)
 
-        self.channelTipLabel = QLabel('国内请选择CN源更新！', self)
+        self.channelTipLabel = QLabel('国内请选择CN源更新，若有异常请及时反馈！', self)
 
         self.buttonLayout = QHBoxLayout()
         self.confirmButton = PrimaryPushButton('更新', self)
@@ -111,12 +119,14 @@ class UpdateFlyoutView(FlyoutViewBase):
 
         self.__initLayout()
         self.__connectSignalToSlot()
+        self.__loadConfig()
 
     def __initLayout(self):
-        self.channelFlowlayout.addWidget(self.githubCheckBox)
+        # self.channelFlowlayout.addWidget(self.githubCheckBox)
         self.channelFlowlayout.addWidget(self.tencentCheckBox)
         self.channelFlowlayout.addWidget(self.atomGitCheckBox)
         self.channelLayout.addWidget(self.channelLabel)
+        self.channelLayout.addWidget(self.githubCheckBox)
         self.channelLayout.addLayout(self.channelFlowlayout)
         # self.channelLayout.addStretch()
 
@@ -124,7 +134,7 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.changelogLayout.addWidget(self.changelog)
         # self.changelogLayout.setContentsMargins(5, 5, 5, 5)
         # self.changelogScrollArea.setMinimumHeight(0)
-        self.changelogScrollArea.setMaximumHeight(80)
+        self.changelogScrollArea.setMaximumHeight(60)
         self.changelogScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.changelogScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
@@ -139,12 +149,35 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.vBoxLayout.addWidget(self.changelogScrollArea)
         self.vBoxLayout.addLayout(self.channelLayout)
         self.vBoxLayout.addWidget(self.channelTipLabel)
-        self.vBoxLayout.addSpacing(8)
+        self.vBoxLayout.addSpacing(10)
         self.vBoxLayout.addLayout(self.buttonLayout)
 
     def __connectSignalToSlot(self):
         self.confirmButton.clicked.connect(self.__onConfirmButtonClicked)
         self.cancelButton.clicked.connect(self.closed)
+
+        self.githubCheckBox.toggled.connect(
+            lambda checked: self.__onRepoClicked(checked, "GitHub"))
+        self.tencentCheckBox.toggled.connect(
+            lambda checked: self.__onRepoClicked(checked, "Tencent"))
+        self.atomGitCheckBox.toggled.connect(
+            lambda checked: self.__onRepoClicked(checked, "AtomGit"))
+
+    def __loadConfig(self):
+        repo = paramConfig.get(paramConfig.repo)
+        if repo == "GitHub":
+            self.githubCheckBox.setChecked(True)
+        elif repo == "Tencent":
+            self.tencentCheckBox.setChecked(True)
+        elif repo == "AtomGit":
+            self.atomGitCheckBox.setChecked(True)
+        else:
+            self.tencentCheckBox.setChecked(True)
+
+    def __onRepoClicked(self, checked: bool, repo: str):
+        if not checked:
+            return
+        paramConfig.set(paramConfig.repo, repo)
 
     def __onConfirmButtonClicked(self):
         code = 0
@@ -176,6 +209,8 @@ class ToolbarWidget(QWidget):
 
         self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
 
+        self.newVersion = ""
+
         self.__initWidget()
 
     def __initWidget(self):
@@ -190,34 +225,15 @@ class ToolbarWidget(QWidget):
 
     def __connectSignalToSlot(self):
         self.updateToolButton.clicked.connect(self.showUpdateTeachingTip)
+        signalBus.newVersionSignal.connect(self.__onNewVersion)
+
+    def __onNewVersion(self, new_version: str):
+        logger.debug(f"new_version: {new_version}")
+        self.newVersion = new_version
+        self.updateToolButton.click()
 
     def showUpdateTeachingTip(self):
-        # view = TeachingTipView(
-        #     icon=None,
-        #     title='*有新版本 3.7.6 Alpha',
-        #     content="最短的捷径就是绕远路，绕远路才是我的最短捷径。",
-        #     # image='resource/Gyro.jpg',
-        #     # image='resource/boqi.gif',
-        #     isClosable=True,
-        #     tailPosition=TeachingTipTailPosition.BOTTOM,
-        # )
-        #
-        # # add widget to view
-        # button = PushButton('Action')
-        # button.setFixedWidth(120)
-        # view.addWidget(button, align=Qt.AlignRight)
-        #
-        # w = PopupTeachingTip.make(
-        #     target=self.updateToolButton,
-        #     view=view,
-        #     duration=-1,
-        #     tailPosition=TeachingTipTailPosition.TOP_RIGHT,
-        #     parent=self
-        # )
-        #
-        # view.closed.connect(w.close)
-
-        view = UpdateFlyoutView()
+        view = UpdateFlyoutView(VERSION, self.newVersion)
 
         w = PopupTeachingTip.make(
             target=self.updateToolButton,
@@ -378,7 +394,8 @@ class BasicSettingWidget(QWidget):
     def __onMessageChanged(self, msg):
         scrollbar = self.messageEdit.verticalScrollBar()
         is_at_bottom = scrollbar.value() == scrollbar.maximum()
-        self.messageEdit.append(f"{datetime.now().strftime("%H:%M:%S")} - {msg}")
+        # self.messageEdit.append(f"{datetime.now().strftime("%H:%M:%S")} - {msg}")
+        self.messageEdit.append(f"{datetime.now().strftime("%H:%M")}: {msg}")
         if is_at_bottom:
             scrollbar.setValue(scrollbar.maximum())
 
@@ -560,7 +577,12 @@ class BottomWidget(CardWidget):
                 elapsed_seconds = (datetime.now() - self._submittedTask.start_time).total_seconds()
                 hours, remainder = divmod(elapsed_seconds, 3600)
                 minutes, seconds = divmod(remainder, 60)
-                elapsed = f", {int(hours)}h {int(minutes)}m {seconds:.2f}s"
+                if int(hours) > 0:
+                    elapsed = f", {int(hours)}h {int(minutes)}m {seconds:.2f}s"
+                elif int(minutes) > 0:
+                    elapsed = f", {int(minutes)}m {seconds:.2f}s"
+                else:
+                    elapsed = f", {seconds:.2f}s"
             signalBus.homeMessageSignal.emit(f"{self.tr("Stop")} {self._submittedTask.name}{elapsed}")
             self._submittedTask = None
 

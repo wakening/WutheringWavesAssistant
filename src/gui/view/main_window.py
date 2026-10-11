@@ -170,10 +170,12 @@ class MainWindow(FluentWindow):
             logger.debug("无新版本需要更新")
             return
         if result is True:
-            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            msg = self.tr(" *有新版本 {version}，请点击右上角更新").format(version=self.remoteVersion.version)
             signalBus.homeMessageSignal.emit(msg)
+            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
             self.setWindowTitle(self.windowTitle() + msg)
-            self.remoteVersion.showInfoBar(msg, 5000, self.homeInterface)
+            # self.remoteVersion.showInfoBar(msg, 5000, self.homeInterface)
+            signalBus.newVersionSignal.emit(self.remoteVersion.version)
 
     def showEvent(self, event):
         super().showEvent(event)

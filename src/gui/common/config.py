@@ -200,6 +200,9 @@ class ParamConfig(QConfig):
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
     device = ConfigItem("Game", "Device", None, OptionsValidator([None, "CPU"]))
 
+    # Setting
+    repo = ConfigItem("Setting", "repo", None, OptionsValidator([None, "GitHub", "Tencent", "AtomGit"]))
+
 
     def save(self):
         """ Save config, excluding certain fields """

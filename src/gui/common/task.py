@@ -61,5 +61,10 @@ class BaseTask(QObject):
             elapsed_seconds = (datetime.now() - self.start_time).total_seconds()
             hours, remainder = divmod(elapsed_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            elapsed = f", {int(hours)}h {int(minutes)}m {seconds:.2f}s"
+            if int(hours) > 0:
+                elapsed = f", {int(hours)}h {int(minutes)}m {seconds:.2f}s"
+            elif int(minutes) > 0:
+                elapsed = f", {int(minutes)}m {seconds:.2f}s"
+            else:
+                elapsed = f", {seconds:.2f}s"
         signalBus.homeMessageSignal.emit(f"{self.tr("Stop")} {self.name}{elapsed}")
