@@ -78,8 +78,8 @@ REPO_URL = "https://github.com/wakening/WutheringWavesAssistant"
 EXAMPLE_URL = "https://github.com/wakening"
 FEEDBACK_URL = "https://github.com/wakening/WutheringWavesAssistant/issues"
 RELEASE_URL = "https://github.com/wakening/WutheringWavesAssistant/releases/latest"
-ZH_SUPPORT_URL = "https://afdian.com/a/wakening"
-EN_SUPPORT_URL = "https://afdian.com/a/wakening"
+ZH_SUPPORT_URL = "https://afdian.com/a/unwaking"
+EN_SUPPORT_URL = "https://afdian.com/a/unwaking"
 CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/CHANGELOG.md" # TODO terminal
 
 VERSION_URLS = [
