@@ -155,8 +155,11 @@ class UpdateFlyoutView(FlyoutViewBase):
         elif self.atomGitCheckBox.isChecked():
             code = 103
         logger.debug(f"exit code: {code}")
+        self.closed.emit()
         # sys.exit(code)
-        QApplication.instance().exit(code)
+        # QApplication.instance().exit(code)
+        # QApplication.instance().exit(0)
+        globalSignal.sysExitSignal.emit(code)
 
     def paintEvent(self, e):
         # 不绘制边框和背景

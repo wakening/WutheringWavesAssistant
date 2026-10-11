@@ -22,18 +22,21 @@ class LogListener(QThread):
         self.logQueue = logQueue
 
     def run(self):
-        while not self.isInterruptionRequested():
-            try:
-                logText = self.logQueue.get(timeout=1)  # 设置超时，避免永久阻塞
-                if logText is None:
-                    continue
-                # 异步必须用signal传递数据，再由槽函数往控件内添加文本，直接在这往控件添加文本QT会经常闪退
-                signalBus.logQueueSignal.emit(logText)
-            except queue.Empty:
-                continue  # 超时继续循环，及时感知运行状态
-            except Exception:
-                logger.exception("日志监听线程发生未知异常，停止运行")
-                break
+        try:
+            while not self.isInterruptionRequested():
+                try:
+                    logText = self.logQueue.get(timeout=1)  # 设置超时，避免永久阻塞
+                    if logText is None:
+                        continue
+                    # 异步必须用signal传递数据，再由槽函数往控件内添加文本，直接在这往控件添加文本QT会经常闪退
+                    signalBus.logQueueSignal.emit(logText)
+                except queue.Empty:
+                    continue  # 超时继续循环，及时感知运行状态
+                except Exception:
+                    logger.exception("日志监听线程发生未知异常，停止运行")
+                    break
+        except Exception:
+            pass
 
     def stop(self):
         self.requestInterruption()

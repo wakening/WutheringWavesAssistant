@@ -1,6 +1,7 @@
 # coding: utf-8
 import logging
 import re
+import sys
 from typing import List
 from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer, QObject
 from PySide6.QtGui import QIcon, QDesktopServices
@@ -72,6 +73,7 @@ class MainWindow(FluentWindow):
         signalBus.windowSizeChanged.connect(self.windowResize)
         self.remoteVersionFinishedSignal.connect(self.showUpdateVersion)
         globalSignal.taskInfoBarSignal.connect(self.showTaskInfoBar)
+        globalSignal.sysExitSignal.connect(self.__onCloseEvent)
 
     def initNavigation(self):
         # add navigation items
@@ -137,6 +139,10 @@ class MainWindow(FluentWindow):
         self.themeListener.terminate()
         self.themeListener.deleteLater()
         super().closeEvent(e)
+
+    def __onCloseEvent(self, exit_code: int):
+        self.close()
+        sys.exit(exit_code)
 
     def _onThemeChangedFinished(self):
         super()._onThemeChangedFinished()

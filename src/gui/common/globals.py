@@ -3,6 +3,7 @@ from PySide6.QtCore import Signal, QObject
 
 class GlobalSignal(QObject):
     """ Signal """
+    sysExitSignal = Signal(int)  # gui关闭信号，右上角的关闭
     closeMainWindowSignal = Signal()  # gui关闭信号，右上角的关闭
     guiExistSignal = Signal()  # 有同路径的gui启动了，不允许，发送信号通知并退出
     taskChangedSignal = Signal(object)  # 当前选择的运行任务，各页面实时发给运行按钮
