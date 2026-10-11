@@ -64,7 +64,7 @@ if errorlevel 1 goto failed
 
 echo.
 echo WWA has been started.
-exit /b 0
+exit
 
 :invalid_directory
 echo [ERROR] update.bat must be located in the project's temp\update directory.
