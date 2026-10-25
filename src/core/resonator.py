@@ -822,6 +822,15 @@ class Resonator(Enum):
             "T_IconRoleHead150_76_UI.png": I18nText.Suoming,
         }
 
+    @staticmethod
+    @lru_cache
+    def id_avatar_mappings() -> dict[str, list[str]]:
+        """角色id 头像"""
+        mappings = {}
+        for k, v in Resonator.avatar_mappings().items():
+            mappings.setdefault(v, []).append(k)
+        return mappings
+
 
 class TeamMember:
     """大世界 编队相关"""

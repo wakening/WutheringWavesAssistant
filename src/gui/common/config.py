@@ -80,7 +80,7 @@ FEEDBACK_URL = "https://github.com/wakening/WutheringWavesAssistant/issues"
 RELEASE_URL = "https://github.com/wakening/WutheringWavesAssistant/releases/latest"
 ZH_SUPPORT_URL = "https://afdian.com/a/unwaking"
 EN_SUPPORT_URL = "https://afdian.com/a/unwaking"
-CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/CHANGELOG.md" # TODO terminal
+CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/blob/main/CHANGELOG.md"
 
 VERSION_URLS = [
     "https://cnb.cool/github.wakening/WutheringWavesAssistant/-/git/raw/main/src/__init__.py",
@@ -199,6 +199,22 @@ class ParamConfig(QConfig):
     resourceQuality = ConfigItem("Game", "ResourceQuality", None, OptionsValidator([None, "UHD", "HD", "SD"]))
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
     device = ConfigItem("Game", "Device", None, OptionsValidator([None, "CPU"]))
+    # Game Shortcut
+    shortcutMoveForward = ConfigItem("Controls", "MoveForward", None)
+    shortcutMoveBackward = ConfigItem("Controls", "MoveBackward", None)
+    shortcutMoveLeft = ConfigItem("Controls", "MoveLeft", None)
+    shortcutMoveRight = ConfigItem("Controls", "MoveRight", None)
+    shortcutResonanceSkill = ConfigItem("Controls", "ResonanceSkill", None)
+    shortcutEchoSkill = ConfigItem("Controls", "EchoSkill", None)
+    shortcutResonanceLiberation = ConfigItem("Controls", "ResonanceLiberation", None)
+    shortcutMember1 = ConfigItem("Controls", "Member1", None)
+    shortcutMember2 = ConfigItem("Controls", "Member2", None)
+    shortcutMember3 = ConfigItem("Controls", "Member3", None)
+    shortcutMember4 = ConfigItem("Controls", "Member4", None)
+    shortcutJump = ConfigItem("Controls", "Jump", None)
+    shortcutPickUp = ConfigItem("Controls", "PickUp", None)
+    shortcutUseUtility = ConfigItem("Controls", "UseUtility", None)
+    shortcutMap = ConfigItem("Controls", "Map", None)
 
     # Setting
     repo = ConfigItem("Setting", "repo", None, OptionsValidator([None, "GitHub", "Tencent", "AtomGit"]))

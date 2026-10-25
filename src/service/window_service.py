@@ -79,8 +79,26 @@ class HwndServiceImpl(WindowService):
     def refresh(self) -> bool:
         with self._rlock:
             try:
-                self._handle = hwnd_util.get_hwnd()
-                return True
+                # self._handle = hwnd_util.get_hwnd()
+
+                handle = None
+                if self._context.spec and self._context.spec.game_path:
+                    handle = hwnd_util.get_hwnd(self.game_path, bool(self.game_path))
+                else:
+                    # 其他情况
+                    # pytest时，ctx参数不完整，场景也简单，直接取当前运行中的游戏
+                    hwnds = hwnd_util.get_hwnds()
+                    if hwnds and len(hwnds) == 1:
+                        handle = hwnds[0]
+                    else:
+                        # 要是没有或者有多个，从注册表拿一个
+                        from src.util import winreg_util
+                        self.game_path = winreg_util.get_install_path()
+                        handle = hwnd_util.get_hwnd(self.game_path, bool(self.game_path))
+                if handle:
+                    self._handle = handle
+                    return True
+                return False
             except Exception:
                 logger.exception("Get hwnd error!")
                 return False

@@ -342,76 +342,90 @@ class ExploreWorkflow(AbstractWorkflow):
 
             listener.start()
 
-        ui = UIOp(self.ctx)
-        idx = 0
-        last_pickup_task_limit = 0
+        if cfg.autoPickup or cfg.skipStory or cfg.autoDialogue:
+            ui = UIOp(self.ctx)
+            idx = 0
+            last_pickup_task_limit = 0
 
-        while ui.is_set():
-            try:
-                # 游戏必须在前台
-                if self.foreground_window_limiter() == 0 and not self.ctx.window_service.is_foreground_window():
-                    # logger.info(f"foreground window disabled")
-                    ui.sleep(1)
-                    continue
+            def _is_foreground_window():
+                for i in range(2):
+                    if self.ctx.window_service.is_foreground_window():
+                        return True
+                    # 修复：若游戏重启了，用无效的句柄判断是否为前台将一直返回否，重新拿一次句柄
+                    if i == 0 and self.ctx.window_service.refresh():
+                        continue
+                    break
+                return False
 
-                # 战斗中不做其他事
-                if self.combat_system is not None:
-                    ui.sleep(0.3)
-                    continue
-
-                # 循环间隔
-                ui.sleep(0.1)
-                idx += 1
-
-                # 定时
-                if self.active_limiter() == 0:
-                    ui.activate()
-
-                # 限速
-                if self.task_limiter() == 0:
-                    # logger.info(f"idx task: {idx}")
-                    img = ui.grap()
-
-                    # 剧情：跳过剧情
-                    if cfg.skipStory and self._skip(img):
+            while ui.is_set():
+                try:
+                    # 游戏必须在前台
+                    # 每次都检查前台，但每隔一定时间才尝试刷新句柄。只要不在前台就暂停一会
+                    if (self.foreground_window_limiter() == 0 and not _is_foreground_window()
+                            or not self.ctx.window_service.is_foreground_window()):
+                        # logger.info(f"foreground window disabled")
+                        ui.sleep(1)
                         continue
 
-                    # 剧情：自动对话
-                    if not cfg.skipStory and cfg.autoDialogue and self._dialogue(img):
+                    # 战斗中不做其他事
+                    if self.combat_system is not None:
+                        ui.sleep(0.3)
                         continue
 
-                    # 剧情：自动播放
-                    if (cfg.skipStory or cfg.autoDialogue) and self._play(img):
-                        continue
+                    # 循环间隔
+                    ui.sleep(0.1)
+                    idx += 1
 
-                    # 大世界：自动拾取
-                    if cfg.autoPickup and self._pickup(img):
-                        continue
-                elif cfg.autoPickup:
-                    limit = self.pickup_task_limiter()
-                    if limit > 0:
+                    # 定时
+                    if self.active_limiter() == 0:
+                        ui.activate()
+
+                    # 限速
+                    if self.task_limiter() == 0:
+                        # logger.info(f"idx task: {idx}")
+                        img = ui.grap()
+
+                        # 剧情：跳过剧情
+                        if cfg.skipStory and self._skip(img):
+                            continue
+
+                        # 剧情：自动对话
+                        if not cfg.skipStory and cfg.autoDialogue and self._dialogue(img):
+                            continue
+
+                        # 剧情：自动播放
+                        if (cfg.skipStory or cfg.autoDialogue) and self._play(img):
+                            continue
+
+                        # 大世界：自动拾取
+                        if cfg.autoPickup and self._pickup(img):
+                            continue
+                    elif cfg.autoPickup:
+                        limit = self.pickup_task_limiter()
+                        if limit > 0:
+                            last_pickup_task_limit = limit
+                            # logger.info(f"pickup_task_limit: {limit}")
+                            continue
+                        # 最小等待时间
+                        if last_pickup_task_limit == 0 and limit == 0:
+                            # logger.info(f"Min pickup sleep: {idx}")
+                            ui.sleep(0.1)
                         last_pickup_task_limit = limit
-                        # logger.info(f"pickup_task_limit: {limit}")
-                        continue
-                    # 最小等待时间
-                    if last_pickup_task_limit == 0 and limit == 0:
-                        # logger.info(f"Min pickup sleep: {idx}")
-                        ui.sleep(0.1)
-                    last_pickup_task_limit = limit
 
-                    # logger.info(f"idx pickup: {idx}")
+                        # logger.info(f"idx pickup: {idx}")
 
-                    # start_time = time.monotonic()
-                    img = ui.grap()
-                    if cfg.autoPickup and self._pickup(img):
+                        # start_time = time.monotonic()
+                        img = ui.grap()
+                        if cfg.autoPickup and self._pickup(img):
+                            # logger.info(f"pickup耗时：{time.monotonic() - start_time}")
+                            continue
                         # logger.info(f"pickup耗时：{time.monotonic() - start_time}")
-                        continue
-                    # logger.info(f"pickup耗时：{time.monotonic() - start_time}")
 
-            except (KeyboardInterrupt, StopError) as e:
-                raise e
-            except Exception as e:
-                logger.exception(e)
+                except (KeyboardInterrupt, StopError) as e:
+                    raise e
+                except Exception as e:
+                    logger.exception(e)
+                    ui.sleep(0.3)
 
         if listener is not None:
             listener.join()
@@ -688,9 +702,23 @@ class ExploreWorkflow(AbstractWorkflow):
         try:
             # logger.debug(f"[{self.count:03d}] '{key_name}' 被按下")
             with self.combat_lock:
-                if not self.ctx.window_service.is_foreground_window():
-                    logger.info(f"[{self.count:03d}] Not in foreground")
-                    return True
+
+                # 游戏在前台才响应指令
+                # 为避免竞争，若其他开关有开启，则自动战斗不刷新句柄，仅判断
+                cfg = self.ctx.runtime.cfg.explore
+                if cfg.autoPickup or cfg.skipStory or cfg.autoDialogue:
+                    if not self.ctx.window_service.is_foreground_window():
+                        logger.info(f"[{self.count:03d}] Not in foreground")
+                        return True
+                else:
+                    for i in range(2):
+                        if not self.ctx.window_service.is_foreground_window():
+                            # 修复：若游戏重启了，用无效的句柄判断是否为前台将一直返回否，重新拿一次句柄
+                            if i == 0 and self.ctx.window_service.refresh():
+                                continue
+                            logger.info(f"[{self.count:03d}] Not in foreground")
+                            return True
+                        break
 
                 # 没启动就启动，已启动就停止
                 if self.combat_system is None:

@@ -1,0 +1,57 @@
+ComboBox, ModelComboBox, MultiSelectionComboBox, TreeComboBox, MultiSelectionTreeComboBox {
+    border: 1px solid rgba(255, 255, 255, 0.053);
+    border-radius: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 5px 31px 6px 11px;
+    /* font: 14px --FontFamilies; */
+    color: white;
+    background-color: rgba(255, 255, 255, 0.0605);
+    text-align: left;
+    outline: none;
+}
+
+ComboBox:hover, ModelComboBox:hover, MultiSelectionComboBox:hover, TreeComboBox:hover, MultiSelectionTreeComboBox:hover {
+    background-color: rgba(255, 255, 255, 0.0837);
+}
+
+ComboBox:pressed, ModelComboBox:pressed, MultiSelectionComboBox:pressed, TreeComboBox:pressed, MultiSelectionTreeComboBox:pressed {
+    background-color: rgba(255, 255, 255, 0.0326);
+    border-top: 1px solid rgba(255, 255, 255, 0.053);
+    color: rgba(255, 255, 255, 0.63);
+}
+
+ComboBox:disabled, ModelComboBox:disabled, MultiSelectionComboBox:disabled, TreeComboBox:disabled, MultiSelectionTreeComboBox:disabled {
+    color: rgba(255, 255, 255, 0.3628);
+    background: rgba(255, 255, 255, 0.0419);
+    border: 1px solid rgba(255, 255, 255, 0.053);
+    border-top: 1px solid rgba(255, 255, 255, 0.053);
+}
+
+ComboBox[isPlaceholderText=true], ModelComboBox[isPlaceholderText=true], MultiSelectionComboBox[isPlaceholderText=true], TreeComboBox[isPlaceholderText=true], MultiSelectionTreeComboBox[isPlaceholderText=true] {
+    color: rgba(255, 255, 255, 0.6063);
+}
+
+QFrame#treeComboPopup {
+    background-color: rgb(43, 43, 43);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 7px;
+}
+
+/* SubClip styles */
+SubClip {
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+SubClip:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+SubClip[isPressed=true] {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+SubClip #clipTextLabel {
+    color: white;
+    font: 13px --FontFamilies;
+}

@@ -21,6 +21,7 @@ class RemoteVersion(QObject):
         self.callback = callback
         # 创建 QNetworkAccessManager 实例
         self.networkManager = QNetworkAccessManager(self)
+        self.networkManager.setTransferTimeout(3000)  # 单条请求的超时时间
         self.networkManager.finished.connect(self._onRequestFinished)
 
         self._index = 0

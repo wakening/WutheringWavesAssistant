@@ -5,7 +5,8 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 
-from PySide6.QtCore import Qt, Signal, QTimer
+from PySide6.QtCore import Qt, Signal, QTimer, QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup, QApplication
 from packaging.version import Version
 
@@ -14,10 +15,11 @@ from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, Indeterminate
                             PrimarySplitPushButton, SplitPushButton, PushButton, PopupTeachingTip, InfoBarIcon,
                             TeachingTipTailPosition, TeachingTip, TeachingTipView, ToolButton, TransparentToolButton,
                             FlyoutViewBase, BodyLabel, PrimaryPushButton, SubtitleLabel, TitleLabel, LargeTitleLabel,
-                            FluentStyleSheet, TransparentPushButton, CheckBox, FlowLayout)
+                            FluentStyleSheet, TransparentPushButton, CheckBox, FlowLayout, HyperlinkButton, toggleTheme,
+                            ToolTipFilter)
 
 from src import __version__
-from src.gui.common.config import paramConfig, VERSION
+from src.gui.common.config import paramConfig, VERSION, RELEASE_URL, CHANGELOG_URL
 from src.gui.common.globals import GlobalSignal, globalSignal
 from src.gui.common.signal_bus import signalBus
 from src.gui.view.home.daily import DailyWidget
@@ -25,6 +27,7 @@ from src.gui.common.style_sheet import StyleSheet
 from src.gui.view.home.echo import EchoWidget
 from src.gui.view.home.events import EventsWidget
 from src.gui.view.home.explore import ExploreWidget
+from src.gui.view.home.game_settings import GameSettingsWidget
 
 logger = logging.getLogger(__name__)
 
@@ -76,27 +79,33 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.new_version = new_version
 
         self.vBoxLayout = QVBoxLayout(self)
+
+        self.titleLayout = QHBoxLayout()
         if self.new_version:
-            title = f"有新版本 {self.version} -> {self.new_version}"
+            title = f'有新版本 {self.version} -> <span style="color: red;">{self.new_version}</span>'
         else:
-            title = f"暂无更新 {self.version}"
-        self.titleLabel = TransparentPushButton(FluentIcon.DOWNLOAD, title, self)
+            title = f'暂无更新 {self.version}'
+        self.titleDownload = TransparentToolButton(FluentIcon.DOWNLOAD, self)
+        self.titleDownload.setToolTip(self.tr('Download'))
+        self.titleLabel = QLabel(self.tr(title), self)
 
         # 更新日志
         self.changelogScrollArea = ScrollArea()
         self.changelogContainer = QWidget(self.changelogScrollArea)
         self.changelogLayout = QVBoxLayout(self.changelogContainer)
         self.changelogTitleLabel = QLabel(self.tr("更新日志:"), self.changelogContainer)
-        self.changelog = QLabel("略", self.changelogContainer)
+        # self.changelog = QLabel("略", self.changelogContainer)
+        self.changelog = HyperlinkButton(CHANGELOG_URL, self.tr("在线查看"), self.changelogContainer)
 
         # git渠道
         self.channelLayout = QVBoxLayout()
         self.channelLabel = QLabel(self.tr("选择更新渠道: "), self)
         self.channelFlowlayout = FlowLayout()
-        self.githubCheckBox = CheckBox("GitHub", self)
-        self.tencentCheckBox = CheckBox("CN-腾讯云", self)
-        # self.tencentCheckBox.setChecked(True)
-        self.atomGitCheckBox = CheckBox("CN-AtomGit", self)
+        self.githubCheckBox = CheckBox(self.tr("GitHub"), self)
+        self.tencentCheckBox = CheckBox(self.tr("CN-腾讯云"), self)
+        self.tencentCheckBox.setToolTip(self.tr("国内加速"))
+        self.atomGitCheckBox = CheckBox(self.tr("CN-AtomGit"), self)
+        self.atomGitCheckBox.setToolTip(self.tr("国内加速"))
 
         self.buttonGroup = QButtonGroup(self)
         self.buttonGroup.addButton(self.githubCheckBox)
@@ -104,11 +113,12 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.buttonGroup.addButton(self.atomGitCheckBox)
         self.buttonGroup.setExclusive(True)
 
-        self.channelTipLabel = QLabel('国内请选择CN源更新，若有异常请及时反馈！', self)
+        self.channelTipLabel = QLabel(self.tr('国内请选择CN源更新，若有异常请及时反馈！'), self)
 
         self.buttonLayout = QHBoxLayout()
-        self.confirmButton = PrimaryPushButton('更新', self)
-        self.cancelButton = PushButton('取消', self)
+        self.confirmButton = PrimaryPushButton(self.tr('重启更新'), self)
+        self.confirmButton.setToolTip(self.tr("需要重启脚本"))
+        self.cancelButton = PushButton(self.tr('取消'), self)
 
         self.__initWidgets()
 
@@ -122,19 +132,26 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.__loadConfig()
 
     def __initLayout(self):
-        # self.channelFlowlayout.addWidget(self.githubCheckBox)
+        # self.setStyleSheet("border: 2px solid red;")
+
+        self.titleLayout.addStretch()
+        self.titleLayout.addWidget(self.titleDownload)
+        self.titleLayout.addWidget(self.titleLabel)
+        self.titleLayout.addStretch()
+        self.titleLayout.setSpacing(2)
+        self.titleLayout.setContentsMargins(0, 0, 0, 0)
+
         self.channelFlowlayout.addWidget(self.tencentCheckBox)
         self.channelFlowlayout.addWidget(self.atomGitCheckBox)
         self.channelLayout.addWidget(self.channelLabel)
         self.channelLayout.addWidget(self.githubCheckBox)
         self.channelLayout.addLayout(self.channelFlowlayout)
-        # self.channelLayout.addStretch()
 
         self.changelogLayout.addWidget(self.changelogTitleLabel)
         self.changelogLayout.addWidget(self.changelog)
         # self.changelogLayout.setContentsMargins(5, 5, 5, 5)
         # self.changelogScrollArea.setMinimumHeight(0)
-        self.changelogScrollArea.setMaximumHeight(60)
+        self.changelogScrollArea.setMaximumHeight(66)
         self.changelogScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.changelogScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
@@ -145,7 +162,7 @@ class UpdateFlyoutView(FlyoutViewBase):
 
         self.vBoxLayout.setSpacing(12)
         self.vBoxLayout.setContentsMargins(20, 16, 20, 16)
-        self.vBoxLayout.addWidget(self.titleLabel)
+        self.vBoxLayout.addLayout(self.titleLayout)
         self.vBoxLayout.addWidget(self.changelogScrollArea)
         self.vBoxLayout.addLayout(self.channelLayout)
         self.vBoxLayout.addWidget(self.channelTipLabel)
@@ -153,6 +170,9 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.vBoxLayout.addLayout(self.buttonLayout)
 
     def __connectSignalToSlot(self):
+        self.titleDownload.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl(RELEASE_URL)))
+
         self.confirmButton.clicked.connect(self.__onConfirmButtonClicked)
         self.cancelButton.clicked.connect(self.closed)
 
@@ -162,6 +182,10 @@ class UpdateFlyoutView(FlyoutViewBase):
             lambda checked: self.__onRepoClicked(checked, "Tencent"))
         self.atomGitCheckBox.toggled.connect(
             lambda checked: self.__onRepoClicked(checked, "AtomGit"))
+
+        # 有新的信号来，旧的全部自己关闭，防止多个弹窗
+        signalBus.newVersionSignal.connect(self.closed)
+        globalSignal.closeMainWindowSignal.connect(self.closed)
 
     def __loadConfig(self):
         repo = paramConfig.get(paramConfig.repo)
@@ -207,23 +231,33 @@ class ToolbarWidget(QWidget):
 
         self.mainLayout = QHBoxLayout(self)
 
-        self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
+        self.themeButton = TransparentToolButton(FluentIcon.CONSTRACT, self)
+        self.themeButton.setToolTip(self.tr('Toggle theme'))
 
+        self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
+        self.updateToolButton.setToolTip(self.tr('Update'))
         self.newVersion = ""
+        self.updateView = None
 
         self.__initWidget()
 
     def __initWidget(self):
+        self.themeButton.installEventFilter(ToolTipFilter(self.themeButton))
+        self.updateToolButton.installEventFilter(ToolTipFilter(self.updateToolButton))
+
         # initialize layout
         self.__initLayout()
         self.__connectSignalToSlot()
 
     def __initLayout(self):
+        self.setObjectName('toolbar')
+        self.mainLayout.addWidget(self.themeButton)
         self.mainLayout.addWidget(self.updateToolButton)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.setAlignment(Qt.AlignTop)
 
     def __connectSignalToSlot(self):
+        self.themeButton.clicked.connect(lambda: toggleTheme(True, True))
         self.updateToolButton.clicked.connect(self.showUpdateTeachingTip)
         signalBus.newVersionSignal.connect(self.__onNewVersion)
 
@@ -421,9 +455,9 @@ class ContentWidget(QWidget):
 
         self.daily = DailyWidget(self)
         self.echo = EchoWidget(self)
-        # self.story = StoryWidget(self)
         self.explore = ExploreWidget(self)
         self.events = EventsWidget(self)
+        self.gameSettings = GameSettingsWidget(self)
         # self.help = QLabel(self.tr("施工中..."), self)
         # self.help.setAlignment(Qt.AlignVCenter| Qt.AlignHCenter)
 
@@ -432,11 +466,12 @@ class ContentWidget(QWidget):
         self.addSubInterface(self.echo, 'echo', self.tr("声骸"))
         self.addSubInterface(self.explore, 'explore', self.tr("探索"))
         self.addSubInterface(self.events, 'events', self.tr("活动"))
+        self.addSubInterface(self.gameSettings, 'gameSettings', self.tr("设置"))
         # self.addSubInterface(self.help, 'help', self.tr("帮助"))
 
         self.currentTask = self.daily
-        self.stackedWidget.setCurrentWidget(self.daily)
-        self.pivot.setCurrentItem(self.daily.objectName())
+        self.stackedWidget.setCurrentWidget(self.gameSettings)
+        self.pivot.setCurrentItem(self.gameSettings.objectName())
 
         self.__initWidget()
 

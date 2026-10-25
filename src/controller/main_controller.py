@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from enum import Enum
+from pathlib import Path
 from typing import Sequence, Dict
 
 from src import __version__
@@ -16,7 +17,7 @@ from src.core import environs
 from src.core.contexts import Context
 from src.core.exceptions import StopError
 from src.core.message import ProcessBridge, MessageBus, MsgSource
-from src.core.runtime import RuntimeConfig
+from src.core.runtime import RuntimeConfig, ResourceQuality
 from src.core.tasks import EchoMergeProcessTask
 from src.core.workflow import TaskSpec, IPCManager, LaunchInfo
 from src.util import hwnd_util, file_util
@@ -363,8 +364,28 @@ class TaskMonitor:
             # exe_path = self.param_config.get_game_path()
             exe_path = self.rt_cfg.game.gamePath
             game_path = hwnd_util.get_ww_exe_path(exe_path)
+
+            def _get_qualities():
+                content = Path(game_path).parent / "Client/Content"
+                if not content.is_dir():
+                    return None
+                # 极致放最后
+                resource_qualities = [ResourceQuality.HD.value, ResourceQuality.SD.value, ResourceQuality.UHD.value]
+                res = []
+                for q in resource_qualities:
+                    if content.joinpath(q).is_dir():
+                        res.append(q)
+                return res
+
+            # 到游戏目录里找资源包，若没有找到配置文件里设置的资源包，重置为当前有的资源包
+            qualities = _get_qualities()
+            quality = self.rt_cfg.game.resourceQuality.value
+            if qualities and quality.upper() not in qualities:
+                logger.warning(f"Invalid resource quality: {quality}, reset to: {qualities[0]}")
+                quality = qualities[0]
+
             # 极致uhd，高清hd，流畅sd
-            return LaunchInfo(game_path, [game_path, f"-krqlv={self.rt_cfg.game.resourceQuality.value.lower()}"])
+            return LaunchInfo(game_path, [game_path, f"-krqlv={quality.lower()}"])
         if len(hwnds) == 1:
             hwnd = hwnds[0]  # 运行中的最优先，不管配置
         else:  # 多个游戏同时运行，优先选自定义配置的

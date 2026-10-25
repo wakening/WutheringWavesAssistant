@@ -26,6 +26,7 @@ class DungeonMeta:
     waveplate: Optional[int]
     enemy_id: Optional[str]
     rewards: Optional[List[str]]
+    camera_reset: bool
 
     def __post_init__(self):
         if not self.id:
@@ -76,6 +77,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Polarizer],
+        camera_reset=False,
         weapon=I18nText.Sword,
     )
 
@@ -89,6 +91,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.String],
+        camera_reset=False,
         weapon=I18nText.Rectifier,
     )
 
@@ -102,6 +105,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.CarvedCrystal],
+        camera_reset=False,
         weapon=I18nText.Broadblade,
     )
 
@@ -115,6 +119,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.WavewornShard],
+        camera_reset=False,
         weapon=I18nText.Gauntlets,
     )
 
@@ -128,6 +133,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Combustor],
+        camera_reset=False,
         weapon=I18nText.Pistols,
     )
 
@@ -141,6 +147,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Polarizer],
+        camera_reset=False,
         weapon=I18nText.Sword,
     )
 
@@ -154,6 +161,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.String],
+        camera_reset=False,
         weapon=I18nText.Rectifier,
     )
 
@@ -167,6 +175,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.CarvedCrystal],
+        camera_reset=False,
         weapon=I18nText.Broadblade,
     )
 
@@ -180,6 +189,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.WavewornShard],
+        camera_reset=False,
         weapon=I18nText.Gauntlets,
     )
 
@@ -193,6 +203,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Combustor],
+        camera_reset=False,
         weapon=I18nText.Pistols,
     )
 
@@ -206,6 +217,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.MetallicDrip],
+        camera_reset=False,
         weapon=I18nText.Sword,
     )
 
@@ -219,6 +231,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Helix],
+        camera_reset=False,
         weapon=I18nText.Rectifier,
     )
 
@@ -232,6 +245,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.WavewornResidue],
+        camera_reset=False,
         weapon=I18nText.Broadblade,
     )
 
@@ -245,6 +259,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Cadence],
+        camera_reset=False,
         weapon=I18nText.Gauntlets,
     )
 
@@ -258,6 +273,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Phlogiston],
+        camera_reset=False,
         weapon=I18nText.Pistols,
     )
 
@@ -271,6 +287,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.MetallicDrip],
+        camera_reset=True,
         weapon=I18nText.Sword,
     )
 
@@ -284,6 +301,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Helix],
+        camera_reset=False,
         weapon=I18nText.Rectifier,
     )
 
@@ -297,6 +315,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.WavewornResidue],
+        camera_reset=False,
         weapon=I18nText.Broadblade,
     )
 
@@ -310,6 +329,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Cadence],
+        camera_reset=False,
         weapon=I18nText.Gauntlets,
     )
 
@@ -323,6 +343,7 @@ class DungeonForgeryChallenge:
         waveplate=40,
         enemy_id=None,
         rewards=[I18nText.Phlogiston],
+        camera_reset=False,
         weapon=I18nText.Pistols,
     )
 
@@ -340,6 +361,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyCalamityEffigy,
         rewards=[I18nText.ForgedEmpyreansSigh],
+        camera_reset=False,
     )
 
     EnemyMyriadSnareRustfireChassis = DungeonMeta(
@@ -352,6 +374,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyMyriadSnareRustfireChassis,
         rewards=[I18nText.SolidaritysLoneflame],
+        camera_reset=False,
     )
 
     EnemyNightmareAdamSmasher = DungeonMeta(
@@ -364,6 +387,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyNightmareAdamSmasher,
         rewards=[I18nText.NightmareFlashdrive],
+        camera_reset=False,
     )
 
     EnemyNamelessExplorer = DungeonMeta(
@@ -376,6 +400,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyNamelessExplorer,
         rewards=[I18nText.OurChoice],
+        camera_reset=False,
     )
 
     EnemyHyvatia = DungeonMeta(
@@ -388,6 +413,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyHyvatia,
         rewards=[I18nText.SuncovetersReach],
+        camera_reset=False,
     )
 
     EnemyReactorHusk = DungeonMeta(
@@ -400,6 +426,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyReactorHusk,
         rewards=[I18nText.BurningJudgment],
+        camera_reset=False,
     )
 
     EnemyLadyOfTheSea = DungeonMeta(
@@ -412,6 +439,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyLadyOfTheSea,
         rewards=[I18nText.AbyssalHusk],
+        camera_reset=False,
     )
 
     EnemyTheFalseSovereign = DungeonMeta(
@@ -424,6 +452,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyTheFalseSovereign,
         rewards=[I18nText.BlightedCrownOfPuppetKing],
+        camera_reset=False,
     )
 
     EnemyFenrico = DungeonMeta(
@@ -436,6 +465,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyFenrico,
         rewards=[I18nText.TruthInLies],
+        camera_reset=False,
     )
 
     EnemyLionessOfGlory = DungeonMeta(
@@ -448,6 +478,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyLionessOfGlory,
         rewards=[I18nText.UnfadingGlory],
+        camera_reset=False,
     )
 
     EnemyDragonOfDirge = DungeonMeta(
@@ -460,6 +491,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyDragonOfDirge,
         rewards=[I18nText.BlazingBone],
+        camera_reset=False,
     )
 
     EnemyLorelei = DungeonMeta(
@@ -472,6 +504,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyLorelei,
         rewards=[I18nText.CleansingConch],
+        camera_reset=False,
     )
 
     EnemySentryConstruct = DungeonMeta(
@@ -484,6 +517,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemySentryConstruct,
         rewards=[I18nText.PlatinumCore],
+        camera_reset=False,
     )
 
     EnemyFallacyOfNoReturn = DungeonMeta(
@@ -496,6 +530,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyFallacyOfNoReturn,
         rewards=[I18nText.TopologicalConfinement],
+        camera_reset=False,
     )
 
     EnemyCrownless = DungeonMeta(
@@ -508,6 +543,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyCrownless,
         rewards=[I18nText.StrifeTacetCore],
+        camera_reset=False,
     )
 
     EnemyThunderingMephis = DungeonMeta(
@@ -520,6 +556,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyThunderingMephis,
         rewards=[I18nText.HiddenThunderTacetCore],
+        camera_reset=False,
     )
 
     EnemyTempestMephis = DungeonMeta(
@@ -532,6 +569,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyTempestMephis,
         rewards=[I18nText.ThunderingTacetCore],
+        camera_reset=False,
     )
 
     EnemyInfernoRider = DungeonMeta(
@@ -544,6 +582,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyInfernoRider,
         rewards=[I18nText.RageTacetCore],
+        camera_reset=False,
     )
 
     EnemyFeilianBeringal = DungeonMeta(
@@ -556,6 +595,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyFeilianBeringal,
         rewards=[I18nText.RoaringRockFist],
+        camera_reset=False,
     )
 
     EnemyMourningAix = DungeonMeta(
@@ -568,6 +608,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyMourningAix,
         rewards=[I18nText.ElegyTacetCore],
+        camera_reset=False,
     )
 
     EnemyImpermanenceHeron = DungeonMeta(
@@ -580,6 +621,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyImpermanenceHeron,
         rewards=[I18nText.GoldDissolvingFeather],
+        camera_reset=False,
     )
 
     EnemyLampylumenMyriad = DungeonMeta(
@@ -592,6 +634,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyLampylumenMyriad,
         rewards=[I18nText.SoundKeepingTacetCore],
+        camera_reset=False,
     )
 
     EnemyMechAbomination = DungeonMeta(
@@ -604,6 +647,7 @@ class DungeonBossChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyMechAbomination,
         rewards=[I18nText.GroupAbominationTacetCore],
+        camera_reset=False,
     )
 
 
@@ -620,6 +664,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldHeartOfFlames = DungeonMeta(
@@ -632,6 +677,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     WesternFangPeaksTacetField = DungeonMeta(
@@ -644,6 +690,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     EasternXuanPeaksTacetField = DungeonMeta(
@@ -656,6 +703,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldSolisiaLanding = DungeonMeta(
@@ -668,6 +716,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldFrostlandsTransitPort = DungeonMeta(
@@ -680,6 +729,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldMountGjallar = DungeonMeta(
@@ -692,6 +742,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldMawburrowDesert = DungeonMeta(
@@ -704,6 +755,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldStagnantRun = DungeonMeta(
@@ -716,6 +768,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldMournfellCanyon = DungeonMeta(
@@ -728,6 +781,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldBeohrWaters = DungeonMeta(
@@ -740,6 +794,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldRiccioliIslands = DungeonMeta(
@@ -752,6 +807,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldFagaceaePeninsula = DungeonMeta(
@@ -764,6 +820,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldPenitentsEnd = DungeonMeta(
@@ -776,6 +833,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldCentralPlains = DungeonMeta(
@@ -788,6 +846,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldDesorockHighlandI = DungeonMeta(
@@ -800,6 +859,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldTigersMaw = DungeonMeta(
@@ -812,6 +872,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldWhiningAixsMire = DungeonMeta(
@@ -824,6 +885,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldPortCityOfGuixu = DungeonMeta(
@@ -836,6 +898,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldDesorockHighlandII = DungeonMeta(
@@ -848,6 +911,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
     TacetFieldDimForest = DungeonMeta(
@@ -860,6 +924,7 @@ class DungeonTacetSuppression:
         waveplate=60,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
     )
 
 
@@ -876,6 +941,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemySuhsinTheInevitable,
         rewards=[I18nText.SkywardGlazedHeart],
+        camera_reset=False,
     )
 
     CourtOfShackledSouls = DungeonMeta(
@@ -888,6 +954,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyThousandPuppetPavilion,
         rewards=[I18nText.SkywardGlazedHeart],
+        camera_reset=False,
     )
 
     SeedOfIllusoryOrigin = DungeonMeta(
@@ -900,6 +967,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyDenia,
         rewards=[I18nText.WeWhoQuestion],
+        camera_reset=False,
     )
 
     GateOfTheLostStar = DungeonMeta(
@@ -912,6 +980,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemySigillum,
         rewards=[I18nText.GoldInMemory],
+        camera_reset=False,
     )
 
     CinderniteApocalypse = DungeonMeta(
@@ -924,6 +993,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyThrenodianLeviathan,
         rewards=[I18nText.CurseOfTheAbyss],
+        camera_reset=False,
     )
 
     TheWheelOfBrokenFate = DungeonMeta(
@@ -936,6 +1006,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyFleurdelys,
         rewards=[I18nText.WhenIrisesBloom],
+        camera_reset=False,
     )
 
     BeyondTheCrimsonCurtain = DungeonMeta(
@@ -948,6 +1019,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyHecate,
         rewards=[I18nText.TheNetherworldsStare],
+        camera_reset=False,
     )
 
     TheFatedConfrontation = DungeonMeta(
@@ -960,6 +1032,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyJue,
         rewards=[I18nText.SentinelsDagger],
+        camera_reset=False,
     )
 
     StatueOfTheCrownless = DungeonMeta(
@@ -972,6 +1045,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyDreamless,
         rewards=[I18nText.DreamlessFeather],
+        camera_reset=False,
     )
 
     ChaoticJuncture = DungeonMeta(
@@ -984,6 +1058,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyScarAberrantNightmare,
         rewards=[I18nText.UnendingDestruction],
+        camera_reset=False,
     )
 
     BellOfArchaicChants = DungeonMeta(
@@ -996,6 +1071,7 @@ class DungeonWeeklyChallenge:
         waveplate=60,
         enemy_id=I18nText.EnemyBellBorneGeochelone,
         rewards=[I18nText.MonumentBell],
+        camera_reset=False,
     )
 
 
@@ -1012,6 +1088,7 @@ class DungeonTacetDiscordNest:
         waveplate=None,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
         routes=[Run.forward(2.5)],
     )
 
@@ -1025,6 +1102,7 @@ class DungeonTacetDiscordNest:
         waveplate=None,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
         routes=[Run.forward(4.5)],
     )
 
@@ -1038,6 +1116,7 @@ class DungeonTacetDiscordNest:
         waveplate=None,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
         routes=[Run.right(0.25), Run.forward(3.5)],
     )
 
@@ -1051,6 +1130,7 @@ class DungeonTacetDiscordNest:
         waveplate=None,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
         routes=[Run.forward(2.7)],
     )
 
@@ -1064,6 +1144,7 @@ class DungeonTacetDiscordNest:
         waveplate=None,
         enemy_id=None,
         rewards=None,
+        camera_reset=False,
         routes=[Run.forward(5.5)],
     )
 
@@ -1081,6 +1162,7 @@ class DungeonTacetDiscordNest:
 #         waveplate=60,
 #         enemy_id=I18nText.EnemyThousandPuppetPavilion,
 #         rewards=[I18nText.SkywardGlazedHeart],
+#         camera_reset=False,
 #     )
 
 if __name__ == '__main__':

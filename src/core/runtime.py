@@ -259,7 +259,7 @@ class GameRuntimeConfig:
                 resourceQuality = ResourceQuality(self._cfg.resourceQuality)
             except Exception:
                 return resourceQuality
-        logger.info(f"Resource Quality: '{resourceQuality}'")
+        logger.info(f"Resource quality: {resourceQuality.value}")
         return resourceQuality
 
     @cached_property

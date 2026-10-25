@@ -64,7 +64,8 @@ class StoryExploreWidget(QWidget):
             self.tr(
                 "快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。\n"
                 "用法：启动脚本，回到游戏，点击【快捷键】，将自动战斗，再次点击【快捷键】或【ESC】键，可停止战斗。\n"
-                "适用于锄地、剧情战斗、部分活动。"
+                "适用：锄地、剧情战斗、部分活动。\n"
+                "注意：点击【快捷键】时，游戏右侧需能看到角色头像，否则无法识别到角色，无法切人。"
             ),
             self
         )
@@ -85,7 +86,10 @@ class StoryExploreWidget(QWidget):
 
         self.skipStoryCheckBox = CheckBox(self.tr("跳过剧情:"), self)
         self.skipStoryDescLabel = QLabel(
-            self.tr("触发剧情后自动帮你点击跳过。"),
+            self.tr(
+                "不看剧情的可开启。\n"
+                "触发剧情后自动帮你点击左上角跳过。白色背景下若识别不到建议手动点一下。"
+            ),
             self
         )
         self.skipStoryDescLabel.setWordWrap(True)
@@ -96,6 +100,7 @@ class StoryExploreWidget(QWidget):
         self.autoDialogueCheckBox = CheckBox(self.tr("自动对话:"), self)
         self.autoDialogueDescLabel = QLabel(
             self.tr(
+                "想看剧情的可开启。\n"
                 "触发剧情后可双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。"
             ),
             self

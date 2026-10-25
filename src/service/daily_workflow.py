@@ -922,6 +922,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             break
         dungeon_name = ctx.tr(dungeon.id)
         cost = dungeon.waveplate or 40
+        logger.info(f"{dungeon_name.raw}")
 
         def _fail():
             ui.esc().sleep(1.2)
@@ -1041,6 +1042,9 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                                 and ui.snapshot().search(ctx.tr(I18nText.StartChallenge), quest_roi)):
                     return _fail()
 
+                # 重置视角
+                if dungeon.camera_reset:
+                    ui.sleep(0.2).camera_reset().sleep(0.6)
                 # 开始挑战
                 if not move_and_scan_dialogue(ctx, ctx.tr(I18nText.StartChallenge), 15):
                     return _fail()

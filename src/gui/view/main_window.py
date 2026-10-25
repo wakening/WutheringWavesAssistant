@@ -2,15 +2,16 @@
 import logging
 import re
 import sys
+from pathlib import Path
 from typing import List
 from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer, QObject
-from PySide6.QtGui import QIcon, QDesktopServices
+from PySide6.QtGui import QIcon, QDesktopServices, QAction
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from PySide6.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget, QSystemTrayIcon
 
 from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
                             SplashScreen, SystemThemeListener, isDarkTheme, InfoBarPosition, InfoBar,
-                            FluentIcon as FIF)
+                            FluentIcon as FIF, SystemTrayMenu, Action)
 
 from src.gui.view.notice_interface import NoticeInterface
 from src.gui.view.gallery_interface import GalleryInterface
@@ -27,6 +28,31 @@ from src.gui.common import resource  # noqa: F401
 from src.gui.common.version_control import RemoteVersion
 
 logger = logging.getLogger(__name__)
+
+
+class SystemTrayIcon(QSystemTrayIcon):
+
+    def __init__(self, parent):
+        super().__init__(parent=parent)
+        self.parent = parent
+        self.setIcon(parent.windowIcon())
+        self.setToolTip(f'WWA {VERSION}')
+
+        self.menu = SystemTrayMenu(parent=parent)
+        self.menu.addActions([
+            Action(self.tr('  显示窗口  '), triggered=self.show_normal),
+            Action(self.tr('  打开目录  '), triggered=self.open_explorer),
+            Action(self.tr('  退出  '), triggered=parent.close),
+        ])
+        self.setContextMenu(self.menu)
+
+    def show_normal(self):
+        self.parent.showNormal()
+        self.parent.activateWindow()
+
+    def open_explorer(self):
+        path = Path(__file__).resolve().parent.parent.parent.parent
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
 
 class MainWindow(FluentWindow):
@@ -92,8 +118,12 @@ class MainWindow(FluentWindow):
         # self.resize(720, 720)
         # self.resize(960, 780)
         self.setMinimumWidth(700)
-        self.setWindowIcon(QIcon(':/gallery/images/logo.ico'))
+        # self.setWindowIcon(QIcon(':/gallery/images/logo.ico'))  # 不将图标编译进resource.py减小体积
+        self.setWindowIcon(QIcon(str(Path(__file__).resolve().parent.parent / 'resource/images/logo.ico')))
         self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
+
+        self.systemTrayIcon = SystemTrayIcon(self)
+        self.systemTrayIcon.show()
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -138,6 +168,7 @@ class MainWindow(FluentWindow):
         globalSignal.closeMainWindowSignal.emit()
         self.themeListener.terminate()
         self.themeListener.deleteLater()
+        self.systemTrayIcon.hide()  # 窗口关闭时隐藏托盘图标
         super().closeEvent(e)
 
     def __onCloseEvent(self, exit_code: int):

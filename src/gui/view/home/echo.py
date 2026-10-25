@@ -108,6 +108,10 @@ class BossRushWidget(QWidget):
         self.lineEdit.setEnabled(False)
         self.aboutButton = PushButton(self.tr("关于"), self)
 
+        # self.enemyFilter = MultiSelectionLiteFilter()
+        # self.enemyFilter = OutlinedMultiSelectionLiteFilter()
+        # self.enemyFilter.addItems(['All', '3.0', '2.0', '1.0'])
+
         # for boss in BossNameEnum:
         new_boss = 1  # TODO 增加boss参数，根据版本区最新版本boss数量
         for i, boss in enumerate(reversed(list(BossNameEnum))):
@@ -151,6 +155,7 @@ class BossRushWidget(QWidget):
         self.toolbarLayout.addStretch()
 
         self.mainLayout.addLayout(self.toolbarLayout)
+        # self.mainLayout.addWidget(self.enemyFilter)
         self.mainLayout.addLayout(self.flowLayout)
         self.mainLayout.addStretch()
         self.mainLayout.setContentsMargins(16, 10, 16, 10)

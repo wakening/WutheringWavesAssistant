@@ -16,6 +16,7 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
 
 from src.core.i18n import I18nText
 from src.core.resonator import Resonator
+from src.core.resource import Resource
 from src.gui.common.config import paramConfig, BossNameEnum
 from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
@@ -375,6 +376,16 @@ class DailyWidget(ScrollArea):
         # self.activityComboBox.addItem(self.tr("不选择"), userData=None)
         # self.activityComboBox.addItem(self.tr("自动"), userData="Auto")
         self.activityComboBox.addItem(self.tr("日活、周活、幻梦游园"), userData="Auto")
+
+        # self.activityComboBox = MultiSelectionComboBox(self.container)
+        # self.activityComboBox.addItem(self.tr("日活"), userData=None)
+        # self.activityComboBox.addItem(self.tr("周活"), userData=None)
+        # self.activityComboBox.addItem(self.tr("幻梦游园"), userData=None)
+        # self.activityComboBox.setChipsMode(False)
+        # self.activityComboBox.setSelectedIndices({0, 1, 2})
+        # for i in range(3):
+        #     self.activityComboBox.setItemEnabled(i, True)
+
         # self.activitySettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.mailCheckBox = CheckBox(self.tr("邮件:"), self.container)
@@ -394,8 +405,13 @@ class DailyWidget(ScrollArea):
         self.focusResonatorComboBox = ComboBox(self.container)
         self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
         self.focusResonatorComboBox.addItem(self.tr("心（施工中）"), userData=None)
-        for resonator_id in reversed(Resonator.i18n_keys()):
-            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
+        # for resonator_id in reversed(Resonator.i18n_keys()):
+        #     self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
+        for avatar, resonator_id in reversed(list(Resonator.avatar_mappings().items())):
+            avatar = QIcon(str(Resource.Unpacked.IconRoleHead150 / avatar))
+            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, avatar, userData=resonator_id)
+            # logger.warning(f"self.focusResonatorComboBox.iconSize(): {str(self.focusResonatorComboBox.iconSize())}")
+            # self.focusResonatorComboBox.setIconSize(QSize(20, 20))
         self.focusResonatorComboBox.setCurrentIndex(1)
         self.focusResonatorComboBox.setEnabled(False)
 
