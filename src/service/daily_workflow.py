@@ -1379,8 +1379,7 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
                     ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
                     ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
-                    fsm.complete()
-                    return True
+                    return _fail()
 
                 if cur_waveplate >= cost:
                     if ui.wait().until(
@@ -1644,12 +1643,9 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ui.sleep(1)
                 # 容错，判断是否有体力不足是否继续弹窗
                 if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
-                    if ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.2):
-                        ui.sleep(0.1)
-                    if ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2):
-                        ui.sleep(0.4)
-                        fsm.complete()
-                        return True
+                    ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
+                    ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
+                    return _fail()
 
                 # 根据体力选择重新挑战还是离开
                 if ui.sleep(0.3).wait().until(
@@ -1924,8 +1920,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if ui.snapshot().search(ctx.tr([I18nText.WeeklyCancel, I18nText.DoNotShowAgain])):
                     ui.click_text(ctx.tr(I18nText.DoNotShowAgain), delay=0.3)
                     ui.click_text(ctx.tr(I18nText.WeeklyCancel), delay=0.2)
-                    fsm.complete()
-                    return True
+                    return _fail()
 
                 if cur_waveplate >= cost:
                     if ui.wait().until(
