@@ -59,7 +59,7 @@ class StoryExploreWidget(QWidget):
 
         self.mainLayout = QVBoxLayout(self)
 
-        self.autoCombatCheckBox = CheckBox(self.tr("自动战斗:"), self)
+        self.autoCombatCheckBox = CheckBox(self.tr("Auto Combat:"), self)
         self.autoCombatDescLabel = QLabel(
             self.tr(
                 "快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。\n"
@@ -74,9 +74,9 @@ class StoryExploreWidget(QWidget):
         self.autoCombatLayout.addWidget(self.autoCombatDescLabel)
         self.autoCombatLayout.setContentsMargins(30, 0, 0, 0)
 
-        self.autoPickupCheckBox = CheckBox(self.tr("自动拾取:"), self)
+        self.autoPickupCheckBox = CheckBox(self.tr("Auto Pickup:"), self)
         self.autoPickupDescLabel = QLabel(
-            self.tr("自动拾取路过的✅声骸、✅草药、✅食材、✅宝箱。"),
+            self.tr("Automatically pick up: ✅Echoes, ✅Herbs, ✅Ingredients, ✅Chests."),
             self
         )
         self.autoPickupDescLabel.setWordWrap(True)
@@ -84,7 +84,7 @@ class StoryExploreWidget(QWidget):
         self.autoPickupLayout.addWidget(self.autoPickupDescLabel)
         self.autoPickupLayout.setContentsMargins(30, 0, 0, 0)
 
-        self.skipStoryCheckBox = CheckBox(self.tr("跳过剧情:"), self)
+        self.skipStoryCheckBox = CheckBox(self.tr("Skip Story:"), self)
         self.skipStoryDescLabel = QLabel(
             self.tr(
                 "不看剧情的可开启。\n"
@@ -97,7 +97,7 @@ class StoryExploreWidget(QWidget):
         self.skipStoryLayout.addWidget(self.skipStoryDescLabel)
         self.skipStoryLayout.setContentsMargins(30, 0, 0, 0)
 
-        self.autoDialogueCheckBox = CheckBox(self.tr("自动对话:"), self)
+        self.autoDialogueCheckBox = CheckBox(self.tr("Auto Dialogue:"), self)
         self.autoDialogueDescLabel = QLabel(
             self.tr(
                 "想看剧情的可开启。\n"
@@ -161,9 +161,9 @@ class ExploreWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        self.tipsLabel = QLabel(self.tr("跑图等都需手动操作，不能代肝大世界！"), self.container)
+        self.tipsLabel = QLabel(self.tr("Exploration and other open-world activities must be performed manually. Automated open-world farming is not supported!"), self.container)
         self.tipsLabel.setWordWrap(True)
-        self.tipsLabel2 = QLabel(self.tr("请勾选需要的功能项，支持多选，任意分辨率"), self.container)
+        self.tipsLabel2 = QLabel(self.tr("Please select the features you want to use. Multiple selections are allowed. Supports any resolution."), self.container)
 
         self.storyExploreWidget = StoryExploreWidget(self.container)
 

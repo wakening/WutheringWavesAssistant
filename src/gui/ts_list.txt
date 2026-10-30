@@ -1,0 +1,2 @@
+src/gui/resource/i18n/gallery.zh_CN.ts
+src/gui/resource/i18n/gallery.zh_HK.ts

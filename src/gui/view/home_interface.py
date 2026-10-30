@@ -93,19 +93,19 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.changelogScrollArea = ScrollArea()
         self.changelogContainer = QWidget(self.changelogScrollArea)
         self.changelogLayout = QVBoxLayout(self.changelogContainer)
-        self.changelogTitleLabel = QLabel(self.tr("更新日志:"), self.changelogContainer)
+        self.changelogTitleLabel = QLabel(self.tr("Changelog:"), self.changelogContainer)
         # self.changelog = QLabel("略", self.changelogContainer)
-        self.changelog = HyperlinkButton(CHANGELOG_URL, self.tr("在线查看"), self.changelogContainer)
+        self.changelog = HyperlinkButton(CHANGELOG_URL, self.tr("View online"), self.changelogContainer)
 
         # git渠道
         self.channelLayout = QVBoxLayout()
-        self.channelLabel = QLabel(self.tr("选择更新渠道: "), self)
+        self.channelLabel = QLabel(self.tr("Select update channel: "), self)
         self.channelFlowlayout = FlowLayout()
         self.githubCheckBox = CheckBox(self.tr("GitHub"), self)
-        self.tencentCheckBox = CheckBox(self.tr("CN-腾讯云"), self)
-        self.tencentCheckBox.setToolTip(self.tr("国内加速"))
+        self.tencentCheckBox = CheckBox(self.tr("CN-Tencent"), self)
+        self.tencentCheckBox.setToolTip(self.tr("China mirror"))
         self.atomGitCheckBox = CheckBox(self.tr("CN-AtomGit"), self)
-        self.atomGitCheckBox.setToolTip(self.tr("国内加速"))
+        self.atomGitCheckBox.setToolTip(self.tr("China mirror"))
 
         self.buttonGroup = QButtonGroup(self)
         self.buttonGroup.addButton(self.githubCheckBox)
@@ -113,12 +113,12 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.buttonGroup.addButton(self.atomGitCheckBox)
         self.buttonGroup.setExclusive(True)
 
-        self.channelTipLabel = QLabel(self.tr('国内请选择CN源更新，若有异常请及时反馈！'), self)
+        self.channelTipLabel = QLabel(self.tr('For users in China, select the CN source for updates. Please report any issues you encounter.'), self)
 
         self.buttonLayout = QHBoxLayout()
-        self.confirmButton = PrimaryPushButton(self.tr('重启更新'), self)
-        self.confirmButton.setToolTip(self.tr("需要重启脚本"))
-        self.cancelButton = PushButton(self.tr('取消'), self)
+        self.confirmButton = PrimaryPushButton(self.tr('Restart to update'), self)
+        self.confirmButton.setToolTip(self.tr('Script restart required'))
+        self.cancelButton = PushButton(self.tr('Cancel'), self)
 
         self.__initWidgets()
 
@@ -331,10 +331,10 @@ class BasicSettingWidget(QWidget):
 
         self.mainLayout = QVBoxLayout(self)
 
-        self.titleLabel = QLabel(self.tr("基础设置"), self)
+        self.titleLabel = QLabel(self.tr("General Settings"), self)
 
         self.langLayout = QHBoxLayout()
-        self.langLabel = QLabel(self.tr("游戏文本:"), self)
+        self.langLabel = QLabel(self.tr("Game Text:"), self)
         self.langComboBox = ComboBox(self)
         # self.langComboBox.setPlaceholderText(self.tr("{text} - {sign}").format(
         #     text=self.langDesc[0], sign=self.lang[0].value))
@@ -347,7 +347,7 @@ class BasicSettingWidget(QWidget):
                 self.langComboBox.setItemEnabled(self.langComboBox.count() - 1, False)
 
         self.resourceQualityLayout = QHBoxLayout()
-        self.resourceQualityLabel = QLabel(self.tr("资源等级:"), self)
+        self.resourceQualityLabel = QLabel(self.tr("Resource Quality:"), self)
         self.resourceQualityComboBox = ComboBox(self)
         # self.resourceQualityComboBox.setPlaceholderText(self.tr("{text} {level}").format(
         #     text=self.resourceQualityDesc[1], level=self.resourceQuality[1]))
@@ -357,7 +357,7 @@ class BasicSettingWidget(QWidget):
         self.resourceQualityComboBox.setCurrentIndex(1)
 
         self.deviceLayout = QHBoxLayout()
-        self.deviceLabel = QLabel(self.tr("运行设备:"), self)
+        self.deviceLabel = QLabel(self.tr("Device:"), self)
         self.deviceComboBox = ComboBox(self)
         self.deviceComboBox.setPlaceholderText(self.tr("{text}").format(text=self.deviceDesc[0]))
         for i in range(len(self.device)):
@@ -462,11 +462,11 @@ class ContentWidget(QWidget):
         # self.help.setAlignment(Qt.AlignVCenter| Qt.AlignHCenter)
 
         # add items to pivot
-        self.addSubInterface(self.daily, 'daily', self.tr("日常"))
-        self.addSubInterface(self.echo, 'echo', self.tr("声骸"))
-        self.addSubInterface(self.explore, 'explore', self.tr("探索"))
-        self.addSubInterface(self.events, 'events', self.tr("活动"))
-        self.addSubInterface(self.gameSettings, 'gameSettings', self.tr("设置"))
+        self.addSubInterface(self.daily, 'daily', self.tr("Daily"))
+        self.addSubInterface(self.echo, 'echo', self.tr("Echo"))
+        self.addSubInterface(self.explore, 'explore', self.tr("Explore"))
+        self.addSubInterface(self.events, 'events', self.tr("Events"))
+        self.addSubInterface(self.gameSettings, 'gameSettings', self.tr("Settings"))
         # self.addSubInterface(self.help, 'help', self.tr("帮助"))
 
         self.currentTask = self.daily
@@ -515,7 +515,7 @@ class BottomWidget(CardWidget):
 
         self.mainLayout = QHBoxLayout(self)
 
-        self.titleLabel = QLabel(self.tr("运行"), self)
+        self.titleLabel = QLabel(self.tr("Run"), self)
         self.titleLabel.setObjectName('titleLabel')
 
         # 双倍提醒

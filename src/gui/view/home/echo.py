@@ -106,7 +106,7 @@ class BossRushWidget(QWidget):
         self.bossNameLabel = QLabel(self.tr("BOSS:"), self)
         self.lineEdit = SearchLineEdit(self)
         self.lineEdit.setEnabled(False)
-        self.aboutButton = PushButton(self.tr("关于"), self)
+        self.aboutButton = PushButton(self.tr("About"), self)
 
         # self.enemyFilter = MultiSelectionLiteFilter()
         # self.enemyFilter = OutlinedMultiSelectionLiteFilter()
@@ -219,7 +219,7 @@ class EchoMergeWidget(QWidget):
         self.mainLayout = QVBoxLayout(self)
 
         # self.checkbox = CheckBox(self.tr("声骸融合: "), self)
-        self.descLabel = QLabel(self.tr("融合背包内未锁定的声骸，任意分辨率"), self)
+        self.descLabel = QLabel(self.tr("Fuse unlocked Echoes in the inventory, any resolution"), self)
         self.descLabel.setWordWrap(True)
 
         self.descLayout = QHBoxLayout()
@@ -238,13 +238,13 @@ class EchoWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        self.tipsLabel = QLabel(self.tr("请勾选需要的功能项"), self.container)
+        self.tipsLabel = QLabel(self.tr("Please select the features you want to use."), self.container)
 
-        self.bossRushCheckBox = CheckBox(self.tr("刷BOSS:"), self.container)
+        self.bossRushCheckBox = CheckBox(self.tr("Boss Farming:"), self.container)
         self.bossRushCheckBox.setChecked(True)
         self.bossRushWidget = BossRushWidget(self.container)
 
-        self.echoMergeCheckBox = CheckBox(self.tr("声骸融合:"), self.container)
+        self.echoMergeCheckBox = CheckBox(self.tr("Echo Fusion:"), self.container)
         self.echoMergeWidget = EchoMergeWidget(self.container)
 
         self.group = QButtonGroup(self.container)

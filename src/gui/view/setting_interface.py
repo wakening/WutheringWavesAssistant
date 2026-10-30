@@ -58,10 +58,10 @@ class SettingInterface(ScrollArea):
         self.windowSizeCard = OptionsSettingCard(
             cfg.windowSize,
             FIF.ZOOM,
-            self.tr("界面大小"),
-            self.tr("调整界面宽高"),
+            self.tr("Window size"),
+            self.tr("Adjust window size"),
             texts=[
-                "720x720", "Default"
+                "720x720", self.tr("Default")
             ],
             parent=self.personalGroup
         )
@@ -197,11 +197,11 @@ class SettingInterface(ScrollArea):
     def showUpdateVersion(self):
         result = self.remoteVersion.checkVersion()
         if result is None:
-            self.remoteVersion.showErrorBar(self.tr("检查更新失败"), 5000, self.parent())
+            self.remoteVersion.showErrorBar(self.tr("Failed to check for updates"), 5000, self.parent())
             return
         if result is False:
-            self.remoteVersion.showInfoBar(self.tr("已经是最新版了"), 5000, self.parent())
+            self.remoteVersion.showInfoBar(self.tr("You're up to date"), 5000, self.parent())
             return
         if result is True:
-            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            msg = self.tr(" * New version available {version}").format(version=self.remoteVersion.version)
             self.remoteVersion.showSuccessBar(msg, 5000, self.parent())

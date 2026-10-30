@@ -72,9 +72,9 @@ class DailyWidget(ScrollArea):
         self.contentLayout = QVBoxLayout()
         # self.contentTitleLabel = QLabel(self.tr("任务设置:"), self.container)
 
-        self.waveplateLabel = QLabel(self.tr("体力:"), self.container)
-        self.nestLabel = QLabel(self.tr("聚落:"), self.container)
-        self.claimRewardsLabel = QLabel(self.tr("领取奖励:"), self.container)
+        self.waveplateLabel = QLabel(self.tr("Waveplates:"), self.container)
+        self.nestLabel = QLabel(self.tr("Nest:"), self.container)
+        self.claimRewardsLabel = QLabel(self.tr("Claim Rewards:"), self.container)
 
         self.upLabels = []
         self.bountifulCrescendo = []
@@ -84,8 +84,8 @@ class DailyWidget(ScrollArea):
         self.__initGridLayout()
 
         self.contentBottomLayout = QHBoxLayout()
-        self.resetButton = PushButton(self.tr("重置"), self.container)
-        self.aboutButton = PushButton(self.tr('关于'), self.container)
+        self.resetButton = PushButton(self.tr("Reset"), self.container)
+        self.aboutButton = PushButton(self.tr('About'), self.container)
 
         self.__initWidget()
 
@@ -287,9 +287,9 @@ class DailyWidget(ScrollArea):
 
     def __initGridLayout(self):
         # self.weeklyChallengeCheckBox.setStyleSheet("QCheckBox { border: 2px solid red; }")
-        self.weeklyChallengeCheckBox = CheckBox(self.tr("周本:"), self.container)
+        self.weeklyChallengeCheckBox = CheckBox(self.tr("Weekly Challenge:"), self.container)
         self.weeklyChallengeComboBox = ComboBox(self.container)
-        self.weeklyChallengeComboBox.addItem(self.tr("不选择"), userData=None)
+        self.weeklyChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
         # self.weeklyChallengeComboBox.addItem(self.tr("自动 - 最新BOSS"), userData="Auto")
         for i in range(len(self.weeklyChallenge)):
             text = self.tr("{challenge} - {boss}").format(
@@ -300,9 +300,9 @@ class DailyWidget(ScrollArea):
         self.weeklyChallengeComboBox.setCurrentIndex(0)
         # self.weeklyChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.tacetSuppressionCheckBox = CheckBox(self.tr("声骸材料:"), self.container)
+        self.tacetSuppressionCheckBox = CheckBox(self.tr("Echo Materials:"), self.container)
         self.tacetSuppressionComboBox = ComboBox(self.container)
-        self.tacetSuppressionComboBox.addItem(self.tr("不选择"), userData=None)
+        self.tacetSuppressionComboBox.addItem(self.tr("Deselect"), userData=None)
         for i in range(len(self.tacetSuppression)):
             text = self.tr("{challenge} - {region}").format(
                 challenge=self.i18ntr(self.tacetSuppression[i]).raw,
@@ -313,9 +313,9 @@ class DailyWidget(ScrollArea):
                 self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, False)
         # self.tacetSuppressionSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.forgeryChallengeCheckBox = CheckBox(self.tr("武器及技能材料:"), self.container)
+        self.forgeryChallengeCheckBox = CheckBox(self.tr("Weapon and Skill Materials:"), self.container)
         self.forgeryChallengeComboBox = ComboBox(self.container)
-        self.forgeryChallengeComboBox.addItem(self.tr("不选择"), userData=None)
+        self.forgeryChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
         for i in range(len(self.forgeryChallenge)):
             text = self.tr("{challenge} - {weapon} - {region}").format(
                 challenge=self.i18ntr(self.forgeryChallenge[i]).raw,
@@ -327,19 +327,19 @@ class DailyWidget(ScrollArea):
             #     self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, False)
         # self.forgeryChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.bossChallengeCheckBox = CheckBox(self.tr("共鸣者突破材料:"), self.container)
+        self.bossChallengeCheckBox = CheckBox(self.tr("Resonator Ascension Materials:"), self.container)
         self.bossChallengeComboBox = ComboBox(self.container)
-        self.bossChallengeComboBox.addItem(self.tr("不选择"), userData=None)
+        self.bossChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
         for i in range(len(self.bossChallenge)):
             self.bossChallengeComboBox.addItem(self.i18ntr(self.bossChallenge[i]).raw, userData=self.bossChallenge[i])
             # if i > -1:
             #     self.bossChallengeComboBox.setItemEnabled(self.bossChallengeComboBox.count() - 1, False)
         # self.bossChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.nightmarePurificationCheckBox = CheckBox(self.tr("梦魇聚落:"), self.container)
+        self.nightmarePurificationCheckBox = CheckBox(self.tr("Nightmare Nest:"), self.container)
         self.nightmarePurificationComboBox = ComboBox(self.container)
-        self.nightmarePurificationComboBox.addItem(self.tr("不选择"), userData=None)
-        self.nightmarePurificationComboBox.addItem(self.tr("全选"), userData="All")
+        self.nightmarePurificationComboBox.addItem(self.tr("Deselect"), userData=None)
+        self.nightmarePurificationComboBox.addItem(self.tr("Select all"), userData="All")
         self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, False)
         for i in range(len(self.nightmarePurification)):
             self.nightmarePurificationComboBox.addItem(
@@ -347,11 +347,11 @@ class DailyWidget(ScrollArea):
                 userData=self.nightmarePurification[i])
         # self.nightmarePurificationSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.tacetDiscordNestCheckBox = CheckBox(self.tr("残象聚落:"), self.container)
+        self.tacetDiscordNestCheckBox = CheckBox(self.tr("Tacet Discord Nest:"), self.container)
         self.tacetDiscordNestComboBox = ComboBox(self.container)
-        self.tacetDiscordNestComboBox.addItem(self.tr("不选择"), userData=None)
-        self.tacetDiscordNestComboBox.addItem(self.tr("全选"), userData="All")
-        self.tacetDiscordNestComboBox.addItem(self.tr("全选 - 梦州"), userData=I18nText.Mengzhou)
+        self.tacetDiscordNestComboBox.addItem(self.tr("Deselect"), userData=None)
+        self.tacetDiscordNestComboBox.addItem(self.tr("Select all"), userData="All")
+        self.tacetDiscordNestComboBox.addItem(self.tr("Select all of Mengzhou"), userData=I18nText.Mengzhou)
         for i in range(len(self.tacetDiscordNestMengzhou)):
             text = self.tr("{challenge} - {region}").format(
                 challenge=self.i18ntr(self.tacetDiscordNestMengzhou[i]).raw,
@@ -360,7 +360,7 @@ class DailyWidget(ScrollArea):
             self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNestMengzhou[i])
             # if i > 3:
             #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
-        self.tacetDiscordNestComboBox.addItem(self.tr("全选 - 拉海洛"), userData=I18nText.LahaiRoi)
+        self.tacetDiscordNestComboBox.addItem(self.tr("Select all of Lahai-Roi"), userData=I18nText.LahaiRoi)
         for i in range(len(self.tacetDiscordNestLahaiRoi)):
             text = self.tr("{challenge} - {region}").format(
                 challenge=self.i18ntr(self.tacetDiscordNestLahaiRoi[i]).raw,
@@ -371,11 +371,11 @@ class DailyWidget(ScrollArea):
             #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
         # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.activityCheckBox = CheckBox(self.tr("活跃行迹:"), self.container)
+        self.activityCheckBox = CheckBox(self.tr("Activity:"), self.container)
         self.activityComboBox = ComboBox(self.container)
-        # self.activityComboBox.addItem(self.tr("不选择"), userData=None)
-        # self.activityComboBox.addItem(self.tr("自动"), userData="Auto")
-        self.activityComboBox.addItem(self.tr("日活、周活、幻梦游园"), userData="Auto")
+        # self.activityComboBox.addItem(self.tr("Deselect"), userData=None)
+        # self.activityComboBox.addItem(self.tr("Auto"), userData="Auto")
+        self.activityComboBox.addItem(self.tr("Daily / Weekly Activity, Phantasma Dreamland"), userData="Auto")
 
         # self.activityComboBox = MultiSelectionComboBox(self.container)
         # self.activityComboBox.addItem(self.tr("日活"), userData=None)
@@ -388,22 +388,22 @@ class DailyWidget(ScrollArea):
 
         # self.activitySettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.mailCheckBox = CheckBox(self.tr("邮件:"), self.container)
+        self.mailCheckBox = CheckBox(self.tr("Mail:"), self.container)
         self.mailComboBox = ComboBox(self.container)
-        #         self.mailComboBox.addItem(self.tr("不选择"), userData=None)
-        self.mailComboBox.addItem(self.tr("自动"), userData="Auto")
+        #         self.mailComboBox.addItem(self.tr("Deselect"), userData=None)
+        self.mailComboBox.addItem(self.tr("Auto"), userData="Auto")
         # self.mailSettingButton = ToggleToolButton(FIF.SETTING, self)
 
-        self.pioneerPodcastCheckBox = CheckBox(self.tr("先约电台:"), self.container)
+        self.pioneerPodcastCheckBox = CheckBox(self.tr("Pioneer Podcast:"), self.container)
         self.pioneerPodcastComboBox = ComboBox(self.container)
-        #         self.pioneerPodcastComboBox.addItem(self.tr("不选择"), userData=None)
-        self.pioneerPodcastComboBox.addItem(self.tr("自动"), userData="Auto")
+        #         self.pioneerPodcastComboBox.addItem(self.tr("Deselect"), userData=None)
+        self.pioneerPodcastComboBox.addItem(self.tr("Auto"), userData="Auto")
         # self.pioneerPodcastSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.focusResonatorLayout = QHBoxLayout()
-        self.focusResonatorTitle = QLabel(self.tr("培养目标: "), self.container)
+        self.focusResonatorTitle = QLabel(self.tr("Focus Resonator: "), self.container)
         self.focusResonatorComboBox = ComboBox(self.container)
-        self.focusResonatorComboBox.addItem(self.tr("不选择"), userData=None)
+        self.focusResonatorComboBox.addItem(self.tr("Deselect"), userData=None)
         self.focusResonatorComboBox.addItem(self.tr("心（施工中）"), userData=None)
         # for resonator_id in reversed(Resonator.i18n_keys()):
         #     self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)

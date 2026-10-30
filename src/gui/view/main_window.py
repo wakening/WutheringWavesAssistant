@@ -40,19 +40,25 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         self.menu = SystemTrayMenu(parent=parent)
         self.menu.addActions([
-            Action(self.tr('  显示窗口  '), triggered=self.show_normal),
-            Action(self.tr('  打开目录  '), triggered=self.open_explorer),
-            Action(self.tr('  退出  '), triggered=parent.close),
+            Action(self.tr('  Show Window  '), triggered=self.showNormal),
+            Action(self.tr('  Open Folder  '), triggered=self.openExplorer),
+            Action(self.tr('  Exit  '), triggered=parent.close),
         ])
         self.setContextMenu(self.menu)
+        # 双击显示主窗口
+        self.activated.connect(self.onTrayActivated)
 
-    def show_normal(self):
+    def showNormal(self):
         self.parent.showNormal()
         self.parent.activateWindow()
 
-    def open_explorer(self):
+    def openExplorer(self):
         path = Path(__file__).resolve().parent.parent.parent.parent
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+
+    def onTrayActivated(self, reason: QSystemTrayIcon.ActivationReason):
+        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+            self.showNormal()
 
 
 class MainWindow(FluentWindow):
@@ -193,7 +199,7 @@ class MainWindow(FluentWindow):
     def showUpdateVersion(self):
         result = self.remoteVersion.checkVersion()
         if result is None:
-            msg = self.tr(" *检查更新失败")
+            msg = self.tr(" * Failed to check for updates")
             signalBus.homeMessageSignal.emit(msg)
             self.setWindowTitle(self.windowTitle() + msg)
             return
@@ -201,9 +207,9 @@ class MainWindow(FluentWindow):
             logger.debug("无新版本需要更新")
             return
         if result is True:
-            msg = self.tr(" *有新版本 {version}，请点击右上角更新").format(version=self.remoteVersion.version)
+            msg = self.tr(" * New version available {version}. Click Update in the top-right corner.").format(version=self.remoteVersion.version)
             signalBus.homeMessageSignal.emit(msg)
-            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            msg = self.tr(" * New version available {version}").format(version=self.remoteVersion.version)
             self.setWindowTitle(self.windowTitle() + msg)
             # self.remoteVersion.showInfoBar(msg, 5000, self.homeInterface)
             signalBus.newVersionSignal.emit(self.remoteVersion.version)

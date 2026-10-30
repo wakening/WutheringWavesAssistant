@@ -330,14 +330,14 @@ class EventsWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        self.tipsLabel = QLabel(self.tr("请勾选需要的功能项"), self.container)
+        self.tipsLabel = QLabel(self.tr("Please select the features you want to use."), self.container)
 
-        self.soarToTheBeatMacroTitle = QLabel(self.tr("沿着节拍启航:"), self.container)
+        self.soarToTheBeatMacroTitle = QLabel(self.tr("Soar to the Beat:"), self.container)
         self.soarToTheBeatLayout = QVBoxLayout()
-        self.soarToTheBeatMacroReplayCheckBox = CheckBox(self.tr("自动音游:"), self.container)
+        self.soarToTheBeatMacroReplayCheckBox = CheckBox(self.tr("Auto Rhythm Game:"), self.container)
         self.soarToTheBeatMacroReplayWidget = SoarToTheBeatMacroReplayWidget(self.container)
         self.soarToTheBeatMacroReplayCheckBox.setChecked(True)
-        self.soarToTheBeatMacroRecordCheckBox = CheckBox(self.tr("录制自定义模板:"), self.container)
+        self.soarToTheBeatMacroRecordCheckBox = CheckBox(self.tr("Record Custom Template:"), self.container)
         self.soarToTheBeatMacroRecordWidget = SoarToTheBeatMacroRecordWidget(self.container)
 
         self.group = QButtonGroup(self.container)

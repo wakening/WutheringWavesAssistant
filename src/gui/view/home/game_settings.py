@@ -28,7 +28,7 @@ class ShortcutWidget(MyShortcutPicker):
         super().__init__(keySequence, text, parent)
         if dialogTitle:
             self.setDialogTitle(dialogTitle)
-        self.setDialogDescription(self.tr('按下按键或组合键以更改此快捷键'))
+        self.setDialogDescription(self.tr('Press a key or key combination to change this shortcut.'))
 
     def loadKeySequence(self, keySequence):
         if not keySequence:
@@ -46,7 +46,7 @@ class GameSettingsWidget(ScrollArea):
         self.mainLayout = QVBoxLayout(self.container)
 
         self.tipsLabel = QLabel(self.tr("Game Settings"), self.container)
-        self.tipsLabel2 = QLabel(self.tr("点击按键进行修改，请保持与游戏内一致"), self.container)
+        self.tipsLabel2 = QLabel(self.tr("Click the button to edit. Please make sure it matches the in-game settings."), self.container)
 
         # Game Settings
         # Sounds

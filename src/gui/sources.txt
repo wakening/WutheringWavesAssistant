@@ -1,0 +1,13 @@
+src/gui/common/translator.py
+src/gui/view/gallery_interface.py
+src/gui/view/home_interface.py
+src/gui/view/main_window.py
+src/gui/view/notice_interface.py
+src/gui/view/param_interface.py
+src/gui/view/setting_interface.py
+src/gui/view/terminal_interface.py
+src/gui/view/home/daily.py
+src/gui/view/home/echo.py
+src/gui/view/home/events.py
+src/gui/view/home/explore.py
+src/gui/view/home/game_settings.py
