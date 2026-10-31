@@ -800,11 +800,8 @@ class DailyWidget(ScrollArea):
     def __showAboutFlyout(self):
         Flyout.create(
             # icon=InfoBarIcon.INFORMATION,
-            title='关于:',
-            content=self.tr(
-                '测试中，仅开放部分关卡。有问题及时群里反馈，最好录屏，或者截图游戏窗口和脚本日志，遮住uid。'
-                '\n使用前建议关闭微星小飞机、英伟达统计数据、Mod等，避免遮挡游戏ui影响识别'
-            ),
+            title=self.tr('About:'),
+            content=self.tr('Gray (unavailable) stages are not supported yet. Support will be gradually expanded in future updates. If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.'),
             target=self.aboutButton,
             parent=self.window()
         )

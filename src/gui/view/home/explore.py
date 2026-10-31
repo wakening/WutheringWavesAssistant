@@ -60,54 +60,46 @@ class StoryExploreWidget(QWidget):
         self.mainLayout = QVBoxLayout(self)
 
         self.autoCombatCheckBox = CheckBox(self.tr("Auto Combat:"), self)
-        self.autoCombatDescLabel = QLabel(
-            self.tr(
-                "快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。\n"
-                "用法：启动脚本，回到游戏，点击【快捷键】，将自动战斗，再次点击【快捷键】或【ESC】键，可停止战斗。\n"
-                "适用：锄地、剧情战斗、部分活动。\n"
-                "注意：点击【快捷键】时，游戏右侧需能看到角色头像，否则无法识别到角色，无法切人。"
-            ),
-            self
-        )
-        self.autoCombatDescLabel.setWordWrap(True)
-        self.autoCombatLayout = QHBoxLayout()
-        self.autoCombatLayout.addWidget(self.autoCombatDescLabel)
+        self.autoCombatDescLabels = [
+            QLabel(self.tr(r'Hotkeys: Mouse [Side Button 1], [Side Button 2], Keyboard [5 (above R)], or [`~]. Choose any one of the four options; you do not need to press them all.'), self, wordWrap=True),
+            QLabel(self.tr(r'Usage: Start the script and return to the game. Press the assigned hotkey to start auto combat. Press the hotkey again or ESC to stop.'), self, wordWrap=True),
+            QLabel(self.tr(r'Suitable for: Overworld farming, story battles, and some event battles.'), self, wordWrap=True),
+            QLabel(self.tr(r"Note: When pressing the hotkey, make sure the character portraits on the right side of the screen are visible. Otherwise, the script won't be able to detect your characters or switch between them."), self, wordWrap=True),
+        ]
+        self.autoCombatLayout = QVBoxLayout()
+        for label in self.autoCombatDescLabels:
+            self.autoCombatLayout.addWidget(label)
+        self.autoCombatLayout.setSpacing(2)
         self.autoCombatLayout.setContentsMargins(30, 0, 0, 0)
 
         self.autoPickupCheckBox = CheckBox(self.tr("Auto Pickup:"), self)
         self.autoPickupDescLabel = QLabel(
-            self.tr("Automatically pick up: ✅Echoes, ✅Herbs, ✅Ingredients, ✅Chests."),
-            self
-        )
+            self.tr("Automatically pick up: ✅Echoes, ✅Herbs, ✅Ingredients, ✅Chests."), self, wordWrap=True)
         self.autoPickupDescLabel.setWordWrap(True)
-        self.autoPickupLayout = QHBoxLayout()
+        self.autoPickupLayout = QVBoxLayout()
         self.autoPickupLayout.addWidget(self.autoPickupDescLabel)
         self.autoPickupLayout.setContentsMargins(30, 0, 0, 0)
 
         self.skipStoryCheckBox = CheckBox(self.tr("Skip Story:"), self)
-        self.skipStoryDescLabel = QLabel(
-            self.tr(
-                "不看剧情的可开启。\n"
-                "触发剧情后自动帮你点击左上角跳过。白色背景下若识别不到建议手动点一下。"
-            ),
-            self
-        )
-        self.skipStoryDescLabel.setWordWrap(True)
-        self.skipStoryLayout = QHBoxLayout()
-        self.skipStoryLayout.addWidget(self.skipStoryDescLabel)
+        self.skipStoryDescLabels = [
+            QLabel(self.tr("Enable this if you prefer to skip the story."), self, wordWrap=True),
+            QLabel(self.tr("Automatically clicks the Skip button in the top-left corner when a cutscene starts. If it fails to detect the button against a white background, try clicking it manually."), self, wordWrap=True),
+        ]
+        self.skipStoryLayout = QVBoxLayout()
+        for label in self.skipStoryDescLabels:
+            self.skipStoryLayout.addWidget(label)
+        self.skipStoryLayout.setSpacing(2)
         self.skipStoryLayout.setContentsMargins(30, 0, 0, 0)
 
         self.autoDialogueCheckBox = CheckBox(self.tr("Auto Dialogue:"), self)
-        self.autoDialogueDescLabel = QLabel(
-            self.tr(
-                "想看剧情的可开启。\n"
-                "触发剧情后可双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。"
-            ),
-            self
-        )
-        self.autoDialogueDescLabel.setWordWrap(True)
-        self.autoDialogueLayout = QHBoxLayout()
-        self.autoDialogueLayout.addWidget(self.autoDialogueDescLabel)
+        self.autoDialogueDescLabels = [
+            QLabel(self.tr("Enable this if you want to watch the story."), self, wordWrap=True),
+            QLabel(self.tr("Once a dialogue sequence starts, you can take your hands off the keyboard. ✅ Auto-advances dialogue. ✅ Automatically selects dialogue options. Continues until the dialogue sequence ends."), self, wordWrap=True),
+        ]
+        self.autoDialogueLayout = QVBoxLayout()
+        for label in self.autoDialogueDescLabels:
+            self.autoDialogueLayout.addWidget(label)
+        self.autoDialogueLayout.setSpacing(2)
         self.autoDialogueLayout.setContentsMargins(30, 0, 0, 0)
 
         self.mainLayout.addWidget(self.autoCombatCheckBox)
@@ -161,9 +153,11 @@ class ExploreWidget(ScrollArea):
         self.container = QWidget(self)
         self.mainLayout = QVBoxLayout(self.container)
 
-        self.tipsLabel = QLabel(self.tr("Exploration and other open-world activities must be performed manually. Automated open-world farming is not supported!"), self.container)
-        self.tipsLabel.setWordWrap(True)
-        self.tipsLabel2 = QLabel(self.tr("Please select the features you want to use. Multiple selections are allowed. Supports any resolution."), self.container)
+        self.tipsLabels = [
+            QLabel(self.tr("Exploration and other open-world activities must be performed manually. Automated open-world farming is not supported!"), self.container, wordWrap=True),
+            QLabel(self.tr("Please select the features you want to use. Multiple selections are allowed. Supports any resolution."), self.container, wordWrap=True)
+        ]
+        self.tipsLayout = QVBoxLayout()
 
         self.storyExploreWidget = StoryExploreWidget(self.container)
 
@@ -188,8 +182,11 @@ class ExploreWidget(ScrollArea):
         self.__connectSignalToSlot()
 
     def __initLayout(self):
-        self.mainLayout.addWidget(self.tipsLabel)
-        self.mainLayout.addWidget(self.tipsLabel2)
+        for label in self.tipsLabels:
+            self.tipsLayout.addWidget(label)
+        self.tipsLayout.setSpacing(3)
+
+        self.mainLayout.addLayout(self.tipsLayout)
         self.mainLayout.addWidget(self.storyExploreWidget)
         self.mainLayout.addStretch()
         self.mainLayout.setSpacing(20)

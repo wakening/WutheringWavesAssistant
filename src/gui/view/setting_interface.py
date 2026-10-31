@@ -61,7 +61,8 @@ class SettingInterface(ScrollArea):
             self.tr("Window size"),
             self.tr("Adjust window size"),
             texts=[
-                "720x720", self.tr("Default")
+                "720x720",
+                self.tr("Default"),
             ],
             parent=self.personalGroup
         )

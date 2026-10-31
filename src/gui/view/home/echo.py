@@ -80,7 +80,7 @@ class BossRushTask(EchoTask):
             result = self.validate()
             if result.success:
                 msg = str([x.value for x in paramConfig.bossName.value])
-                self._createTopRightInfoBar(self.tr('Boss Rush: '), msg, 5000)
+                self._createTopRightInfoBar(self.tr('Boss: '), msg, 5000)
                 self.submit(start)
             return result
         self.submit(start)

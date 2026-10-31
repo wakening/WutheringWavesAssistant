@@ -92,7 +92,7 @@
     <name>BossRushTask</name>
     <message>
         <location filename="../../view/home/echo.py" line="83"/>
-        <source>Boss Rush: </source>
+        <source>Boss: </source>
         <translation>刷Boss: </translation>
     </message>
 </context>
@@ -269,7 +269,7 @@
         <location filename="../../view/param_interface.py" line="1769"/>
         <location filename="../../view/param_interface.py" line="1780"/>
         <source>{challenge} - {boss}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{challenge} - {boss}</translation>
     </message>
     <message>
         <location filename="../../view/param_interface.py" line="1631"/>
@@ -510,10 +510,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="807"/>
-        <source>测试中，仅开放部分关卡。有问题及时群里反馈，最好录屏，或者截图游戏窗口和脚本日志，遮住uid。
-使用前建议关闭微星小飞机、英伟达统计数据、Mod等，避免遮挡游戏ui影响识别</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../view/home/daily.py" line="803"/>
+        <source>About:</source>
+        <translation>关于:</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/daily.py" line="804"/>
+        <source>Gray (unavailable) stages are not supported yet. Support will be gradually expanded in future updates. If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.</source>
+        <translation>灰色不可点击的关卡暂不支持，后续会逐步完善，有问题及时在群里反馈。使用前建议关闭Mod等，避免影响识别</translation>
     </message>
 </context>
 <context>
@@ -600,12 +604,12 @@
 <context>
     <name>ExploreWidget</name>
     <message>
-        <location filename="../../view/home/explore.py" line="164"/>
+        <location filename="../../view/home/explore.py" line="157"/>
         <source>Exploration and other open-world activities must be performed manually. Automated open-world farming is not supported!</source>
         <translation>跑图等都需手动操作，不能代肝大世界！</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="166"/>
+        <location filename="../../view/home/explore.py" line="158"/>
         <source>Please select the features you want to use. Multiple selections are allowed. Supports any resolution.</source>
         <translation>请勾选需要的功能项，支持多选，任意分辨率</translation>
     </message>
@@ -733,107 +737,107 @@
     <message>
         <location filename="../../view/home/game_settings.py" line="76"/>
         <source>Member:</source>
-        <translation type="unfinished"></translation>
+        <translation>编队:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="78"/>
         <source>Member 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>切换队员1:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="78"/>
         <source>Switch to Team Member 1</source>
-        <translation type="unfinished"></translation>
+        <translation>切换编队1号队员</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="79"/>
         <source>Member 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>切换队员2:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="79"/>
         <source>Switch to Team Member 2</source>
-        <translation type="unfinished"></translation>
+        <translation>切换编队2号队员</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="80"/>
         <source>Member 3:</source>
-        <translation type="unfinished"></translation>
+        <translation>切换队员3:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="80"/>
         <source>Switch to Team Member 3</source>
-        <translation type="unfinished"></translation>
+        <translation>切换编队3号队员</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="81"/>
         <source>Member 4:</source>
-        <translation type="unfinished"></translation>
+        <translation>切换队员4:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="81"/>
         <source>Switch to Team Member 4</source>
-        <translation type="unfinished"></translation>
+        <translation>切换编队4号队员</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="83"/>
         <source>Other:</source>
-        <translation type="unfinished"></translation>
+        <translation>其他:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="85"/>
         <source>Jump:</source>
-        <translation type="unfinished"></translation>
+        <translation>跳跃:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="85"/>
         <source>Jump</source>
-        <translation>跳</translation>
+        <translation>跳跃</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="86"/>
         <source>Pick Up/Interact:</source>
-        <translation type="unfinished"></translation>
+        <translation>拾取/交互:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="86"/>
         <source>Pick Up/Interact</source>
-        <translation type="unfinished"></translation>
+        <translation>拾取/交互</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="87"/>
         <source>Use Utility:</source>
-        <translation type="unfinished"></translation>
+        <translation>探索工具:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="87"/>
         <source>Use Utility</source>
-        <translation type="unfinished"></translation>
+        <translation>探索工具</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="88"/>
         <source>Map:</source>
-        <translation type="unfinished"></translation>
+        <translation>地图:</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="88"/>
         <source>Map</source>
-        <translation type="unfinished"></translation>
+        <translation>地图</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="113"/>
-        <source>Reset Keyboard</source>
-        <translation type="unfinished"></translation>
+        <source>Reset All Keybinds</source>
+        <translation>重置所有按键</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="244"/>
         <source>Note</source>
-        <translation type="unfinished"></translation>
+        <translation>提示</translation>
     </message>
     <message>
         <location filename="../../view/home/game_settings.py" line="245"/>
         <source>Are you sure you want to reset the key bindings to defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>你确定要将所有按键绑定重置为默认值？</translation>
     </message>
 </context>
 <context>
@@ -942,7 +946,7 @@
     <message>
         <location filename="../../view/param_interface.py" line="991"/>
         <source>Param</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">参数</translation>
     </message>
     <message>
         <location filename="../../view/param_interface.py" line="995"/>
@@ -1019,8 +1023,8 @@
     </message>
     <message>
         <location filename="../../view/setting_interface.py" line="55"/>
-        <location filename="../../view/setting_interface.py" line="76"/>
-        <location filename="../../view/setting_interface.py" line="84"/>
+        <location filename="../../view/setting_interface.py" line="77"/>
+        <location filename="../../view/setting_interface.py" line="85"/>
         <source>Use system setting</source>
         <translation>跟随系统设置</translation>
     </message>
@@ -1035,94 +1039,99 @@
         <translation>调整界面宽高</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="114"/>
+        <location filename="../../view/setting_interface.py" line="65"/>
+        <source>Default</source>
+        <translation>默认</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="115"/>
         <source>Help us improve Wuthering Waves Assistant by providing feedback</source>
         <translation>欢迎反馈建议，帮我们将软件做得更好。</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="200"/>
+        <location filename="../../view/setting_interface.py" line="201"/>
         <source>Failed to check for updates</source>
         <translation>检查更新失败</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="203"/>
+        <location filename="../../view/setting_interface.py" line="204"/>
         <source>You&apos;re up to date</source>
         <translation>已经是最新版了</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="206"/>
+        <location filename="../../view/setting_interface.py" line="207"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="71"/>
+        <location filename="../../view/setting_interface.py" line="72"/>
         <source>Interface zoom</source>
         <translation>界面缩放</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="72"/>
+        <location filename="../../view/setting_interface.py" line="73"/>
         <source>Change the size of widgets and fonts</source>
         <translation>调整小部件和字体的大小</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="82"/>
+        <location filename="../../view/setting_interface.py" line="83"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="83"/>
+        <location filename="../../view/setting_interface.py" line="84"/>
         <source>Set your preferred language for UI</source>
         <translation>选择界面所使用的语言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="90"/>
+        <location filename="../../view/setting_interface.py" line="91"/>
         <source>Software update</source>
         <translation>软件更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="93"/>
+        <location filename="../../view/setting_interface.py" line="94"/>
         <source>Check for updates when the application starts</source>
         <translation>在应用程序启动时检查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="94"/>
+        <location filename="../../view/setting_interface.py" line="95"/>
         <source>The new version will be more stable and have more features</source>
         <translation>新版本将更加稳定并拥有更多功能（建议启用此选项）</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="100"/>
-        <location filename="../../view/setting_interface.py" line="120"/>
+        <location filename="../../view/setting_interface.py" line="101"/>
+        <location filename="../../view/setting_interface.py" line="121"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="111"/>
-        <location filename="../../view/setting_interface.py" line="113"/>
+        <location filename="../../view/setting_interface.py" line="112"/>
+        <location filename="../../view/setting_interface.py" line="114"/>
         <source>Provide feedback</source>
         <translation>提供反馈</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="118"/>
+        <location filename="../../view/setting_interface.py" line="119"/>
         <source>Check update</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="121"/>
+        <location filename="../../view/setting_interface.py" line="122"/>
         <source>Copyright</source>
         <translation>版权所有</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="122"/>
+        <location filename="../../view/setting_interface.py" line="123"/>
         <source>Version</source>
         <translation>当前版本</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="176"/>
+        <location filename="../../view/setting_interface.py" line="177"/>
         <source>Configuration takes effect after restart</source>
         <translation>配置在重启软件后生效</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="175"/>
+        <location filename="../../view/setting_interface.py" line="176"/>
         <source>Updated successfully</source>
         <translation>更新成功</translation>
     </message>
@@ -1212,44 +1221,64 @@
         <translation>自动战斗:</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="69"/>
-        <source>快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。
-用法：启动脚本，回到游戏，点击【快捷键】，将自动战斗，再次点击【快捷键】或【ESC】键，可停止战斗。
-适用：锄地、剧情战斗、部分活动。
-注意：点击【快捷键】时，游戏右侧需能看到角色头像，否则无法识别到角色，无法切人。</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../view/home/explore.py" line="64"/>
+        <source>Hotkeys: Mouse [Side Button 1], [Side Button 2], Keyboard [5 (above R)], or [`~]. Choose any one of the four options; you do not need to press them all.</source>
+        <translation>快捷键：鼠标【侧键1】、【侧键2】、键盘【数字5（R键上方）】、【`~】。四种任选一种，不用全按。</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="77"/>
+        <location filename="../../view/home/explore.py" line="65"/>
+        <source>Usage: Start the script and return to the game. Press the assigned hotkey to start auto combat. Press the hotkey again or ESC to stop.</source>
+        <translation>用法：启动脚本，回到游戏，点击【快捷键】，将自动战斗，再次点击【快捷键】或【ESC】键，可停止战斗。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="66"/>
+        <source>Suitable for: Overworld farming, story battles, and some event battles.</source>
+        <translation>适用：锄地、剧情战斗、部分活动。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="67"/>
+        <source>Note: When pressing the hotkey, make sure the character portraits on the right side of the screen are visible. Otherwise, the script won&apos;t be able to detect your characters or switch between them.</source>
+        <translation>注意：点击【快捷键】时，游戏右侧需能看到角色头像，否则无法识别到角色，无法切人。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="75"/>
         <source>Auto Pickup:</source>
         <translation>自动拾取:</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="79"/>
+        <location filename="../../view/home/explore.py" line="77"/>
         <source>Automatically pick up: ✅Echoes, ✅Herbs, ✅Ingredients, ✅Chests.</source>
         <translation>自动拾取路过的✅声骸、✅草药、✅食材、✅宝箱。</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="87"/>
+        <location filename="../../view/home/explore.py" line="83"/>
         <source>Skip Story:</source>
         <translation>跳过剧情:</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="92"/>
-        <source>不看剧情的可开启。
-触发剧情后自动帮你点击左上角跳过。白色背景下若识别不到建议手动点一下。</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../view/home/explore.py" line="85"/>
+        <source>Enable this if you prefer to skip the story.</source>
+        <translation>不看剧情的可开启。</translation>
     </message>
     <message>
-        <location filename="../../view/home/explore.py" line="100"/>
+        <location filename="../../view/home/explore.py" line="86"/>
+        <source>Automatically clicks the Skip button in the top-left corner when a cutscene starts. If it fails to detect the button against a white background, try clicking it manually.</source>
+        <translation>触发剧情后自动帮你点击左上角跳过。白色背景下若识别不到建议手动点一下。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="96"/>
+        <source>Enable this if you want to watch the story.</source>
+        <translation>想看剧情的可开启。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="97"/>
+        <source>Once a dialogue sequence starts, you can take your hands off the keyboard. ✅ Auto-advances dialogue. ✅ Automatically selects dialogue options. Continues until the dialogue sequence ends.</source>
+        <translation>触发剧情后可双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/explore.py" line="94"/>
         <source>Auto Dialogue:</source>
         <translation>自动对话:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/explore.py" line="105"/>
-        <source>想看剧情的可开启。
-触发剧情后可双手离开键盘，✅自动播放，✅自动选择对话，直到这段剧情结束。</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

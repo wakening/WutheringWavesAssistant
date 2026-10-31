@@ -1,6 +1,6 @@
 import logging
 
-from PySide6.QtCore import Qt, Signal, QSize, QEvent
+from PySide6.QtCore import Qt, Signal, QSize, QEvent, QTimer
 from PySide6.QtGui import QIcon, QColor, QIntValidator, QShortcut, QKeySequence
 from PySide6.QtWidgets import (QWidget, QLabel, QFileDialog, QFrame, QVBoxLayout, QButtonGroup, QHBoxLayout,
                                QPushButton, QApplication, QSizePolicy, QFormLayout, QCheckBox, QGridLayout)
@@ -46,7 +46,7 @@ class GameSettingsWidget(ScrollArea):
         self.mainLayout = QVBoxLayout(self.container)
 
         self.tipsLabel = QLabel(self.tr("Game Settings"), self.container)
-        self.tipsLabel2 = QLabel(self.tr("Click the button to edit. Please make sure it matches the in-game settings."), self.container)
+        self.tipsLabel2 = QLabel(self.tr("Click the button to edit. Please make sure it matches the in-game settings."), self.container, wordWrap=True)
 
         # Game Settings
         # Sounds
@@ -110,7 +110,7 @@ class GameSettingsWidget(ScrollArea):
         #     ShortcutWidget('H', self.tr('Tutorial:'), self.tr('Tutorial)),
         # ]
 
-        self.resetButton = PushButton(self.tr('Reset Keyboard'), self.container)
+        self.resetButton = PushButton(self.tr('Reset All Keybinds'), self.container)
 
         self.__initWidget()
 
@@ -278,3 +278,12 @@ class GameSettingsWidget(ScrollArea):
             self.currentTask = currentTask
             globalSignal.taskChangedSignal.emit(currentTask)
             # logger.debug(f"Current task: {self.currentTask}")
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 修复控件挤在一起
+        QTimer.singleShot(0, self.refreshLayout)
+
+    def refreshLayout(self):
+        self.mainLayout.invalidate()
+        self.mainLayout.activate()
