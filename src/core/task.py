@@ -257,7 +257,7 @@ class TaskFSM(FSM):
 
     # ------- 状态切换 -------
 
-    def transition(self, new_status: TaskStatus):
+    def transition(self, new_status: TaskStatus, *, stacklevel=2):
         """安全地转换状态"""
         if self.task_id:
             task_id = f"[{self.task_id}] "
@@ -268,30 +268,30 @@ class TaskFSM(FSM):
             self.history.append(self.status)
             # logger.info(f"[{self.task_id}] {self.name}: {self.status}")
 
-            logger.info(f"{task_id}{self.name}: {self.status}")
+            logger.info(f"{task_id}{self.name}: {self.status}", stacklevel=stacklevel)
         except ValueError as e:
-            logger.error(f"{task_id}{self.name}: 转换失败")
+            logger.error(f"{task_id}{self.name}: 转换失败", stacklevel=stacklevel)
             raise e
 
-    def start(self):
-        self.transition(TaskStatus.IN_PROGRESS)
+    def start(self, *, stacklevel=3):
+        self.transition(TaskStatus.IN_PROGRESS, stacklevel=stacklevel)
 
-    def wait(self):
-        self.transition(TaskStatus.WAITING)
+    def wait(self, *, stacklevel=3):
+        self.transition(TaskStatus.WAITING, stacklevel=stacklevel)
 
-    def complete(self):
-        self.transition(TaskStatus.COMPLETED)
+    def complete(self, *, stacklevel=3):
+        self.transition(TaskStatus.COMPLETED, stacklevel=stacklevel)
 
-    def fail(self):
-        self.transition(TaskStatus.FAILED)
+    def fail(self, *, stacklevel=3):
+        self.transition(TaskStatus.FAILED, stacklevel=stacklevel)
 
-    def cancel(self):
-        self.transition(TaskStatus.CANCELLED)
+    def cancel(self, *, stacklevel=3):
+        self.transition(TaskStatus.CANCELLED, stacklevel=stacklevel)
 
-    def retry(self):
+    def retry(self, *, stacklevel=3):
         """重试失败的任务"""
         if self.status.can_retry:
-            self.transition(TaskStatus.PENDING)
+            self.transition(TaskStatus.PENDING, stacklevel=stacklevel)
         else:
             logger.info(f"无法重试: 当前状态 {self.status.name}")
 
@@ -341,12 +341,12 @@ class LatchTaskFSM(TaskFSM):
         self.count = count
         self._lock = threading.Lock()
 
-    def start(self):
+    def start(self, *, stacklevel=4):
         with self._lock:
             if self.count <= 0 or self.is_terminal:
                 return False
             if self.status == TaskStatus.PENDING:
-                super().start()
+                super().start(stacklevel=stacklevel)
             self.count = max(0, self.count - 1)
             return True
 
