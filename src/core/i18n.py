@@ -179,6 +179,7 @@ class I18nText:
     Jingran = "Jingran"
     Suoming = "Suoming"
     Hsin = "Hsin"
+    Lily = "Lily"
 
     # ------- Combat -------
     BreachTimeRemaining = "BreachTimeRemaining"
@@ -279,6 +280,7 @@ class I18nText:
     GroupAbominationTacetCore = "GroupAbominationTacetCore"
 
     # ------- Skill Upgrade Material -------
+    RemnantOfTheWheel = "RemnantOfTheWheel"
     SkywardGlazedHeart = "SkywardGlazedHeart"
     WeWhoQuestion = "WeWhoQuestion"
     GoldInMemory = "GoldInMemory"
@@ -542,6 +544,7 @@ class I18nText:
     SoloChallenge = "SoloChallenge"
     DefeatTheEnemiesWithinTimeLimit = "DefeatTheEnemiesWithinTimeLimit"
     ForgeryChallengeComplete = "ForgeryChallengeComplete"
+    ForgeryChallengeFailed = "ForgeryChallengeFailed"
     ForgeryClaim = "ForgeryClaim"
     ForgeryClaimX2 = "ForgeryClaimX2"
     ForgeryRestart = "ForgeryRestart"
@@ -574,6 +577,7 @@ class I18nText:
     EchoSet = "EchoSet"
     DefeatTheTdsInTheTacetField = "DefeatTheTdsInTheTacetField"
     TacetFieldChallengeComplete = "TacetFieldChallengeComplete"
+    TacetFieldChallengeFailed = "TacetFieldChallengeFailed"
     TacetFieldClaim = "TacetFieldClaim"
     TacetFieldClaimX2 = "TacetFieldClaimX2"
     TacetFieldNoticeChallengeComplete = "TacetFieldNoticeChallengeComplete"
@@ -918,7 +922,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Danjin$"), raw="Danjin"),
     },
     I18nText.Mortefi: {
-        Language.ZH: RegexStr(r"^莫特斐$", raw="莫特斐"),
+        Language.ZH: RegexStr(r"^莫特.?$", raw="莫特斐"),
         Language.EN: RegexStr(flex_ws(r"^Mortefi$"), raw="Mortefi"),
     },
     I18nText.Yuanwu: {
@@ -986,7 +990,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Brant$"), raw="Brant"),
     },
     I18nText.Cantarella: {
-        Language.ZH: RegexStr(r"^坎特蕾拉$", raw="坎特蕾拉"),
+        Language.ZH: RegexStr(r"^坎特.?拉$", raw="坎特蕾拉"),
         Language.EN: RegexStr(flex_ws(r"^Cantarella$"), raw="Cantarella"),
     },
     I18nText.Zanni: {
@@ -1018,7 +1022,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^[Il]uno$"), raw="Iuno"),
     },
     I18nText.Galbrena: {
-        Language.ZH: RegexStr(r"^嘉贝莉娜$", raw="嘉贝莉娜"),
+        Language.ZH: RegexStr(r"^嘉贝.?娜$", raw="嘉贝莉娜"),
         Language.EN: RegexStr(flex_ws(r"^Galbrena$"), raw="Galbrena"),
     },
     I18nText.Qiuyuan: {
@@ -1050,7 +1054,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Luuk.*?Herssen$"), raw="Luuk Herssen"),
     },
     I18nText.Sigrika: {
-        Language.ZH: RegexStr(r"^西格莉卡$", raw="西格莉卡"),
+        Language.ZH: RegexStr(r"^西格.?卡$", raw="西格莉卡"),
         Language.EN: RegexStr(flex_ws(r"^Sigrika$"), raw="Sigrika"),
     },
     I18nText.Hiyuki: {
@@ -1074,8 +1078,8 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Lucilla$"), raw="Lucilla"),
     },
     I18nText.YangyangXuanling: {
-        Language.ZH: RegexStr(r"^秧秧.?玄翎$", raw="秧秧·玄翎"),
-        Language.EN: RegexStr(flex_ws(r"^YangyangXuanling$"), raw="YangyangXuanling"),
+        Language.ZH: RegexStr(r"^秧秧.?玄.?$", raw="秧秧·玄翎"),
+        Language.EN: RegexStr(flex_ws(r"^Yangyang.*?Xuanling$"), raw="Yangyang: Xuanling"),
     },
     I18nText.Suisui: {
         Language.ZH: RegexStr(r"^穗穗$", raw="穗穗"),
@@ -1096,6 +1100,10 @@ I18N_TEXT = {
     I18nText.Hsin: {
         Language.ZH: RegexStr(r"^心$", raw="心"),
         Language.EN: RegexStr(flex_ws(r"^Hsin$"), raw="Hsin"),
+    },
+    I18nText.Lily: {
+        Language.ZH: RegexStr(r"^莉莉$", raw="莉莉"),
+        Language.EN: RegexStr(flex_ws(r"^Lily$"), raw="Lily"),
     },
 
     # ------- Combat -------
@@ -1467,6 +1475,10 @@ I18N_TEXT = {
     },
 
     # ------- Skill Upgrade Material -------
+    I18nText.RemnantOfTheWheel: {
+        Language.ZH: RegexStr(r"^演轮残蜕$", raw="演轮残蜕"),
+        Language.EN: RegexStr(flex_ws(r"^Remnant of the Wheel$"), raw=r"Remnant of the Wheel"),
+    },
     I18nText.SkywardGlazedHeart: {
         Language.ZH: RegexStr(r"^天衢琉璃之心$", raw="天衢琉璃之心"),
         Language.EN: RegexStr(flex_ws(r"^Skyward Glazed Heart$"), raw=r"Skyward Glazed Heart"),
@@ -2502,6 +2514,10 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^挑战成功$", raw="挑战成功"),
         Language.EN: RegexStr(flex_ws(r"^Challenge Complete$"), raw=r"Challenge Complete"),
     },
+    I18nText.ForgeryChallengeFailed: {
+        Language.ZH: RegexStr(r"^挑战失败$", raw="挑战失败"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw=r"Challenge Failed"),
+    },
     I18nText.ForgeryClaim: {
         Language.ZH: RegexStr(r"^单倍领取$", raw="单倍领取"),
         Language.EN: RegexStr(flex_ws(r"^Claim$"), raw=r"Claim"),
@@ -2566,7 +2582,7 @@ I18N_TEXT = {
     },
     I18nText.TacetFieldRiccioliIslands: {
         Language.ZH: RegexStr(r"^.?乔利群岛无音区$", raw="黎乔利群岛无音区"),
-        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Riccioli Islands"), raw=r"Tacet Field:  Riccioli Islands"),
+        Language.EN: RegexStr(flex_ws(r"^Tacet Field.*?Riccioli Islands"), raw=r"Tacet Field: Riccioli Islands"),
     },
     I18nText.TacetFieldFagaceaePeninsula: {
         Language.ZH: RegexStr(r"^.?生半岛无音区$", raw="槲生半岛无音区"),
@@ -2623,6 +2639,10 @@ I18N_TEXT = {
     I18nText.TacetFieldChallengeComplete: {
         Language.ZH: RegexStr(r"挑战达成", raw="挑战达成"),
         Language.EN: RegexStr(flex_ws(r"Challenge Complete"), raw=r"Challenge Complete"),
+    },
+    I18nText.TacetFieldChallengeFailed: {
+        Language.ZH: RegexStr(r"^挑战失败$", raw="挑战失败"),
+        Language.EN: RegexStr(flex_ws(r"^Challenge Failed$"), raw=r"Challenge Failed"),
     },
     I18nText.TacetFieldClaim: {
         Language.ZH: RegexStr(r"^单倍领取$", raw="单倍领取"),
@@ -2735,43 +2755,43 @@ I18N_TEXT = {
     },
     I18nText.WeeklyBossThousandPuppetPavilion: {
         Language.ZH: RegexStr(r"千.?重楼", raw="千傀重楼"),
-        Language.EN: RegexStr(r"Thousand.?Puppet Pavilion", raw="Thousand-Puppet Pavilion"),
+        Language.EN: RegexStr(flex_ws(r"Thousand.?Puppet Pavilion"), raw="Thousand-Puppet Pavilion"),
     },
     I18nText.WeeklyBossDenia: {
         Language.ZH: RegexStr(r"达妮娅", raw="达妮娅"),
-        Language.EN: RegexStr(r"Denia", raw="Denia"),
+        Language.EN: RegexStr(flex_ws(r"Denia"), raw="Denia"),
     },
     I18nText.WeeklyBossSigillum: {
         Language.ZH: RegexStr(r"辛吉勒姆", raw="辛吉勒姆"),
-        Language.EN: RegexStr(r"Sigillum", raw="Sigillum"),
+        Language.EN: RegexStr(flex_ws(r"Sigillum"), raw="Sigillum"),
     },
     I18nText.WeeklyBossThrenodianLeviathan: {
         Language.ZH: RegexStr(r"鸣式.?利维亚坦", raw="鸣式·利维亚坦"),
-        Language.EN: RegexStr(r"Threnodian.?Leviathan", raw="Threnodian: Leviathan"),
+        Language.EN: RegexStr(flex_ws(r"Threnodian.?Leviathan"), raw="Threnodian: Leviathan"),
     },
     I18nText.WeeklyBossFleurdelys: {
         Language.ZH: RegexStr(r"芙露德.?斯", raw="芙露德莉斯"),
-        Language.EN: RegexStr(r"Fleurdelys", raw="Fleurdelys"),
+        Language.EN: RegexStr(flex_ws(r"Fleurdelys"), raw="Fleurdelys"),
     },
     I18nText.WeeklyBossHecate: {
         Language.ZH: RegexStr(r"赫卡.?", raw="赫卡忒"),
-        Language.EN: RegexStr(r"Hecate", raw="Hecate"),
+        Language.EN: RegexStr(flex_ws(r"Hecate"), raw="Hecate"),
     },
     I18nText.WeeklyBossJue: {
         Language.ZH: RegexStr(r"角", raw="角"),
-        Language.EN: RegexStr(r"Ju.?", raw="Jué"),
+        Language.EN: RegexStr(flex_ws(r"Ju.?"), raw="Jué"),
     },
     I18nText.WeeklyBossCrownless: {
         Language.ZH: RegexStr(r"无妄者", raw="无妄者"),
-        Language.EN: RegexStr(r"Dreamless", raw="Dreamless"),
+        Language.EN: RegexStr(flex_ws(r"Dreamless"), raw="Dreamless"),
     },
     I18nText.WeeklyBossScarAberrantNightmare: {
         Language.ZH: RegexStr(r"伤痕.?异生梦.?", raw="伤痕·异生梦魇"),
-        Language.EN: RegexStr(r"Scar: Aberrant Nightmare", raw=r"Scar: Aberrant Nightmare", desc="Chaotic Juncture"),
+        Language.EN: RegexStr(flex_ws(r"Scar: Aberrant Nightmare"), raw=r"Scar: Aberrant Nightmare", desc="Chaotic Juncture"),
     },
     I18nText.WeeklyBossBellBorneGeochelone: {
         Language.ZH: RegexStr(r"鸣钟之龟", raw="鸣钟之龟"),
-        Language.EN: RegexStr(r"Bell.?Borne Geochelone", raw="Bell-Borne Geochelone"),
+        Language.EN: RegexStr(flex_ws(r"Bell.?Borne Geochelone"), raw="Bell-Borne Geochelone"),
     },
     # instance
     I18nText.EnterTheSonoroSphere: {

@@ -1057,7 +1057,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 combat_system.check_boss_hp = False
                 combat_system.auto_pickup = False
 
-                timeout = 10 * 60
+                timeout = 300 + 60  # 副本限时300秒
                 no_text_count = 3
                 no_text_max = no_text_count
                 deadline = time.monotonic() + timeout
@@ -1072,6 +1072,9 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         # 挑战成功
                         if ui.search(ctx.tr(I18nText.ForgeryChallengeComplete)):
                             break
+                        # 挑战失败
+                        if ui.search(ctx.tr(I18nText.ForgeryChallengeFailed)):
+                            return _fail()
                         # 限时击败敌人
                         if ui.search(ctx.tr(I18nText.DefeatTheEnemiesWithinTimeLimit)):
                             logger.debug("战斗中")
@@ -1556,7 +1559,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 combat_system.auto_pickup = False
                 combat_system.exit_special_state(Morph.Forced)
 
-                timeout = 10 * 60
+                timeout = 300 + 50  # 副本限时300秒
                 no_text_count = 3
                 no_text_max = no_text_count
                 deadline = time.monotonic() + timeout
@@ -1571,6 +1574,10 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         # 挑战达成
                         if ui.search(ctx.tr(I18nText.TacetFieldChallengeComplete)):
                             break
+                        # 挑战失败，一般是卡到地图外，一直打到副本超时时出现
+                        if (ui.search(ctx.tr(I18nText.TacetFieldChallengeFailed))
+                                and ui.click_text(ctx.tr(I18nText.TacetFieldExit))):
+                            return _fail()
                         # 清理无音区中涌现的残象
                         if ui.search(keyword):
                             logger.debug("战斗中")
