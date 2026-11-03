@@ -940,7 +940,7 @@ class DungeonWeeklyChallenge:
         region=I18nText.GuidebookMengzhou,
         waveplate=60,
         enemy_id=I18nText.EnemySuhsinTheInevitable,
-        rewards=[I18nText.SkywardGlazedHeart],
+        rewards=[I18nText.RemnantOfTheWheel],
         camera_reset=False,
     )
 

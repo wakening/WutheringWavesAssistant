@@ -57,7 +57,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     def onTrayActivated(self, reason: QSystemTrayIcon.ActivationReason):
-        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+        if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.showNormal()
 
 

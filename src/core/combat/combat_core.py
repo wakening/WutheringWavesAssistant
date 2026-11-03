@@ -120,9 +120,12 @@ class ResonatorNameEnum(Enum):
     qingxiao = "清宵"
     jingran = "景燃"
 
-    # v3.x
+    # v3.7
     suoming = "锁暝"
     hsin = "心"
+
+    # v3.8
+    lily = "莉莉"
 
     # 缓存
     __value_map = None

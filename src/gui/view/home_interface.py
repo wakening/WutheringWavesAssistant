@@ -7,7 +7,8 @@ from datetime import datetime
 
 from PySide6.QtCore import Qt, Signal, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup, QApplication
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QHBoxLayout, QStackedWidget, QButtonGroup, QApplication,
+                               QFormLayout)
 from packaging.version import Version
 
 from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, IndeterminateProgressRing, ToggleToolButton,
@@ -19,6 +20,7 @@ from qfluentwidgets import (ScrollArea, ComboBox, TextEdit, Pivot, Indeterminate
                             ToolTipFilter)
 
 from src import __version__
+from src.core.i18n import Language
 from src.gui.common.config import paramConfig, VERSION, RELEASE_URL, CHANGELOG_URL
 from src.gui.common.globals import GlobalSignal, globalSignal
 from src.gui.common.signal_bus import signalBus
@@ -82,9 +84,9 @@ class UpdateFlyoutView(FlyoutViewBase):
 
         self.titleLayout = QHBoxLayout()
         if self.new_version:
-            title = f'有新版本 {self.version} -> <span style="color: red;">{self.new_version}</span>'
+            title = f'{self.tr('有新版本')} {self.version} -> <span style="color: red;">{self.new_version}</span>'
         else:
-            title = f'暂无更新 {self.version}'
+            title = f'{self.tr('暂无更新')} {self.version}'
         self.titleDownload = TransparentToolButton(FluentIcon.DOWNLOAD, self)
         self.titleDownload.setToolTip(self.tr('Download'))
         self.titleLabel = QLabel(self.tr(title), self)
@@ -284,102 +286,48 @@ class BasicSettingWidget(QWidget):
     def __init__(self, /, parent=None):
         super().__init__(parent)
 
-        from src.core.i18n import Language
-
-        self.lang = [
-            Language.ZH,
-            Language.EN,
-            Language.ZH_TW,
-            Language.JA,
-            Language.KO,
-            Language.ES,
-            Language.FR,
-            Language.DE,
-            Language.TH,
-        ]
-        self.langDesc = [
-            "简体中文",
-            "English",
-            "繁體中文",
-            "日本語",
-            "한국어",
-            "Español",
-            "Français",
-            "Deutsch",
-            "ภาษาไทย",
-        ]
-        self.device = [
-            "Auto",
-            "Auto",
-            "CPU",
-        ]
-        self.deviceDesc = [
-            "自动",
-            "GPU",
-            "CPU",
-        ]
-        self.resourceQuality = [
-            "UHD",
-            "HD",
-            "SD",
-        ]
-        self.resourceQualityDesc = [
-            "极致",
-            "高清（默认）",
-            "流畅",
-        ]
-
         self.mainLayout = QVBoxLayout(self)
 
         self.titleLabel = QLabel(self.tr("General Settings"), self)
 
-        self.langLayout = QHBoxLayout()
-        self.langLabel = QLabel(self.tr("Game Text:"), self)
+        self.langList = [
+            ("简体中文", Language.ZH, True),
+            ("English", Language.EN, True),
+            ("繁體中文", Language.ZH_TW, False),
+            ("日本語", Language.JA, False),
+            ("한국어", Language.KO, False),
+            ("Español", Language.ES, False),
+            ("Français", Language.FR, False),
+            ("Deutsch", Language.DE, False),
+            ("ภาษาไทย", Language.TH, False),
+        ]
         self.langComboBox = ComboBox(self)
-        # self.langComboBox.setPlaceholderText(self.tr("{text} - {sign}").format(
-        #     text=self.langDesc[0], sign=self.lang[0].value))
-        self.langComboBox.setPlaceholderText(self.tr("{text}").format(text=self.langDesc[0]))
-        for i in range(len(self.lang)):
-            # self.langComboBox.addItem(self.tr("{text} - {sign}").format(
-            #     text=self.langDesc[i], sign=self.lang[i].value), userData=self.lang[i].value)
-            self.langComboBox.addItem(self.tr("{text}").format(text=self.langDesc[i]), userData=self.lang[i].value)
-            if i > 1:
-                self.langComboBox.setItemEnabled(self.langComboBox.count() - 1, False)
+        for text, data, enable in self.langList:
+            self.langComboBox.addItem(text, userData=data.value)
+            self.langComboBox.setItemEnabled(self.langComboBox.count() - 1, enable)
+        self.langComboBox.setCurrentIndex(0)
 
-        self.resourceQualityLayout = QHBoxLayout()
-        self.resourceQualityLabel = QLabel(self.tr("Resource Quality:"), self)
         self.resourceQualityComboBox = ComboBox(self)
-        # self.resourceQualityComboBox.setPlaceholderText(self.tr("{text} {level}").format(
-        #     text=self.resourceQualityDesc[1], level=self.resourceQuality[1]))
-        for i in range(len(self.resourceQuality)):
-            self.resourceQualityComboBox.addItem(self.tr("{level} {text}").format(
-                text=self.resourceQualityDesc[i], level=self.resourceQuality[i]), userData=self.resourceQuality[i])
+        self.resourceQualityComboBox.addItem(self.tr("UHD"), userData="UHD")
+        self.resourceQualityComboBox.addItem(self.tr("HD (Default)"), userData="HD")
+        self.resourceQualityComboBox.addItem(self.tr("SD"), userData="SD")
         self.resourceQualityComboBox.setCurrentIndex(1)
 
-        self.deviceLayout = QHBoxLayout()
-        self.deviceLabel = QLabel(self.tr("Device:"), self)
         self.deviceComboBox = ComboBox(self)
-        self.deviceComboBox.setPlaceholderText(self.tr("{text}").format(text=self.deviceDesc[0]))
-        for i in range(len(self.device)):
-            self.deviceComboBox.addItem(self.tr("{text}").format(text=self.deviceDesc[i]), userData=self.device[i])
-            if i == 1:
-                self.deviceComboBox.setItemEnabled(self.deviceComboBox.count() - 1, False)
+        self.deviceComboBox.addItem(self.tr("Auto"), userData="Auto")
+        self.deviceComboBox.addItem("GPU", userData="Auto")
+        self.deviceComboBox.setItemEnabled(self.deviceComboBox.count() - 1, False)
+        self.deviceComboBox.addItem("CPU", userData="CPU")
+        self.deviceComboBox.setCurrentIndex(0)
 
-        # self.gamePathHLayout = QHBoxLayout()
-        # self.gamePathLabel = QLabel(self.tr("游戏路径:"), self.scrollWidget)
-        # self.gamePathComboBox = ComboBox(self.scrollWidget)
-        # TODO 订阅消息总线，实时写入当前任务消息
+        self.formLayout = QFormLayout()
+        self.formLayout.addRow(self.tr("In-Game Text:"), self.langComboBox)
+        self.formLayout.addRow(self.tr("Resource Quality:"), self.resourceQualityComboBox)
+        self.formLayout.addRow(self.tr("Device:"), self.deviceComboBox)
+
+        # 订阅消息总线，实时写入当前任务消息
         self.messageEdit = TextEdit(self)
         self.messageEdit.setReadOnly(True)
-
-        # self.descriptionEdit.setReadOnly(True)
-        # self.descriptionEdit.setHtml("""
-        #                 <h3>版本活动</h3>
-        #
-        #                 <ul>
-        #                 <li>双倍无音区</li>
-        #                 </ul>
-        #                 """)
 
         self.__initWidget()
 
@@ -392,19 +340,11 @@ class BasicSettingWidget(QWidget):
         self.__loadConfig()
 
     def __initLayout(self):
-        self.langLayout.addWidget(self.langLabel)
-        self.langLayout.addWidget(self.langComboBox, 1)
-        self.resourceQualityLayout.addWidget(self.resourceQualityLabel)
-        self.resourceQualityLayout.addWidget(self.resourceQualityComboBox, 1)
-        self.deviceLayout.addWidget(self.deviceLabel)
-        self.deviceLayout.addWidget(self.deviceComboBox, 1)
-        # self.langLayout.setContentsMargins(0, 0, 0, 0)
-        # self.langLayout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # self.formLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        self.formLayout.setContentsMargins(0, 0, 0, 0)
 
         self.mainLayout.addWidget(self.titleLabel)
-        self.mainLayout.addLayout(self.langLayout)
-        self.mainLayout.addLayout(self.resourceQualityLayout)
-        self.mainLayout.addLayout(self.deviceLayout)
+        self.mainLayout.addLayout(self.formLayout)
         self.mainLayout.addWidget(self.messageEdit, 1)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         # self.mainLayout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
@@ -417,7 +357,6 @@ class BasicSettingWidget(QWidget):
 
     def __onLangComboBoxChanged(self, index):
         paramConfig.set(paramConfig.gameLanguage, self.langComboBox.currentData())
-        # self.__refreshGridLayout(index)
 
     def __onResourceQualityChanged(self, index):
         paramConfig.set(paramConfig.resourceQuality, self.resourceQualityComboBox.currentData())
@@ -428,18 +367,26 @@ class BasicSettingWidget(QWidget):
     def __onMessageChanged(self, msg):
         scrollbar = self.messageEdit.verticalScrollBar()
         is_at_bottom = scrollbar.value() == scrollbar.maximum()
-        # self.messageEdit.append(f"{datetime.now().strftime("%H:%M:%S")} - {msg}")
         self.messageEdit.append(f"{datetime.now().strftime("%H:%M")}: {msg}")
         if is_at_bottom:
             scrollbar.setValue(scrollbar.maximum())
 
     def __loadConfig(self):
-        self.langComboBox.setCurrentIndex(
-            self.langComboBox.findData(paramConfig.get(paramConfig.gameLanguage)))
+        if gameLanguage := paramConfig.get(paramConfig.gameLanguage):
+            index = self.langComboBox.findData(gameLanguage)
+            if index >= 0:
+                self.langComboBox.setCurrentIndex(index)
+
         if resourceQuality := paramConfig.get(paramConfig.resourceQuality):
-            self.resourceQualityComboBox.setCurrentIndex(self.resourceQualityComboBox.findData(resourceQuality))
-        self.deviceComboBox.setCurrentIndex(
-            self.deviceComboBox.findData(paramConfig.get(paramConfig.device)))
+            index = self.resourceQualityComboBox.findData(resourceQuality)
+            if index >= 0:
+                self.resourceQualityComboBox.setCurrentIndex(index)
+
+        device = paramConfig.get(paramConfig.device)
+        index = 0
+        if device and device == "CPU":
+            index = self.deviceComboBox.findData(paramConfig.get(paramConfig.device))
+        self.deviceComboBox.setCurrentIndex(index)
 
 
 class ContentWidget(QWidget):
@@ -470,8 +417,8 @@ class ContentWidget(QWidget):
         # self.addSubInterface(self.help, 'help', self.tr("帮助"))
 
         self.currentTask = self.daily
-        self.stackedWidget.setCurrentWidget(self.gameSettings)
-        self.pivot.setCurrentItem(self.gameSettings.objectName())
+        self.stackedWidget.setCurrentWidget(self.daily)
+        self.pivot.setCurrentItem(self.daily.objectName())
 
         self.__initWidget()
 

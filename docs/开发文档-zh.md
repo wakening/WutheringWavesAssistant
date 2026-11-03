@@ -13,7 +13,8 @@
 在 src/gui/ts_list.txt 内逐行配置需要生成的ts翻译文件，每种语言配置一个，源语言为英文，不用翻译不用配置  
 ```cmd
 pyside6-lupdate -locations absolute @src/gui/sources.txt -ts @src/gui/ts_list.txt
-
+```
+```cmd
 pyside6-lupdate -locations absolute @src/gui/sources.txt -ts @src/gui/ts_list.txt -no-obsolete
 ```
 

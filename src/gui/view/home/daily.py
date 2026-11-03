@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from typing import Optional
 
 from PySide6.QtCore import Qt, Signal, QSize, QEvent, QCoreApplication
@@ -17,12 +18,85 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
 from src.core.i18n import I18nText
 from src.core.resonator import Resonator
 from src.core.resource import Resource
-from src.gui.common.config import paramConfig, BossNameEnum
+from src.gui.common.config import paramConfig
 from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
 from src.gui.common.task import TaskId, BaseTask, ValidationResult
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class QForgeryChallenge:
+    """副本参数，字段都用于页面翻译展示用，逻辑相关应使用id获取dungeon对象处理"""
+    id: str
+    name: str
+    region: str
+    reward: str
+    weapon: str
+    enable: bool
+
+
+@dataclass
+class QBossChallenge:
+    id: str
+    name: str
+    region: str
+    reward: str
+    enable: bool
+
+
+@dataclass
+class QTacetSuppression:
+    id: str
+    name: str
+    region: str
+    rewards: list[str]
+    enable: bool
+
+
+@dataclass
+class QWeeklyChallenge:
+    id: str
+    name: str
+    enemy: str
+    region: str
+    reward: str
+    enable: bool
+
+
+@dataclass
+class QTacetDiscordNest:
+    id: str
+    name: str
+    region_id: str
+    region: str
+    rewards: list[str]
+    enable: bool
+
+
+@dataclass
+class QNightmarePurification:
+    id: str
+    name: str
+    region_id: str
+    region: str
+    rewards: list[str]
+    enable: bool
+
+
+@dataclass
+class QResonator:
+    id: str
+    name: str
+    weeklyChallenge: str
+    tacetSuppression: list[str]
+    forgeryChallenge: list[str]
+    bossChallenge: str
+    gather: str
+    tacetDiscordNest: list[str]
+    nightmarePurification: list[str]
+    enable: bool
 
 
 class DailyTask(BaseTask):
@@ -92,335 +166,1423 @@ class DailyWidget(ScrollArea):
         self.currentTask = self.task
 
     def __initData(self):
-        from src.core.i18n import I18nText, I18nTr, Language
+        #------- 通用参数 -------
 
-        # try:
-        #     self.curLang = Language(paramConfig.get(paramConfig.gameLanguage))
-        # except Exception:
-        #     self.curLang = Language.ZH
-        self.curLang = Language.ZH
+        # 地区
+        self.mengzhou = self.tr("Mengzhou")
+        self.lahaiRoi = self.tr("Lahai-Roi")
+        self.rinascita = self.tr("Rinascita")
+        self.theBlackShores = self.tr("The Black Shores")
+        self.jinzhou = self.tr("Jinzhou")
 
-        self.i18ntr = I18nTr(self.curLang)
+        # 武器
+        self.sword = self.tr('Sword')
+        self.rectifier = self.tr('Rectifier')
+        self.broadblade = self.tr('Broadblade')
+        self.gauntlets = self.tr('Gauntlets')
+        self.pistols = self.tr('Pistols')
 
-        # 周本副本名，保存用，后端用，倒叙，最新在前
-        self.weeklyChallenge = [
-            I18nText.OrdinanceOfTheInevitable,
-            I18nText.CourtOfShackledSouls,
-            I18nText.SeedOfIllusoryOrigin,
-            I18nText.GateOfTheLostStar,
-            I18nText.CinderniteApocalypse,
-            I18nText.TheWheelOfBrokenFate,
-            I18nText.BeyondTheCrimsonCurtain,
-            I18nText.TheFatedConfrontation,
-            I18nText.StatueOfTheCrownless,
-            I18nText.ChaoticJuncture,
-            I18nText.BellOfArchaicChants,
+        #------- 副本参数，新的在前 -------
+
+        # 周本
+        self.weeklyChallengeList = [
+            QWeeklyChallenge(
+                id=I18nText.OrdinanceOfTheInevitable,
+                name=self.tr("Ordinance of the Inevitable"),
+                enemy=self.tr("Suhsin the Inevitable"),
+                region=self.mengzhou,
+                reward=self.tr("Remnant of the Wheel"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.CourtOfShackledSouls,
+                name=self.tr("Court of Shackled Souls"),
+                enemy=self.tr("Thousand-Puppet Pavilion"),
+                region=self.mengzhou,
+                reward=self.tr("Skyward Glazed Heart"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.SeedOfIllusoryOrigin,
+                name=self.tr("Seed of Illusory Origin"),
+                enemy=self.tr("Denia"),
+                region=self.lahaiRoi,
+                reward=self.tr("We Who Question"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.GateOfTheLostStar,
+                name=self.tr("Gate of the Lost Star"),
+                enemy=self.tr("Sigillum"),
+                region=self.lahaiRoi,
+                reward=self.tr("Gold in Memory"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.CinderniteApocalypse,
+                name=self.tr("Cindernite Apocalypse"),
+                enemy=self.tr("Threnodian: Leviathan"),
+                region=self.rinascita,
+                reward=self.tr("Curse of the Abyss"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.TheWheelOfBrokenFate,
+                name=self.tr("The Wheel of Broken Fate"),
+                enemy=self.tr("Fleurdelys"),
+                region=self.rinascita,
+                reward=self.tr("When Irises Bloom"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.BeyondTheCrimsonCurtain,
+                name=self.tr("Beyond the Crimson Curtain"),
+                enemy=self.tr("Hecate"),
+                region=self.rinascita,
+                reward=self.tr("The Netherworld's Stare"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.TheFatedConfrontation,
+                name=self.tr("The Fated Confrontation"),
+                enemy=self.tr("Jué"),
+                region=self.jinzhou,
+                reward=self.tr("Sentinel's Dagger"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.StatueOfTheCrownless,
+                name=self.tr("Statue of the Crownless"),
+                enemy=self.tr("Dreamless"),
+                region=self.jinzhou,
+                reward=self.tr("Dreamless Feather"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.ChaoticJuncture,
+                name=self.tr("Chaotic Juncture"),
+                enemy=self.tr("Scar"),
+                region=self.jinzhou,
+                reward=self.tr("Unending Destruction"),
+                enable=True,
+            ),
+            QWeeklyChallenge(
+                id=I18nText.BellOfArchaicChants,
+                name=self.tr("Bell of Archaic Chants"),
+                enemy=self.tr("Bell-Borne Geochelone"),
+                region=self.jinzhou,
+                reward=self.tr("Monument Bell"),
+                enable=True,
+            ),
         ]
-        # 周本boss名，展示用，仅前端用
-        self.weeklyBoss = [
-            I18nText.WeeklyBossSuhsinTheInevitable,
-            I18nText.WeeklyBossThousandPuppetPavilion,
-            I18nText.WeeklyBossDenia,
-            I18nText.WeeklyBossSigillum,
-            I18nText.WeeklyBossThrenodianLeviathan,
-            I18nText.WeeklyBossFleurdelys,
-            I18nText.WeeklyBossHecate,
-            I18nText.WeeklyBossJue,
-            I18nText.WeeklyBossCrownless,
-            I18nText.WeeklyBossScarAberrantNightmare,
-            I18nText.WeeklyBossBellBorneGeochelone,
-        ]
+
         # 武器、角色升级素材
-        self.weapon = [
-            I18nText.Sword,
-            I18nText.Rectifier,
-            I18nText.Broadblade,
-            I18nText.Gauntlets,
-            I18nText.Pistols,
+        self.forgeryChallengeList = [
+            QForgeryChallenge(
+                id=I18nText.WingfallChasm,
+                name=self.tr("Wingfall Chasm"),
+                region=self.mengzhou,
+                reward=self.tr("Polarizer"),
+                weapon=self.sword,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.SilentChasm,
+                name=self.tr("Silent Chasm"),
+                region=self.mengzhou,
+                reward=self.tr("String"),
+                weapon=self.rectifier,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.SplitChasm,
+                name=self.tr("Split Chasm"),
+                region=self.mengzhou,
+                reward=self.tr("Carved Crystal"),
+                weapon=self.broadblade,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.ErodedChasm,
+                name=self.tr("Eroded Chasm"),
+                region=self.mengzhou,
+                reward=self.tr("Waveworn Shard"),
+                weapon=self.gauntlets,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.AshenChasm,
+                name=self.tr("Ashen Chasm"),
+                region=self.mengzhou,
+                reward=self.tr("Combustor"),
+                weapon=self.pistols,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.FallenSanctum,
+                name=self.tr("Fallen Sanctum"),
+                region=self.lahaiRoi,
+                reward=self.tr("Polarizer"),
+                weapon=self.sword,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.LessonInSunset,
+                name=self.tr("Lesson in Sunset"),
+                region=self.lahaiRoi,
+                reward=self.tr("String"),
+                weapon=self.rectifier,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.StrickenSanctum,
+                name=self.tr("Stricken Sanctum"),
+                region=self.lahaiRoi,
+                reward=self.tr("Carved Crystal"),
+                weapon=self.broadblade,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.LessonInVoid,
+                name=self.tr("Lesson in Void"),
+                region=self.lahaiRoi,
+                reward=self.tr("Waveworn Shard"),
+                weapon=self.gauntlets,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.LessonInEmbers,
+                name=self.tr("Lesson in Embers"),
+                region=self.lahaiRoi,
+                reward=self.tr("Combustor"),
+                weapon=self.pistols,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.GardenOfSalvation,
+                name=self.tr("Garden of Salvation"),
+                region=self.rinascita,
+                reward=self.tr("Metallic Drip"),
+                weapon=self.sword,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.AbyssOfInitiation,
+                name=self.tr("Abyss of Initiation"),
+                region=self.rinascita,
+                reward=self.tr("Helix"),
+                weapon=self.rectifier,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.GardenOfAdoration,
+                name=self.tr("Garden of Adoration"),
+                region=self.rinascita,
+                reward=self.tr("Waveworn Residue"),
+                weapon=self.broadblade,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.AbyssOfSacrifice,
+                name=self.tr("Abyss of Sacrifice"),
+                region=self.rinascita,
+                reward=self.tr("Cadence"),
+                weapon=self.gauntlets,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.AbyssOfConfession,
+                name=self.tr("Abyss of Confession"),
+                region=self.rinascita,
+                reward=self.tr("Phlogiston"),
+                weapon=self.pistols,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.FlamingRemnants,
+                name=self.tr("Flaming Remnants"),
+                region=self.jinzhou,
+                reward=self.tr("Metallic Drip"),
+                weapon=self.sword,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.MistyForest,
+                name=self.tr("Misty Forest"),
+                region=self.jinzhou,
+                reward=self.tr("Helix"),
+                weapon=self.rectifier,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.ErodedRuins,
+                name=self.tr("Eroded Ruins"),
+                region=self.jinzhou,
+                reward=self.tr("Waveworn Residue"),
+                weapon=self.broadblade,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.MoonlitGroves,
+                name=self.tr("Moonlit Groves"),
+                region=self.jinzhou,
+                reward=self.tr("Cadence"),
+                weapon=self.gauntlets,
+                enable=True,
+            ),
+            QForgeryChallenge(
+                id=I18nText.MarigoldWoods,
+                name=self.tr("Marigold Woods"),
+                region=self.jinzhou,
+                reward=self.tr("Phlogiston"),
+                weapon=self.pistols,
+                enable=True,
+            ),
         ]
-        self.forgeryChallenge = [
-            I18nText.WingfallChasm,
-            I18nText.SilentChasm,
-            I18nText.SplitChasm,
-            I18nText.ErodedChasm,
-            I18nText.AshenChasm,
-            I18nText.FallenSanctum,
-            I18nText.LessonInSunset,
-            I18nText.StrickenSanctum,
-            I18nText.LessonInVoid,
-            I18nText.LessonInEmbers,
-            I18nText.GardenOfSalvation,
-            I18nText.AbyssOfInitiation,
-            I18nText.GardenOfAdoration,
-            I18nText.AbyssOfSacrifice,
-            I18nText.AbyssOfConfession,
-            I18nText.FlamingRemnants,
-            I18nText.MistyForest,
-            I18nText.ErodedRuins,
-            I18nText.MoonlitGroves,
-            I18nText.MarigoldWoods,
+
+        # 共鸣者突破材料
+        self.bossChallengeList = [
+            QBossChallenge(
+                id=I18nText.EnemyCalamityEffigy,
+                name=self.tr("Calamity Effigy"),
+                region=self.mengzhou,
+                reward=self.tr("Forged Empyrean's Sigh"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyMyriadSnareRustfireChassis,
+                name=self.tr("Myriad Snare: Rustfire Chassis"),
+                region=self.mengzhou,
+                reward=self.tr("Solidarity's Loneflame"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyNightmareAdamSmasher,
+                name=self.tr("Nightmare: Adam Smasher"),
+                region=self.lahaiRoi,
+                reward=self.tr("Nightmare Flashdrive"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyNamelessExplorer,
+                name=self.tr("Nameless Explorer"),
+                region=self.lahaiRoi,
+                reward=self.tr("Our Choice"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyHyvatia,
+                name=self.tr("Hyvatia"),
+                region=self.lahaiRoi,
+                reward=self.tr("Suncoveter's Reach"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyReactorHusk,
+                name=self.tr("Reactor Husk"),
+                region=self.lahaiRoi,
+                reward=self.tr("Burning Judgment"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyLadyOfTheSea,
+                name=self.tr("Lady of the Sea"),
+                region=self.rinascita,
+                reward=self.tr("Abyssal Husk"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyTheFalseSovereign,
+                name=self.tr("The False Sovereign"),
+                region=self.rinascita,
+                reward=self.tr("Blighted Crown of Puppet King"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyFenrico,
+                name=self.tr("Fenrico"),
+                region=self.rinascita,
+                reward=self.tr("Truth in Lies"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyLionessOfGlory,
+                name=self.tr("Lioness of Glory"),
+                region=self.rinascita,
+                reward=self.tr("Unfading Glory"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyDragonOfDirge,
+                name=self.tr("Dragon of Dirge"),
+                region=self.rinascita,
+                reward=self.tr("Blazing Bone"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyLorelei,
+                name=self.tr("Lorelei"),
+                region=self.rinascita,
+                reward=self.tr("Cleansing Conch"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemySentryConstruct,
+                name=self.tr("Sentry Construct"),
+                region=self.rinascita,
+                reward=self.tr("Platinum Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyFallacyOfNoReturn,
+                name=self.tr("Fallacy of No Return"),
+                region=self.theBlackShores,
+                reward=self.tr("Topological Confinement"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyCrownless,
+                name=self.tr("Crownless"),
+                region=self.jinzhou,
+                reward=self.tr("Strife Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyFeilianBeringal,
+                name=self.tr("Feilian Beringal"),
+                region=self.jinzhou,
+                reward=self.tr("Hidden Thunder Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyTempestMephis,
+                name=self.tr("Tempest Mephis"),
+                region=self.jinzhou,
+                reward=self.tr("Thundering Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyThunderingMephis,
+                name=self.tr("Thundering Mephis"),
+                region=self.jinzhou,
+                reward=self.tr("Rage Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyMourningAix,
+                name=self.tr("Mourning Aix"),
+                region=self.jinzhou,
+                reward=self.tr("Roaring Rock Fist"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyMechAbomination,
+                name=self.tr("Mech Abomination"),
+                region=self.jinzhou,
+                reward=self.tr("Elegy Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyImpermanenceHeron,
+                name=self.tr("Impermanence Heron"),
+                region=self.jinzhou,
+                reward=self.tr("Gold-Dissolving Feather"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyInfernoRider,
+                name=self.tr("Inferno Rider"),
+                region=self.jinzhou,
+                reward=self.tr("Sound-Keeping Tacet Core"),
+                enable=True,
+            ),
+            QBossChallenge(
+                id=I18nText.EnemyLampylumenMyriad,
+                name=self.tr("Lampylumen Myriad"),
+                region=self.jinzhou,
+                reward=self.tr("Group Abomination Tacet Core"),
+                enable=True,
+            ),
         ]
-        self.bossChallenge = [
-            I18nText.EnemyCalamityEffigy,
-            I18nText.EnemyMyriadSnareRustfireChassis,
-            I18nText.EnemyNightmareAdamSmasher,
-            I18nText.EnemyNamelessExplorer,
-            I18nText.EnemyHyvatia,
-            I18nText.EnemyReactorHusk,
-            I18nText.EnemyLadyOfTheSea,
-            I18nText.EnemyTheFalseSovereign,
-            I18nText.EnemyFenrico,
-            I18nText.EnemyLionessOfGlory,
-            I18nText.EnemyDragonOfDirge,
-            I18nText.EnemyLorelei,
-            I18nText.EnemySentryConstruct,
-            I18nText.EnemyFallacyOfNoReturn,
-            I18nText.EnemyCrownless,
-            I18nText.EnemyFeilianBeringal,
-            I18nText.EnemyTempestMephis,
-            I18nText.EnemyThunderingMephis,
-            I18nText.EnemyMourningAix,
-            I18nText.EnemyMechAbomination,
-            I18nText.EnemyImpermanenceHeron,
-            I18nText.EnemyInfernoRider,
-            I18nText.EnemyLampylumenMyriad,
+
+        # 无音区
+        self.tacetSuppressionList = [
+            QTacetSuppression(
+                id=I18nText.TacetFieldHeartOfStillness,
+                name=self.tr("Heart of Stillness"),
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldHeartOfFlames,
+                name=self.tr("Heart of Flames"),
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.WesternFangPeaksTacetField,
+                name=self.tr("Western Fang Peaks"),
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.EasternXuanPeaksTacetField,
+                name=self.tr("Eastern Xuan Peaks"),
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldSolisiaLanding,
+                name=self.tr("Solisia Landing"),
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldFrostlandsTransitPort,
+                name=self.tr("Frostlands Transit Port"),
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldMountGjallar,
+                name=self.tr("Mount Gjallar"),
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldMawburrowDesert,
+                name=self.tr("Mawburrow Desert"),
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldStagnantRun,
+                name=self.tr("Stagnant Run"),
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldMournfellCanyon,
+                name=self.tr("Mournfell Canyon"),
+                region=self.rinascita,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldBeohrWaters,
+                name=self.tr("Beohr Waters"),
+                region=self.rinascita,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldRiccioliIslands,
+                name=self.tr("Riccioli Islands"),
+                region=self.rinascita,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldFagaceaePeninsula,
+                name=self.tr("Fagaceae Peninsula"),
+                region=self.rinascita,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldPenitentsEnd,
+                name=self.tr("Penitent's End"),
+                region=self.rinascita,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldCentralPlains,
+                name=self.tr("Central Plains"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldDesorockHighlandI,
+                name=self.tr("Desorock Highland I"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=False,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldTigersMaw,
+                name=self.tr("Tiger's Maw"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldWhiningAixsMire,
+                name=self.tr("Whining Aix's Mire"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldPortCityOfGuixu,
+                name=self.tr("Port City of Guixu"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldDesorockHighlandII,
+                name=self.tr("Desorock Highland II"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=False,
+            ),
+            QTacetSuppression(
+                id=I18nText.TacetFieldDimForest,
+                name=self.tr("Dim Forest"),
+                region=self.jinzhou,
+                rewards=[],
+                enable=True,
+            ),
         ]
-        self.tacetSuppression = [
-            I18nText.TacetFieldHeartOfStillness,
-            I18nText.TacetFieldHeartOfFlames,
-            I18nText.WesternFangPeaksTacetField,
-            I18nText.EasternXuanPeaksTacetField,
-            I18nText.TacetFieldSolisiaLanding,
-            I18nText.TacetFieldFrostlandsTransitPort,
-            I18nText.TacetFieldMountGjallar,
-            I18nText.TacetFieldMawburrowDesert,
-            I18nText.TacetFieldStagnantRun,
-            I18nText.TacetFieldMournfellCanyon,
-            I18nText.TacetFieldBeohrWaters,
-            I18nText.TacetFieldRiccioliIslands,
-            I18nText.TacetFieldFagaceaePeninsula,
-            I18nText.TacetFieldPenitentsEnd,
-            I18nText.TacetFieldCentralPlains,
-            I18nText.TacetFieldDesorockHighlandI,
-            I18nText.TacetFieldTigersMaw,
-            I18nText.TacetFieldWhiningAixsMire,
-            I18nText.TacetFieldPortCityOfGuixu,
-            I18nText.TacetFieldDesorockHighlandII,
-            I18nText.TacetFieldDimForest,
-        ]
-        self.tacetSuppressionTips = [
-            [I18nText.WishesOfQuietSnowfall, I18nText.ReelOfSplicedMemories],
-            [I18nText.TrailblazingStar, I18nText.SoundOfTrueName],
-            [I18nText.TrailblazingStar, I18nText.ChromaticFoam],
-            [I18nText.RiteOfGildedRevelation, I18nText.PactOfNeonlightLeap],
-            [I18nText.RiteOfGildedRevelation, I18nText.HaloOfStarryRadiance],
-        ]
-        self.nightmarePurification = [
-        ]
+
+        # 残象聚落
         self.tacetDiscordNestMengzhou = [
-            I18nText.SimulacrumNexusTacetDiscordNest,
-            I18nText.SouthernYuanHillsTacetDiscordNest,
+            QTacetDiscordNest(
+                id=I18nText.SimulacrumNexusTacetDiscordNest,
+                name=self.tr("Simulacrum Nexus"),
+                region_id=I18nText.Mengzhou,
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetDiscordNest(
+                id=I18nText.SouthernYuanHillsTacetDiscordNest,
+                name=self.tr("Southern Yuan Hills"),
+                region_id=I18nText.Mengzhou,
+                region=self.mengzhou,
+                rewards=[],
+                enable=True,
+            ),
         ]
+
         self.tacetDiscordNestLahaiRoi = [
-            I18nText.StarblindCrashsiteTacetDiscordNest,
-            I18nText.RebirthUplandsTacetDiscordNest,
-            I18nText.StagnantRunTacetDiscordNest,
+            QTacetDiscordNest(
+                id=I18nText.StarblindCrashsiteTacetDiscordNest,
+                name=self.tr("Starblind Crashsite"),
+                region_id=I18nText.LahaiRoi,
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetDiscordNest(
+                id=I18nText.RebirthUplandsTacetDiscordNest,
+                name=self.tr("Rebirth Uplands"),
+                region_id=I18nText.LahaiRoi,
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
+            QTacetDiscordNest(
+                id=I18nText.StagnantRunTacetDiscordNest,
+                name=self.tr("Stagnant Run"),
+                region_id=I18nText.LahaiRoi,
+                region=self.lahaiRoi,
+                rewards=[],
+                enable=True,
+            ),
         ]
-        self.guidebookRegion = [
-            I18nText.GuidebookMengzhou,
-            I18nText.GuidebookLahaiRoi,
-            I18nText.GuidebookRinascita,
-            I18nText.GuidebookJinzhou,
+
+        # 梦魇聚落
+        self.nightmarePurificationList = [
         ]
-        self.guidebookRegionMap = {
-            I18nText.WingfallChasm: I18nText.GuidebookMengzhou,
-            I18nText.SilentChasm: I18nText.GuidebookMengzhou,
-            I18nText.SplitChasm: I18nText.GuidebookMengzhou,
-            I18nText.ErodedChasm: I18nText.GuidebookMengzhou,
-            I18nText.AshenChasm: I18nText.GuidebookMengzhou,
-            I18nText.FallenSanctum: I18nText.GuidebookLahaiRoi,
-            I18nText.LessonInSunset: I18nText.GuidebookLahaiRoi,
-            I18nText.StrickenSanctum: I18nText.GuidebookLahaiRoi,
-            I18nText.LessonInVoid: I18nText.GuidebookLahaiRoi,
-            I18nText.LessonInEmbers: I18nText.GuidebookLahaiRoi,
-            I18nText.GardenOfSalvation: I18nText.GuidebookRinascita,
-            I18nText.AbyssOfInitiation: I18nText.GuidebookRinascita,
-            I18nText.GardenOfAdoration: I18nText.GuidebookRinascita,
-            I18nText.AbyssOfSacrifice: I18nText.GuidebookRinascita,
-            I18nText.AbyssOfConfession: I18nText.GuidebookRinascita,
-            I18nText.FlamingRemnants: I18nText.GuidebookJinzhou,
-            I18nText.MistyForest: I18nText.GuidebookJinzhou,
-            I18nText.ErodedRuins: I18nText.GuidebookJinzhou,
-            I18nText.MoonlitGroves: I18nText.GuidebookJinzhou,
-            I18nText.MarigoldWoods: I18nText.GuidebookJinzhou,
 
-            I18nText.TacetFieldHeartOfStillness: I18nText.GuidebookMengzhou,
-            I18nText.TacetFieldHeartOfFlames: I18nText.GuidebookMengzhou,
-            I18nText.WesternFangPeaksTacetField: I18nText.GuidebookMengzhou,
-            I18nText.EasternXuanPeaksTacetField: I18nText.GuidebookMengzhou,
-            I18nText.TacetFieldSolisiaLanding: I18nText.GuidebookLahaiRoi,
-            I18nText.TacetFieldFrostlandsTransitPort: I18nText.GuidebookLahaiRoi,
-            I18nText.TacetFieldMountGjallar: I18nText.GuidebookLahaiRoi,
-            I18nText.TacetFieldMawburrowDesert: I18nText.GuidebookLahaiRoi,
-            I18nText.TacetFieldStagnantRun: I18nText.GuidebookLahaiRoi,
-            I18nText.TacetFieldMournfellCanyon: I18nText.GuidebookRinascita,
-            I18nText.TacetFieldBeohrWaters: I18nText.GuidebookRinascita,
-            I18nText.TacetFieldRiccioliIslands: I18nText.GuidebookRinascita,
-            I18nText.TacetFieldFagaceaePeninsula: I18nText.GuidebookRinascita,
-            I18nText.TacetFieldPenitentsEnd: I18nText.GuidebookRinascita,
-            I18nText.TacetFieldCentralPlains: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldDesorockHighlandI: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldTigersMaw: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldWhiningAixsMire: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldPortCityOfGuixu: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldDesorockHighlandII: I18nText.GuidebookJinzhou,
-            I18nText.TacetFieldDimForest: I18nText.GuidebookJinzhou,
-
-            I18nText.SimulacrumNexusTacetDiscordNest: I18nText.GuidebookMengzhou,
-            I18nText.SouthernYuanHillsTacetDiscordNest: I18nText.GuidebookMengzhou,
-            I18nText.StarblindCrashsiteTacetDiscordNest: I18nText.GuidebookLahaiRoi,
-            I18nText.RebirthUplandsTacetDiscordNest: I18nText.GuidebookLahaiRoi,
-            I18nText.StagnantRunTacetDiscordNest: I18nText.GuidebookLahaiRoi,
-
-        }
-
+        # 培养目标
+        self.resonatorList = [
+            QResonator(
+                id=I18nText.Suoming,
+                name=self.tr("Suoming"),
+                weeklyChallenge=self.tr("Suhsin the Inevitable"),
+                tacetSuppression=[self.tr("Heart of Stillness"), self.tr("Heart of Flames")],
+                forgeryChallenge=[self.tr("Wingfall Chasm"), self.tr("Fallen Sanctum")],
+                bossChallenge=self.tr("Calamity Effigy"),
+                gather=self.tr("Miasmic Branch"),
+                tacetDiscordNest=[self.tr("Simulacrum Nexus")],
+                nightmarePurification=[],
+                enable=True,
+            ),
+            QResonator(
+                id=I18nText.Hsin,
+                name=self.tr("Hsin"),
+                weeklyChallenge=self.tr("Suhsin the Inevitable"),
+                tacetSuppression=[self.tr("Heart of Stillness"), self.tr("Heart of Flames")],
+                forgeryChallenge=[self.tr("Silent Chasm"), self.tr("Lesson in Sunset")],
+                bossChallenge=self.tr("Myriad Snare: Rustfire Chassis"),
+                gather=self.tr("Bloom of Hearkening"),
+                tacetDiscordNest=[self.tr("Simulacrum Nexus")],
+                nightmarePurification=[],
+                enable=True,
+            ),
+            QResonator(
+                id=I18nText.Jingran,
+                name=self.tr("Jingran"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Qingxiao,
+                name=self.tr("Qingxiao"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Suisui,
+                name=self.tr("Suisui"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.YangyangXuanling,
+                name=self.tr("Yangyang: Xuanling"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Rebecca,
+                name=self.tr("Rebecca"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lucy,
+                name=self.tr("Lucy"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Hiyuki,
+                name=self.tr("Hiyuki"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lucilla,
+                name=self.tr("Lucilla"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Sigrika,
+                name=self.tr("Sigrika"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Denia,
+                name=self.tr("Denia"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Mornye,
+                name=self.tr("Mornye"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lynae,
+                name=self.tr("Lynae"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Buling,
+                name=self.tr("Buling"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Chisa,
+                name=self.tr("Chisa"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Qiuyuan,
+                name=self.tr("Qiuyuan"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Galbrena,
+                name=self.tr("Galbrena"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.LuukHerssen,
+                name=self.tr("Luuk Herssen"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Aemeath,
+                name=self.tr("Aemeath"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Augusta,
+                name=self.tr("Augusta"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Iuno,
+                name=self.tr("Iuno"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lupa,
+                name=self.tr("Lupa"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Phoebe,
+                name=self.tr("Phoebe"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Brant,
+                name=self.tr("Brant"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Phrolova,
+                name=self.tr("Phrolova"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Cartethyia,
+                name=self.tr("Cartethyia"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Zanni,
+                name=self.tr("Zanni"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Ciaccona,
+                name=self.tr("Ciaccona"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Cantarella,
+                name=self.tr("Cantarella"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Roccia,
+                name=self.tr("Roccia"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Carlotta,
+                name=self.tr("Carlotta"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Youhu,
+                name=self.tr("Youhu"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lumi,
+                name=self.tr("Lumi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Camellya,
+                name=self.tr("Camellya"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Shorekeeper,
+                name=self.tr("Shorekeeper"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Zhezhi,
+                name=self.tr("Zhezhi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Changli,
+                name=self.tr("Changli"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.XiangliYao,
+                name=self.tr("Xiangli Yao"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Jinhsi,
+                name=self.tr("Jinhsi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Jianxin,
+                name=self.tr("Jianxin"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Calcharo,
+                name=self.tr("Calcharo"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Yinlin,
+                name=self.tr("Yinlin"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Yuanwu,
+                name=self.tr("Yuanwu"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Lingyang,
+                name=self.tr("Lingyang"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Mortefi,
+                name=self.tr("Mortefi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Aalto,
+                name=self.tr("Aalto"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Jiyan,
+                name=self.tr("Jiyan"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Danjin,
+                name=self.tr("Danjin"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Taoqi,
+                name=self.tr("Taoqi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Encore,
+                name=self.tr("Encore"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Sanhua,
+                name=self.tr("Sanhua"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Baizhi,
+                name=self.tr("Baizhi"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Rover,
+                name=self.tr("Rover"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Verina,
+                name=self.tr("Verina"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Chixia,
+                name=self.tr("Chixia"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+            QResonator(
+                id=I18nText.Yangyang,
+                name=self.tr("Yangyang"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
+        ]
 
     def __initGridLayout(self):
         # self.weeklyChallengeCheckBox.setStyleSheet("QCheckBox { border: 2px solid red; }")
         self.weeklyChallengeCheckBox = CheckBox(self.tr("Weekly Challenge:"), self.container)
         self.weeklyChallengeComboBox = ComboBox(self.container)
-        self.weeklyChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
-        # self.weeklyChallengeComboBox.addItem(self.tr("自动 - 最新BOSS"), userData="Auto")
-        for i in range(len(self.weeklyChallenge)):
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.weeklyChallenge[i]).raw, boss=self.i18ntr(self.weeklyBoss[i]).raw)
-            self.weeklyChallengeComboBox.addItem(text, userData=self.weeklyChallenge[i])
-            # if i > 3:
-            #     self.weeklyChallengeComboBox.setItemEnabled(self.weeklyChallengeComboBox.count() - 1, False)
-        self.weeklyChallengeComboBox.setCurrentIndex(0)
-        # self.weeklyChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
+        self.weeklyChallengeComboBox.addItem(self.tr("Not selected"), userData=None)
+        for item in self.weeklyChallengeList:
+            text = self.tr("{name} - {enemy}").format(name=item.name, enemy=item.enemy)
+            self.weeklyChallengeComboBox.addItem(text, userData=item.id)
+            self.weeklyChallengeComboBox.setItemEnabled(self.weeklyChallengeComboBox.count() - 1, item.enable)
 
         self.tacetSuppressionCheckBox = CheckBox(self.tr("Echo Materials:"), self.container)
         self.tacetSuppressionComboBox = ComboBox(self.container)
-        self.tacetSuppressionComboBox.addItem(self.tr("Deselect"), userData=None)
-        for i in range(len(self.tacetSuppression)):
-            text = self.tr("{challenge} - {region}").format(
-                challenge=self.i18ntr(self.tacetSuppression[i]).raw,
-                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetSuppression[i])).raw,
-            )
-            self.tacetSuppressionComboBox.addItem(text, userData=self.tacetSuppression[i])
-            if self.tacetSuppression[i] in [I18nText.TacetFieldDesorockHighlandI, I18nText.TacetFieldDesorockHighlandII]:
-                self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, False)
-        # self.tacetSuppressionSettingButton = ToggleToolButton(FIF.SETTING, self)
+        self.tacetSuppressionComboBox.addItem(self.tr("Not selected"), userData=None)
+        for item in self.tacetSuppressionList:
+            self.tacetSuppressionComboBox.addItem(f"{item.name} - {item.region}", userData=item.id)
+            self.tacetSuppressionComboBox.setItemEnabled(self.tacetSuppressionComboBox.count() - 1, item.enable)
 
         self.forgeryChallengeCheckBox = CheckBox(self.tr("Weapon and Skill Materials:"), self.container)
         self.forgeryChallengeComboBox = ComboBox(self.container)
-        self.forgeryChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
-        for i in range(len(self.forgeryChallenge)):
-            text = self.tr("{challenge} - {weapon} - {region}").format(
-                challenge=self.i18ntr(self.forgeryChallenge[i]).raw,
-                weapon=self.i18ntr(self.weapon[i % len(self.weapon)]).raw,
-                region=self.i18ntr(self.guidebookRegionMap.get(self.forgeryChallenge[i])).raw,
-            )
-            self.forgeryChallengeComboBox.addItem(text, userData=self.forgeryChallenge[i])
-            # if i > len(self.weapon) * 3 - 1:
-            #     self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, False)
-        # self.forgeryChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
+        self.forgeryChallengeComboBox.addItem(self.tr("Not selected"), userData=None)
+        for item in self.forgeryChallengeList:
+            text = self.tr("{name} - {weapon} - {region}").format(name=item.name, weapon=item.weapon, region=item.region)
+            self.forgeryChallengeComboBox.addItem(text, userData=item.id)
+            self.forgeryChallengeComboBox.setItemEnabled(self.forgeryChallengeComboBox.count() - 1, item.enable)
 
-        self.bossChallengeCheckBox = CheckBox(self.tr("Resonator Ascension Materials:"), self.container)
+        self.bossChallengeCheckBox = CheckBox(self.tr("Ascension Materials:"), self.container)
         self.bossChallengeComboBox = ComboBox(self.container)
-        self.bossChallengeComboBox.addItem(self.tr("Deselect"), userData=None)
-        for i in range(len(self.bossChallenge)):
-            self.bossChallengeComboBox.addItem(self.i18ntr(self.bossChallenge[i]).raw, userData=self.bossChallenge[i])
-            # if i > -1:
-            #     self.bossChallengeComboBox.setItemEnabled(self.bossChallengeComboBox.count() - 1, False)
-        # self.bossChallengeSettingButton = ToggleToolButton(FIF.SETTING, self)
-
-        self.nightmarePurificationCheckBox = CheckBox(self.tr("Nightmare Nest:"), self.container)
-        self.nightmarePurificationComboBox = ComboBox(self.container)
-        self.nightmarePurificationComboBox.addItem(self.tr("Deselect"), userData=None)
-        self.nightmarePurificationComboBox.addItem(self.tr("Select all"), userData="All")
-        self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, False)
-        for i in range(len(self.nightmarePurification)):
-            self.nightmarePurificationComboBox.addItem(
-                self.i18ntr(self.nightmarePurification[i]).raw,
-                userData=self.nightmarePurification[i])
-        # self.nightmarePurificationSettingButton = ToggleToolButton(FIF.SETTING, self)
+        self.bossChallengeComboBox.addItem(self.tr("Not selected"), userData=None)
+        for item in self.bossChallengeList:
+            self.bossChallengeComboBox.addItem(item.name, userData=item.id)
+            self.bossChallengeComboBox.setItemEnabled(self.bossChallengeComboBox.count() - 1, item.enable)
 
         self.tacetDiscordNestCheckBox = CheckBox(self.tr("Tacet Discord Nest:"), self.container)
         self.tacetDiscordNestComboBox = ComboBox(self.container)
-        self.tacetDiscordNestComboBox.addItem(self.tr("Deselect"), userData=None)
+        self.tacetDiscordNestComboBox.addItem(self.tr("Not selected"), userData=None)
         self.tacetDiscordNestComboBox.addItem(self.tr("Select all"), userData="All")
         self.tacetDiscordNestComboBox.addItem(self.tr("Select all of Mengzhou"), userData=I18nText.Mengzhou)
-        for i in range(len(self.tacetDiscordNestMengzhou)):
-            text = self.tr("{challenge} - {region}").format(
-                challenge=self.i18ntr(self.tacetDiscordNestMengzhou[i]).raw,
-                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNestMengzhou[i])).raw,
-            )
-            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNestMengzhou[i])
-            # if i > 3:
-            #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
+        for item in self.tacetDiscordNestMengzhou:
+            text = self.tr("{name} - {region}").format(name=item.name, region=item.region)
+            self.tacetDiscordNestComboBox.addItem(text, userData=item.id)
+            self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, item.enable)
         self.tacetDiscordNestComboBox.addItem(self.tr("Select all of Lahai-Roi"), userData=I18nText.LahaiRoi)
-        for i in range(len(self.tacetDiscordNestLahaiRoi)):
-            text = self.tr("{challenge} - {region}").format(
-                challenge=self.i18ntr(self.tacetDiscordNestLahaiRoi[i]).raw,
-                region=self.i18ntr(self.guidebookRegionMap.get(self.tacetDiscordNestLahaiRoi[i])).raw,
-            )
-            self.tacetDiscordNestComboBox.addItem(text, userData=self.tacetDiscordNestLahaiRoi[i])
-            # if i > 3:
-            #     self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, False)
-        # self.tacetDiscordNestSettingButton = ToggleToolButton(FIF.SETTING, self)
+        for item in self.tacetDiscordNestLahaiRoi:
+            self.tacetDiscordNestComboBox.addItem(f"{item.name} - {item.region}", userData=item.id)
+            self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, item.enable)
+
+        self.nightmarePurificationCheckBox = CheckBox(self.tr("Nightmare Nest:"), self.container)
+        self.nightmarePurificationComboBox = ComboBox(self.container)
+        self.nightmarePurificationComboBox.addItem(self.tr("Not selected"), userData=None)
+        self.nightmarePurificationComboBox.addItem(self.tr("Select all"), userData="All")
+        self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, False)
+        for item in self.nightmarePurificationList:
+            self.nightmarePurificationComboBox.addItem(item.name, userData=item.id)
+            self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, item.enable)
 
         self.activityCheckBox = CheckBox(self.tr("Activity:"), self.container)
         self.activityComboBox = ComboBox(self.container)
-        # self.activityComboBox.addItem(self.tr("Deselect"), userData=None)
-        # self.activityComboBox.addItem(self.tr("Auto"), userData="Auto")
-        self.activityComboBox.addItem(self.tr("Daily / Weekly Activity, Phantasma Dreamland"), userData="Auto")
-
-        # self.activityComboBox = MultiSelectionComboBox(self.container)
-        # self.activityComboBox.addItem(self.tr("日活"), userData=None)
-        # self.activityComboBox.addItem(self.tr("周活"), userData=None)
-        # self.activityComboBox.addItem(self.tr("幻梦游园"), userData=None)
-        # self.activityComboBox.setChipsMode(False)
-        # self.activityComboBox.setSelectedIndices({0, 1, 2})
-        # for i in range(3):
-        #     self.activityComboBox.setItemEnabled(i, True)
-
-        # self.activitySettingButton = ToggleToolButton(FIF.SETTING, self)
+        self.activityComboBox.addItem(self.tr(r"Daily / Weekly Activity, Phantasma Dreamland"), userData="Auto")
 
         self.mailCheckBox = CheckBox(self.tr("Mail:"), self.container)
         self.mailComboBox = ComboBox(self.container)
-        #         self.mailComboBox.addItem(self.tr("Deselect"), userData=None)
         self.mailComboBox.addItem(self.tr("Auto"), userData="Auto")
-        # self.mailSettingButton = ToggleToolButton(FIF.SETTING, self)
 
         self.pioneerPodcastCheckBox = CheckBox(self.tr("Pioneer Podcast:"), self.container)
         self.pioneerPodcastComboBox = ComboBox(self.container)
-        #         self.pioneerPodcastComboBox.addItem(self.tr("Deselect"), userData=None)
         self.pioneerPodcastComboBox.addItem(self.tr("Auto"), userData="Auto")
-        # self.pioneerPodcastSettingButton = ToggleToolButton(FIF.SETTING, self)
+
+        # 培养目标
+        self.focusWeeklyChallenge = QLabel(self.container)
+        self.focusTacetSuppression = QLabel(self.container)
+        self.focusForgeryChallenge = QLabel(self.container)
+        self.focusBossChallenge = QLabel(self.container)
+        self.focusGather = QLabel(self.container)
+        self.focusTacetDiscordNest = QLabel(self.container)
 
         self.focusResonatorLayout = QHBoxLayout()
-        self.focusResonatorTitle = QLabel(self.tr("Focus Resonator: "), self.container)
+        self.focusResonatorTitle = QLabel(self.tr("Resonator: "), self.container)
         self.focusResonatorComboBox = ComboBox(self.container)
-        self.focusResonatorComboBox.addItem(self.tr("Deselect"), userData=None)
-        self.focusResonatorComboBox.addItem(self.tr("心（施工中）"), userData=None)
-        # for resonator_id in reversed(Resonator.i18n_keys()):
-        #     self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, userData=resonator_id)
-        for avatar, resonator_id in reversed(list(Resonator.avatar_mappings().items())):
-            avatar = QIcon(str(Resource.Unpacked.IconRoleHead150 / avatar))
-            self.focusResonatorComboBox.addItem(self.i18ntr(resonator_id).raw, avatar, userData=resonator_id)
-            # logger.warning(f"self.focusResonatorComboBox.iconSize(): {str(self.focusResonatorComboBox.iconSize())}")
-            # self.focusResonatorComboBox.setIconSize(QSize(20, 20))
-        self.focusResonatorComboBox.setCurrentIndex(1)
-        self.focusResonatorComboBox.setEnabled(False)
-
-        self.focusWeeklyChallenge = QLabel(self.tr("天演溯心"), self.container)
-        self.focusTacetSuppression = QLabel(self.tr("沉心域、烬心域无音区"), self.container)
-        self.focusForgeryChallenge = QLabel(self.tr("音感仪（梦州、拉海洛）"), self.container)
-        self.focusBossChallenge = QLabel(self.tr("万囮牢·朽躯"), self.container)
-        self.focusGather = QLabel(self.tr("采集: 倾念华"), self.container)
-        self.focusTacetDiscordNest = QLabel(self.tr("梦枢天罗残象聚落"), self.container)
+        self.focusResonatorComboBox.addItem(self.tr("Not selected"), userData=None)
+        iam = Resonator.id_avatar_mappings()
+        for item in self.resonatorList:
+            if not item.enable:
+                continue
+            avatar = None
+            if avatars := iam.get(item.id):
+                avatar = QIcon(str(Resource.Unpacked.IconRoleHead150 / avatars[0]))
+            self.focusResonatorComboBox.addItem(item.name, avatar, userData=item.id)
+        self.focusResonatorComboBox.setCurrentIndex(0)
 
         self.buttonGroup = [
             self.tacetSuppressionCheckBox,
@@ -457,90 +1619,6 @@ class DailyWidget(ScrollArea):
         if register is not None:
             register.append(upLabel)
         return upLabel
-
-    def __refreshGridLayout(self, index):
-        from src.core.i18n import I18nText, I18nTr, Language
-
-        try:
-            self.curLang = self.lang[index]
-        except Exception:
-            self.curLang = Language.ZH
-
-        self.i18ntr = I18nTr(self.curLang)
-
-        for idx in range(self.weeklyChallengeComboBox.count()):
-            try:
-                i = self.weeklyChallenge.index(self.weeklyChallengeComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.weeklyChallenge[i]).raw, boss=self.i18ntr(self.weeklyBoss[i]).raw)
-            self.weeklyChallengeComboBox.setItemText(idx, text)
-
-        for idx in range(self.tacetSuppressionComboBox.count()):
-            try:
-                i = self.tacetSuppression.index(self.tacetSuppressionComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.tacetSuppression[i]).raw, boss=self.i18ntr(self.tacetSuppression[i]).raw)
-            self.tacetSuppressionComboBox.setItemText(idx, text)
-            # _tipsList = self.tacetSuppressionTips[i]
-            # _tips = ""
-            # for x in range(len(_tipsList)):
-            #     _tips += self.i18ntr(_tipsList[x])
-            #     if x < len(_tipsList) - 1:
-            #         _tips += "\n"
-            # self.tacetSuppressionComboBox.setToolTip(_tips)
-
-        for idx in range(self.forgeryChallengeComboBox.count()):
-            try:
-                i = self.forgeryChallenge.index(self.forgeryChallengeComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.forgeryChallenge[i]).raw, boss=self.i18ntr(self.forgeryChallenge[i]).raw)
-            self.forgeryChallengeComboBox.setItemText(idx, text)
-
-        for idx in range(self.bossChallengeComboBox.count()):
-            try:
-                i = self.bossChallenge.index(self.bossChallengeComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.bossChallenge[i]).raw, boss=self.i18ntr(self.bossChallenge[i]).raw)
-            self.bossChallengeComboBox.setItemText(idx, text)
-
-        for idx in range(self.nightmarePurificationComboBox.count()):
-            try:
-                i = self.nightmarePurification.index(self.nightmarePurificationComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.nightmarePurification[i]).raw,
-                boss=self.i18ntr(self.nightmarePurification[i]).raw)
-            self.nightmarePurificationComboBox.setItemText(idx, text)
-
-        for idx in range(self.tacetDiscordNestComboBox.count()):
-            try:
-                i = self.tacetDiscordNest.index(self.tacetDiscordNestComboBox.itemData(idx))
-            except Exception:
-                i = -1
-            if i == -1:
-                continue
-            text = self.tr("{challenge} - {boss}").format(
-                challenge=self.i18ntr(self.tacetDiscordNest[i]).raw, boss=self.i18ntr(self.tacetDiscordNest[i]).raw)
-            self.tacetDiscordNestComboBox.setItemText(idx, text)
 
     def __initWidget(self):
         # self.resize(1000, 800)
@@ -580,7 +1658,7 @@ class DailyWidget(ScrollArea):
         self.contentBottomLayout.setContentsMargins(0, 0, 0, 0)
 
         self.focusResonatorLayout.addWidget(self.focusResonatorTitle)
-        self.focusResonatorLayout.addWidget(self.focusResonatorComboBox)
+        self.focusResonatorLayout.addWidget(self.focusResonatorComboBox, 1)
         self.focusResonatorLayout.setContentsMargins(0, 0, 0, 0)
 
         # grid
@@ -685,7 +1763,7 @@ class DailyWidget(ScrollArea):
         self.weeklyChallengeCheckBox.toggled.connect(
             lambda checked: paramConfig.set(paramConfig.weeklyChallengeOpen, checked))
         for idx, cb in enumerate(self.buttonGroup):
-            cb.toggled.connect(lambda checked, c=cb, i=idx: self.onCheckboxGroupChanged(c, i, checked))
+            cb.toggled.connect(lambda checked, c=cb, i=idx: self.__onCheckboxGroupChanged(c, i, checked))
         self.nightmarePurificationCheckBox.toggled.connect(
             lambda checked: paramConfig.set(paramConfig.nightmarePurificationOpen, checked))
         self.tacetDiscordNestCheckBox.toggled.connect(
@@ -720,6 +1798,8 @@ class DailyWidget(ScrollArea):
         self.resetButton.clicked.connect(self.__onResetButtonClicked)
         self.aboutButton.clicked.connect(self.__showAboutFlyout)
 
+        self.focusResonatorComboBox.currentIndexChanged.connect(self.__onFocusResonatorIndexChanged)
+
         globalSignal.doubleDropSignal.connect(self.__onDoubleDrop)
 
     def __loadConfig(self):
@@ -752,6 +1832,10 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox.setCurrentIndex(
             self.pioneerPodcastComboBox.findData(paramConfig.get(paramConfig.pioneerPodcast)))
 
+        index = self.focusResonatorComboBox.findData(paramConfig.get(paramConfig.focusResonator))
+        if index >= 0:
+            self.focusResonatorComboBox.setCurrentIndex(index)
+
     def __onResetButtonClicked(self):
         self.weeklyChallengeComboBox.setCurrentIndex(0)
         self.weeklyChallengeCheckBox.setChecked(False)
@@ -780,7 +1864,7 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox.setCurrentIndex(0)
         self.pioneerPodcastCheckBox.setChecked(False)
 
-    def onCheckboxGroupChanged(self, cb, idx, checked):
+    def __onCheckboxGroupChanged(self, cb, idx, checked):
         # logger.info(f"onCheckboxGroupChanged: {cb.text()} {checked}")
         for i in range(len(self.buttonGroup)):
             if checked:
@@ -797,11 +1881,35 @@ class DailyWidget(ScrollArea):
                 self.buttonGroupComboBox[i].setEnabled(True)
                 paramConfig.set(self.buttonGroupOpen[i], False)
 
+    def __updateFocusResonatorInfo(self, resonator_id: str | None):
+        for resonator in self.resonatorList:
+            if resonator.id != resonator_id:
+                continue
+            self.focusWeeklyChallenge.setText(resonator.weeklyChallenge)
+            self.focusTacetSuppression.setText(", ".join(resonator.tacetSuppression))
+            self.focusForgeryChallenge.setText(", ".join(resonator.forgeryChallenge))
+            self.focusBossChallenge.setText(resonator.bossChallenge)
+            # self.focusGather.setText(self.tr(r"Gather: {}").format(resonator.gather))
+            self.focusTacetDiscordNest.setText(", ".join(resonator.tacetDiscordNest))
+            return
+
+        self.focusWeeklyChallenge.clear()
+        self.focusTacetSuppression.clear()
+        self.focusForgeryChallenge.clear()
+        self.focusBossChallenge.clear()
+        # self.focusGather.clear()
+        self.focusTacetDiscordNest.clear()
+
+    def __onFocusResonatorIndexChanged(self, index: int):
+        resonator_id = self.focusResonatorComboBox.itemData(index)
+        paramConfig.set(paramConfig.focusResonator, resonator_id)
+        self.__updateFocusResonatorInfo(resonator_id)
+
     def __showAboutFlyout(self):
         Flyout.create(
             # icon=InfoBarIcon.INFORMATION,
             title=self.tr('About:'),
-            content=self.tr('Gray (unavailable) stages are not supported yet. Support will be gradually expanded in future updates. If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.'),
+            content=self.tr('If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.'),
             target=self.aboutButton,
             parent=self.window()
         )
