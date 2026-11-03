@@ -161,8 +161,8 @@
         <file>qss/light/terminal_interface.qss</file>
         <file>qss/light/param_interface.qss</file>
 
-        <file>i18n/gallery.zh_CN.qm</file>
-        <file>i18n/gallery.zh_HK.qm</file>
+<!--        <file>i18n/gallery.zh_CN.qm</file>-->
+<!--        <file>i18n/gallery.zh_HK.qm</file>-->
 
     </qresource>
 </RCC>

@@ -106,7 +106,10 @@ def wwa():
     locale = cfg.get(cfg.language).value
     translator = FluentTranslator(locale)
     galleryTranslator = QTranslator()
-    galleryTranslator.load(locale, "gallery", ".", ":/gallery/i18n")
+    # galleryTranslator.load(locale, "gallery", ".", ":/gallery/i18n")
+    # 不编译进resource.py，直接绝对路径加载
+    i18n_path = Path(__file__).resolve().parent / "resource" / "i18n"
+    galleryTranslator.load(locale, "gallery", ".", str(i18n_path))
 
     app.installTranslator(translator)
     app.installTranslator(galleryTranslator)
