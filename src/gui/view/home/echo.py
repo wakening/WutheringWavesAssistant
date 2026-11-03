@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, Signal, QSize, QEvent, QCoreApplication
 from PySide6.QtGui import QIcon, QColor, QIntValidator
@@ -13,6 +14,7 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
                             PushButton, ToolButton, MessageBox, SearchLineEdit, TransparentPushButton, ToggleToolButton,
                             DropDownPushButton, TogglePushButton)
 
+from src.core.enemy import EnemyVersion
 from src.gui.common.config import paramConfig, BossNameEnum
 from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
@@ -20,6 +22,15 @@ from src.gui.common.task import BaseTask, ValidationResult, TaskId
 from src.gui.components.check_box import CheckCard
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class QEnemy:
+    id: BossNameEnum
+    name: str
+    version: EnemyVersion
+    background: bool
+    enable: bool
 
 
 class EchoTask(BaseTask):
@@ -94,11 +105,314 @@ class BossRushWidget(QWidget):
 
         self.task = BossRushTask(self)
 
+        self.latestVersion = EnemyVersion.V3_7
+        self.enemyList = [
+            QEnemy(
+                id=BossNameEnum.SuhsinTheInevitable,
+                name=self.tr("Suhsin the Inevitable"),
+                version=EnemyVersion.V3_7,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.CalamityEffigy,
+                name=self.tr("Calamity Effigy"),
+                version=EnemyVersion.V3_6,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.ThousandPuppetPavilion,
+                name=self.tr("Thousand-Puppet Pavilion"),
+                version=EnemyVersion.V3_5,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.MyriadSnareRustfireChassis,
+                name=self.tr("Myriad Snare: Rustfire Chassis"),
+                version=EnemyVersion.V3_5,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareAdamSmasher,
+                name=self.tr("Nightmare: Adam Smasher"),
+                version=EnemyVersion.V3_4,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Denia,
+                name=self.tr("Denia"),
+                version=EnemyVersion.V3_3,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NamelessExplorer,
+                name=self.tr("Nameless Explorer"),
+                version=EnemyVersion.V3_1,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Sigillum,
+                name=self.tr("Sigillum"),
+                version=EnemyVersion.V3_1,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.ReactorHusk,
+                name=self.tr("Reactor Husk"),
+                version=EnemyVersion.V3_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Hyvatia,
+                name=self.tr("Hyvatia"),
+                version=EnemyVersion.V3_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.ThrenodianLeviathan,
+                name=self.tr("Threnodian: Leviathan"),
+                version=EnemyVersion.V2_7,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.TheFalseSovereign,
+                name=self.tr("The False Sovereign"),
+                version=EnemyVersion.V2_6,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.LadyOfTheSea,
+                name=self.tr("Lady of the Sea"),
+                version=EnemyVersion.V2_6,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Fenrico,
+                name=self.tr("Fenrico"),
+                version=EnemyVersion.V2_5,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareHecate,
+                name=self.tr("Nightmare: Hecate"),
+                version=EnemyVersion.V2_5,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.LionessOfGlory,
+                name=self.tr("Lioness of Glory"),
+                version=EnemyVersion.V2_4,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareKelpie,
+                name=self.tr("Nightmare: Kelpie"),
+                version=EnemyVersion.V2_4,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Fleurdelys,
+                name=self.tr("Fleurdelys"),
+                version=EnemyVersion.V2_2,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareLampylumenMyriad,
+                name=self.tr("Nightmare: Lampylumen Myriad"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareMourningAix,
+                name=self.tr("Nightmare: Mourning Aix"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareInfernoRider,
+                name=self.tr("Nightmare: Inferno Rider"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareCrownless,
+                name=self.tr("Nightmare: Crownless"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareThunderingMephis,
+                name=self.tr("Nightmare: Thundering Mephis"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareTempestMephis,
+                name=self.tr("Nightmare: Tempest Mephis"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareImpermanenceHeron,
+                name=self.tr("Nightmare: Impermanence Heron"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.NightmareFeilianBeringal,
+                name=self.tr("Nightmare: Feilian Beringal"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.DragonOfDirge,
+                name=self.tr("Dragon of Dirge"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Lorelei,
+                name=self.tr("Lorelei"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Hecate,
+                name=self.tr("Hecate"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.SentryConstruct,
+                name=self.tr("Sentry Construct"),
+                version=EnemyVersion.V2_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.FallacyOfNoReturn,
+                name=self.tr("Fallacy of No Return"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Jue,
+                name=self.tr("Jué"),
+                version=EnemyVersion.V1_1,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Crownless,
+                name=self.tr("Crownless"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.FeilianBeringal,
+                name=self.tr("Feilian Beringal"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.TempestMephis,
+                name=self.tr("Tempest Mephis"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.ThunderingMephis,
+                name=self.tr("Thundering Mephis"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.MourningAix,
+                name=self.tr("Mourning Aix"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.MechAbomination,
+                name=self.tr("Mech Abomination"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.ImpermanenceHeron,
+                name=self.tr("Impermanence Heron"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.InfernoRider,
+                name=self.tr("Inferno Rider"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.BellBorneGeochelone,
+                name=self.tr("Bell-Borne Geochelone"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.LampylumenMyriad,
+                name=self.tr("Lampylumen Myriad"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+            QEnemy(
+                id=BossNameEnum.Dreamless,
+                name=self.tr("Dreamless"),
+                version=EnemyVersion.V1_0,
+                background=False,
+                enable=True,
+            ),
+        ]
+
         self.mainLayout = QVBoxLayout(self)
 
         self.flowLayout = FlowLayout(isTight=True)
-        self.checkCards: dict[BossNameEnum, CheckCard] = {}
-        self.firstEnemy = ""
         self.enemyGroup = QButtonGroup(self)
         self.enemyGroup.setExclusive(True)
 
@@ -106,24 +420,23 @@ class BossRushWidget(QWidget):
         self.bossNameLabel = QLabel(self.tr("BOSS:"), self)
         self.lineEdit = SearchLineEdit(self)
         self.lineEdit.setEnabled(False)
+        self.lineEdit.setPlaceholderText(self.tr("In Development"))
+        self.lineEdit.setClearButtonEnabled(True)
+
         self.aboutButton = PushButton(self.tr("About"), self)
 
         # self.enemyFilter = MultiSelectionLiteFilter()
         # self.enemyFilter = OutlinedMultiSelectionLiteFilter()
         # self.enemyFilter.addItems(['All', '3.0', '2.0', '1.0'])
 
-        # for boss in BossNameEnum:
-        new_boss = 1  # TODO 增加boss参数，根据版本区最新版本boss数量
-        for i, boss in enumerate(reversed(list(BossNameEnum))):
-            if i == 0:
-                self.firstEnemy = boss
-            checkCard = CheckCard(boss.value, parent=self)
-            checkCard.setChecked(False)
-            if i < new_boss or boss == BossNameEnum.NightmareMourningAix:
+        self.checkCards: dict[BossNameEnum, CheckCard] = {}
+        for item in self.enemyList:
+            checkCard = CheckCard(item.name, parent=self)
+            checkCard.setChecked(item.id == BossNameEnum.Dreamless)
+            if item.background or self.latestVersion == item.version:
                 checkCard.setBackground()
-            self.checkCards[boss] = checkCard
-            checkCard.setProperty("boss", boss)
-            self.enemyGroup.addButton(checkCard.checkbox)
+            checkCard.setProperty("boss", item.id)
+            self.checkCards[item.id] = checkCard
 
         self.__initWidget()
 
@@ -132,19 +445,18 @@ class BossRushWidget(QWidget):
         self.setObjectName('view')
         # StyleSheet.PARAM_INTERFACE.apply(self)
 
-        self.lineEdit.setMaximumWidth(300)
-        self.lineEdit.setClearButtonEnabled(True)
-        self.lineEdit.setPlaceholderText('施工中...')
-
-        for boss, card in self.checkCards.items():
-            self.flowLayout.addWidget(card)
-
         # initialize layout
         self.__initLayout()
         self.__connectSignalToSlot()
         self.__loadConfig()
 
     def __initLayout(self):
+        self.lineEdit.setMaximumWidth(300)
+
+        for checkCard in self.checkCards.values():
+            self.enemyGroup.addButton(checkCard.checkbox)
+            self.flowLayout.addWidget(checkCard)
+
         self.flowLayout.setSpacing(0)
         self.flowLayout.setContentsMargins(0, 10, 0, 10)
 
@@ -186,14 +498,15 @@ class BossRushWidget(QWidget):
         paramConfig.set(paramConfig.bossName, [cb.property("boss")])
 
     def __showAboutFlyout(self):
+        texts = [
+            self.tr("任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。"),
+            self.tr("若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。"),
+            self.tr("萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。"),
+        ]
         Flyout.create(
             # icon=InfoBarIcon.INFORMATION,
-            title='关于:',
-            content=self.tr(
-                '任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。'
-                '\n若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。'
-                '\n萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。'
-            ),
+            title=self.tr('About:'),
+            content="\n".join(texts),
             target=self.aboutButton,
             parent=self.window()
         )

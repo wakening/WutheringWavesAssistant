@@ -85,17 +85,9 @@
         <translation>游戏文本:</translation>
     </message>
     <message>
-        <source>{text}</source>
-        <translation type="vanished">{text}</translation>
-    </message>
-    <message>
         <location filename="../../view/home_interface.py" line="325"/>
         <source>Resource Quality:</source>
         <translation>资源等级:</translation>
-    </message>
-    <message>
-        <source>{level} {text}</source>
-        <translation type="vanished">{level} {text}</translation>
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="326"/>
@@ -106,7 +98,7 @@
 <context>
     <name>BossRushTask</name>
     <message>
-        <location filename="../../view/home/echo.py" line="83"/>
+        <location filename="../../view/home/echo.py" line="94"/>
         <source>Boss: </source>
         <translation>刷Boss: </translation>
     </message>
@@ -114,21 +106,254 @@
 <context>
     <name>BossRushWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="106"/>
+        <location filename="../../view/home/echo.py" line="112"/>
+        <source>Suhsin the Inevitable</source>
+        <translation>天演溯心</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="119"/>
+        <source>Calamity Effigy</source>
+        <translation>天傀劫煞</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="126"/>
+        <source>Thousand-Puppet Pavilion</source>
+        <translation>千傀重楼</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="133"/>
+        <source>Myriad Snare: Rustfire Chassis</source>
+        <translation>万囮牢·朽躯</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="140"/>
+        <source>Nightmare: Adam Smasher</source>
+        <translation>梦魇亚当·重锤</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="147"/>
+        <source>Denia</source>
+        <translation>达妮娅</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="154"/>
+        <source>Nameless Explorer</source>
+        <translation>无铭探索者</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="161"/>
+        <source>Sigillum</source>
+        <translation>辛吉勒姆</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="168"/>
+        <source>Reactor Husk</source>
+        <translation>炉芯机骸</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="175"/>
+        <source>Hyvatia</source>
+        <translation>海维夏</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="182"/>
+        <source>Threnodian: Leviathan</source>
+        <translation>鸣式·利维亚坦</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="189"/>
+        <source>The False Sovereign</source>
+        <translation>伪作的神王</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="196"/>
+        <source>Lady of the Sea</source>
+        <translation>海之女</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="203"/>
+        <source>Fenrico</source>
+        <translation>芬莱克</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="210"/>
+        <source>Nightmare: Hecate</source>
+        <translation>梦魇·赫卡忒</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="217"/>
+        <source>Lioness of Glory</source>
+        <translation>荣耀狮像</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="224"/>
+        <source>Nightmare: Kelpie</source>
+        <translation>梦魇·凯尔匹</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="231"/>
+        <source>Fleurdelys</source>
+        <translation>芙露德莉丝</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="238"/>
+        <source>Nightmare: Lampylumen Myriad</source>
+        <translation>梦魇·辉萤军势</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="245"/>
+        <source>Nightmare: Mourning Aix</source>
+        <translation>梦魇·哀声鸷</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="252"/>
+        <source>Nightmare: Inferno Rider</source>
+        <translation>梦魇·燎照之骑</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="259"/>
+        <source>Nightmare: Crownless</source>
+        <translation>梦魇·无冠者</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="266"/>
+        <source>Nightmare: Thundering Mephis</source>
+        <translation>梦魇·云闪之鳞</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="273"/>
+        <source>Nightmare: Tempest Mephis</source>
+        <translation>梦魇·朔雷之鳞</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="280"/>
+        <source>Nightmare: Impermanence Heron</source>
+        <translation>梦魇·无常凶鹭</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="287"/>
+        <source>Nightmare: Feilian Beringal</source>
+        <translation>梦魇·飞廉之猩</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="294"/>
+        <source>Dragon of Dirge</source>
+        <translation>叹息古龙</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="301"/>
+        <source>Lorelei</source>
+        <translation>罗蕾莱</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="308"/>
+        <source>Hecate</source>
+        <translation>赫卡忒</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="315"/>
+        <source>Sentry Construct</source>
+        <translation>异构武装</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="322"/>
+        <source>Fallacy of No Return</source>
+        <translation>无归的谬误</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="329"/>
+        <source>Jué</source>
+        <translation>角</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="336"/>
+        <source>Crownless</source>
+        <translation>无冠者</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="343"/>
+        <source>Feilian Beringal</source>
+        <translation>飞廉之猩</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="350"/>
+        <source>Tempest Mephis</source>
+        <translation>朔雷之鳞</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="357"/>
+        <source>Thundering Mephis</source>
+        <translation>云闪之鳞</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="364"/>
+        <source>Mourning Aix</source>
+        <translation>哀声鸷</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="371"/>
+        <source>Mech Abomination</source>
+        <translation>聚械机偶</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="378"/>
+        <source>Impermanence Heron</source>
+        <translation>无常凶鹭</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="385"/>
+        <source>Inferno Rider</source>
+        <translation>燎照之骑</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="392"/>
+        <source>Bell-Borne Geochelone</source>
+        <translation>鸣钟之龟</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="399"/>
+        <source>Lampylumen Myriad</source>
+        <translation>辉萤军势</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="406"/>
+        <source>Dreamless</source>
+        <translation>无妄者</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="420"/>
         <source>BOSS:</source>
         <translation>BOSS:</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="109"/>
+        <location filename="../../view/home/echo.py" line="423"/>
+        <source>In Development</source>
+        <translation>开发中</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="426"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="196"/>
-        <source>任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。
-若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。
-萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。</source>
-        <translation>任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。</translation>
+        <location filename="../../view/home/echo.py" line="502"/>
+        <source>任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="503"/>
+        <source>若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="504"/>
+        <source>萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/home/echo.py" line="508"/>
+        <source>About:</source>
+        <translation>关于:</translation>
     </message>
 </context>
 <context>
@@ -395,26 +620,14 @@
         <translation>不选择</translation>
     </message>
     <message>
-        <source>{challenge} - {boss}</source>
-        <translation type="vanished">{challenge} - {boss}</translation>
-    </message>
-    <message>
         <location filename="../../view/home/daily.py" line="1508"/>
         <source>Echo Materials:</source>
         <translation>声骸材料:</translation>
     </message>
     <message>
-        <source>{challenge} - {region}</source>
-        <translation type="vanished">{challenge} - {region}</translation>
-    </message>
-    <message>
         <location filename="../../view/home/daily.py" line="1515"/>
         <source>Weapon and Skill Materials:</source>
         <translation>武器及技能材料:</translation>
-    </message>
-    <message>
-        <source>{challenge} - {weapon} - {region}</source>
-        <translation type="vanished">{challenge} - {weapon} - {region}</translation>
     </message>
     <message>
         <location filename="../../view/home/daily.py" line="1523"/>
@@ -1543,7 +1756,7 @@
 <context>
     <name>EchoMergeWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="222"/>
+        <location filename="../../view/home/echo.py" line="535"/>
         <source>Fuse unlocked Echoes in the inventory, any resolution</source>
         <translation>融合背包内未锁定的声骸，任意分辨率</translation>
     </message>
@@ -1551,7 +1764,7 @@
 <context>
     <name>EchoTask</name>
     <message>
-        <location filename="../../view/home/echo.py" line="38"/>
+        <location filename="../../view/home/echo.py" line="49"/>
         <source>Task: </source>
         <translation>Task: </translation>
     </message>
@@ -1559,17 +1772,17 @@
 <context>
     <name>EchoWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="241"/>
+        <location filename="../../view/home/echo.py" line="554"/>
         <source>Please select the features you want to use.</source>
         <translation>请勾选需要的功能项</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="243"/>
+        <location filename="../../view/home/echo.py" line="556"/>
         <source>Boss Farming:</source>
         <translation>刷BOSS:</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="247"/>
+        <location filename="../../view/home/echo.py" line="560"/>
         <source>Echo Fusion:</source>
         <translation>声骸融合:</translation>
     </message>
