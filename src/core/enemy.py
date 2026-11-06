@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from functools import total_ordering
 from typing import List, Optional
 
 import numpy as np
@@ -66,6 +67,7 @@ class EnemyIcon(Enum):
     Icon5 = "icon5.png"
 
 
+@total_ordering
 class EnemyVersion(Enum):
     """实装版本枚举"""
     # 1.x
@@ -101,6 +103,37 @@ class EnemyVersion(Enum):
     V4_4 = "v4.4"
     V4_5 = "v4.5"
     V4_6 = "v4.6"
+
+    @property
+    def _sort_key(self):
+        # "v3.7" -> (3, 7)，按数值比较，未来 v1.10 / v2.10 也不会错
+        major, minor = self.value.lstrip("v").split(".")
+        return (int(major), int(minor))
+
+    def __lt__(self, other):
+        if isinstance(other, EnemyVersion):
+            return self._sort_key < other._sort_key
+        return NotImplemented
+
+    def __eq__(self, other):
+        if isinstance(other, EnemyVersion):
+            return self._sort_key == other._sort_key
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(self._sort_key)
+
+    def is_v1(self) -> bool:
+        return self._sort_key[0] == 1
+
+    def is_v2(self) -> bool:
+        return self._sort_key[0] == 2
+
+    def is_v3(self) -> bool:
+        return self._sort_key[0] == 3
+
+    def is_v4(self) -> bool:
+        return self._sort_key[0] == 4
 
 
 class SonataEffect(Enum):

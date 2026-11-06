@@ -247,7 +247,7 @@ class ToolbarWidget(QWidget):
 
         self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
         self.updateToolButton.installEventFilter(ToolTipFilter(self.updateToolButton))
-        self.updateToolButton.setToolTip(self.tr('Update'))
+        self.updateToolButton.setToolTip(self.tr('Version update'))
         self.newVersion = ""
         self.updateView = None
 
@@ -594,21 +594,27 @@ class BottomWidget(CardWidget):
         except Exception as e:
             logger.exception(e)
             return tipsText
+
+        skillMaterials = self.tr(r'<b><font color="red">{msg}</font></b>').format(
+            msg=self.tr("Today: Skill Materials Double Drop"))
+        echoMaterials = self.tr(r'<b><font color="red">{msg}</font></b>').format(
+            msg=self.tr("Today: Echo Materials Double Drop"))
+
         if v.major > 3 or v.major == 3 and v.minor >= 7:
             if TimeRange.from_str("2026-10-15 04:00", "2026-10-22 04:00").contains():
-                tipsText = f'<b><font color="red">{self.tr("今日: 双倍养成材料")}</font></b>'
+                tipsText = skillMaterials
                 globalSignal.doubleDropSignal.emit(True)
             elif TimeRange.from_str("2026-11-04 04:00", "2026-11-11 04:00").contains():
-                tipsText = f'<b><font color="red">{self.tr("今日: 双倍声骸材料")}</font></b>'
+                tipsText = echoMaterials
                 globalSignal.doubleDropSignal.emit(False)
             if tipsText:
                 return tipsText
         if v.major > 3 or v.major == 3 and v.minor >= 6:
             if TimeRange.from_str("2026-09-03 04:00", "2026-09-10 04:00").contains():
-                tipsText = f'<b><font color="red">{self.tr("今日: 双倍养成材料")}</font></b>'
+                tipsText = skillMaterials
                 globalSignal.doubleDropSignal.emit(True)
             elif TimeRange.from_str("2026-09-22 04:00", "2026-09-29 04:00").contains():
-                tipsText = f'<b><font color="red">{self.tr("今日: 双倍声骸材料")}</font></b>'
+                tipsText = echoMaterials
                 globalSignal.doubleDropSignal.emit(False)
             if tipsText:
                 return tipsText

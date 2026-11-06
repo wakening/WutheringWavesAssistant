@@ -12,7 +12,7 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
                             SingleDirectionScrollArea, PrimaryPushButton, FluentStyleSheet,
                             LineEdit, SettingCard, ComboBox, ConfigItem,
                             PushButton, ToolButton, MessageBox, SearchLineEdit, TransparentPushButton, ToggleToolButton,
-                            DropDownPushButton, TogglePushButton)
+                            DropDownPushButton, TogglePushButton, ToolTipFilter)
 
 from src.core.enemy import EnemyVersion
 from src.gui.common.config import paramConfig, BossNameEnum
@@ -20,6 +20,7 @@ from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
 from src.gui.common.task import BaseTask, ValidationResult, TaskId
 from src.gui.components.check_box import CheckCard
+from src.gui.components.widgets.exclusive_filter import ExclusiveLiteFilter
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,7 @@ class BossRushTask(EchoTask):
 
 
 class BossRushWidget(QWidget):
+    enemyChanged = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -409,6 +411,7 @@ class BossRushWidget(QWidget):
                 enable=True,
             ),
         ]
+        self.enemyIdMapping = {i.id: i for i in self.enemyList}
 
         self.mainLayout = QVBoxLayout(self)
 
@@ -417,22 +420,20 @@ class BossRushWidget(QWidget):
         self.enemyGroup.setExclusive(True)
 
         self.toolbarLayout = QHBoxLayout()
-        self.bossNameLabel = QLabel(self.tr("BOSS:"), self)
-        self.lineEdit = SearchLineEdit(self)
-        self.lineEdit.setEnabled(False)
-        self.lineEdit.setPlaceholderText(self.tr("In Development"))
-        self.lineEdit.setClearButtonEnabled(True)
+        self.searchEdit = SearchLineEdit(self)
+        self.searchEdit.setPlaceholderText(self.tr("Search"))
+        self.searchEdit.setClearButtonEnabled(True)
+        self.enemyFilter = ExclusiveLiteFilter()
+        self.enemyFilter.addItems(['All', '3.0', '2.0', '1.0'])
 
         self.aboutButton = PushButton(self.tr("About"), self)
 
-        # self.enemyFilter = MultiSelectionLiteFilter()
-        # self.enemyFilter = OutlinedMultiSelectionLiteFilter()
-        # self.enemyFilter.addItems(['All', '3.0', '2.0', '1.0'])
-
         self.checkCards: dict[BossNameEnum, CheckCard] = {}
         for item in self.enemyList:
+            if not item.enable:
+                continue
             checkCard = CheckCard(item.name, parent=self)
-            checkCard.setChecked(item.id == BossNameEnum.Dreamless)
+            checkCard.setChecked(False)
             if item.background or self.latestVersion == item.version:
                 checkCard.setBackground()
             checkCard.setProperty("boss", item.id)
@@ -451,20 +452,20 @@ class BossRushWidget(QWidget):
         self.__loadConfig()
 
     def __initLayout(self):
-        self.lineEdit.setMaximumWidth(300)
+        self.searchEdit.setMaximumWidth(300)
+
+        self.toolbarLayout.addWidget(self.searchEdit)
+        self.toolbarLayout.addSpacing(15)
+        self.toolbarLayout.addWidget(self.enemyFilter)
+        self.toolbarLayout.addWidget(self.aboutButton)
+        self.toolbarLayout.addStretch()
+        self.toolbarLayout.setContentsMargins(0, 0, 0, 0)
 
         for checkCard in self.checkCards.values():
             self.enemyGroup.addButton(checkCard.checkbox)
             self.flowLayout.addWidget(checkCard)
-
         self.flowLayout.setSpacing(0)
         self.flowLayout.setContentsMargins(0, 10, 0, 10)
-
-        self.toolbarLayout.addWidget(self.bossNameLabel)
-        self.toolbarLayout.addWidget(self.lineEdit)
-        self.toolbarLayout.addWidget(self.aboutButton)
-        self.toolbarLayout.setSpacing(8)
-        self.toolbarLayout.addStretch()
 
         self.mainLayout.addLayout(self.toolbarLayout)
         # self.mainLayout.addWidget(self.enemyFilter)
@@ -474,28 +475,72 @@ class BossRushWidget(QWidget):
 
     def __connectSignalToSlot(self):
         for boss, card in self.checkCards.items():
-            card.stateChanged.connect(lambda state, cb=card: self.__on_card_state_changed(cb, state))
+            card.stateChanged.connect(lambda state, cb=card: self.__onCardStateChanged(cb, state))
 
         self.aboutButton.clicked.connect(self.__showAboutFlyout)
+
+        self.enemyFilter.currentTextChanged.connect(self.__onEnemyFilterChanged)
+
+        self.searchEdit.textChanged.connect(self.__onTextChanged)
+        self.searchEdit.clearSignal.connect(self.__onClear)
 
     def __loadConfig(self):
         value = paramConfig.get(paramConfig.bossName)
         # logger.warning(f"{value}")
-        if value and len(value) > 0:
+        if value and len(value) > 0 and self.checkCards.get(value[0]) is not None:
             card = self.checkCards.get(value[0])
-            if len(value) > 1:
-                card.setChecked(True)
-            else:
-                card.blockSignals(True)
-                card.setChecked(True)
-                card.blockSignals(False)
         else:
             card = self.checkCards.get(BossNameEnum.Dreamless)
-            card.setChecked(True)
+        card.blockSignals(True)
+        card.setChecked(True)
+        card.blockSignals(False)
 
-    def __on_card_state_changed(self, cb, state):
+    def __onCardStateChanged(self, cb, state):
         logger.debug(f"checkbox: {cb.checkbox.text()}, isChecked: {cb.checkbox.isChecked()}")
-        paramConfig.set(paramConfig.bossName, [cb.property("boss")])
+        enemyId = cb.property("boss")
+        paramConfig.set(paramConfig.bossName, [enemyId])
+        self.enemyChanged.emit(self.enemyIdMapping.get(enemyId).name or '')
+
+    def __onEnemyFilterChanged(self, text: str):
+        logger.debug(f"__onEnemyFilterChanged: {text}")
+        if not text or text == "All":
+            for id, card in self.checkCards.items():
+                card.setVisible(True)
+        else:
+            for id, card in self.checkCards.items():
+                enemy = self.enemyIdMapping.get(id)
+                if text == "1.0":
+                    card.setVisible(enemy.version.is_v1())
+                    continue
+                if text == "2.0":
+                    card.setVisible(enemy.version.is_v2())
+                    continue
+                if text == "3.0":
+                    card.setVisible(enemy.version.is_v3())
+                    continue
+                card.setVisible(True)
+        self.__refreshFlowlayout()
+
+    def __onTextChanged(self, text: str):
+        logger.debug(f"__onTextChanged: {text}")
+        if not text:
+            if self.enemyFilter.currentItem() == "All":
+                self.__onEnemyFilterChanged("All")
+            else:
+                self.enemyFilter.setCurrentItem("All")
+            return
+        keyword = text.strip().lower()
+        for id, card in self.checkCards.items():
+            enemy = self.enemyIdMapping.get(id)
+            if enemy is None or not enemy.enable or not enemy.name:
+                continue
+            card.setVisible(keyword in enemy.name.lower())
+
+    def __onClear(self):
+        if self.enemyFilter.currentItem() == "All":
+            self.__onEnemyFilterChanged("All")
+        else:
+            self.enemyFilter.setCurrentItem("All")
 
     def __showAboutFlyout(self):
         texts = [
@@ -513,6 +558,9 @@ class BossRushWidget(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
+        self.__refreshFlowlayout()
+
+    def __refreshFlowlayout(self):
         self.flowLayout.invalidate()
         self.flowLayout.activate()
 
@@ -553,8 +601,11 @@ class EchoWidget(ScrollArea):
 
         self.tipsLabel = QLabel(self.tr("Please select the features you want to use."), self.container)
 
+        self.bossRushLayout = QHBoxLayout()
         self.bossRushCheckBox = CheckBox(self.tr("Boss Farming:"), self.container)
         self.bossRushCheckBox.setChecked(True)
+        self.bossNameLabel = QLabel(self.container)
+
         self.bossRushWidget = BossRushWidget(self.container)
 
         self.echoMergeCheckBox = CheckBox(self.tr("Echo Fusion:"), self.container)
@@ -590,9 +641,14 @@ class EchoWidget(ScrollArea):
         self.__loadConfig()
 
     def __initLayout(self):
+        self.bossRushLayout.addWidget(self.bossRushCheckBox)
+        self.bossRushLayout.addSpacing(2)
+        self.bossRushLayout.addWidget(self.bossNameLabel)
+        self.bossRushLayout.addStretch()
+
         self.mainLayout.addWidget(self.tipsLabel)
         self.mainLayout.addSpacing(20)
-        self.mainLayout.addWidget(self.bossRushCheckBox)
+        self.mainLayout.addLayout(self.bossRushLayout)
         self.mainLayout.addWidget(self.bossRushWidget)
         self.mainLayout.addWidget(self.echoMergeCheckBox)
         self.mainLayout.addWidget(self.echoMergeWidget)
@@ -605,6 +661,8 @@ class EchoWidget(ScrollArea):
         self.echoMergeCheckBox.stateChanged.connect(
             lambda _: self.__onTaskChecked(self.echoMergeCheckBox, self.echoMergeWidget.task))
 
+        self.bossRushWidget.enemyChanged.connect(lambda enemyName: self.bossNameLabel.setText(enemyName))
+
     def __onTaskChecked(self, checkbox, currentTask):
         # logger.debug(f"echo __onTaskChecked: {checkbox.isChecked()}, {currentTask}")
         if checkbox.isChecked():
@@ -613,4 +671,6 @@ class EchoWidget(ScrollArea):
             # logger.debug(f"Current task: {self.currentTask}")
 
     def __loadConfig(self):
-        pass
+        enemyIdList = paramConfig.get(paramConfig.bossName)
+        if enemyIdList and (enemy := self.bossRushWidget.enemyIdMapping.get(enemyIdList[0])) and enemy.name:
+            self.bossNameLabel.setText(enemy.name)

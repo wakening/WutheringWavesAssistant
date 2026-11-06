@@ -62,17 +62,17 @@
     <message>
         <location filename="../../view/home_interface.py" line="318"/>
         <source>UHD</source>
-        <translation>UHD 極致</translation>
+        <translation>極致 UHD</translation>
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="319"/>
         <source>HD (Default)</source>
-        <translation>HD 高畫質（預設）</translation>
+        <translation>高清 HD（預設）</translation>
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="320"/>
         <source>SD</source>
-        <translation>SD 流暢</translation>
+        <translation>流暢 SD</translation>
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="324"/>
@@ -98,7 +98,7 @@
 <context>
     <name>BossRushTask</name>
     <message>
-        <location filename="../../view/home/echo.py" line="94"/>
+        <location filename="../../view/home/echo.py" line="95"/>
         <source>Boss: </source>
         <translation>刷Boss: </translation>
     </message>
@@ -106,252 +106,247 @@
 <context>
     <name>BossRushWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="112"/>
+        <location filename="../../view/home/echo.py" line="114"/>
         <source>Suhsin the Inevitable</source>
         <translation>天演溯心</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="119"/>
+        <location filename="../../view/home/echo.py" line="121"/>
         <source>Calamity Effigy</source>
         <translation>天傀劫煞</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="126"/>
+        <location filename="../../view/home/echo.py" line="128"/>
         <source>Thousand-Puppet Pavilion</source>
         <translation>千傀重樓</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="133"/>
+        <location filename="../../view/home/echo.py" line="135"/>
         <source>Myriad Snare: Rustfire Chassis</source>
         <translation>萬囮牢·朽軀</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="140"/>
+        <location filename="../../view/home/echo.py" line="142"/>
         <source>Nightmare: Adam Smasher</source>
         <translation>夢魘亞當·碎骨</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="147"/>
+        <location filename="../../view/home/echo.py" line="149"/>
         <source>Denia</source>
         <translation>達妮婭</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="154"/>
+        <location filename="../../view/home/echo.py" line="156"/>
         <source>Nameless Explorer</source>
         <translation>無銘探索者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="161"/>
+        <location filename="../../view/home/echo.py" line="163"/>
         <source>Sigillum</source>
         <translation>辛吉勒姆</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="168"/>
+        <location filename="../../view/home/echo.py" line="170"/>
         <source>Reactor Husk</source>
         <translation>爐芯機骸</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="175"/>
+        <location filename="../../view/home/echo.py" line="177"/>
         <source>Hyvatia</source>
         <translation>海維夏</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="182"/>
+        <location filename="../../view/home/echo.py" line="184"/>
         <source>Threnodian: Leviathan</source>
         <translation>鳴式·利維亞坦</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="189"/>
+        <location filename="../../view/home/echo.py" line="191"/>
         <source>The False Sovereign</source>
         <translation>偽作的神王</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="196"/>
+        <location filename="../../view/home/echo.py" line="198"/>
         <source>Lady of the Sea</source>
         <translation>海之女</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="203"/>
+        <location filename="../../view/home/echo.py" line="205"/>
         <source>Fenrico</source>
         <translation>芬萊克</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="210"/>
+        <location filename="../../view/home/echo.py" line="212"/>
         <source>Nightmare: Hecate</source>
         <translation>夢魘·赫卡忒</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="217"/>
+        <location filename="../../view/home/echo.py" line="219"/>
         <source>Lioness of Glory</source>
         <translation>榮耀獅像</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="224"/>
+        <location filename="../../view/home/echo.py" line="226"/>
         <source>Nightmare: Kelpie</source>
         <translation>夢魘·凱爾匹</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="231"/>
+        <location filename="../../view/home/echo.py" line="233"/>
         <source>Fleurdelys</source>
         <translation>芙露德莉斯</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="238"/>
+        <location filename="../../view/home/echo.py" line="240"/>
         <source>Nightmare: Lampylumen Myriad</source>
         <translation>夢魘·輝螢軍勢</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="245"/>
+        <location filename="../../view/home/echo.py" line="247"/>
         <source>Nightmare: Mourning Aix</source>
         <translation>夢魘·哀聲鷙</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="252"/>
+        <location filename="../../view/home/echo.py" line="254"/>
         <source>Nightmare: Inferno Rider</source>
         <translation>夢魘·燎照之騎</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="259"/>
+        <location filename="../../view/home/echo.py" line="261"/>
         <source>Nightmare: Crownless</source>
         <translation>夢魘·無冠者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="266"/>
+        <location filename="../../view/home/echo.py" line="268"/>
         <source>Nightmare: Thundering Mephis</source>
         <translation>夢魘·雲閃之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="273"/>
+        <location filename="../../view/home/echo.py" line="275"/>
         <source>Nightmare: Tempest Mephis</source>
         <translation>夢魘·朔雷之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="280"/>
+        <location filename="../../view/home/echo.py" line="282"/>
         <source>Nightmare: Impermanence Heron</source>
         <translation>夢魘·無常凶鷺</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="287"/>
+        <location filename="../../view/home/echo.py" line="289"/>
         <source>Nightmare: Feilian Beringal</source>
         <translation>夢魘·飛廉之猩</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="294"/>
+        <location filename="../../view/home/echo.py" line="296"/>
         <source>Dragon of Dirge</source>
         <translation>嘆息古龍</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="301"/>
+        <location filename="../../view/home/echo.py" line="303"/>
         <source>Lorelei</source>
         <translation>羅蕾萊</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="308"/>
+        <location filename="../../view/home/echo.py" line="310"/>
         <source>Hecate</source>
         <translation>赫卡忒</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="315"/>
+        <location filename="../../view/home/echo.py" line="317"/>
         <source>Sentry Construct</source>
         <translation>異構武裝</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="322"/>
+        <location filename="../../view/home/echo.py" line="324"/>
         <source>Fallacy of No Return</source>
         <translation>無歸的謬誤</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="329"/>
+        <location filename="../../view/home/echo.py" line="331"/>
         <source>Jué</source>
         <translation>角</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="336"/>
+        <location filename="../../view/home/echo.py" line="338"/>
         <source>Crownless</source>
         <translation>無冠者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="343"/>
+        <location filename="../../view/home/echo.py" line="345"/>
         <source>Feilian Beringal</source>
         <translation>飛廉之猩</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="350"/>
+        <location filename="../../view/home/echo.py" line="352"/>
         <source>Tempest Mephis</source>
         <translation>朔雷之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="357"/>
+        <location filename="../../view/home/echo.py" line="359"/>
         <source>Thundering Mephis</source>
         <translation>雲閃之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="364"/>
+        <location filename="../../view/home/echo.py" line="366"/>
         <source>Mourning Aix</source>
         <translation>哀聲鷙</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="371"/>
+        <location filename="../../view/home/echo.py" line="373"/>
         <source>Mech Abomination</source>
         <translation>聚械機偶</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="378"/>
+        <location filename="../../view/home/echo.py" line="380"/>
         <source>Impermanence Heron</source>
         <translation>無常凶鷺</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="385"/>
+        <location filename="../../view/home/echo.py" line="387"/>
         <source>Inferno Rider</source>
         <translation>燎照之騎</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="392"/>
+        <location filename="../../view/home/echo.py" line="394"/>
         <source>Bell-Borne Geochelone</source>
         <translation>鳴鐘之龜</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="399"/>
+        <location filename="../../view/home/echo.py" line="401"/>
         <source>Lampylumen Myriad</source>
         <translation>輝螢軍勢</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="406"/>
+        <location filename="../../view/home/echo.py" line="408"/>
         <source>Dreamless</source>
         <translation>無妄者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="420"/>
-        <source>BOSS:</source>
-        <translation>BOSS:</translation>
+        <location filename="../../view/home/echo.py" line="424"/>
+        <source>Search</source>
+        <translation>搜尋</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="423"/>
-        <source>In Development</source>
-        <translation>開發中</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/echo.py" line="426"/>
+        <location filename="../../view/home/echo.py" line="429"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="502"/>
+        <location filename="../../view/home/echo.py" line="547"/>
         <source>任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="503"/>
+        <location filename="../../view/home/echo.py" line="548"/>
         <source>若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="504"/>
+        <location filename="../../view/home/echo.py" line="549"/>
         <source>萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="508"/>
+        <location filename="../../view/home/echo.py" line="553"/>
         <source>About:</source>
         <translation>關於:</translation>
     </message>
@@ -367,6 +362,22 @@
         <location filename="../../view/home_interface.py" line="541"/>
         <source>Validate: </source>
         <translation>Validate: </translation>
+    </message>
+    <message>
+        <location filename="../../view/home_interface.py" line="598"/>
+        <location filename="../../view/home_interface.py" line="600"/>
+        <source>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;{msg}&lt;/font&gt;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;{msg}&lt;/font&gt;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../view/home_interface.py" line="599"/>
+        <source>Today: Skill Materials Double Drop</source>
+        <translation>今日：雙倍養成材料</translation>
+    </message>
+    <message>
+        <location filename="../../view/home_interface.py" line="601"/>
+        <source>Today: Echo Materials Double Drop</source>
+        <translation>今日：雙倍聲骸材料</translation>
     </message>
 </context>
 <context>
@@ -1394,7 +1405,7 @@
     <message>
         <location filename="../../view/home/daily.py" line="814"/>
         <source>Lily</source>
-        <translation type="unfinished"></translation>
+        <translation>莉莉</translation>
     </message>
     <message>
         <location filename="../../view/home/daily.py" line="826"/>
@@ -1761,7 +1772,7 @@
 <context>
     <name>EchoMergeWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="535"/>
+        <location filename="../../view/home/echo.py" line="583"/>
         <source>Fuse unlocked Echoes in the inventory, any resolution</source>
         <translation>融合背包內未鎖定的聲骸，支援任何解析度</translation>
     </message>
@@ -1769,7 +1780,7 @@
 <context>
     <name>EchoTask</name>
     <message>
-        <location filename="../../view/home/echo.py" line="49"/>
+        <location filename="../../view/home/echo.py" line="50"/>
         <source>Task: </source>
         <translation>Task: </translation>
     </message>
@@ -1777,17 +1788,17 @@
 <context>
     <name>EchoWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="554"/>
+        <location filename="../../view/home/echo.py" line="602"/>
         <source>Please select the features you want to use.</source>
         <translation>請勾選所需的功能項目</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="556"/>
+        <location filename="../../view/home/echo.py" line="605"/>
         <source>Boss Farming:</source>
         <translation>刷BOSS:</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="560"/>
+        <location filename="../../view/home/echo.py" line="611"/>
         <source>Echo Fusion:</source>
         <translation>聲骸融合:</translation>
     </message>
@@ -1883,197 +1894,197 @@
 <context>
     <name>GameSettingsWidget</name>
     <message>
-        <location filename="../../view/home/game_settings.py" line="204"/>
+        <location filename="../../view/home/game_settings.py" line="48"/>
         <source>Game Settings</source>
         <translation>遊戲設定</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="205"/>
+        <location filename="../../view/home/game_settings.py" line="49"/>
         <source>Click the button to edit. Please make sure it matches the in-game settings.</source>
         <translation>點擊按鍵進行修改，請與遊戲內的設定保持一致</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="223"/>
+        <location filename="../../view/home/game_settings.py" line="63"/>
         <source>Movement:</source>
         <translation>移動:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="225"/>
+        <location filename="../../view/home/game_settings.py" line="65"/>
         <source>Move forward:</source>
         <translation>前:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="225"/>
+        <location filename="../../view/home/game_settings.py" line="65"/>
         <source>Move forward</source>
         <translation>前</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="226"/>
+        <location filename="../../view/home/game_settings.py" line="66"/>
         <source>Move backward:</source>
         <translation>後:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="226"/>
+        <location filename="../../view/home/game_settings.py" line="66"/>
         <source>Move backward</source>
         <translation>後</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="227"/>
+        <location filename="../../view/home/game_settings.py" line="67"/>
         <source>Move left:</source>
         <translation>左:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="227"/>
+        <location filename="../../view/home/game_settings.py" line="67"/>
         <source>Move left</source>
         <translation>左</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="228"/>
+        <location filename="../../view/home/game_settings.py" line="68"/>
         <source>Move right:</source>
         <translation>右:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="228"/>
+        <location filename="../../view/home/game_settings.py" line="68"/>
         <source>Move right</source>
         <translation>右</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="230"/>
+        <location filename="../../view/home/game_settings.py" line="70"/>
         <source>Skill:</source>
         <translation>技能:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="232"/>
+        <location filename="../../view/home/game_settings.py" line="72"/>
         <source>Resonance Skill:</source>
         <translation>共鳴技能:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="232"/>
+        <location filename="../../view/home/game_settings.py" line="72"/>
         <source>Resonance Skill</source>
         <translation>共鳴技能</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="233"/>
+        <location filename="../../view/home/game_settings.py" line="73"/>
         <source>Echo Skill:</source>
         <translation>聲骸技能:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="233"/>
+        <location filename="../../view/home/game_settings.py" line="73"/>
         <source>Echo Skill</source>
         <translation>聲骸技能</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="234"/>
+        <location filename="../../view/home/game_settings.py" line="74"/>
         <source>Resonance Liberation:</source>
         <translation>共鳴解放:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="234"/>
+        <location filename="../../view/home/game_settings.py" line="74"/>
         <source>Resonance Liberation</source>
         <translation>共鳴解放</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="236"/>
+        <location filename="../../view/home/game_settings.py" line="76"/>
         <source>Member:</source>
         <translation>編隊:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="238"/>
+        <location filename="../../view/home/game_settings.py" line="78"/>
         <source>Member 1:</source>
         <translation>切換隊員1:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="238"/>
+        <location filename="../../view/home/game_settings.py" line="78"/>
         <source>Switch to Team Member 1</source>
         <translation>切換編隊1號隊員</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="239"/>
+        <location filename="../../view/home/game_settings.py" line="79"/>
         <source>Member 2:</source>
         <translation>切換隊員2:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="239"/>
+        <location filename="../../view/home/game_settings.py" line="79"/>
         <source>Switch to Team Member 2</source>
         <translation>切換編隊2號隊員</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="240"/>
+        <location filename="../../view/home/game_settings.py" line="80"/>
         <source>Member 3:</source>
         <translation>切換隊員3:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="240"/>
+        <location filename="../../view/home/game_settings.py" line="80"/>
         <source>Switch to Team Member 3</source>
         <translation>切換編隊3號隊員</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="241"/>
+        <location filename="../../view/home/game_settings.py" line="81"/>
         <source>Member 4:</source>
         <translation>切換隊員4:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="241"/>
+        <location filename="../../view/home/game_settings.py" line="81"/>
         <source>Switch to Team Member 4</source>
         <translation>切換編隊4號隊員</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="243"/>
+        <location filename="../../view/home/game_settings.py" line="83"/>
         <source>Other:</source>
         <translation>其他:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="245"/>
+        <location filename="../../view/home/game_settings.py" line="85"/>
         <source>Jump:</source>
         <translation>跳躍:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="245"/>
+        <location filename="../../view/home/game_settings.py" line="85"/>
         <source>Jump</source>
         <translation>跳躍</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="246"/>
+        <location filename="../../view/home/game_settings.py" line="86"/>
         <source>Pick Up/Interact:</source>
         <translation>拾取/交互:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="246"/>
+        <location filename="../../view/home/game_settings.py" line="86"/>
         <source>Pick Up/Interact</source>
         <translation>拾取/交互</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="247"/>
+        <location filename="../../view/home/game_settings.py" line="87"/>
         <source>Use Utility:</source>
         <translation>探索工具:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="247"/>
+        <location filename="../../view/home/game_settings.py" line="87"/>
         <source>Use Utility</source>
         <translation>探索工具</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="248"/>
+        <location filename="../../view/home/game_settings.py" line="88"/>
         <source>Map:</source>
         <translation>地圖:</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="248"/>
+        <location filename="../../view/home/game_settings.py" line="88"/>
         <source>Map</source>
         <translation>地圖</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="273"/>
+        <location filename="../../view/home/game_settings.py" line="113"/>
         <source>Reset All Keybinds</source>
         <translation>重設所有按鍵</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="404"/>
+        <location filename="../../view/home/game_settings.py" line="244"/>
         <source>Note</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../view/home/game_settings.py" line="405"/>
+        <location filename="../../view/home/game_settings.py" line="245"/>
         <source>Are you sure you want to reset the key bindings to defaults?</source>
         <translation>確定要將所有按鍵綁定重設為預設值？</translation>
     </message>
@@ -2608,8 +2619,8 @@
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="250"/>
-        <source>Update</source>
-        <translation>更新</translation>
+        <source>Version update</source>
+        <translation>版本更新</translation>
     </message>
 </context>
 <context>
