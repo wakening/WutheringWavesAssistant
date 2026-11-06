@@ -482,6 +482,7 @@ class BossRushWidget(QWidget):
         self.enemyFilter.currentTextChanged.connect(self.__onEnemyFilterChanged)
 
         self.searchEdit.textChanged.connect(self.__onTextChanged)
+        self.searchEdit.searchSignal.connect(self.__onTextChanged)
         self.searchEdit.clearSignal.connect(self.__onClear)
 
     def __loadConfig(self):
@@ -535,6 +536,7 @@ class BossRushWidget(QWidget):
             if enemy is None or not enemy.enable or not enemy.name:
                 continue
             card.setVisible(keyword in enemy.name.lower())
+        self.__refreshFlowlayout()
 
     def __onClear(self):
         if self.enemyFilter.currentItem() == "All":
