@@ -96,8 +96,7 @@ class ToolBar(QWidget):
 
             self.themeButton.installEventFilter(ToolTipFilter(self.themeButton))
             self.supportButton.installEventFilter(ToolTipFilter(self.supportButton))
-            self.feedbackButton.installEventFilter(
-                ToolTipFilter(self.feedbackButton))
+            self.feedbackButton.installEventFilter(ToolTipFilter(self.feedbackButton))
             self.themeButton.setToolTip(self.tr('Toggle theme'))
             self.supportButton.setToolTip(self.tr('Support me'))
             self.feedbackButton.setToolTip(self.tr('Send feedback'))

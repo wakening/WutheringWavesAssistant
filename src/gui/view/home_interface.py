@@ -80,15 +80,17 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.version = version
         self.new_version = new_version
 
-        self.vBoxLayout = QVBoxLayout(self)
+        self.mainLayout = QVBoxLayout(self)
 
         self.titleLayout = QHBoxLayout()
         if self.new_version:
-            title = f'{self.tr('有新版本')} {self.version} -> <span style="color: red;">{self.new_version}</span>'
+            title = self.tr(r"{update} {version} -> <span style=\"color: red;\">{new_version}</span>").format(
+                update=self.tr('New version available:'), version=self.version, new_version=self.new_version)
         else:
-            title = f'{self.tr('暂无更新')} {self.version}'
+            title = self.tr(r"{update} {version}").format(update=self.tr('Up to date'), version=self.version)
         self.titleDownload = TransparentToolButton(FluentIcon.DOWNLOAD, self)
-        self.titleDownload.setToolTip(self.tr('Download'))
+        self.titleDownload.installEventFilter(ToolTipFilter(self.titleDownload))
+        self.titleDownload.setToolTip(self.tr('View Downloads'))
         self.titleLabel = QLabel(self.tr(title), self)
 
         # 更新日志
@@ -104,9 +106,13 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.channelLabel = QLabel(self.tr("Select update channel: "), self)
         self.channelFlowlayout = FlowLayout()
         self.githubCheckBox = CheckBox(self.tr("GitHub"), self)
+        self.githubCheckBox.installEventFilter(ToolTipFilter(self.githubCheckBox))
+        self.githubCheckBox.setToolTip(self.tr("Primary Repository"))
         self.tencentCheckBox = CheckBox(self.tr("CN-Tencent"), self)
+        self.tencentCheckBox.installEventFilter(ToolTipFilter(self.tencentCheckBox))
         self.tencentCheckBox.setToolTip(self.tr("China mirror"))
         self.atomGitCheckBox = CheckBox(self.tr("CN-AtomGit"), self)
+        self.atomGitCheckBox.installEventFilter(ToolTipFilter(self.atomGitCheckBox))
         self.atomGitCheckBox.setToolTip(self.tr("China mirror"))
 
         self.buttonGroup = QButtonGroup(self)
@@ -115,16 +121,18 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.buttonGroup.addButton(self.atomGitCheckBox)
         self.buttonGroup.setExclusive(True)
 
-        self.channelTipLabel = QLabel(self.tr('For users in China, select the CN source for updates. Please report any issues you encounter.'), self)
+        self.channelTipLabel = QLabel(self.tr('For users in China, select the CN source for updates. Please report any issues you encounter.'), self, wordWrap=True)
 
         self.buttonLayout = QHBoxLayout()
         self.confirmButton = PrimaryPushButton(self.tr('Restart to update'), self)
+        self.confirmButton.installEventFilter(ToolTipFilter(self.confirmButton))
         self.confirmButton.setToolTip(self.tr('Script restart required'))
         self.cancelButton = PushButton(self.tr('Cancel'), self)
 
         self.__initWidgets()
 
     def __initWidgets(self):
+        self.setFixedWidth(350)
         self.titleLabel.setObjectName('titleLabel')
         # self.contentLabel.setObjectName('contentLabel')
         FluentStyleSheet.TEACHING_TIP.apply(self)
@@ -162,14 +170,14 @@ class UpdateFlyoutView(FlyoutViewBase):
         self.buttonLayout.addWidget(self.confirmButton)
         self.buttonLayout.addWidget(self.cancelButton)
 
-        self.vBoxLayout.setSpacing(12)
-        self.vBoxLayout.setContentsMargins(20, 16, 20, 16)
-        self.vBoxLayout.addLayout(self.titleLayout)
-        self.vBoxLayout.addWidget(self.changelogScrollArea)
-        self.vBoxLayout.addLayout(self.channelLayout)
-        self.vBoxLayout.addWidget(self.channelTipLabel)
-        self.vBoxLayout.addSpacing(10)
-        self.vBoxLayout.addLayout(self.buttonLayout)
+        self.mainLayout.setSpacing(12)
+        self.mainLayout.setContentsMargins(20, 16, 20, 16)
+        self.mainLayout.addLayout(self.titleLayout)
+        self.mainLayout.addWidget(self.changelogScrollArea)
+        self.mainLayout.addLayout(self.channelLayout)
+        self.mainLayout.addWidget(self.channelTipLabel)
+        self.mainLayout.addSpacing(10)
+        self.mainLayout.addLayout(self.buttonLayout)
 
     def __connectSignalToSlot(self):
         self.titleDownload.clicked.connect(
@@ -234,9 +242,11 @@ class ToolbarWidget(QWidget):
         self.mainLayout = QHBoxLayout(self)
 
         self.themeButton = TransparentToolButton(FluentIcon.CONSTRACT, self)
+        self.themeButton.installEventFilter(ToolTipFilter(self.themeButton))
         self.themeButton.setToolTip(self.tr('Toggle theme'))
 
         self.updateToolButton = TransparentToolButton(FluentIcon.RINGER, self)
+        self.updateToolButton.installEventFilter(ToolTipFilter(self.updateToolButton))
         self.updateToolButton.setToolTip(self.tr('Update'))
         self.newVersion = ""
         self.updateView = None
@@ -244,9 +254,6 @@ class ToolbarWidget(QWidget):
         self.__initWidget()
 
     def __initWidget(self):
-        self.themeButton.installEventFilter(ToolTipFilter(self.themeButton))
-        self.updateToolButton.installEventFilter(ToolTipFilter(self.updateToolButton))
-
         # initialize layout
         self.__initLayout()
         self.__connectSignalToSlot()

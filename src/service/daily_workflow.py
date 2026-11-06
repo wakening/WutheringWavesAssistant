@@ -979,8 +979,9 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.snapshot()
                 if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-                if not (
-                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                # 找直接挑战
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
                     continue
                 challenge_list.sort(key=lambda x: x.y1)
                 if dungeon_text[0].y1 > challenge_list[-1].y2:
@@ -1242,8 +1243,9 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.snapshot()
                 if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-                if not (
-                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                # 找直接挑战
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
                     continue
                 challenge_list.sort(key=lambda x: x.y1)
                 if dungeon_text[0].y1 > challenge_list[-1].y2:
@@ -1433,6 +1435,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
             break
         dungeon_name = ctx.tr(dungeon.id)
+        logger.info(f"{dungeon_name.raw}")
         cost = dungeon.waveplate or 60
 
         def _fail():
@@ -1490,7 +1493,9 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.snapshot()
                 if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-                if not (challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                # 找直接挑战
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
                     continue
                 challenge_list.sort(key=lambda x: x.y1)
                 if dungeon_text[0].y1 > challenge_list[-1].y2:
@@ -1763,8 +1768,9 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.snapshot()
                 if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-                if not (
-                challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
+                # 找直接挑战
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
                     continue
                 challenge_list.sort(key=lambda x: x.y1)
                 if dungeon_text[0].y1 > challenge_list[-1].y2:
@@ -2020,7 +2026,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 # 找副本名
                 if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
                     continue
-                # 找前往
+                # 找直接挑战
                 challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
                 if not challenge_list:
                     continue

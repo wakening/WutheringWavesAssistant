@@ -731,6 +731,7 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     roiex = RoiEx(ctx)
     enemy = local.enemy
     enemy_name = ctx.tr(local.enemy.id)
+    dungeon_name = ctx.tr(enemy.quick_boss_meta.dungeon_name)
     menu = ctx.tr(enemy.quick_boss_meta.menu)
     logger.debug(f"Enemy: {enemy_name.raw}")
 
@@ -749,9 +750,9 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             ui.sleep(0.2).snapshot()
         else:
             ui.snapshot()
-        if not (enemy_text := ui.search(enemy_name, roiex.guidebook_content)):
+        if not (enemy_text := ui.search(dungeon_name, roiex.guidebook_content)):
             continue
-        if not (challenge_list := ui.search(ctx.tr(I18nText.Challenge), roiex.guidebook_content)):
+        if not (challenge_list := ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)):
             continue
         challenge_list.sort(key=lambda x: x.y1)
         if enemy_text[0].y1 > challenge_list[-1].y2:
@@ -761,6 +762,11 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
         if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
             continue
+        # 检查是否解锁
+        if challenge_text and not re.search(ctx.tr(I18nText.Challenge), challenge_text.text, re.I):
+            logger.warning(f"Unlock dungeon: {dungeon_name.raw}")
+            return False
+        # 点击直接挑战
         ui.click_bbox(challenge_text, times=2, interval=0.3)
 
         # 点击提示弹窗

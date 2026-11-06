@@ -788,7 +788,7 @@ def match_remaining_attempts(result: list[TextBox] | None) -> tuple[Optional[int
     try:
         # 本周剩余可收取次数: 3/3
         logger.info(f"{result[0].text}", stacklevel=2)
-        match = re.search(r"([0-9o])/(\d)", result[0].text, flags=re.I)
+        match = re.search(r"([0-9o]{1,2})/(\d{1,2})", result[0].text, flags=re.I)
         if not match:
             return None, None
         logger.debug(f"match: {match.group(0)}")

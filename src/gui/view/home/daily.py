@@ -807,8 +807,20 @@ class DailyWidget(ScrollArea):
         self.nightmarePurificationList = [
         ]
 
-        # 培养目标
+        # 培养目标，保持与游戏内一致
         self.resonatorList = [
+            QResonator(
+                id=I18nText.Lily,
+                name=self.tr("Lily"),
+                weeklyChallenge='',
+                tacetSuppression=[],
+                forgeryChallenge=[],
+                bossChallenge='',
+                gather='',
+                tacetDiscordNest=[],
+                nightmarePurification=[],
+                enable=False,
+            ),
             QResonator(
                 id=I18nText.Suoming,
                 name=self.tr("Suoming"),
