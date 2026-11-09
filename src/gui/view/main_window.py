@@ -155,13 +155,14 @@ class MainWindow(FluentWindow):
             QDesktopServices.openUrl(QUrl(EN_SUPPORT_URL))
 
     def windowResize(self):
-        windowSize = cfg.get(cfg.windowSize)
-        if windowSize == "Default":
-            windowSize = (1280, 800)
-            # windowSize = (1080, 760)
-        else:
-            window_wh = windowSize.split("x")
-            windowSize = (int(window_wh[0]), int(window_wh[1]))
+        windowSize = (1280, 800)
+        # windowSize = cfg.get(cfg.windowSize)
+        # if windowSize == "Default":
+        #     windowSize = (1280, 800)
+        #     # windowSize = (1080, 760)
+        # else:
+        #     window_wh = windowSize.split("x")
+        #     windowSize = (int(window_wh[0]), int(window_wh[1]))
         self.resize(*windowSize)
         self.alignWindowToCenter()
 

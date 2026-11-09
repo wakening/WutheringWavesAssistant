@@ -12,11 +12,11 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
                             SingleDirectionScrollArea, PrimaryPushButton, FluentStyleSheet,
                             LineEdit, SettingCard, ComboBox, ConfigItem,
                             PushButton, ToolButton, MessageBox, SearchLineEdit, TransparentPushButton, ToggleToolButton,
-                            DropDownPushButton, TogglePushButton, ToolTipFilter)
+                            DropDownPushButton, TogglePushButton, ToolTipFilter, SimpleCardWidget)
 
 from src.core.enemy import EnemyVersion
 from src.gui.common.config import paramConfig, BossNameEnum
-from src.gui.common.globals import globalParam, globalSignal
+from src.gui.common.globals import globalSignal
 from src.gui.common.style_sheet import StyleSheet
 from src.gui.common.task import BaseTask, ValidationResult, TaskId
 from src.gui.components.check_box import CheckCard
@@ -104,6 +104,7 @@ class BossRushWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        # self.setBorderRadius(18)
 
         self.task = BossRushTask(self)
 
@@ -427,6 +428,7 @@ class BossRushWidget(QWidget):
         self.enemyFilter.addItems(['All', '3.0', '2.0', '1.0'])
 
         self.aboutButton = PushButton(self.tr("About"), self)
+        self.aboutButton.setVisible(False)
 
         self.checkCards: dict[BossNameEnum, CheckCard] = {}
         for item in self.enemyList:
@@ -468,7 +470,6 @@ class BossRushWidget(QWidget):
         self.flowLayout.setContentsMargins(0, 10, 0, 10)
 
         self.mainLayout.addLayout(self.toolbarLayout)
-        # self.mainLayout.addWidget(self.enemyFilter)
         self.mainLayout.addLayout(self.flowLayout)
         self.mainLayout.addStretch()
         self.mainLayout.setContentsMargins(16, 10, 16, 10)

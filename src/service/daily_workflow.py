@@ -647,6 +647,7 @@ def doActivityDaily(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     fsm = local.activityDailyFSM
     if fsm.is_terminal:
         return True
+    logger.info(f"{ctx.tr(fsm.name).raw}")
 
     def _fail():
         # ui.esc().sleep(1)
@@ -712,6 +713,7 @@ def doActivityWeekly(ctx: NodeContext, local: TaskLocal, **kwargs) -> Optional[b
     fsm = local.activityWeeklyFSM
     if fsm.is_terminal:
         return True
+    logger.info(f"{ctx.tr(fsm.name).raw}")
 
     def _fail():
         # ui.esc().sleep(1)
@@ -1994,6 +1996,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
         # 检查当前副本状态
         if fsm.is_terminal:
             continue
+        logger.info(f"{ctx.tr(fsm.name).raw}")
         if not fsm.start():
             fsm.fail()
             continue
@@ -2003,8 +2006,6 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             fsm.fail()
             continue
         dungeon_name = ctx.tr(dungeon.id)
-
-        logger.info(f"{dungeon_name.raw}")
 
         def _fail():
             ui.esc().sleep(1.2)
@@ -2339,6 +2340,7 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 def doMail(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
     if local.mailFSM.is_terminal:
         return True
+    logger.info(f"{ctx.tr(local.mailFSM.name).raw}")
     local.mailFSM.start()
 
     ui = UIOp(ctx)

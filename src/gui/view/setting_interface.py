@@ -5,7 +5,7 @@ from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSetti
                             OptionsSettingCard, PushSettingCard,
                             HyperlinkCard, PrimaryPushSettingCard, ScrollArea,
                             ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
-                            setTheme, setThemeColor, RangeSettingCard, isDarkTheme)
+                            setTheme, setThemeColor, RangeSettingCard, isDarkTheme, Dialog, MessageBox)
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import InfoBar
 from PySide6.QtCore import Qt, Signal, QUrl, QStandardPaths
@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
 
 from ..common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL, \
     VERSION_URLS
+from ..common.globals import globalSignal
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.version_control import RemoteVersion
@@ -44,7 +45,7 @@ class SettingInterface(ScrollArea):
         #     cfg.micaEnabled,
         #     self.personalGroup
         # )
-        self.themeCard = OptionsSettingCard(
+        self.themeCard = ComboBoxSettingCard(
             cfg.themeMode,
             FIF.BRUSH,
             self.tr('Application theme'),
@@ -61,12 +62,12 @@ class SettingInterface(ScrollArea):
             self.tr("Window size"),
             self.tr("Adjust window size"),
             texts=[
-                "720x720",
+                # "720x720",
                 self.tr("Default"),
             ],
             parent=self.personalGroup
         )
-        self.zoomCard = OptionsSettingCard(
+        self.zoomCard = ComboBoxSettingCard(
             cfg.dpiScale,
             FIF.ZOOM,
             self.tr("Interface zoom"),
@@ -128,6 +129,8 @@ class SettingInterface(ScrollArea):
 
         self.__initWidget()
 
+        self.windowSizeCard.setVisible(False)
+
     def __initWidget(self):
         self.resize(1000, 800)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -172,12 +175,13 @@ class SettingInterface(ScrollArea):
 
     def __showRestartTooltip(self):
         """ show restart tooltip """
-        InfoBar.success(
-            self.tr('Updated successfully'),
-            self.tr('Configuration takes effect after restart'),
-            duration=2500,
-            parent=self
+        w = MessageBox(
+            self.tr('Restart Required'),
+            self.tr('This change requires a restart. Restart now?'),
+            self.window()
         )
+        if w.exec():
+            globalSignal.sysExitSignal.emit(200)
 
     def __connectSignalToSlot(self):
         """ connect signal to slot """

@@ -684,6 +684,8 @@ class HomeV2Interface(ScrollArea):
         self.__connectSignalToSlot()
 
     def __initLayout(self):
+        # self.setStyleSheet("border: 2px solid red;")
+
         self.topLayout.addWidget(self.banner, 1)
         # self.topLayout.addStretch()
         self.topLayout.addWidget(self.toolbarWidget)
@@ -693,7 +695,7 @@ class HomeV2Interface(ScrollArea):
         self.middleLayout.setContentsMargins(6, 0, 0, 0)
 
         self.mainLayout.addLayout(self.topLayout)
-        self.mainLayout.addSpacing(12)
+        self.mainLayout.addSpacing(10)
         self.mainLayout.addLayout(self.middleLayout, 1)
         self.mainLayout.addWidget(self.bottomWidget)
         self.mainLayout.setContentsMargins(36, 18, 16, 8)

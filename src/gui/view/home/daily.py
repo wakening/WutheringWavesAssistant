@@ -141,10 +141,7 @@ class DailyWidget(ScrollArea):
         self.task = DailyTask(self)
 
         self.container = QWidget(self)
-        self.mainLayout = QHBoxLayout(self.container)
-
-        self.contentLayout = QVBoxLayout()
-        # self.contentTitleLabel = QLabel(self.tr("任务设置:"), self.container)
+        self.mainLayout = QVBoxLayout(self.container)
 
         self.waveplateLabel = QLabel(self.tr("Waveplates:"), self.container)
         self.nestLabel = QLabel(self.tr("Nest:"), self.container)
@@ -609,147 +606,147 @@ class DailyWidget(ScrollArea):
         self.tacetSuppressionList = [
             QTacetSuppression(
                 id=I18nText.TacetFieldHeartOfStillness,
-                name=self.tr("Heart of Stillness"),
+                name=self.tr("Heart of Stillness", "Tacet Field"),
                 region=self.mengzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldHeartOfFlames,
-                name=self.tr("Heart of Flames"),
+                name=self.tr("Heart of Flames", "Tacet Field"),
                 region=self.mengzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.WesternFangPeaksTacetField,
-                name=self.tr("Western Fang Peaks"),
+                name=self.tr("Western Fang Peaks", "Tacet Field"),
                 region=self.mengzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.EasternXuanPeaksTacetField,
-                name=self.tr("Eastern Xuan Peaks"),
+                name=self.tr("Eastern Xuan Peaks", "Tacet Field"),
                 region=self.mengzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldSolisiaLanding,
-                name=self.tr("Solisia Landing"),
+                name=self.tr("Solisia Landing", "Tacet Field"),
                 region=self.lahaiRoi,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldFrostlandsTransitPort,
-                name=self.tr("Frostlands Transit Port"),
+                name=self.tr("Frostlands Transit Port", "Tacet Field"),
                 region=self.lahaiRoi,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldMountGjallar,
-                name=self.tr("Mount Gjallar"),
+                name=self.tr("Mount Gjallar", "Tacet Field"),
                 region=self.lahaiRoi,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldMawburrowDesert,
-                name=self.tr("Mawburrow Desert"),
+                name=self.tr("Mawburrow Desert", "Tacet Field"),
                 region=self.lahaiRoi,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldStagnantRun,
-                name=self.tr("Stagnant Run"),
+                name=self.tr("Stagnant Run", "Tacet Field"),
                 region=self.lahaiRoi,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldMournfellCanyon,
-                name=self.tr("Mournfell Canyon"),
+                name=self.tr("Mournfell Canyon", "Tacet Field"),
                 region=self.rinascita,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldBeohrWaters,
-                name=self.tr("Beohr Waters"),
+                name=self.tr("Beohr Waters", "Tacet Field"),
                 region=self.rinascita,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldRiccioliIslands,
-                name=self.tr("Riccioli Islands"),
+                name=self.tr("Riccioli Islands", "Tacet Field"),
                 region=self.rinascita,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldFagaceaePeninsula,
-                name=self.tr("Fagaceae Peninsula"),
+                name=self.tr("Fagaceae Peninsula", "Tacet Field"),
                 region=self.rinascita,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldPenitentsEnd,
-                name=self.tr("Penitent's End"),
+                name=self.tr("Penitent's End", "Tacet Field"),
                 region=self.rinascita,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldCentralPlains,
-                name=self.tr("Central Plains"),
+                name=self.tr("Central Plains", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldDesorockHighlandI,
-                name=self.tr("Desorock Highland I"),
+                name=self.tr("Desorock Highland I", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=False,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldTigersMaw,
-                name=self.tr("Tiger's Maw"),
+                name=self.tr("Tiger's Maw", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldWhiningAixsMire,
-                name=self.tr("Whining Aix's Mire"),
+                name=self.tr("Whining Aix's Mire", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldPortCityOfGuixu,
-                name=self.tr("Port City of Guixu"),
+                name=self.tr("Port City of Guixu", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=True,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldDesorockHighlandII,
-                name=self.tr("Desorock Highland II"),
+                name=self.tr("Desorock Highland II", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=False,
             ),
             QTacetSuppression(
                 id=I18nText.TacetFieldDimForest,
-                name=self.tr("Dim Forest"),
+                name=self.tr("Dim Forest", "Tacet Field"),
                 region=self.jinzhou,
                 rewards=[],
                 enable=True,
@@ -760,7 +757,7 @@ class DailyWidget(ScrollArea):
         self.tacetDiscordNestMengzhou = [
             QTacetDiscordNest(
                 id=I18nText.SimulacrumNexusTacetDiscordNest,
-                name=self.tr("Simulacrum Nexus"),
+                name=self.tr("Simulacrum Nexus", "Tacet Discord Nest"),
                 region_id=I18nText.Mengzhou,
                 region=self.mengzhou,
                 rewards=[],
@@ -768,7 +765,7 @@ class DailyWidget(ScrollArea):
             ),
             QTacetDiscordNest(
                 id=I18nText.SouthernYuanHillsTacetDiscordNest,
-                name=self.tr("Southern Yuan Hills"),
+                name=self.tr("Southern Yuan Hills", "Tacet Discord Nest"),
                 region_id=I18nText.Mengzhou,
                 region=self.mengzhou,
                 rewards=[],
@@ -779,7 +776,7 @@ class DailyWidget(ScrollArea):
         self.tacetDiscordNestLahaiRoi = [
             QTacetDiscordNest(
                 id=I18nText.StarblindCrashsiteTacetDiscordNest,
-                name=self.tr("Starblind Crashsite"),
+                name=self.tr("Starblind Crashsite", "Tacet Discord Nest"),
                 region_id=I18nText.LahaiRoi,
                 region=self.lahaiRoi,
                 rewards=[],
@@ -787,7 +784,7 @@ class DailyWidget(ScrollArea):
             ),
             QTacetDiscordNest(
                 id=I18nText.RebirthUplandsTacetDiscordNest,
-                name=self.tr("Rebirth Uplands"),
+                name=self.tr("Rebirth Uplands", "Tacet Discord Nest"),
                 region_id=I18nText.LahaiRoi,
                 region=self.lahaiRoi,
                 rewards=[],
@@ -795,7 +792,7 @@ class DailyWidget(ScrollArea):
             ),
             QTacetDiscordNest(
                 id=I18nText.StagnantRunTacetDiscordNest,
-                name=self.tr("Stagnant Run"),
+                name=self.tr("Stagnant Run", "Tacet Discord Nest"),
                 region_id=I18nText.LahaiRoi,
                 region=self.lahaiRoi,
                 rewards=[],
@@ -825,11 +822,11 @@ class DailyWidget(ScrollArea):
                 id=I18nText.Suoming,
                 name=self.tr("Suoming"),
                 weeklyChallenge=self.tr("Suhsin the Inevitable"),
-                tacetSuppression=[self.tr("Heart of Stillness"), self.tr("Heart of Flames")],
+                tacetSuppression=[self.tr("Heart of Stillness", "Tacet Field"), self.tr("Heart of Flames", "Tacet Field")],
                 forgeryChallenge=[self.tr("Wingfall Chasm"), self.tr("Fallen Sanctum")],
                 bossChallenge=self.tr("Calamity Effigy"),
                 gather=self.tr("Miasmic Branch"),
-                tacetDiscordNest=[self.tr("Simulacrum Nexus")],
+                tacetDiscordNest=[self.tr("Simulacrum Nexus", "Tacet Discord Nest")],
                 nightmarePurification=[],
                 enable=True,
             ),
@@ -837,11 +834,11 @@ class DailyWidget(ScrollArea):
                 id=I18nText.Hsin,
                 name=self.tr("Hsin"),
                 weeklyChallenge=self.tr("Suhsin the Inevitable"),
-                tacetSuppression=[self.tr("Heart of Stillness"), self.tr("Heart of Flames")],
+                tacetSuppression=[self.tr("Heart of Stillness", "Tacet Field"), self.tr("Heart of Flames", "Tacet Field")],
                 forgeryChallenge=[self.tr("Silent Chasm"), self.tr("Lesson in Sunset")],
                 bossChallenge=self.tr("Myriad Snare: Rustfire Chassis"),
                 gather=self.tr("Bloom of Hearkening"),
-                tacetDiscordNest=[self.tr("Simulacrum Nexus")],
+                tacetDiscordNest=[self.tr("Simulacrum Nexus", "Tacet Discord Nest")],
                 nightmarePurification=[],
                 enable=True,
             ),
@@ -1656,6 +1653,8 @@ class DailyWidget(ScrollArea):
         self.activityCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         self.mailCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
+        # self.focusWeeklyChallenge.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+
         # initialize layout
         self.__initLayout()
         self.__connectSignalToSlot()
@@ -1669,8 +1668,10 @@ class DailyWidget(ScrollArea):
         # self.contentBottomLayout.setContentsMargins(110, 0, 0, 0)
         self.contentBottomLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.focusResonatorLayout.addWidget(self.focusResonatorTitle)
-        self.focusResonatorLayout.addWidget(self.focusResonatorComboBox, 1)
+        self.focusResonatorLayout.addWidget(self.focusResonatorTitle, 14)
+        self.focusResonatorLayout.addStretch(1)
+        self.focusResonatorLayout.addWidget(self.focusResonatorComboBox, 24)
+        self.focusResonatorLayout.addStretch(1)
         self.focusResonatorLayout.setContentsMargins(0, 0, 0, 0)
 
         # grid
@@ -1758,17 +1759,10 @@ class DailyWidget(ScrollArea):
         self.gridLayout.setColumnStretch(2, 7)
         self.gridLayout.setColumnStretch(3, 3)
 
-        # self.contentLayout.addWidget(self.contentTitleLabel)
-        self.contentLayout.addLayout(self.gridLayout)
-        # self.contentLayout.addLayout(self.contentBottomLayout)
-        self.contentLayout.addStretch()
-        self.contentLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.mainLayout.addLayout(self.contentLayout)
-        # self.mainLayout.addSpacing(50)
-        # self.mainLayout.addStretch(1)
-        # self.mainLayout.addLayout(self.focusResonatorLayout, 4)
-        self.mainLayout.setContentsMargins(30, 10, 36, 10)
+        self.mainLayout.addLayout(self.gridLayout)
+        self.mainLayout.addStretch()
+        # self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setContentsMargins(20, 0, 15, 0)
         # self.mainLayout.setAlignment(Qt.AlignTop)
 
     def __connectSignalToSlot(self):

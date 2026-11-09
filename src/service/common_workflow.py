@@ -343,19 +343,19 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
 
         result = ui.search(waveplate_crystal_regex, waveplate_crystal_roi)
         if result:
-            logger.debug(f"waveplate crystal: {result[0].text}")
+            logger.debug(f"Waveplate crystal: {result[0].text}")
             waveplate_crystal = int(result[0].text)
         else:
             # 0无法识别
             logger.debug(f"ocr result: {ui.bbox_result}")
-            logger.debug("waveplate crystal number not found")
+            logger.debug("Waveplate crystal number not found")
             waveplate_crystal = 0
 
         result = ui.search(total_waveplate_regex, total_waveplate_roi)
         if not result:
-            logger.warning(f"total waveplate number not found")
+            logger.warning(f"Total waveplate number not found")
             return None, None
-        logger.debug(f"total waveplate: {result[0].text}")
+        logger.debug(f"Total waveplate: {result[0].text}")
 
         zero_pattern = re.compile(r"[oO]")
         match = total_waveplate_pattern.search(result[0].text)
@@ -364,7 +364,7 @@ def _query_waveplate(ctx: NodeContext, waveplate_crystal_roi, total_waveplate_ro
         total_waveplate = int(zero_pattern.sub("0", match.group(2)))
         if total_waveplate != max_waveplate:
             return None, None
-        logger.info(f"waveplate: {waveplate_crystal}, {cur_waveplate}/{total_waveplate}", stacklevel=2)
+        logger.info(f"Waveplate: {waveplate_crystal}, {cur_waveplate}/{total_waveplate}", stacklevel=2)
         return cur_waveplate, waveplate_crystal
     except (KeyboardInterrupt, StopError) as e:
         raise e

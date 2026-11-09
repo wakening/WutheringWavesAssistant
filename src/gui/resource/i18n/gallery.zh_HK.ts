@@ -106,247 +106,247 @@
 <context>
     <name>BossRushWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="114"/>
+        <location filename="../../view/home/echo.py" line="115"/>
         <source>Suhsin the Inevitable</source>
         <translation>天演溯心</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="121"/>
+        <location filename="../../view/home/echo.py" line="122"/>
         <source>Calamity Effigy</source>
         <translation>天傀劫煞</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="128"/>
+        <location filename="../../view/home/echo.py" line="129"/>
         <source>Thousand-Puppet Pavilion</source>
         <translation>千傀重樓</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="135"/>
+        <location filename="../../view/home/echo.py" line="136"/>
         <source>Myriad Snare: Rustfire Chassis</source>
         <translation>萬囮牢·朽軀</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="142"/>
+        <location filename="../../view/home/echo.py" line="143"/>
         <source>Nightmare: Adam Smasher</source>
         <translation>夢魘亞當·碎骨</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="149"/>
+        <location filename="../../view/home/echo.py" line="150"/>
         <source>Denia</source>
         <translation>達妮婭</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="156"/>
+        <location filename="../../view/home/echo.py" line="157"/>
         <source>Nameless Explorer</source>
         <translation>無銘探索者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="163"/>
+        <location filename="../../view/home/echo.py" line="164"/>
         <source>Sigillum</source>
         <translation>辛吉勒姆</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="170"/>
+        <location filename="../../view/home/echo.py" line="171"/>
         <source>Reactor Husk</source>
         <translation>爐芯機骸</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="177"/>
+        <location filename="../../view/home/echo.py" line="178"/>
         <source>Hyvatia</source>
         <translation>海維夏</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="184"/>
+        <location filename="../../view/home/echo.py" line="185"/>
         <source>Threnodian: Leviathan</source>
         <translation>鳴式·利維亞坦</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="191"/>
+        <location filename="../../view/home/echo.py" line="192"/>
         <source>The False Sovereign</source>
         <translation>偽作的神王</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="198"/>
+        <location filename="../../view/home/echo.py" line="199"/>
         <source>Lady of the Sea</source>
         <translation>海之女</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="205"/>
+        <location filename="../../view/home/echo.py" line="206"/>
         <source>Fenrico</source>
         <translation>芬萊克</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="212"/>
+        <location filename="../../view/home/echo.py" line="213"/>
         <source>Nightmare: Hecate</source>
         <translation>夢魘·赫卡忒</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="219"/>
+        <location filename="../../view/home/echo.py" line="220"/>
         <source>Lioness of Glory</source>
         <translation>榮耀獅像</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="226"/>
+        <location filename="../../view/home/echo.py" line="227"/>
         <source>Nightmare: Kelpie</source>
         <translation>夢魘·凱爾匹</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="233"/>
+        <location filename="../../view/home/echo.py" line="234"/>
         <source>Fleurdelys</source>
         <translation>芙露德莉斯</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="240"/>
+        <location filename="../../view/home/echo.py" line="241"/>
         <source>Nightmare: Lampylumen Myriad</source>
         <translation>夢魘·輝螢軍勢</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="247"/>
+        <location filename="../../view/home/echo.py" line="248"/>
         <source>Nightmare: Mourning Aix</source>
         <translation>夢魘·哀聲鷙</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="254"/>
+        <location filename="../../view/home/echo.py" line="255"/>
         <source>Nightmare: Inferno Rider</source>
         <translation>夢魘·燎照之騎</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="261"/>
+        <location filename="../../view/home/echo.py" line="262"/>
         <source>Nightmare: Crownless</source>
         <translation>夢魘·無冠者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="268"/>
+        <location filename="../../view/home/echo.py" line="269"/>
         <source>Nightmare: Thundering Mephis</source>
         <translation>夢魘·雲閃之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="275"/>
+        <location filename="../../view/home/echo.py" line="276"/>
         <source>Nightmare: Tempest Mephis</source>
         <translation>夢魘·朔雷之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="282"/>
+        <location filename="../../view/home/echo.py" line="283"/>
         <source>Nightmare: Impermanence Heron</source>
         <translation>夢魘·無常凶鷺</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="289"/>
+        <location filename="../../view/home/echo.py" line="290"/>
         <source>Nightmare: Feilian Beringal</source>
         <translation>夢魘·飛廉之猩</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="296"/>
+        <location filename="../../view/home/echo.py" line="297"/>
         <source>Dragon of Dirge</source>
         <translation>嘆息古龍</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="303"/>
+        <location filename="../../view/home/echo.py" line="304"/>
         <source>Lorelei</source>
         <translation>羅蕾萊</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="310"/>
+        <location filename="../../view/home/echo.py" line="311"/>
         <source>Hecate</source>
         <translation>赫卡忒</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="317"/>
+        <location filename="../../view/home/echo.py" line="318"/>
         <source>Sentry Construct</source>
         <translation>異構武裝</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="324"/>
+        <location filename="../../view/home/echo.py" line="325"/>
         <source>Fallacy of No Return</source>
         <translation>無歸的謬誤</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="331"/>
+        <location filename="../../view/home/echo.py" line="332"/>
         <source>Jué</source>
         <translation>角</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="338"/>
+        <location filename="../../view/home/echo.py" line="339"/>
         <source>Crownless</source>
         <translation>無冠者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="345"/>
+        <location filename="../../view/home/echo.py" line="346"/>
         <source>Feilian Beringal</source>
         <translation>飛廉之猩</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="352"/>
+        <location filename="../../view/home/echo.py" line="353"/>
         <source>Tempest Mephis</source>
         <translation>朔雷之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="359"/>
+        <location filename="../../view/home/echo.py" line="360"/>
         <source>Thundering Mephis</source>
         <translation>雲閃之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="366"/>
+        <location filename="../../view/home/echo.py" line="367"/>
         <source>Mourning Aix</source>
         <translation>哀聲鷙</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="373"/>
+        <location filename="../../view/home/echo.py" line="374"/>
         <source>Mech Abomination</source>
         <translation>聚械機偶</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="380"/>
+        <location filename="../../view/home/echo.py" line="381"/>
         <source>Impermanence Heron</source>
         <translation>無常凶鷺</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="387"/>
+        <location filename="../../view/home/echo.py" line="388"/>
         <source>Inferno Rider</source>
         <translation>燎照之騎</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="394"/>
+        <location filename="../../view/home/echo.py" line="395"/>
         <source>Bell-Borne Geochelone</source>
         <translation>鳴鐘之龜</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="401"/>
+        <location filename="../../view/home/echo.py" line="402"/>
         <source>Lampylumen Myriad</source>
         <translation>輝螢軍勢</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="408"/>
+        <location filename="../../view/home/echo.py" line="409"/>
         <source>Dreamless</source>
         <translation>無妄者</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="424"/>
+        <location filename="../../view/home/echo.py" line="425"/>
         <source>Search</source>
         <translation>搜尋</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="429"/>
+        <location filename="../../view/home/echo.py" line="430"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="547"/>
+        <location filename="../../view/home/echo.py" line="550"/>
         <source>任意配队，人数不限，建议带奶，建议1280x720最低画质挂机还省电。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="548"/>
+        <location filename="../../view/home/echo.py" line="551"/>
         <source>若游戏内没有1280x720分辨率选项，或修改后游戏微闪一下没有反应，这是游戏的问题，换成其他修改后有效的小分辨率，如1600x900。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="549"/>
+        <location filename="../../view/home/echo.py" line="552"/>
         <source>萌新建议降低索拉等级刷梦魇boss，通过5合1获取1c3c。</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="553"/>
+        <location filename="../../view/home/echo.py" line="556"/>
         <source>About:</source>
         <translation>關於:</translation>
     </message>
@@ -590,1181 +590,1211 @@
 <context>
     <name>DailyWidget</name>
     <message>
-        <location filename="../../view/home/daily.py" line="149"/>
+        <location filename="../../view/home/daily.py" line="146"/>
         <source>Waveplates:</source>
         <translation>體力:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="150"/>
+        <location filename="../../view/home/daily.py" line="147"/>
         <source>Nest:</source>
         <translation>聚落:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="151"/>
+        <location filename="../../view/home/daily.py" line="148"/>
         <source>Claim Rewards:</source>
         <translation>領取獎勵:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="161"/>
+        <location filename="../../view/home/daily.py" line="158"/>
         <source>Reset</source>
         <translation>重設</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="162"/>
+        <location filename="../../view/home/daily.py" line="159"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1512"/>
+        <location filename="../../view/home/daily.py" line="1509"/>
         <source>Weekly Challenge:</source>
         <translation>週本:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1514"/>
-        <location filename="../../view/home/daily.py" line="1522"/>
-        <location filename="../../view/home/daily.py" line="1529"/>
-        <location filename="../../view/home/daily.py" line="1537"/>
-        <location filename="../../view/home/daily.py" line="1544"/>
-        <location filename="../../view/home/daily.py" line="1558"/>
-        <location filename="../../view/home/daily.py" line="1588"/>
+        <location filename="../../view/home/daily.py" line="1511"/>
+        <location filename="../../view/home/daily.py" line="1519"/>
+        <location filename="../../view/home/daily.py" line="1526"/>
+        <location filename="../../view/home/daily.py" line="1534"/>
+        <location filename="../../view/home/daily.py" line="1541"/>
+        <location filename="../../view/home/daily.py" line="1555"/>
+        <location filename="../../view/home/daily.py" line="1585"/>
         <source>Not selected</source>
         <translation>不選擇</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1520"/>
+        <location filename="../../view/home/daily.py" line="1517"/>
         <source>Echo Materials:</source>
         <translation>聲骸材料:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1527"/>
+        <location filename="../../view/home/daily.py" line="1524"/>
         <source>Weapon and Skill Materials:</source>
         <translation>武器材料:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1535"/>
+        <location filename="../../view/home/daily.py" line="1532"/>
         <source>Ascension Materials:</source>
         <translation>角色突破材料:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1556"/>
+        <location filename="../../view/home/daily.py" line="1553"/>
         <source>Nightmare Nest:</source>
         <translation>夢魘聚落:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1545"/>
-        <location filename="../../view/home/daily.py" line="1559"/>
+        <location filename="../../view/home/daily.py" line="1542"/>
+        <location filename="../../view/home/daily.py" line="1556"/>
         <source>Select all</source>
         <translation>全選</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="173"/>
+        <location filename="../../view/home/daily.py" line="170"/>
         <source>Mengzhou</source>
         <translation>夢州</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="174"/>
+        <location filename="../../view/home/daily.py" line="171"/>
         <source>Lahai-Roi</source>
         <translation>拉海洛</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="175"/>
+        <location filename="../../view/home/daily.py" line="172"/>
         <source>Rinascita</source>
         <translation>黎那汐塔</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="176"/>
+        <location filename="../../view/home/daily.py" line="173"/>
         <source>The Black Shores</source>
         <translation>黑海岸</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="179"/>
+        <location filename="../../view/home/daily.py" line="176"/>
         <source>Jinzhou</source>
         <translation>今州</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="180"/>
+        <location filename="../../view/home/daily.py" line="177"/>
         <source>Sword</source>
         <translation>迅刀</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="181"/>
+        <location filename="../../view/home/daily.py" line="178"/>
         <source>Rectifier</source>
         <translation>音感儀</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="182"/>
+        <location filename="../../view/home/daily.py" line="179"/>
         <source>Broadblade</source>
         <translation>長刃</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="183"/>
+        <location filename="../../view/home/daily.py" line="180"/>
         <source>Gauntlets</source>
         <translation>臂鎧</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="188"/>
+        <location filename="../../view/home/daily.py" line="185"/>
         <source>Pistols</source>
         <translation>佩槍</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="191"/>
+        <location filename="../../view/home/daily.py" line="188"/>
         <source>Ordinance of the Inevitable</source>
         <translation>定序諸理之律</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="192"/>
-        <location filename="../../view/home/daily.py" line="827"/>
-        <location filename="../../view/home/daily.py" line="839"/>
+        <location filename="../../view/home/daily.py" line="189"/>
+        <location filename="../../view/home/daily.py" line="824"/>
+        <location filename="../../view/home/daily.py" line="836"/>
         <source>Suhsin the Inevitable</source>
         <translation>天演溯心</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="194"/>
+        <location filename="../../view/home/daily.py" line="191"/>
         <source>Remnant of the Wheel</source>
         <translation>演輪殘蛻</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="199"/>
+        <location filename="../../view/home/daily.py" line="196"/>
         <source>Court of Shackled Souls</source>
         <translation>失墜困咎之庭</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="200"/>
+        <location filename="../../view/home/daily.py" line="197"/>
         <source>Thousand-Puppet Pavilion</source>
         <translation>千傀重樓</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="202"/>
+        <location filename="../../view/home/daily.py" line="199"/>
         <source>Skyward Glazed Heart</source>
         <translation>天衢琉璃之心</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="207"/>
+        <location filename="../../view/home/daily.py" line="204"/>
         <source>Seed of Illusory Origin</source>
         <translation>虛妄誕生之種</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="208"/>
-        <location filename="../../view/home/daily.py" line="958"/>
+        <location filename="../../view/home/daily.py" line="205"/>
+        <location filename="../../view/home/daily.py" line="955"/>
         <source>Denia</source>
         <translation>達妮婭</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="210"/>
+        <location filename="../../view/home/daily.py" line="207"/>
         <source>We Who Question</source>
         <translation>質問的我們</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="215"/>
+        <location filename="../../view/home/daily.py" line="212"/>
         <source>Gate of the Lost Star</source>
         <translation>星海迷途之扉</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="216"/>
+        <location filename="../../view/home/daily.py" line="213"/>
         <source>Sigillum</source>
         <translation>辛吉勒姆</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="218"/>
+        <location filename="../../view/home/daily.py" line="215"/>
         <source>Gold in Memory</source>
         <translation>憶中沉金</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="223"/>
+        <location filename="../../view/home/daily.py" line="220"/>
         <source>Cindernite Apocalypse</source>
         <translation>燼夜天啟之章</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="224"/>
+        <location filename="../../view/home/daily.py" line="221"/>
         <source>Threnodian: Leviathan</source>
         <translation>鳴式·利維亞坦</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="226"/>
+        <location filename="../../view/home/daily.py" line="223"/>
         <source>Curse of the Abyss</source>
         <translation>深洋的咒詛</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="231"/>
+        <location filename="../../view/home/daily.py" line="228"/>
         <source>The Wheel of Broken Fate</source>
         <translation>命途斷章之輪</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="232"/>
+        <location filename="../../view/home/daily.py" line="229"/>
         <source>Fleurdelys</source>
         <translation>芙露德莉斯</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="234"/>
+        <location filename="../../view/home/daily.py" line="231"/>
         <source>When Irises Bloom</source>
         <translation>鳶尾盛開之日</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="239"/>
+        <location filename="../../view/home/daily.py" line="236"/>
         <source>Beyond the Crimson Curtain</source>
         <translation>彼世猩紅之幕</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="240"/>
+        <location filename="../../view/home/daily.py" line="237"/>
         <source>Hecate</source>
         <translation>赫卡忒</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="242"/>
+        <location filename="../../view/home/daily.py" line="239"/>
         <source>The Netherworld&apos;s Stare</source>
         <translation>冥扉的歡覷</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="247"/>
+        <location filename="../../view/home/daily.py" line="244"/>
         <source>The Fated Confrontation</source>
         <translation>時序命定之爭</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="248"/>
+        <location filename="../../view/home/daily.py" line="245"/>
         <source>Jué</source>
         <translation>角</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="250"/>
+        <location filename="../../view/home/daily.py" line="247"/>
         <source>Sentinel&apos;s Dagger</source>
         <translation>歲時之角刃</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="255"/>
+        <location filename="../../view/home/daily.py" line="252"/>
         <source>Statue of the Crownless</source>
         <translation>無冠巨像之心</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="256"/>
+        <location filename="../../view/home/daily.py" line="253"/>
         <source>Dreamless</source>
         <translation>無妄者</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="258"/>
+        <location filename="../../view/home/daily.py" line="255"/>
         <source>Dreamless Feather</source>
         <translation>無妄之羽</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="263"/>
+        <location filename="../../view/home/daily.py" line="260"/>
         <source>Chaotic Juncture</source>
         <translation>無序邊境之火</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="264"/>
+        <location filename="../../view/home/daily.py" line="261"/>
         <source>Scar</source>
         <translation>傷痕</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="266"/>
+        <location filename="../../view/home/daily.py" line="263"/>
         <source>Unending Destruction</source>
         <translation>不息壞滅</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="271"/>
+        <location filename="../../view/home/daily.py" line="268"/>
         <source>Bell of Archaic Chants</source>
         <translation>昔日詠嘆之鐘</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="272"/>
+        <location filename="../../view/home/daily.py" line="269"/>
         <source>Bell-Borne Geochelone</source>
         <translation>鳴鐘之龜</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="274"/>
+        <location filename="../../view/home/daily.py" line="271"/>
         <source>Monument Bell</source>
         <translation>碑趺古鐘</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="283"/>
-        <location filename="../../view/home/daily.py" line="829"/>
+        <location filename="../../view/home/daily.py" line="280"/>
+        <location filename="../../view/home/daily.py" line="826"/>
         <source>Wingfall Chasm</source>
         <translation>隕翼雲淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="285"/>
-        <location filename="../../view/home/daily.py" line="325"/>
+        <location filename="../../view/home/daily.py" line="282"/>
+        <location filename="../../view/home/daily.py" line="322"/>
         <source>Polarizer</source>
         <translation>偏振體</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="291"/>
-        <location filename="../../view/home/daily.py" line="841"/>
+        <location filename="../../view/home/daily.py" line="288"/>
+        <location filename="../../view/home/daily.py" line="838"/>
         <source>Silent Chasm</source>
         <translation>靜滅雲淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="293"/>
-        <location filename="../../view/home/daily.py" line="333"/>
+        <location filename="../../view/home/daily.py" line="290"/>
+        <location filename="../../view/home/daily.py" line="330"/>
         <source>String</source>
         <translation>弦線</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="299"/>
+        <location filename="../../view/home/daily.py" line="296"/>
         <source>Split Chasm</source>
         <translation>裂斬雲淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="301"/>
-        <location filename="../../view/home/daily.py" line="341"/>
+        <location filename="../../view/home/daily.py" line="298"/>
+        <location filename="../../view/home/daily.py" line="338"/>
         <source>Carved Crystal</source>
         <translation>切削晶塊</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="307"/>
+        <location filename="../../view/home/daily.py" line="304"/>
         <source>Eroded Chasm</source>
         <translation>碎蝕雲淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="309"/>
-        <location filename="../../view/home/daily.py" line="349"/>
+        <location filename="../../view/home/daily.py" line="306"/>
+        <location filename="../../view/home/daily.py" line="346"/>
         <source>Waveworn Shard</source>
         <translation>海蝕碎晶</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="315"/>
+        <location filename="../../view/home/daily.py" line="312"/>
         <source>Ashen Chasm</source>
         <translation>沉熄雲淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="317"/>
-        <location filename="../../view/home/daily.py" line="357"/>
+        <location filename="../../view/home/daily.py" line="314"/>
+        <location filename="../../view/home/daily.py" line="354"/>
         <source>Combustor</source>
         <translation>聚燃體</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="323"/>
-        <location filename="../../view/home/daily.py" line="829"/>
+        <location filename="../../view/home/daily.py" line="320"/>
+        <location filename="../../view/home/daily.py" line="826"/>
         <source>Fallen Sanctum</source>
         <translation>荒萋舊殿</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="331"/>
-        <location filename="../../view/home/daily.py" line="841"/>
+        <location filename="../../view/home/daily.py" line="328"/>
+        <location filename="../../view/home/daily.py" line="838"/>
         <source>Lesson in Sunset</source>
         <translation>殘照終課</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="339"/>
+        <location filename="../../view/home/daily.py" line="336"/>
         <source>Stricken Sanctum</source>
         <translation>災逆舊殿</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="347"/>
+        <location filename="../../view/home/daily.py" line="344"/>
         <source>Lesson in Void</source>
         <translation>虛誕終課</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="355"/>
+        <location filename="../../view/home/daily.py" line="352"/>
         <source>Lesson in Embers</source>
         <translation>餘燼終課</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="363"/>
+        <location filename="../../view/home/daily.py" line="360"/>
         <source>Garden of Salvation</source>
         <translation>赦罪庭園</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="365"/>
-        <location filename="../../view/home/daily.py" line="405"/>
+        <location filename="../../view/home/daily.py" line="362"/>
+        <location filename="../../view/home/daily.py" line="402"/>
         <source>Metallic Drip</source>
         <translation>金屬液滴</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="371"/>
+        <location filename="../../view/home/daily.py" line="368"/>
         <source>Abyss of Initiation</source>
         <translation>浸禮海淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="373"/>
-        <location filename="../../view/home/daily.py" line="413"/>
+        <location filename="../../view/home/daily.py" line="370"/>
+        <location filename="../../view/home/daily.py" line="410"/>
         <source>Helix</source>
         <translation>渦流</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="379"/>
+        <location filename="../../view/home/daily.py" line="376"/>
         <source>Garden of Adoration</source>
         <translation>讚頌庭園</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="381"/>
-        <location filename="../../view/home/daily.py" line="421"/>
+        <location filename="../../view/home/daily.py" line="378"/>
+        <location filename="../../view/home/daily.py" line="418"/>
         <source>Waveworn Residue</source>
         <translation>海蝕嵌合體</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="387"/>
+        <location filename="../../view/home/daily.py" line="384"/>
         <source>Abyss of Sacrifice</source>
         <translation>祝祭海淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="389"/>
-        <location filename="../../view/home/daily.py" line="429"/>
+        <location filename="../../view/home/daily.py" line="386"/>
+        <location filename="../../view/home/daily.py" line="426"/>
         <source>Cadence</source>
         <translation>聲律</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="395"/>
+        <location filename="../../view/home/daily.py" line="392"/>
         <source>Abyss of Confession</source>
         <translation>告解海淵</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="397"/>
-        <location filename="../../view/home/daily.py" line="437"/>
+        <location filename="../../view/home/daily.py" line="394"/>
+        <location filename="../../view/home/daily.py" line="434"/>
         <source>Phlogiston</source>
         <translation>晶化燃素</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="403"/>
+        <location filename="../../view/home/daily.py" line="400"/>
         <source>Flaming Remnants</source>
         <translation>熔毀廢都</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="411"/>
+        <location filename="../../view/home/daily.py" line="408"/>
         <source>Misty Forest</source>
         <translation>旋霧之森</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="419"/>
+        <location filename="../../view/home/daily.py" line="416"/>
         <source>Eroded Ruins</source>
         <translation>侵蝕廢都</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="427"/>
+        <location filename="../../view/home/daily.py" line="424"/>
         <source>Moonlit Groves</source>
         <translation>流月之森</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="435"/>
+        <location filename="../../view/home/daily.py" line="432"/>
         <source>Marigold Woods</source>
         <translation>欲燃之森</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="447"/>
-        <location filename="../../view/home/daily.py" line="830"/>
+        <location filename="../../view/home/daily.py" line="444"/>
+        <location filename="../../view/home/daily.py" line="827"/>
         <source>Calamity Effigy</source>
         <translation>天傀劫煞</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="449"/>
+        <location filename="../../view/home/daily.py" line="446"/>
         <source>Forged Empyrean&apos;s Sigh</source>
         <translation>贗仙的嗟嘆</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="454"/>
-        <location filename="../../view/home/daily.py" line="842"/>
+        <location filename="../../view/home/daily.py" line="451"/>
+        <location filename="../../view/home/daily.py" line="839"/>
         <source>Myriad Snare: Rustfire Chassis</source>
         <translation>萬囮牢·朽軀</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="456"/>
+        <location filename="../../view/home/daily.py" line="453"/>
         <source>Solidarity&apos;s Loneflame</source>
         <translation>孤焰酬義</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="461"/>
+        <location filename="../../view/home/daily.py" line="458"/>
         <source>Nightmare: Adam Smasher</source>
         <translation>夢魘亞當·碎骨</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="463"/>
+        <location filename="../../view/home/daily.py" line="460"/>
         <source>Nightmare Flashdrive</source>
         <translation>夢魘燼樞</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="468"/>
+        <location filename="../../view/home/daily.py" line="465"/>
         <source>Nameless Explorer</source>
         <translation>無銘探索者</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="470"/>
+        <location filename="../../view/home/daily.py" line="467"/>
         <source>Our Choice</source>
         <translation>我們的選擇</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="475"/>
+        <location filename="../../view/home/daily.py" line="472"/>
         <source>Hyvatia</source>
         <translation>海維夏</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="477"/>
+        <location filename="../../view/home/daily.py" line="474"/>
         <source>Suncoveter&apos;s Reach</source>
         <translation>覬日者的指尖</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="482"/>
+        <location filename="../../view/home/daily.py" line="479"/>
         <source>Reactor Husk</source>
         <translation>爐芯機骸</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="484"/>
+        <location filename="../../view/home/daily.py" line="481"/>
         <source>Burning Judgment</source>
         <translation>不熄的裁決</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="489"/>
+        <location filename="../../view/home/daily.py" line="486"/>
         <source>Lady of the Sea</source>
         <translation>海之女</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="491"/>
+        <location filename="../../view/home/daily.py" line="488"/>
         <source>Abyssal Husk</source>
         <translation>深海餘蝕</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="496"/>
+        <location filename="../../view/home/daily.py" line="493"/>
         <source>The False Sovereign</source>
         <translation>偽作的神王</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="498"/>
+        <location filename="../../view/home/daily.py" line="495"/>
         <source>Blighted Crown of Puppet King</source>
         <translation>群儡的穢冕</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="503"/>
+        <location filename="../../view/home/daily.py" line="500"/>
         <source>Fenrico</source>
         <translation>芬萊克</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="505"/>
+        <location filename="../../view/home/daily.py" line="502"/>
         <source>Truth in Lies</source>
         <translation>箴言與謊言</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="510"/>
+        <location filename="../../view/home/daily.py" line="507"/>
         <source>Lioness of Glory</source>
         <translation>榮耀獅像</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="512"/>
+        <location filename="../../view/home/daily.py" line="509"/>
         <source>Unfading Glory</source>
         <translation>不朽榮耀</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="517"/>
+        <location filename="../../view/home/daily.py" line="514"/>
         <source>Dragon of Dirge</source>
         <translation>嘆息古龍</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="519"/>
+        <location filename="../../view/home/daily.py" line="516"/>
         <source>Blazing Bone</source>
         <translation>焚磷厄骨</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="524"/>
+        <location filename="../../view/home/daily.py" line="521"/>
         <source>Lorelei</source>
         <translation>羅蕾萊</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="526"/>
+        <location filename="../../view/home/daily.py" line="523"/>
         <source>Cleansing Conch</source>
         <translation>滌罪音螺</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="531"/>
+        <location filename="../../view/home/daily.py" line="528"/>
         <source>Sentry Construct</source>
         <translation>異構武裝</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="533"/>
+        <location filename="../../view/home/daily.py" line="530"/>
         <source>Platinum Core</source>
         <translation>白金機心</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="538"/>
+        <location filename="../../view/home/daily.py" line="535"/>
         <source>Fallacy of No Return</source>
         <translation>無歸的謬誤</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="540"/>
+        <location filename="../../view/home/daily.py" line="537"/>
         <source>Topological Confinement</source>
         <translation>幽囚拓撲</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="545"/>
+        <location filename="../../view/home/daily.py" line="542"/>
         <source>Crownless</source>
         <translation>無冠者</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="547"/>
+        <location filename="../../view/home/daily.py" line="544"/>
         <source>Strife Tacet Core</source>
         <translation>紛爭聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="552"/>
+        <location filename="../../view/home/daily.py" line="549"/>
         <source>Feilian Beringal</source>
         <translation>飛廉之猩</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="554"/>
+        <location filename="../../view/home/daily.py" line="551"/>
         <source>Hidden Thunder Tacet Core</source>
         <translation>隱雷聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="559"/>
+        <location filename="../../view/home/daily.py" line="556"/>
         <source>Tempest Mephis</source>
         <translation>朔雷之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="561"/>
+        <location filename="../../view/home/daily.py" line="558"/>
         <source>Thundering Tacet Core</source>
         <translation>霍閃聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="566"/>
+        <location filename="../../view/home/daily.py" line="563"/>
         <source>Thundering Mephis</source>
         <translation>雲閃之鱗</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="568"/>
+        <location filename="../../view/home/daily.py" line="565"/>
         <source>Rage Tacet Core</source>
         <translation>怒號聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="573"/>
+        <location filename="../../view/home/daily.py" line="570"/>
         <source>Mourning Aix</source>
         <translation>哀聲鷙</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="575"/>
+        <location filename="../../view/home/daily.py" line="572"/>
         <source>Roaring Rock Fist</source>
         <translation>呼嘯岩拳</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="580"/>
+        <location filename="../../view/home/daily.py" line="577"/>
         <source>Mech Abomination</source>
         <translation>聚械機偶</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="582"/>
+        <location filename="../../view/home/daily.py" line="579"/>
         <source>Elegy Tacet Core</source>
         <translation>哀歌聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="587"/>
+        <location filename="../../view/home/daily.py" line="584"/>
         <source>Impermanence Heron</source>
         <translation>無常凶鷺</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="589"/>
+        <location filename="../../view/home/daily.py" line="586"/>
         <source>Gold-Dissolving Feather</source>
         <translation>銷金之翎</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="594"/>
+        <location filename="../../view/home/daily.py" line="591"/>
         <source>Inferno Rider</source>
         <translation>燎照之騎</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="596"/>
+        <location filename="../../view/home/daily.py" line="593"/>
         <source>Sound-Keeping Tacet Core</source>
         <translation>留音聲核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="601"/>
+        <location filename="../../view/home/daily.py" line="598"/>
         <source>Lampylumen Myriad</source>
         <translation>輝螢軍勢</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="603"/>
+        <location filename="../../view/home/daily.py" line="600"/>
         <source>Group Abomination Tacet Core</source>
         <translation>群孽異核</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="612"/>
-        <location filename="../../view/home/daily.py" line="828"/>
-        <location filename="../../view/home/daily.py" line="840"/>
+        <location filename="../../view/home/daily.py" line="609"/>
+        <location filename="../../view/home/daily.py" line="825"/>
+        <location filename="../../view/home/daily.py" line="837"/>
         <source>Heart of Stillness</source>
+        <comment>Tacet Field</comment>
         <translation>沉心域無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="619"/>
-        <location filename="../../view/home/daily.py" line="828"/>
-        <location filename="../../view/home/daily.py" line="840"/>
+        <location filename="../../view/home/daily.py" line="616"/>
+        <location filename="../../view/home/daily.py" line="825"/>
+        <location filename="../../view/home/daily.py" line="837"/>
         <source>Heart of Flames</source>
+        <comment>Tacet Field</comment>
         <translation>燼心域無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="626"/>
+        <location filename="../../view/home/daily.py" line="623"/>
         <source>Western Fang Peaks</source>
+        <comment>Tacet Field</comment>
         <translation>方擎西峰無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="633"/>
+        <location filename="../../view/home/daily.py" line="630"/>
         <source>Eastern Xuan Peaks</source>
+        <comment>Tacet Field</comment>
         <translation>玄幽東嶽無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="640"/>
+        <location filename="../../view/home/daily.py" line="637"/>
         <source>Solisia Landing</source>
+        <comment>Tacet Field</comment>
         <translation>落日堤嶼無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="647"/>
+        <location filename="../../view/home/daily.py" line="644"/>
         <source>Frostlands Transit Port</source>
+        <comment>Tacet Field</comment>
         <translation>冰原運輸港無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="654"/>
+        <location filename="../../view/home/daily.py" line="651"/>
         <source>Mount Gjallar</source>
+        <comment>Tacet Field</comment>
         <translation>加拉爾冠階無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="661"/>
+        <location filename="../../view/home/daily.py" line="658"/>
         <source>Mawburrow Desert</source>
+        <comment>Tacet Field</comment>
         <translation>隱喙深腹無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="668"/>
-        <location filename="../../view/home/daily.py" line="798"/>
+        <location filename="../../view/home/daily.py" line="665"/>
         <source>Stagnant Run</source>
+        <comment>Tacet Field</comment>
         <translation>陷足流川無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="675"/>
+        <location filename="../../view/home/daily.py" line="672"/>
         <source>Mournfell Canyon</source>
+        <comment>Tacet Field</comment>
         <translation>哀慟谷無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="682"/>
+        <location filename="../../view/home/daily.py" line="679"/>
         <source>Beohr Waters</source>
+        <comment>Tacet Field</comment>
         <translation>貝奧海域無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="689"/>
+        <location filename="../../view/home/daily.py" line="686"/>
         <source>Riccioli Islands</source>
+        <comment>Tacet Field</comment>
         <translation>黎喬利群島無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="696"/>
+        <location filename="../../view/home/daily.py" line="693"/>
         <source>Fagaceae Peninsula</source>
+        <comment>Tacet Field</comment>
         <translation>槲生半島無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="703"/>
+        <location filename="../../view/home/daily.py" line="700"/>
         <source>Penitent&apos;s End</source>
+        <comment>Tacet Field</comment>
         <translation>悲嘆墓島無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="710"/>
+        <location filename="../../view/home/daily.py" line="707"/>
         <source>Central Plains</source>
+        <comment>Tacet Field</comment>
         <translation>中曲臺地無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="717"/>
+        <location filename="../../view/home/daily.py" line="714"/>
         <source>Desorock Highland I</source>
+        <comment>Tacet Field</comment>
         <translation>荒石高地無音區Ⅰ</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="724"/>
+        <location filename="../../view/home/daily.py" line="721"/>
         <source>Tiger&apos;s Maw</source>
+        <comment>Tacet Field</comment>
         <translation>虎口山脈無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="731"/>
+        <location filename="../../view/home/daily.py" line="728"/>
         <source>Whining Aix&apos;s Mire</source>
+        <comment>Tacet Field</comment>
         <translation>怨鳥澤無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="738"/>
+        <location filename="../../view/home/daily.py" line="735"/>
         <source>Port City of Guixu</source>
+        <comment>Tacet Field</comment>
         <translation>歸墟港市無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="745"/>
+        <location filename="../../view/home/daily.py" line="742"/>
         <source>Desorock Highland II</source>
+        <comment>Tacet Field</comment>
         <translation>荒石高地無音區Ⅱ</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="752"/>
+        <location filename="../../view/home/daily.py" line="749"/>
         <source>Dim Forest</source>
+        <comment>Tacet Field</comment>
         <translation>無光之森無音區</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="763"/>
-        <location filename="../../view/home/daily.py" line="832"/>
-        <location filename="../../view/home/daily.py" line="844"/>
+        <location filename="../../view/home/daily.py" line="760"/>
+        <location filename="../../view/home/daily.py" line="829"/>
+        <location filename="../../view/home/daily.py" line="841"/>
         <source>Simulacrum Nexus</source>
+        <comment>Tacet Discord Nest</comment>
         <translation>夢樞天羅殘象聚落</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="771"/>
+        <location filename="../../view/home/daily.py" line="768"/>
         <source>Southern Yuan Hills</source>
+        <comment>Tacet Discord Nest</comment>
         <translation>落淵南丘殘象聚落</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="782"/>
+        <location filename="../../view/home/daily.py" line="779"/>
         <source>Starblind Crashsite</source>
+        <comment>Tacet Discord Nest</comment>
         <translation>盲望之塌殘象聚落</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="790"/>
+        <location filename="../../view/home/daily.py" line="787"/>
         <source>Rebirth Uplands</source>
+        <comment>Tacet Discord Nest</comment>
         <translation>復生丘原殘象聚落</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="814"/>
+        <location filename="../../view/home/daily.py" line="795"/>
+        <source>Stagnant Run</source>
+        <comment>Tacet Discord Nest</comment>
+        <translation>陷足流川殘象聚落</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/daily.py" line="811"/>
         <source>Lily</source>
         <translation>莉莉</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="826"/>
+        <location filename="../../view/home/daily.py" line="823"/>
         <source>Suoming</source>
         <translation>鎖暝</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="831"/>
+        <location filename="../../view/home/daily.py" line="828"/>
         <source>Miasmic Branch</source>
         <translation>瘴痕殘株</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="838"/>
+        <location filename="../../view/home/daily.py" line="835"/>
         <source>Hsin</source>
         <translation>心</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="843"/>
+        <location filename="../../view/home/daily.py" line="840"/>
         <source>Bloom of Hearkening</source>
         <translation>傾念華</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="850"/>
+        <location filename="../../view/home/daily.py" line="847"/>
         <source>Jingran</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="862"/>
+        <location filename="../../view/home/daily.py" line="859"/>
         <source>Qingxiao</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="874"/>
+        <location filename="../../view/home/daily.py" line="871"/>
         <source>Suisui</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="886"/>
+        <location filename="../../view/home/daily.py" line="883"/>
         <source>Yangyang: Xuanling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="898"/>
+        <location filename="../../view/home/daily.py" line="895"/>
         <source>Rebecca</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="910"/>
+        <location filename="../../view/home/daily.py" line="907"/>
         <source>Lucy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="922"/>
+        <location filename="../../view/home/daily.py" line="919"/>
         <source>Hiyuki</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="934"/>
+        <location filename="../../view/home/daily.py" line="931"/>
         <source>Lucilla</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="946"/>
+        <location filename="../../view/home/daily.py" line="943"/>
         <source>Sigrika</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="970"/>
+        <location filename="../../view/home/daily.py" line="967"/>
         <source>Mornye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="982"/>
+        <location filename="../../view/home/daily.py" line="979"/>
         <source>Lynae</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="994"/>
+        <location filename="../../view/home/daily.py" line="991"/>
         <source>Buling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1006"/>
+        <location filename="../../view/home/daily.py" line="1003"/>
         <source>Chisa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1018"/>
+        <location filename="../../view/home/daily.py" line="1015"/>
         <source>Qiuyuan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1030"/>
+        <location filename="../../view/home/daily.py" line="1027"/>
         <source>Galbrena</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1042"/>
+        <location filename="../../view/home/daily.py" line="1039"/>
         <source>Luuk Herssen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1054"/>
+        <location filename="../../view/home/daily.py" line="1051"/>
         <source>Aemeath</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1066"/>
+        <location filename="../../view/home/daily.py" line="1063"/>
         <source>Augusta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1078"/>
+        <location filename="../../view/home/daily.py" line="1075"/>
         <source>Iuno</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1090"/>
+        <location filename="../../view/home/daily.py" line="1087"/>
         <source>Lupa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1102"/>
+        <location filename="../../view/home/daily.py" line="1099"/>
         <source>Phoebe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1114"/>
+        <location filename="../../view/home/daily.py" line="1111"/>
         <source>Brant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1126"/>
+        <location filename="../../view/home/daily.py" line="1123"/>
         <source>Phrolova</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1138"/>
+        <location filename="../../view/home/daily.py" line="1135"/>
         <source>Cartethyia</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1150"/>
+        <location filename="../../view/home/daily.py" line="1147"/>
         <source>Zanni</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1162"/>
+        <location filename="../../view/home/daily.py" line="1159"/>
         <source>Ciaccona</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1174"/>
+        <location filename="../../view/home/daily.py" line="1171"/>
         <source>Cantarella</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1186"/>
+        <location filename="../../view/home/daily.py" line="1183"/>
         <source>Roccia</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1198"/>
+        <location filename="../../view/home/daily.py" line="1195"/>
         <source>Carlotta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1210"/>
+        <location filename="../../view/home/daily.py" line="1207"/>
         <source>Youhu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1222"/>
+        <location filename="../../view/home/daily.py" line="1219"/>
         <source>Lumi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1234"/>
+        <location filename="../../view/home/daily.py" line="1231"/>
         <source>Camellya</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1246"/>
+        <location filename="../../view/home/daily.py" line="1243"/>
         <source>Shorekeeper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1258"/>
+        <location filename="../../view/home/daily.py" line="1255"/>
         <source>Zhezhi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1270"/>
+        <location filename="../../view/home/daily.py" line="1267"/>
         <source>Changli</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1282"/>
+        <location filename="../../view/home/daily.py" line="1279"/>
         <source>Xiangli Yao</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1294"/>
+        <location filename="../../view/home/daily.py" line="1291"/>
         <source>Jinhsi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1306"/>
+        <location filename="../../view/home/daily.py" line="1303"/>
         <source>Jianxin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1318"/>
+        <location filename="../../view/home/daily.py" line="1315"/>
         <source>Calcharo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1330"/>
+        <location filename="../../view/home/daily.py" line="1327"/>
         <source>Yinlin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1342"/>
+        <location filename="../../view/home/daily.py" line="1339"/>
         <source>Yuanwu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1354"/>
+        <location filename="../../view/home/daily.py" line="1351"/>
         <source>Lingyang</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1366"/>
+        <location filename="../../view/home/daily.py" line="1363"/>
         <source>Mortefi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1378"/>
+        <location filename="../../view/home/daily.py" line="1375"/>
         <source>Aalto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1390"/>
+        <location filename="../../view/home/daily.py" line="1387"/>
         <source>Jiyan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1402"/>
+        <location filename="../../view/home/daily.py" line="1399"/>
         <source>Danjin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1414"/>
+        <location filename="../../view/home/daily.py" line="1411"/>
         <source>Taoqi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1426"/>
+        <location filename="../../view/home/daily.py" line="1423"/>
         <source>Encore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1438"/>
+        <location filename="../../view/home/daily.py" line="1435"/>
         <source>Sanhua</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1450"/>
+        <location filename="../../view/home/daily.py" line="1447"/>
         <source>Baizhi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1462"/>
+        <location filename="../../view/home/daily.py" line="1459"/>
         <source>Rover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1474"/>
+        <location filename="../../view/home/daily.py" line="1471"/>
         <source>Verina</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1486"/>
+        <location filename="../../view/home/daily.py" line="1483"/>
         <source>Chixia</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1498"/>
+        <location filename="../../view/home/daily.py" line="1495"/>
         <source>Yangyang</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1516"/>
+        <location filename="../../view/home/daily.py" line="1513"/>
         <source>{name} - {enemy}</source>
         <translation>{name} - {enemy}</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1531"/>
+        <location filename="../../view/home/daily.py" line="1528"/>
         <source>{name} - {weapon} - {region}</source>
         <translation>{name} - {weapon} - {region}</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1542"/>
+        <location filename="../../view/home/daily.py" line="1539"/>
         <source>Tacet Discord Nest:</source>
         <translation>殘象聚落:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1546"/>
+        <location filename="../../view/home/daily.py" line="1543"/>
         <source>Select all of Mengzhou</source>
         <translation>全選 - 夢州</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1548"/>
+        <location filename="../../view/home/daily.py" line="1545"/>
         <source>{name} - {region}</source>
         <translation>{name} - {region}</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1551"/>
+        <location filename="../../view/home/daily.py" line="1548"/>
         <source>Select all of Lahai-Roi</source>
         <translation>全選 - 拉海洛</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1565"/>
+        <location filename="../../view/home/daily.py" line="1562"/>
         <source>Activity:</source>
         <translation>活躍行跡:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1567"/>
+        <location filename="../../view/home/daily.py" line="1564"/>
         <source>Daily / Weekly Activity, Phantasma Dreamland</source>
         <translation>日活、週活、幻夢遊園</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1569"/>
+        <location filename="../../view/home/daily.py" line="1566"/>
         <source>Mail:</source>
         <translation>郵件:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1571"/>
-        <location filename="../../view/home/daily.py" line="1575"/>
+        <location filename="../../view/home/daily.py" line="1568"/>
+        <location filename="../../view/home/daily.py" line="1572"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1573"/>
+        <location filename="../../view/home/daily.py" line="1570"/>
         <source>Pioneer Podcast:</source>
         <translation>先約電台:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1586"/>
+        <location filename="../../view/home/daily.py" line="1583"/>
         <source>Resonator: </source>
         <translation>培養目標: </translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1923"/>
+        <location filename="../../view/home/daily.py" line="1917"/>
         <source>About:</source>
         <translation>關於:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1924"/>
+        <location filename="../../view/home/daily.py" line="1918"/>
         <source>If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.</source>
         <translation>如有任何問題，請即時到群組回報。使用前建議先關閉Mod等，以免影響識別效果。</translation>
     </message>
@@ -1772,7 +1802,7 @@
 <context>
     <name>EchoMergeWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="583"/>
+        <location filename="../../view/home/echo.py" line="586"/>
         <source>Fuse unlocked Echoes in the inventory, any resolution</source>
         <translation>融合背包內未鎖定的聲骸，支援任何解析度</translation>
     </message>
@@ -1788,17 +1818,17 @@
 <context>
     <name>EchoWidget</name>
     <message>
-        <location filename="../../view/home/echo.py" line="602"/>
+        <location filename="../../view/home/echo.py" line="605"/>
         <source>Please select the features you want to use.</source>
         <translation>請勾選所需的功能項目</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="605"/>
+        <location filename="../../view/home/echo.py" line="608"/>
         <source>Boss Farming:</source>
         <translation>刷BOSS:</translation>
     </message>
     <message>
-        <location filename="../../view/home/echo.py" line="611"/>
+        <location filename="../../view/home/echo.py" line="614"/>
         <source>Echo Fusion:</source>
         <translation>聲骸融合:</translation>
     </message>
@@ -2167,17 +2197,17 @@
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="203"/>
+        <location filename="../../view/main_window.py" line="204"/>
         <source> * Failed to check for updates</source>
         <translation> *檢查更新失敗</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="210"/>
+        <location filename="../../view/main_window.py" line="211"/>
         <source> * New version available {version}. Click Update in the top-right corner.</source>
         <translation> *有新版本 {version}，請點擊右上角更新</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="212"/>
+        <location filename="../../view/main_window.py" line="213"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
     </message>
@@ -2241,148 +2271,148 @@
 <context>
     <name>SettingInterface</name>
     <message>
-        <location filename="../../view/setting_interface.py" line="35"/>
+        <location filename="../../view/setting_interface.py" line="36"/>
         <source>Settings</source>
         <translation>設置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="39"/>
+        <location filename="../../view/setting_interface.py" line="40"/>
         <source>Personalization</source>
         <translation>個性化</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="50"/>
+        <location filename="../../view/setting_interface.py" line="51"/>
         <source>Application theme</source>
         <translation>應用主題</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="51"/>
+        <location filename="../../view/setting_interface.py" line="52"/>
         <source>Change the appearance of your application</source>
         <translation>調整你的應用的外觀</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="53"/>
+        <location filename="../../view/setting_interface.py" line="54"/>
         <source>Light</source>
         <translation>淺色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="53"/>
+        <location filename="../../view/setting_interface.py" line="54"/>
         <source>Dark</source>
         <translation>深色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="55"/>
-        <location filename="../../view/setting_interface.py" line="77"/>
-        <location filename="../../view/setting_interface.py" line="85"/>
+        <location filename="../../view/setting_interface.py" line="56"/>
+        <location filename="../../view/setting_interface.py" line="78"/>
+        <location filename="../../view/setting_interface.py" line="86"/>
         <source>Use system setting</source>
         <translation>跟隨繫統設置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="61"/>
+        <location filename="../../view/setting_interface.py" line="62"/>
         <source>Window size</source>
         <translation>介面大小</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="62"/>
+        <location filename="../../view/setting_interface.py" line="63"/>
         <source>Adjust window size</source>
         <translation>調整介面寬高</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="65"/>
+        <location filename="../../view/setting_interface.py" line="66"/>
         <source>Default</source>
         <translation>預設</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="115"/>
+        <location filename="../../view/setting_interface.py" line="116"/>
         <source>Help us improve Wuthering Waves Assistant by providing feedback</source>
         <translation>歡迎提供意見與建議，幫助我們將軟體做得更好。</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="201"/>
+        <location filename="../../view/setting_interface.py" line="179"/>
+        <source>Restart Required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="180"/>
+        <source>This change requires a restart. Restart now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="205"/>
         <source>Failed to check for updates</source>
         <translation>檢查更新失敗</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="204"/>
+        <location filename="../../view/setting_interface.py" line="208"/>
         <source>You&apos;re up to date</source>
         <translation>已是最新版本</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="207"/>
+        <location filename="../../view/setting_interface.py" line="211"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="72"/>
+        <location filename="../../view/setting_interface.py" line="73"/>
         <source>Interface zoom</source>
         <translation>界麵縮放</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="73"/>
+        <location filename="../../view/setting_interface.py" line="74"/>
         <source>Change the size of widgets and fonts</source>
         <translation>調整小部件和字體的大小</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="83"/>
+        <location filename="../../view/setting_interface.py" line="84"/>
         <source>Language</source>
         <translation>語言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="84"/>
+        <location filename="../../view/setting_interface.py" line="85"/>
         <source>Set your preferred language for UI</source>
         <translation>選擇界麵所使用的語言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="91"/>
+        <location filename="../../view/setting_interface.py" line="92"/>
         <source>Software update</source>
         <translation>軟件更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="94"/>
+        <location filename="../../view/setting_interface.py" line="95"/>
         <source>Check for updates when the application starts</source>
         <translation>在應用程序啟動時檢查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="95"/>
+        <location filename="../../view/setting_interface.py" line="96"/>
         <source>The new version will be more stable and have more features</source>
         <translation>新版本將更加穩定並擁有更多功能（建議啟用此選項）</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="101"/>
-        <location filename="../../view/setting_interface.py" line="121"/>
+        <location filename="../../view/setting_interface.py" line="102"/>
+        <location filename="../../view/setting_interface.py" line="122"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="112"/>
-        <location filename="../../view/setting_interface.py" line="114"/>
+        <location filename="../../view/setting_interface.py" line="113"/>
+        <location filename="../../view/setting_interface.py" line="115"/>
         <source>Provide feedback</source>
         <translation>提供反饋</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="119"/>
+        <location filename="../../view/setting_interface.py" line="120"/>
         <source>Check update</source>
         <translation>檢查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="122"/>
+        <location filename="../../view/setting_interface.py" line="123"/>
         <source>Copyright</source>
         <translation>版權所有</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="123"/>
+        <location filename="../../view/setting_interface.py" line="124"/>
         <source>Version</source>
         <translation>當前版本</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="177"/>
-        <source>Configuration takes effect after restart</source>
-        <translation>配置在重啟軟件後生效</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="176"/>
-        <source>Updated successfully</source>
-        <translation>更新成功</translation>
     </message>
 </context>
 <context>

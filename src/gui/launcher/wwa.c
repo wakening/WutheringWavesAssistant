@@ -5,6 +5,10 @@
 
 #pragma comment(lib, "User32.lib")
 
+// 重启限流：10 分钟窗口内最多 20 次重启
+#define RESTART_WINDOW_MS  (10 * 60 * 1000)
+#define RESTART_MAX_COUNT  20
+
 // 启动更新脚本；失败时统一弹窗
 static BOOL LaunchUpdater(const wchar_t *root, int updateArg)
 {
@@ -91,43 +95,11 @@ failed:
     return FALSE;
 }
 
-int WINAPI wWinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    PWSTR lpCmdLine,
-    int nCmdShow)
+// 启动 Python（优先项目自带）或 Conda，并等待其退出。
+// 成功拿到退出码返回 TRUE 并写入 *pExitCode；
+// 启动失败返回 FALSE（已弹窗）。
+static BOOL RunApp(const wchar_t *local_python, DWORD *pExitCode)
 {
-    (void)hInstance;
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-    (void)nCmdShow;
-
-    // 获取 WWA.exe 所在目录
-    wchar_t exePath[MAX_PATH];
-    wchar_t root[MAX_PATH] = { 0 };
-
-    DWORD len = GetModuleFileNameW(
-        NULL, exePath, MAX_PATH);
-
-    if (len > 0 && len < MAX_PATH)
-    {
-        wchar_t *lastSlash = wcsrchr(exePath, L'\\');
-
-        if (lastSlash != NULL)
-        {
-            *lastSlash = L'\0';
-
-            if (swprintf_s(
-                    root, MAX_PATH, L"%ls", exePath) >= 0)
-            {
-                SetCurrentDirectoryW(root);
-            }
-        }
-    }
-
-    // 优先使用项目自带的 Python
-    const wchar_t *local_python = L"py312\\pythonw.exe";
-
     STARTUPINFOW si = { 0 };
     PROCESS_INFORMATION pi = { 0 };
     si.cb = sizeof(si);
@@ -147,7 +119,7 @@ int WINAPI wWinMain(
                 L"Error",
                 MB_OK | MB_ICONERROR
             );
-            return 1;
+            return FALSE;
         }
 
         if (!CreateProcessW(
@@ -177,7 +149,7 @@ int WINAPI wWinMain(
                 MB_OK | MB_ICONERROR
             );
 
-            return 1;
+            return FALSE;
         }
     }
     else
@@ -217,7 +189,7 @@ int WINAPI wWinMain(
                 MB_OK | MB_ICONERROR
             );
 
-            return 1;
+            return FALSE;
         }
     }
 
@@ -237,26 +209,140 @@ int WINAPI wWinMain(
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    // 101～109 均触发更新，个位数作为脚本参数
-    if (gotExitCode && exitCode >= 101 && exitCode <= 109)
-    {
-        int updateArg = (int)(exitCode % 10);
+    if (!gotExitCode)
+        return FALSE;
 
-        if (root[0] != L'\0')
+    *pExitCode = exitCode;
+    return TRUE;
+}
+
+// 重启限流：记录最近 RESTART_MAX_COUNT 次重启的时间戳（环形队列）
+typedef struct
+{
+    ULONGLONG stamps[RESTART_MAX_COUNT];
+    int count;      // 已记录数量（最多 RESTART_MAX_COUNT）
+    int next;       // 下一个写入位置
+} RestartLimiter;
+
+// 尝试登记一次重启；允许返回 TRUE，超过限流返回 FALSE
+static BOOL RestartLimiter_TryAcquire(RestartLimiter *lim)
+{
+    ULONGLONG now = GetTickCount64();
+
+    // 清理窗口外的旧记录：只看环形队列里最老的那条
+    if (lim->count == RESTART_MAX_COUNT)
+    {
+        int oldest = lim->next;  // 写满时 next 指向最老记录
+        if (now - lim->stamps[oldest] >= RESTART_WINDOW_MS)
         {
-            LaunchUpdater(root, updateArg);
+            // 最老记录已出窗口，覆盖它即可
+            lim->stamps[oldest] = now;
+            lim->next = (lim->next + 1) % RESTART_MAX_COUNT;
+            return TRUE;
         }
-        else
+        // 写满且最老记录仍在窗口内，说明窗口内已达上限
+        return FALSE;
+    }
+
+    // 未写满，直接追加
+    lim->stamps[lim->next] = now;
+    lim->next = (lim->next + 1) % RESTART_MAX_COUNT;
+    lim->count++;
+    return TRUE;
+}
+
+int WINAPI wWinMain(
+    HINSTANCE hInstance,
+    HINSTANCE hPrevInstance,
+    PWSTR lpCmdLine,
+    int nCmdShow)
+{
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nCmdShow;
+
+    // 获取 WWA.exe 所在目录
+    wchar_t exePath[MAX_PATH];
+    wchar_t root[MAX_PATH] = { 0 };
+
+    DWORD len = GetModuleFileNameW(
+        NULL, exePath, MAX_PATH);
+
+    if (len > 0 && len < MAX_PATH)
+    {
+        wchar_t *lastSlash = wcsrchr(exePath, L'\\');
+
+        if (lastSlash != NULL)
         {
-            MessageBoxW(
-                NULL,
-                L"Failed to locate the application directory.",
-                L"Error",
-                MB_OK | MB_ICONERROR
-            );
+            *lastSlash = L'\0';
+
+            if (swprintf_s(
+                    root, MAX_PATH, L"%ls", exePath) >= 0)
+            {
+                SetCurrentDirectoryW(root);
+            }
         }
     }
 
-    // 保留原版的启动器返回行为
+    // 优先使用项目自带的 Python
+    const wchar_t *local_python = L"py312\\pythonw.exe";
+
+    // 重启限流器（清零即 count=0, next=0）
+    RestartLimiter limiter = { { 0 }, 0, 0 };
+
+    // 启动 -> 等待 -> 根据退出码决定是否重启/更新
+    for (;;)
+    {
+        DWORD exitCode = 0;
+
+        if (!RunApp(local_python, &exitCode))
+        {
+            // 启动失败（RunApp 已弹窗），直接退出
+            return 1;
+        }
+
+        // 200：不更新，直接重新启动（受 10 分钟 20 次限流）
+        if (exitCode == 200)
+        {
+            if (!RestartLimiter_TryAcquire(&limiter))
+            {
+                MessageBoxW(
+                    NULL,
+                    L"Too many restarts in a short time.\n"
+                    L"Up to 20 restarts per 10 minutes are allowed.",
+                    L"Error",
+                    MB_OK | MB_ICONERROR
+                );
+                break;
+            }
+
+            continue;
+        }
+
+        // 101～109 均触发更新，个位数作为脚本参数
+        if (exitCode >= 101 && exitCode <= 109)
+        {
+            int updateArg = (int)(exitCode % 10);
+
+            if (root[0] != L'\0')
+            {
+                LaunchUpdater(root, updateArg);
+            }
+            else
+            {
+                MessageBoxW(
+                    NULL,
+                    L"Failed to locate the application directory.",
+                    L"Error",
+                    MB_OK | MB_ICONERROR
+                );
+            }
+        }
+
+        // 其他退出码：保留原版的启动器返回行为
+        break;
+    }
+
     return 0;
 }
