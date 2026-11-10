@@ -60,7 +60,8 @@ class _KeyCap(QWidget):
         super().__init__(parent)
         self.text = text
         self.setFont(getFont(fontSize))
-        self.setFixedSize(max(height, QFontMetrics(self.font()).horizontalAdvance(text) + 20), height)
+        # self.setFixedSize(max(height, QFontMetrics(self.font()).horizontalAdvance(text) + 20), height)
+        self.setFixedSize(max(height, max(QFontMetrics(self.font()).horizontalAdvance(text) + 20, 120)), height)
         self.setAccessibleName(text)
         qconfig.themeChangedFinished.connect(self.update)
         qconfig.themeColorChanged.connect(self.update)
@@ -93,10 +94,10 @@ class _KeyCaps(QWidget):
             widget.hide()
             widget.deleteLater()
         for text in _tokens(sequence):
-            # self.row.addWidget(_KeyCap(text, 20 if self._large else 15,
-            #                           56 if self._large else 36, self))
             self.row.addWidget(_KeyCap(text, 20 if self._large else 15,
-                                       56 if self._large else 28, self))
+                                      56 if self._large else 36, self))
+            # self.row.addWidget(_KeyCap(text, 20 if self._large else 15,
+            #                            56 if self._large else 28, self))
         self.row.invalidate()
         self.updateGeometry()
         self.setAccessibleName(sequence.toString(QKeySequence.NativeText) or self.tr('Not set'))

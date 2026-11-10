@@ -29,7 +29,7 @@ from src.gui.common.style_sheet import StyleSheet
 from src.gui.view.home.echo import EchoWidget
 from src.gui.view.home.events import EventsWidget
 from src.gui.view.home.explore import ExploreWidget
-from src.gui.view.home.game_settings import GameSettingsWidget
+# from src.gui.view.home.game_settings import GameSettingsWidget
 
 logger = logging.getLogger(__name__)
 
@@ -411,7 +411,7 @@ class ContentWidget(QWidget):
         self.echo = EchoWidget(self)
         self.explore = ExploreWidget(self)
         self.events = EventsWidget(self)
-        self.gameSettings = GameSettingsWidget(self)
+        # self.gameSettings = GameSettingsWidget(self)
         # self.help = QLabel(self.tr("施工中..."), self)
         # self.help.setAlignment(Qt.AlignVCenter| Qt.AlignHCenter)
 
@@ -420,7 +420,7 @@ class ContentWidget(QWidget):
         self.addSubInterface(self.echo, 'echo', self.tr("Echo"))
         self.addSubInterface(self.explore, 'explore', self.tr("Explore"))
         self.addSubInterface(self.events, 'events', self.tr("Events"))
-        self.addSubInterface(self.gameSettings, 'gameSettings', self.tr("Settings"))
+        # self.addSubInterface(self.gameSettings, 'gameSettings', self.tr("Settings"))
         # self.addSubInterface(self.help, 'help', self.tr("帮助"))
 
         self.currentTask = self.daily

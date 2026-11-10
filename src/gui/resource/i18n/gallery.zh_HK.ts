@@ -2,57 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_HK" sourcelanguage="en_US">
 <context>
-    <name>AutoBossParamSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="1179"/>
-        <source>Target Boss Names</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1180"/>
-        <source>可任选。日常可刷梦魇哀声鸷来合成1c3c。梦魇或副本内boss建议单刷。</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AutoCombatSwitchSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="338"/>
-        <source>On</source>
-        <translation>開</translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="338"/>
-        <source>Off</source>
-        <translation>關</translation>
-    </message>
-</context>
-<context>
-    <name>AutoRestartPeriodSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="174"/>
-        <source>默认关闭</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="177"/>
-        <location filename="../../view/param_interface.py" line="184"/>
-        <source>自定义时间</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="186"/>
-        <location filename="../../view/param_interface.py" line="261"/>
-        <source>设置时间</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="271"/>
-        <source>Restart every {hours} hours, {minutes} minutes, and {seconds} seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>BasicSettingWidget</name>
     <message>
         <location filename="../../view/home_interface.py" line="298"/>
@@ -381,53 +330,6 @@
     </message>
 </context>
 <context>
-    <name>ComboSequenceDialog</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="361"/>
-        <source>备注: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="365"/>
-        <source>连招: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="369"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="370"/>
-        <source>Cancel</source>
-        <translation>取消</translation>
-    </message>
-</context>
-<context>
-    <name>ComboSequenceSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="430"/>
-        <source>默认</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="433"/>
-        <location filename="../../view/param_interface.py" line="440"/>
-        <source>自定义连招</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="442"/>
-        <source>设置连招</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="536"/>
-        <source>Restart every {hours} hours, {minutes} minutes, and {seconds} seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ContentWidget</name>
     <message>
         <location filename="../../view/home_interface.py" line="419"/>
@@ -449,10 +351,114 @@
         <source>Events</source>
         <translation>活動</translation>
     </message>
+</context>
+<context>
+    <name>ControlsSettingCard</name>
     <message>
-        <location filename="../../view/home_interface.py" line="423"/>
-        <source>Settings</source>
-        <translation>設定</translation>
+        <location filename="../../view/setting_interface.py" line="68"/>
+        <source>Move forward</source>
+        <translation>向前移動</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="69"/>
+        <source>Move backward</source>
+        <translation>向後移動</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="70"/>
+        <source>Move left</source>
+        <translation>向左移動</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="71"/>
+        <source>Move right</source>
+        <translation>向右移動</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="73"/>
+        <source>Resonance Skill</source>
+        <translation>共鳴技能</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="74"/>
+        <source>Echo Skill</source>
+        <translation>聲骸技能</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="75"/>
+        <source>Resonance Liberation</source>
+        <translation>共鳴解放</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="77"/>
+        <source>Team Member 1</source>
+        <translation>切換編隊1號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="77"/>
+        <source>Switch to Team Member 1</source>
+        <translation>切換編隊1號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="78"/>
+        <source>Team Member 2</source>
+        <translation>切換編隊2號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="78"/>
+        <source>Switch to Team Member 2</source>
+        <translation>切換編隊2號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="79"/>
+        <source>Team Member 3</source>
+        <translation>切換編隊3號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="79"/>
+        <source>Switch to Team Member 3</source>
+        <translation>切換編隊3號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="80"/>
+        <source>Team Member 4</source>
+        <translation>切換編隊4號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="80"/>
+        <source>Switch to Team Member 4</source>
+        <translation>切換編隊4號隊員</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="82"/>
+        <source>Jump</source>
+        <translation>跳躍</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="83"/>
+        <source>Pick Up/Interact</source>
+        <translation>拾取/交互</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="84"/>
+        <source>Use Utility</source>
+        <translation>探索工具</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="85"/>
+        <source>Map</source>
+        <translation>地圖</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="88"/>
+        <location filename="../../view/setting_interface.py" line="201"/>
+        <source>Reset All Keybinds</source>
+        <translation>重設所有按鍵</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="202"/>
+        <source>Are you sure you want to reset the key bindings to defaults?</source>
+        <translation>確定要將所有按鍵綁定重設為預設值？</translation>
     </message>
 </context>
 <context>
@@ -461,130 +467,6 @@
         <location filename="../../view/home/daily.py" line="117"/>
         <source>Task: </source>
         <translation>任務: </translation>
-    </message>
-</context>
-<context>
-    <name>DailyTaskSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="1460"/>
-        <source>任务设置</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1465"/>
-        <source>基础设置</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1467"/>
-        <source>游戏文本:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1469"/>
-        <location filename="../../view/param_interface.py" line="1472"/>
-        <source>{text} - {sign}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1492"/>
-        <source>重置</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1493"/>
-        <source>关于</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1619"/>
-        <source>周本:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1621"/>
-        <location filename="../../view/param_interface.py" line="1633"/>
-        <location filename="../../view/param_interface.py" line="1642"/>
-        <location filename="../../view/param_interface.py" line="1654"/>
-        <location filename="../../view/param_interface.py" line="1662"/>
-        <location filename="../../view/param_interface.py" line="1671"/>
-        <source>不选择</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1624"/>
-        <location filename="../../view/param_interface.py" line="1724"/>
-        <location filename="../../view/param_interface.py" line="1736"/>
-        <location filename="../../view/param_interface.py" line="1747"/>
-        <location filename="../../view/param_interface.py" line="1758"/>
-        <location filename="../../view/param_interface.py" line="1769"/>
-        <location filename="../../view/param_interface.py" line="1780"/>
-        <source>{challenge} - {boss}</source>
-        <translation type="unfinished">{challenge} - {boss}</translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1631"/>
-        <source>声骸材料:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1640"/>
-        <source>武器及技能材料:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1644"/>
-        <source>{challenge} - {weapon}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1652"/>
-        <source>共鸣者突破材料:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1660"/>
-        <source>梦魇聚落:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1663"/>
-        <location filename="../../view/param_interface.py" line="1672"/>
-        <source>全选</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1669"/>
-        <source>残象聚落:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1676"/>
-        <source>活跃度:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1679"/>
-        <location filename="../../view/param_interface.py" line="1684"/>
-        <location filename="../../view/param_interface.py" line="1689"/>
-        <source>自动</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1681"/>
-        <source>邮件:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1686"/>
-        <source>先约电台:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="2028"/>
-        <source>测试版，仅开放部分关卡。有问题及时群里反馈，最好录屏，或者截图游戏窗口和脚本日志，遮住uid。
-使用前建议关闭微星小飞机、英伟达统计数据、Mod等，避免遮挡游戏ui影响识别</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1894,282 +1776,6 @@
     </message>
 </context>
 <context>
-    <name>GamePathSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="573"/>
-        <source>默认自动获取。例: {gamePath}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="578"/>
-        <source>默认自动获取。当前未找到游戏路径，请手动设置</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="581"/>
-        <source>自定义路径，适合多游戏，同时运行多个游戏时优先操控该路径下的游戏窗口</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="589"/>
-        <source>脚本优先操控运行中的游戏窗口，不管这个参数，多开或游戏没启动时才看选了哪个</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="594"/>
-        <source>Add &quot;Wuthering Waves.exe&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GameSettingsWidget</name>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="48"/>
-        <source>Game Settings</source>
-        <translation>遊戲設定</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="49"/>
-        <source>Click the button to edit. Please make sure it matches the in-game settings.</source>
-        <translation>點擊按鍵進行修改，請與遊戲內的設定保持一致</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="63"/>
-        <source>Movement:</source>
-        <translation>移動:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="65"/>
-        <source>Move forward:</source>
-        <translation>前:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="65"/>
-        <source>Move forward</source>
-        <translation>前</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="66"/>
-        <source>Move backward:</source>
-        <translation>後:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="66"/>
-        <source>Move backward</source>
-        <translation>後</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="67"/>
-        <source>Move left:</source>
-        <translation>左:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="67"/>
-        <source>Move left</source>
-        <translation>左</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="68"/>
-        <source>Move right:</source>
-        <translation>右:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="68"/>
-        <source>Move right</source>
-        <translation>右</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="70"/>
-        <source>Skill:</source>
-        <translation>技能:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="72"/>
-        <source>Resonance Skill:</source>
-        <translation>共鳴技能:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="72"/>
-        <source>Resonance Skill</source>
-        <translation>共鳴技能</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="73"/>
-        <source>Echo Skill:</source>
-        <translation>聲骸技能:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="73"/>
-        <source>Echo Skill</source>
-        <translation>聲骸技能</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="74"/>
-        <source>Resonance Liberation:</source>
-        <translation>共鳴解放:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="74"/>
-        <source>Resonance Liberation</source>
-        <translation>共鳴解放</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="76"/>
-        <source>Member:</source>
-        <translation>編隊:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="78"/>
-        <source>Member 1:</source>
-        <translation>切換隊員1:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="78"/>
-        <source>Switch to Team Member 1</source>
-        <translation>切換編隊1號隊員</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="79"/>
-        <source>Member 2:</source>
-        <translation>切換隊員2:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="79"/>
-        <source>Switch to Team Member 2</source>
-        <translation>切換編隊2號隊員</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="80"/>
-        <source>Member 3:</source>
-        <translation>切換隊員3:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="80"/>
-        <source>Switch to Team Member 3</source>
-        <translation>切換編隊3號隊員</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="81"/>
-        <source>Member 4:</source>
-        <translation>切換隊員4:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="81"/>
-        <source>Switch to Team Member 4</source>
-        <translation>切換編隊4號隊員</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="83"/>
-        <source>Other:</source>
-        <translation>其他:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="85"/>
-        <source>Jump:</source>
-        <translation>跳躍:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="85"/>
-        <source>Jump</source>
-        <translation>跳躍</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="86"/>
-        <source>Pick Up/Interact:</source>
-        <translation>拾取/交互:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="86"/>
-        <source>Pick Up/Interact</source>
-        <translation>拾取/交互</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="87"/>
-        <source>Use Utility:</source>
-        <translation>探索工具:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="87"/>
-        <source>Use Utility</source>
-        <translation>探索工具</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="88"/>
-        <source>Map:</source>
-        <translation>地圖:</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="88"/>
-        <source>Map</source>
-        <translation>地圖</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="113"/>
-        <source>Reset All Keybinds</source>
-        <translation>重設所有按鍵</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="244"/>
-        <source>Note</source>
-        <translation>提示</translation>
-    </message>
-    <message>
-        <location filename="../../view/home/game_settings.py" line="245"/>
-        <source>Are you sure you want to reset the key bindings to defaults?</source>
-        <translation>確定要將所有按鍵綁定重設為預設值？</translation>
-    </message>
-</context>
-<context>
-    <name>MacroParamSettingCard</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="1244"/>
-        <source>预设模板:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1252"/>
-        <source>自定义模板  目录: {dir}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1262"/>
-        <source>刷新</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1263"/>
-        <source>使用自定义模板</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1264"/>
-        <source>关于</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1266"/>
-        <source>保存/停止快捷键: ESC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1368"/>
-        <source>Refresh: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1368"/>
-        <source>Successful</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1441"/>
-        <source>模板为人工录制，本身并不完美，因设备、网络等影响，可能存在极小的正负延迟，对不上轴ESC重跑即可，都能3S全奖励。作者也打不出100%，部分歌曲只有90%+，欢迎使用录制功能，将你的模板文件、结算分数、按键设置截图打包分享到群里，由群主校准后合进脚本内。
-角色选陆赫斯/莫宁，默认按键0延迟。
-请勿直接修改预设模板，有问题先检查选项是否勾选正确</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainWindow</name>
     <message>
         <location filename="../../view/main_window.py" line="112"/>
@@ -2221,196 +1827,148 @@
     </message>
 </context>
 <context>
-    <name>ParamInterface</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="991"/>
-        <source>Param</source>
-        <translation type="unfinished">參數</translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="995"/>
-        <source>Boss Rush Parameters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1041"/>
-        <source>Scheduled Game Restart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1042"/>
-        <source>Restart the game at regular intervals. This only applies to the Boss Rush task</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1056"/>
-        <source>Game Parameters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1061"/>
-        <source>Installation Directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1062"/>
-        <source>If you play multiple games, configure this accordingly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1107"/>
-        <source>Updated successfully</source>
-        <translation>更新成功</translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="1108"/>
-        <source>Configuration takes effect after restart</source>
-        <translation>配置在重啟軟件後生效</translation>
-    </message>
-</context>
-<context>
     <name>SettingInterface</name>
     <message>
-        <location filename="../../view/setting_interface.py" line="36"/>
+        <location filename="../../view/setting_interface.py" line="244"/>
         <source>Settings</source>
         <translation>設置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="40"/>
+        <location filename="../../view/setting_interface.py" line="248"/>
         <source>Personalization</source>
         <translation>個性化</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="51"/>
+        <location filename="../../view/setting_interface.py" line="259"/>
         <source>Application theme</source>
         <translation>應用主題</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="52"/>
+        <location filename="../../view/setting_interface.py" line="260"/>
         <source>Change the appearance of your application</source>
         <translation>調整你的應用的外觀</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="54"/>
+        <location filename="../../view/setting_interface.py" line="262"/>
         <source>Light</source>
         <translation>淺色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="54"/>
+        <location filename="../../view/setting_interface.py" line="262"/>
         <source>Dark</source>
         <translation>深色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="56"/>
-        <location filename="../../view/setting_interface.py" line="78"/>
-        <location filename="../../view/setting_interface.py" line="86"/>
+        <location filename="../../view/setting_interface.py" line="264"/>
+        <location filename="../../view/setting_interface.py" line="286"/>
+        <location filename="../../view/setting_interface.py" line="294"/>
         <source>Use system setting</source>
         <translation>跟隨繫統設置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="62"/>
-        <source>Window size</source>
-        <translation>介面大小</translation>
+        <location filename="../../view/setting_interface.py" line="299"/>
+        <source>Game</source>
+        <translation>遊戲</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="63"/>
-        <source>Adjust window size</source>
-        <translation>調整介面寬高</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="66"/>
-        <source>Default</source>
-        <translation>預設</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="116"/>
+        <location filename="../../view/setting_interface.py" line="333"/>
         <source>Help us improve Wuthering Waves Assistant by providing feedback</source>
         <translation>歡迎提供意見與建議，幫助我們將軟體做得更好。</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="179"/>
+        <location filename="../../view/setting_interface.py" line="397"/>
         <source>Restart Required</source>
-        <translation type="unfinished"></translation>
+        <translation>重啟生效</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="180"/>
+        <location filename="../../view/setting_interface.py" line="398"/>
         <source>This change requires a restart. Restart now?</source>
-        <translation type="unfinished"></translation>
+        <translation>此變更需要重啟軟體後才能生效。是否立即重啟？</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="205"/>
+        <location filename="../../view/setting_interface.py" line="423"/>
         <source>Failed to check for updates</source>
         <translation>檢查更新失敗</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="208"/>
+        <location filename="../../view/setting_interface.py" line="426"/>
         <source>You&apos;re up to date</source>
         <translation>已是最新版本</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="211"/>
+        <location filename="../../view/setting_interface.py" line="429"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="73"/>
+        <location filename="../../view/setting_interface.py" line="281"/>
         <source>Interface zoom</source>
         <translation>界麵縮放</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="74"/>
+        <location filename="../../view/setting_interface.py" line="282"/>
         <source>Change the size of widgets and fonts</source>
         <translation>調整小部件和字體的大小</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="84"/>
+        <location filename="../../view/setting_interface.py" line="292"/>
         <source>Language</source>
         <translation>語言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="85"/>
+        <location filename="../../view/setting_interface.py" line="293"/>
         <source>Set your preferred language for UI</source>
         <translation>選擇界麵所使用的語言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="92"/>
+        <location filename="../../view/setting_interface.py" line="302"/>
+        <source>Keybindings</source>
+        <translation>按鍵</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="303"/>
+        <source>Please use the same keybindings as in-game</source>
+        <translation>請與遊戲內的按鍵設定保持一致</translation>
+    </message>
+    <message>
+        <location filename="../../view/setting_interface.py" line="309"/>
         <source>Software update</source>
         <translation>軟件更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="95"/>
+        <location filename="../../view/setting_interface.py" line="312"/>
         <source>Check for updates when the application starts</source>
         <translation>在應用程序啟動時檢查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="96"/>
+        <location filename="../../view/setting_interface.py" line="313"/>
         <source>The new version will be more stable and have more features</source>
         <translation>新版本將更加穩定並擁有更多功能（建議啟用此選項）</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="102"/>
-        <location filename="../../view/setting_interface.py" line="122"/>
+        <location filename="../../view/setting_interface.py" line="319"/>
+        <location filename="../../view/setting_interface.py" line="339"/>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="113"/>
-        <location filename="../../view/setting_interface.py" line="115"/>
+        <location filename="../../view/setting_interface.py" line="330"/>
+        <location filename="../../view/setting_interface.py" line="332"/>
         <source>Provide feedback</source>
         <translation>提供反饋</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="120"/>
+        <location filename="../../view/setting_interface.py" line="337"/>
         <source>Check update</source>
         <translation>檢查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="123"/>
+        <location filename="../../view/setting_interface.py" line="340"/>
         <source>Copyright</source>
         <translation>版權所有</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="124"/>
+        <location filename="../../view/setting_interface.py" line="341"/>
         <source>Version</source>
         <translation>當前版本</translation>
     </message>
@@ -2418,7 +1976,7 @@
 <context>
     <name>ShortcutWidget</name>
     <message>
-        <location filename="../../view/home/game_settings.py" line="31"/>
+        <location filename="../../view/setting_interface.py" line="34"/>
         <source>Press a key or key combination to change this shortcut.</source>
         <translation>按下按鍵或組合鍵以更改此快捷鍵</translation>
     </message>
@@ -2584,34 +2142,6 @@
         <location filename="../../view/terminal_interface.py" line="111"/>
         <source>Terminal</source>
         <translation>終端</translation>
-    </message>
-</context>
-<context>
-    <name>TimeDialog</name>
-    <message>
-        <location filename="../../view/param_interface.py" line="50"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="51"/>
-        <source>Cancel</source>
-        <translation>取消</translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="55"/>
-        <source>时</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="56"/>
-        <source>分</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../view/param_interface.py" line="57"/>
-        <source>秒</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2808,6 +2338,29 @@
         <location filename="../../view/home_interface.py" line="130"/>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+</context>
+<context>
+    <name>_ShortcutPickerDialog</name>
+    <message>
+        <location filename="../../components/widgets/_shortcut_picker_dialog.py" line="34"/>
+        <source>Press a key combination</source>
+        <translation>按下組合鍵</translation>
+    </message>
+    <message>
+        <location filename="../../components/widgets/_shortcut_picker_dialog.py" line="42"/>
+        <source>Save</source>
+        <translation>儲存</translation>
+    </message>
+    <message>
+        <location filename="../../components/widgets/_shortcut_picker_dialog.py" line="43"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../../components/widgets/_shortcut_picker_dialog.py" line="44"/>
+        <source>Reset</source>
+        <translation>重設</translation>
     </message>
 </context>
 </TS>

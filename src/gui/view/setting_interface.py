@@ -1,25 +1,233 @@
 # coding:utf-8
 import logging
+from typing import Union
 
 from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSettingCard,
                             OptionsSettingCard, PushSettingCard,
                             HyperlinkCard, PrimaryPushSettingCard, ScrollArea,
                             ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
-                            setTheme, setThemeColor, RangeSettingCard, isDarkTheme, Dialog, MessageBox)
-from qfluentwidgets import FluentIcon as FIF
-from qfluentwidgets import InfoBar
+                            setTheme, setThemeColor, RangeSettingCard, isDarkTheme, Dialog, MessageBox,
+                            ExpandSettingCard, FluentIconBase, FluentIcon as FIF, InfoBar, RadioButton, qconfig,
+                            TableWidget, ListWidget, PushButton)
 from PySide6.QtCore import Qt, Signal, QUrl, QStandardPaths
-from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
+from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence
+from PySide6.QtWidgets import QWidget, QLabel, QFileDialog, QButtonGroup, QTableWidgetItem, QListWidgetItem, \
+    QSizePolicy, QHBoxLayout
 
-from ..common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL, \
-    VERSION_URLS
+from ..common.config import (cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL,
+                             VERSION_URLS, paramConfig)
 from ..common.globals import globalSignal
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.version_control import RemoteVersion
+from ..components.my_shortcut_picker import MyShortcutPicker
 
 logger = logging.getLogger(__name__)
+
+
+class ShortcutWidget(MyShortcutPicker):
+
+    def __init__(self, keySequence='Ctrl+Shift+A', text='', dialogTitle='', parent=None):
+        super().__init__(keySequence, text, parent)
+        if dialogTitle:
+            self.setDialogTitle(dialogTitle)
+        self.setDialogDescription(self.tr('Press a key or key combination to change this shortcut.'))
+        self.setBorderRadius(1)
+        row = self.layout()
+        row.setContentsMargins(25, 8, 25, 8)
+
+    def loadKeySequence(self, keySequence):
+        if not keySequence:
+            return
+        self.blockSignals(True)
+        self.setKeySequence(keySequence)
+        self.blockSignals(False)
+
+
+class ControlsSettingCard(ExpandSettingCard):
+    """ setting card with a group of options """
+
+    def __init__(self, icon: Union[str, QIcon, FluentIconBase], title, content=None, parent=None):
+        """
+        Parameters
+        ----------
+        icon: str | QIcon | FluentIconBase
+            the icon to be drawn
+
+        title: str
+            the title of setting card
+
+        content: str
+            the content of setting card
+
+        parent: QWidget
+            parent window
+        """
+        super().__init__(icon, title, content, parent)
+
+        self.moveForwardWidget = ShortcutWidget('W', self.tr('Move forward'), self.tr('Move forward'), self)
+        self.moveBackwardWidget = ShortcutWidget('A', self.tr('Move backward'), self.tr('Move backward'), self)
+        self.moveLeftWidget = ShortcutWidget('S', self.tr('Move left'), self.tr('Move left'), self)
+        self.moveRightWidget = ShortcutWidget('D', self.tr('Move right'), self.tr('Move right'), self)
+
+        self.resonanceSkillWidget = ShortcutWidget('E', self.tr('Resonance Skill'), self.tr('Resonance Skill'), self)
+        self.echoSkillWidget = ShortcutWidget('Q', self.tr('Echo Skill'), self.tr('Echo Skill'), self)
+        self.resonanceLiberationWidget = ShortcutWidget('R', self.tr('Resonance Liberation'), self.tr('Resonance Liberation'), self)
+
+        self.member1Widget = ShortcutWidget('1', self.tr('Team Member 1'), self.tr('Switch to Team Member 1'), self)
+        self.member2Widget = ShortcutWidget('2', self.tr('Team Member 2'), self.tr('Switch to Team Member 2'), self)
+        self.member3Widget = ShortcutWidget('3', self.tr('Team Member 3'), self.tr('Switch to Team Member 3'), self)
+        self.member4Widget = ShortcutWidget('4', self.tr('Team Member 4'), self.tr('Switch to Team Member 4'), self)
+
+        self.jumpWidget = ShortcutWidget('Space', self.tr('Jump'), self.tr('Jump'), self)
+        self.pickUpWidget = ShortcutWidget('F', self.tr('Pick Up/Interact'), self.tr('Pick Up/Interact'), self)
+        self.useUtilityWidget = ShortcutWidget('T', self.tr('Use Utility'), self.tr('Use Utility'), self)
+        self.mapWidget = ShortcutWidget('M', self.tr('Map'), self.tr('Map'), self)
+
+        self.resetLayout = QHBoxLayout()
+        self.resetButton = PushButton(self.tr('Reset All Keybinds'), self)
+
+        self.__initWidget()
+        self._adjustViewSize()
+
+    def __initWidget(self):
+
+        # initialize layout
+        self.__initLayout()
+        self.__connectSignalToSlot()
+        self.__loadConfig()
+
+    def __initLayout(self):
+        # self.setStyleSheet("border: 2px solid red;")
+
+        self.moveForwardWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.moveBackwardWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.moveLeftWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.moveRightWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.resonanceSkillWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.echoSkillWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.resonanceLiberationWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.member1Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.member2Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.member3Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.member4Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.jumpWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.pickUpWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.useUtilityWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.mapWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+        self.resetButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+
+        self.resetLayout.addStretch()
+        self.resetLayout.addWidget(self.resetButton)
+        self.resetLayout.setContentsMargins(0, 10, 28, 10)
+
+        self.viewLayout.addWidget(self.moveForwardWidget)
+        self.viewLayout.addWidget(self.moveBackwardWidget)
+        self.viewLayout.addWidget(self.moveLeftWidget)
+        self.viewLayout.addWidget(self.moveRightWidget)
+        self.viewLayout.addWidget(self.resonanceSkillWidget)
+        self.viewLayout.addWidget(self.echoSkillWidget)
+        self.viewLayout.addWidget(self.resonanceLiberationWidget)
+        self.viewLayout.addWidget(self.member1Widget)
+        self.viewLayout.addWidget(self.member2Widget)
+        self.viewLayout.addWidget(self.member3Widget)
+        self.viewLayout.addWidget(self.member4Widget)
+        self.viewLayout.addWidget(self.jumpWidget)
+        self.viewLayout.addWidget(self.pickUpWidget)
+        self.viewLayout.addWidget(self.useUtilityWidget)
+        self.viewLayout.addWidget(self.mapWidget)
+
+        self.viewLayout.addLayout(self.resetLayout)
+
+        # self.viewLayout.addStretch()
+        self.viewLayout.setSpacing(0)
+        self.viewLayout.setContentsMargins(0, 0, 0, 0)
+
+    def __connectSignalToSlot(self):
+        self.moveForwardWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.moveForwardWidget, paramConfig.shortcutMoveForward))
+        self.moveBackwardWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.moveBackwardWidget, paramConfig.shortcutMoveBackward))
+        self.moveLeftWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.moveLeftWidget, paramConfig.shortcutMoveLeft))
+        self.moveRightWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.moveRightWidget, paramConfig.shortcutMoveRight))
+        self.resonanceSkillWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.resonanceSkillWidget, paramConfig.shortcutResonanceSkill))
+        self.echoSkillWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.echoSkillWidget, paramConfig.shortcutEchoSkill))
+        self.resonanceLiberationWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.resonanceLiberationWidget,
+                                                    paramConfig.shortcutResonanceLiberation))
+        self.member1Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.member1Widget, paramConfig.shortcutMember1))
+        self.member2Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.member2Widget, paramConfig.shortcutMember2))
+        self.member3Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.member3Widget, paramConfig.shortcutMember3))
+        self.member4Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.member4Widget, paramConfig.shortcutMember4))
+        self.jumpWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.jumpWidget, paramConfig.shortcutJump))
+        self.pickUpWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.pickUpWidget, paramConfig.shortcutPickUp))
+        self.useUtilityWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.useUtilityWidget, paramConfig.shortcutUseUtility))
+        self.mapWidget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.mapWidget, paramConfig.shortcutMap))
+
+        self.resetButton.clicked.connect(self.__showResetDialog)
+
+    def __loadConfig(self):
+        self.moveForwardWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMoveForward))
+        self.moveBackwardWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMoveBackward))
+        self.moveLeftWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMoveLeft))
+        self.moveRightWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMoveRight))
+        self.resonanceSkillWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutResonanceSkill))
+        self.echoSkillWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutEchoSkill))
+        self.resonanceLiberationWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutResonanceLiberation))
+        self.member1Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember1))
+        self.member2Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember2))
+        self.member3Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember3))
+        self.member4Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember4))
+        self.jumpWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutJump))
+        self.pickUpWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutPickUp))
+        self.useUtilityWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutUseUtility))
+        self.mapWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMap))
+
+    def __showResetDialog(self):
+        title = self.tr('Reset All Keybinds')
+        content = self.tr('Are you sure you want to reset the key bindings to defaults?')
+        w = MessageBox(title, content, self.window())
+        # w.setTitleBarVisible(False)
+        # w.setContentCopyable(True)
+        if not w.exec():
+            return
+
+        self.moveForwardWidget.reset()
+        self.moveBackwardWidget.reset()
+        self.moveLeftWidget.reset()
+        self.moveRightWidget.reset()
+        self.resonanceSkillWidget.reset()
+        self.echoSkillWidget.reset()
+        self.resonanceLiberationWidget.reset()
+        self.member1Widget.reset()
+        self.member2Widget.reset()
+        self.member3Widget.reset()
+        self.member4Widget.reset()
+        self.jumpWidget.reset()
+        self.pickUpWidget.reset()
+        self.useUtilityWidget.reset()
+        self.mapWidget.reset()
+
+    def __onKeySequenceChanged(self, keySequence: QKeySequence, shortcutWidget: ShortcutWidget, item):
+        keyStr = keySequence.toString(QKeySequence.SequenceFormat.PortableText)
+        logger.info(f"{shortcutWidget.textLabel.text()} '{keyStr}'")
+        if shortcutWidget.defaultKeySequence() == shortcutWidget.keySequence():
+            paramConfig.set(item, None)
+        else:
+            paramConfig.set(item, keyStr)
 
 
 class SettingInterface(ScrollArea):
@@ -56,17 +264,17 @@ class SettingInterface(ScrollArea):
             ],
             parent=self.personalGroup
         )
-        self.windowSizeCard = OptionsSettingCard(
-            cfg.windowSize,
-            FIF.ZOOM,
-            self.tr("Window size"),
-            self.tr("Adjust window size"),
-            texts=[
-                # "720x720",
-                self.tr("Default"),
-            ],
-            parent=self.personalGroup
-        )
+        # self.windowSizeCard = OptionsSettingCard(
+        #     cfg.windowSize,
+        #     FIF.ZOOM,
+        #     self.tr("Window size"),
+        #     self.tr("Adjust window size"),
+        #     texts=[
+        #         # "720x720",
+        #         self.tr("Default"),
+        #     ],
+        #     parent=self.personalGroup
+        # )
         self.zoomCard = ComboBoxSettingCard(
             cfg.dpiScale,
             FIF.ZOOM,
@@ -84,6 +292,15 @@ class SettingInterface(ScrollArea):
             self.tr('Language'),
             self.tr('Set your preferred language for UI'),
             texts=['简体中文', '繁體中文', 'English', self.tr('Use system setting')],
+            parent=self.personalGroup
+        )
+
+        # game setting
+        self.gameSettingGroup = SettingCardGroup(self.tr("Game"), self.scrollWidget)
+        self.gameSettingCard = ControlsSettingCard(
+            FIF.GAME,
+            self.tr("Keybindings"),
+            self.tr("Please use the same keybindings as in-game"),
             parent=self.personalGroup
         )
 
@@ -129,8 +346,6 @@ class SettingInterface(ScrollArea):
 
         self.__initWidget()
 
-        self.windowSizeCard.setVisible(False)
-
     def __initWidget(self):
         self.resize(1000, 800)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -156,9 +371,11 @@ class SettingInterface(ScrollArea):
         # add cards to group
         # self.personalGroup.addSettingCard(self.micaCard)
         self.personalGroup.addSettingCard(self.themeCard)
-        self.personalGroup.addSettingCard(self.windowSizeCard)
+        # self.personalGroup.addSettingCard(self.windowSizeCard)
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
+
+        self.gameSettingGroup.addSettingCard(self.gameSettingCard)
 
         self.updateSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
 
@@ -167,9 +384,10 @@ class SettingInterface(ScrollArea):
         self.aboutGroup.addSettingCard(self.aboutCard)
 
         # add setting card group to layout
-        self.expandLayout.setSpacing(28)
+        self.expandLayout.setSpacing(15)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
         self.expandLayout.addWidget(self.personalGroup)
+        self.expandLayout.addWidget(self.gameSettingGroup)
         self.expandLayout.addWidget(self.updateSoftwareGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
@@ -190,7 +408,7 @@ class SettingInterface(ScrollArea):
         # personalization
         cfg.themeChanged.connect(setTheme)
         # self.micaCard.checkedChanged.connect(signalBus.micaEnableChanged)
-        self.windowSizeCard.optionChanged.connect(signalBus.windowSizeChanged.emit)
+        # self.windowSizeCard.optionChanged.connect(signalBus.windowSizeChanged.emit)
 
         # about
         self.feedbackCard.clicked.connect(
