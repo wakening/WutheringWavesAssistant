@@ -26,11 +26,22 @@ if errorlevel 1 goto failed
 set "ROOT=%CD%"
 set "GIT=%ROOT%\git\cmd\git.exe"
 set "LAUNCHER=%ROOT%\WWA.exe"
+set "USE_BUNDLED_GIT=1"
 
 rem Check required files
-if not exist "%GIT%" goto git_not_found
 if not exist "%ROOT%\.git" goto repository_not_found
 if not exist "%LAUNCHER%" goto launcher_not_found
+
+rem Check bundled git; if missing, fall back to system git
+if exist "%GIT%" goto git_ready
+
+echo [INFO] Bundled Git not found, trying system Git...
+set "GIT=git"
+set "USE_BUNDLED_GIT=0"
+"%GIT%" --version >nul 2>&1
+if errorlevel 1 goto git_not_found
+
+:git_ready
 
 rem Optionally change the origin URL
 set "REPO_URL="
@@ -52,10 +63,18 @@ echo Fetching updates...
 if errorlevel 1 goto failed
 
 echo.
+if "%USE_BUNDLED_GIT%"=="1" goto reset_upstream
+echo Merging to upstream...
+"%GIT%" merge "@{upstream}"
+if errorlevel 1 goto failed
+goto update_done
+
+:reset_upstream
 echo Resetting to upstream...
 "%GIT%" reset --hard "@{upstream}"
 if errorlevel 1 goto failed
 
+:update_done
 rem Restart application
 echo.
 echo Update completed. Starting WWA...
@@ -71,8 +90,7 @@ echo [ERROR] update.bat must be located in the project's temp\update directory.
 goto failed
 
 :git_not_found
-echo [ERROR] Git executable not found:
-echo "%GIT%"
+echo [ERROR] Git executable not found (neither bundled nor system git is available).
 goto failed
 
 :repository_not_found
