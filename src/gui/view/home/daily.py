@@ -810,13 +810,13 @@ class DailyWidget(ScrollArea):
                 id=I18nText.Lily,
                 name=self.tr("Lily"),
                 weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
+                tacetSuppression=[self.tr("Heart of Stillness", "Tacet Field")],
+                forgeryChallenge=[self.tr("Ashen Chasm"), self.tr("Lesson in Embers")],
+                bossChallenge=self.tr("Hyvatia"),
                 gather='',
-                tacetDiscordNest=[],
+                tacetDiscordNest=[self.tr("Simulacrum Nexus", "Tacet Discord Nest")],
                 nightmarePurification=[],
-                enable=False,
+                enable=True,
             ),
             QResonator(
                 id=I18nText.Suoming,
@@ -869,26 +869,28 @@ class DailyWidget(ScrollArea):
             QResonator(
                 id=I18nText.Suisui,
                 name=self.tr("Suisui"),
-                weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
-                gather='',
-                tacetDiscordNest=[],
+                weeklyChallenge=self.tr("Thousand-Puppet Pavilion"),
+                tacetSuppression=[self.tr("Eastern Xuan Peaks", "Tacet Field"),
+                                  self.tr("Western Fang Peaks", "Tacet Field")],
+                forgeryChallenge=[self.tr("Silent Chasm"), self.tr("Lesson in Sunset")],
+                bossChallenge=self.tr("Myriad Snare: Rustfire Chassis"),
+                gather=self.tr("Flowborne Dream"),
+                tacetDiscordNest=[self.tr("Southern Yuan Hills", "Tacet Discord Nest")],
                 nightmarePurification=[],
-                enable=False,
+                enable=True,
             ),
             QResonator(
                 id=I18nText.YangyangXuanling,
                 name=self.tr("Yangyang: Xuanling"),
-                weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
-                gather='',
-                tacetDiscordNest=[],
+                weeklyChallenge=self.tr("Thousand-Puppet Pavilion"),
+                tacetSuppression=[self.tr("Eastern Xuan Peaks", "Tacet Field"),
+                                  self.tr("Western Fang Peaks", "Tacet Field")],
+                forgeryChallenge=[self.tr("Wingfall Chasm"), self.tr("Fallen Sanctum")],
+                bossChallenge=self.tr("Myriad Snare: Rustfire Chassis"),
+                gather=self.tr("Cloudperch Seed"),
+                tacetDiscordNest=[self.tr("Southern Yuan Hills", "Tacet Discord Nest")],
                 nightmarePurification=[],
-                enable=False,
+                enable=True,
             ),
             QResonator(
                 id=I18nText.Rebecca,
@@ -917,14 +919,14 @@ class DailyWidget(ScrollArea):
             QResonator(
                 id=I18nText.Hiyuki,
                 name=self.tr("Hiyuki"),
-                weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
-                gather='',
-                tacetDiscordNest=[],
+                weeklyChallenge=self.tr("Denia"),
+                tacetSuppression=[self.tr("Solisia Landing", "Tacet Field")],
+                forgeryChallenge=[self.tr("Wingfall Chasm"), self.tr("Fallen Sanctum")],
+                bossChallenge=self.tr("Nameless Explorer"),
+                gather=self.tr("Redbell"),
+                tacetDiscordNest=[self.tr("Stagnant Run", "Tacet Discord Nest"), self.tr("Rebirth Uplands", "Tacet Discord Nest")],
                 nightmarePurification=[],
-                enable=False,
+                enable=True,
             ),
             QResonator(
                 id=I18nText.Lucilla,
@@ -941,14 +943,14 @@ class DailyWidget(ScrollArea):
             QResonator(
                 id=I18nText.Sigrika,
                 name=self.tr("Sigrika"),
-                weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
-                gather='',
-                tacetDiscordNest=[],
+                weeklyChallenge=self.tr("Sigillum"),
+                tacetSuppression=[self.tr("Frostlands Transit Port", "Tacet Field")],
+                forgeryChallenge=[self.tr("Eroded Chasm"), self.tr("Lesson in Void")],
+                bossChallenge=self.tr("Nameless Explorer"),
+                gather=self.tr("Arithmetic Shell"),
+                tacetDiscordNest=[self.tr("Stagnant Run", "Tacet Discord Nest"), self.tr("Rebirth Uplands", "Tacet Discord Nest")],
                 nightmarePurification=[],
-                enable=False,
+                enable=True,
             ),
             QResonator(
                 id=I18nText.Denia,
@@ -1013,14 +1015,14 @@ class DailyWidget(ScrollArea):
             QResonator(
                 id=I18nText.Qiuyuan,
                 name=self.tr("Qiuyuan"),
-                weeklyChallenge='',
-                tacetSuppression=[],
-                forgeryChallenge=[],
-                bossChallenge='',
-                gather='',
+                weeklyChallenge=self.tr("Threnodian: Leviathan"),
+                tacetSuppression=[self.tr("Mournfell Canyon", "Tacet Field")],
+                forgeryChallenge=[self.tr("Garden of Salvation"), self.tr("Flaming Remnants")],
+                bossChallenge=self.tr("Fenrico"),
+                gather=self.tr("Wintry Bell"),
                 tacetDiscordNest=[],
-                nightmarePurification=[],
-                enable=False,
+                nightmarePurification=[self.tr("Tideline Verge", "Nightmare Nest")],
+                enable=True,
             ),
             QResonator(
                 id=I18nText.Galbrena,
@@ -1578,6 +1580,7 @@ class DailyWidget(ScrollArea):
         self.focusBossChallenge = QLabel(self.container)
         self.focusGather = QLabel(self.container)
         self.focusTacetDiscordNest = QLabel(self.container)
+        self.focusNightmarePurification = QLabel(self.container)
 
         self.focusResonatorLayout = QHBoxLayout()
         self.focusResonatorTitle = QLabel(self.tr("Resonator: "), self.container)
@@ -1722,6 +1725,7 @@ class DailyWidget(ScrollArea):
         row += 1
         self.gridLayout.addWidget(self.nightmarePurificationCheckBox, row, 1)
         self.gridLayout.addWidget(self.nightmarePurificationComboBox, row, 2)
+        self.gridLayout.addWidget(self.focusNightmarePurification, row, 3)
         # self.gridLayout.addWidget(self.nightmarePurificationSettingButton, row, 2)
 
         row += 1
@@ -1897,6 +1901,7 @@ class DailyWidget(ScrollArea):
             self.focusBossChallenge.setText(resonator.bossChallenge)
             # self.focusGather.setText(self.tr(r"Gather: {}").format(resonator.gather))
             self.focusTacetDiscordNest.setText(", ".join(resonator.tacetDiscordNest))
+            self.focusNightmarePurification.setText(", ".join(resonator.nightmarePurification))
             return
 
         self.focusWeeklyChallenge.clear()
@@ -1905,6 +1910,7 @@ class DailyWidget(ScrollArea):
         self.focusBossChallenge.clear()
         # self.focusGather.clear()
         self.focusTacetDiscordNest.clear()
+        self.focusNightmarePurification.clear()
 
     def __onFocusResonatorIndexChanged(self, index: int):
         resonator_id = self.focusResonatorComboBox.itemData(index)

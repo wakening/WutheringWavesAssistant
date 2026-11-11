@@ -1051,17 +1051,17 @@ class ParamInterface(ScrollArea):
         #     parent=self.bossGroup
         # )
 
-        # game folders
-        self.gameGroup = SettingCardGroup(
-            self.tr("Game Parameters"), self.scrollWidget)
-
-        self.gamePathCard = GamePathSettingCard(
-            paramConfig.gamePath,
-            FIF.FOLDER,
-            self.tr("Installation Directory"),
-            self.tr("If you play multiple games, configure this accordingly"),
-            self.gameGroup
-        )
+        # # game folders
+        # self.gameGroup = SettingCardGroup(
+        #     self.tr("Game Parameters"), self.scrollWidget)
+        #
+        # self.gamePathCard = GamePathSettingCard(
+        #     paramConfig.gamePath,
+        #     FIF.FOLDER,
+        #     self.tr("Installation Directory"),
+        #     self.tr("If you play multiple games, configure this accordingly"),
+        #     self.gameGroup
+        # )
 
         self.__initWidget()
 
@@ -1085,8 +1085,8 @@ class ParamInterface(ScrollArea):
     def __initLayout(self):
         self.settingLabel.move(36, 30)
 
-        # add cards to group
-        self.gameGroup.addSettingCard(self.gamePathCard)
+        # # add cards to group
+        # self.gameGroup.addSettingCard(self.gamePathCard)
 
         # self.bossGroup.addSettingCard(self.bossNameCard)
         # self.bossGroup.addSettingCard(self.bossLevelCard)
@@ -1099,7 +1099,7 @@ class ParamInterface(ScrollArea):
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
 
         self.expandLayout.addWidget(self.bossGroup)
-        self.expandLayout.addWidget(self.gameGroup)
+        # self.expandLayout.addWidget(self.gameGroup)
 
     def __showRestartTooltip(self):
         """ show restart tooltip """

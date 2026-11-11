@@ -8,11 +8,12 @@ from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSetti
                             ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
                             setTheme, setThemeColor, RangeSettingCard, isDarkTheme, Dialog, MessageBox,
                             ExpandSettingCard, FluentIconBase, FluentIcon as FIF, InfoBar, RadioButton, qconfig,
-                            TableWidget, ListWidget, PushButton, FluentStyleSheet, PrimaryPushButton)
+                            TableWidget, ListWidget, PushButton, FluentStyleSheet, PrimaryPushButton,
+                            ExpandGroupSettingCard, ConfigItem)
 from PySide6.QtCore import Qt, Signal, QUrl, QStandardPaths
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence
 from PySide6.QtWidgets import (QWidget, QLabel, QFileDialog, QButtonGroup, QTableWidgetItem, QListWidgetItem,
-                               QSizePolicy, QHBoxLayout)
+                               QSizePolicy, QHBoxLayout, QVBoxLayout)
 
 from ..common.config import (cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL,
                              VERSION_URLS, paramConfig)
@@ -21,6 +22,7 @@ from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.version_control import RemoteVersion
 from ..components.my_shortcut_picker import MyShortcutPicker
+from ...util import winreg_util
 
 logger = logging.getLogger(__name__)
 
@@ -232,6 +234,175 @@ class ControlsSettingCard(ExpandSettingCard):
             paramConfig.set(item, keyStr)
 
 
+class GamePathSettingCard(ExpandGroupSettingCard):
+    """ Custom Value setting card """
+
+    gamePathChanged = Signal(int)
+
+    def __init__(self, configItem: ConfigItem, icon: Union[str, QIcon, FluentIconBase], title: str,
+                 content=None, parent=None):
+        super().__init__(icon, title, content, parent=parent)
+        self.configItem = configItem
+        self.defaultValue = configItem.defaultValue
+        self.customValue = paramConfig.get(configItem)
+        self.customValueLast = None if self.customValue == self.defaultValue else self.customValue
+
+        self.choiceLabel = QLabel(self)
+
+        self.radioWidget = QWidget(self.view)
+        self.radioLayout = QVBoxLayout(self.radioWidget)
+
+        install_path = winreg_util.get_install_path()
+        if install_path:
+            gamePath = install_path.strip().replace("\\", "/").replace("\\\\", "/")
+            gamePathText = self.tr("默认自动获取。例: {gamePath}").format(gamePath=gamePath)
+        else:
+            gamePathText = self.tr("默认自动获取。当前未找到游戏路径，请手动设置")
+
+        self.defaultRadioButton = RadioButton(gamePathText, self.radioWidget)
+        # self.tr('Default Close'), self.radioWidget)
+        self.customRadioButton = RadioButton(
+            self.tr('自定义路径，适合多游戏，同时运行多个游戏时优先操控该路径下的游戏窗口'), self.radioWidget)
+        # self.tr('Custom Time'), self.radioWidget)
+        self.buttonGroup = QButtonGroup(self)
+
+        self.customValueWidget = QWidget(self.view)
+        self.customValueLayout = QHBoxLayout(self.customValueWidget)
+        self.customLabel = QLabel(
+            # self.tr('自定义路径'), self.customValueWidget)
+            self.tr(f"脚本优先操控运行中的游戏窗口，不管这个参数，多开或游戏没启动时才看选了哪个"), self.customValueWidget)
+        # self.customLabel.setEnabled(False)
+        # self.chooseTimeButton = QPushButton(
+        #     self.tr('设置路径'), self.customValueWidget)
+        self.chooseTimeButton = PushButton(
+            self.tr(f'Add \"Wuthering Waves.exe\"'), self, FIF.FOLDER_ADD)
+
+        self.__initWidget()
+
+    def __initWidget(self):
+        self.__initLayout()
+
+        if self.defaultValue != self.customValue:
+            # self.customLabel.setEnabled(True)
+            self.customRadioButton.setChecked(True)
+            self.chooseTimeButton.setEnabled(True)
+            self._updateChoiceLabel(self.customValue)
+        else:
+            self.defaultRadioButton.setChecked(True)
+            self.chooseTimeButton.setEnabled(False)
+            self._updateChoiceLabel(self.defaultValue)
+
+        # self.choiceLabel.setText(self.buttonGroup.checkedButton().text())
+        self.choiceLabel.adjustSize()
+
+        self.choiceLabel.setObjectName("titleLabel")
+        self.customLabel.setObjectName("titleLabel")
+        self.chooseTimeButton.setObjectName('chooseTimeButton')
+
+        self.buttonGroup.buttonClicked.connect(self.__onRadioButtonClicked)
+        self.chooseTimeButton.clicked.connect(self.__showFolderDialog)
+
+    def __initLayout(self):
+        self.addWidget(self.choiceLabel)
+
+        self.radioLayout.setSpacing(19)
+        self.radioLayout.setAlignment(Qt.AlignTop)
+        self.radioLayout.setContentsMargins(48, 18, 0, 18)
+        self.buttonGroup.addButton(self.customRadioButton)
+        self.buttonGroup.addButton(self.defaultRadioButton)
+        self.radioLayout.addWidget(self.defaultRadioButton)
+        self.radioLayout.addWidget(self.customRadioButton)
+        self.radioLayout.setSizeConstraint(QVBoxLayout.SetMinimumSize)
+
+        self.customValueLayout.setContentsMargins(48, 18, 44, 18)
+        self.customValueLayout.addWidget(self.customLabel, 0, Qt.AlignLeft)
+        self.customValueLayout.addWidget(self.chooseTimeButton, 0, Qt.AlignRight)
+        self.customValueLayout.setSizeConstraint(QHBoxLayout.SetMinimumSize)
+
+        self.viewLayout.setSpacing(0)
+        self.viewLayout.setContentsMargins(0, 0, 0, 0)
+        self.addGroupWidget(self.radioWidget)
+        self.addGroupWidget(self.customValueWidget)
+
+    def __onRadioButtonClicked(self, button: RadioButton):
+        """ radio button clicked slot """
+        # if button.text() == self.choiceLabel.text():
+        #     return
+
+        # self.choiceLabel.setText(button.text())
+        # self.choiceLabel.adjustSize()
+
+        if button is self.defaultRadioButton:
+            # self.customLabel.setEnabled(False)
+            if self.choiceLabel.text() != self.defaultValue:
+                self.choiceLabel.setText(self.tr(self.defaultValue))
+                self.choiceLabel.adjustSize()
+            self.chooseTimeButton.setDisabled(True)
+            paramConfig.set(self.configItem, self.defaultValue)
+            if self.defaultValue != self.customValue:
+                self.gamePathChanged.emit(self.defaultValue)
+        else:
+            # self.customLabel.setEnabled(True)
+            if self.customValueLast is not None:
+                self.customValue = self.customValueLast
+                self._updateChoiceLabel(self.customValue)
+            self.chooseTimeButton.setDisabled(False)
+            paramConfig.set(self.configItem, self.customValue)
+            if self.defaultValue != self.customValue:
+                self.gamePathChanged.emit(self.customValue)
+
+    # def __showChooseTimeDialog(self):
+    #     """ show color dialog """
+    #     w = TimeDialog(self.tr('设置时间'), self.window())
+    #     w.valueChanged.connect(self.__onCustomValueChanged)
+    #     w.exec()
+
+    def __showFolderDialog(self):
+        """ show folder dialog """
+        # folder = QFileDialog.getExistingDirectory(
+        #     self, self.tr("Choose folder"), self._dialogDirectory)
+        # 打开文件对话框，选择文件
+        folder, _ = QFileDialog.getOpenFileName(
+            self,
+            "Choose \"Wuthering Waves.exe\"",
+            "./",
+            "Executable Files (*.exe);;All Files (*)"  # 过滤器：只显示 .exe 文件及所有文件
+            # filter="Wuthering Waves (Wuthering Waves.exe);;Executable Files (*.exe);;All Files (*)"
+        )
+        if folder:
+            logger.debug(f"Selected file: {folder}")
+        else:
+            logger.debug("No file selected.")
+
+        if not folder or folder == self.customValue:
+            return
+
+        # self.__addFolderItem(folder)
+        # self.folders.append(folder)
+        # paramConfig.set(self.configItem, self.folders)
+        # self.folderChanged.emit(self.folders)
+
+        self.__onCustomValueChanged(folder)
+
+    def _updateChoiceLabel(self, value):
+        if not value or value == self.defaultValue:
+            self.choiceLabel.setText(self.tr(self.defaultValue))
+        else:
+            logger.debug(value)
+            self.choiceLabel.setText(value)
+        self.choiceLabel.adjustSize()
+
+    def __onCustomValueChanged(self, value):
+        """ custom color changed slot """
+        if not value:
+            return
+        paramConfig.set(self.configItem, value)
+        self.customValue = value
+        self.customValueLast = value
+        self._updateChoiceLabel(value)
+        self.gamePathChanged.emit(value)
+
+
 class SettingInterface(ScrollArea):
     """ Setting interface """
 
@@ -244,6 +415,22 @@ class SettingInterface(ScrollArea):
 
         # setting label
         self.settingLabel = QLabel(self.tr("Settings"), self)
+
+        # game setting
+        self.gameSettingGroup = SettingCardGroup(self.tr("Game"), self.scrollWidget)
+        self.gameKeybindingsCard = ControlsSettingCard(
+            FIF.GAME,
+            self.tr("Keybindings"),
+            self.tr("Please use the same keybindings as in-game"),
+            parent=self.gameSettingGroup
+        )
+        self.gamePathCard = GamePathSettingCard(
+            paramConfig.gamePath,
+            FIF.FOLDER,
+            self.tr("Installation Directory"),
+            self.tr("If you play multiple games, configure this accordingly"),
+            parent=self.gameSettingGroup
+        )
 
         # personalization
         self.personalGroup = SettingCardGroup(
@@ -294,15 +481,6 @@ class SettingInterface(ScrollArea):
             self.tr('Language'),
             self.tr('Set your preferred language for UI'),
             texts=['简体中文', '繁體中文', 'English', self.tr('Use system setting')],
-            parent=self.personalGroup
-        )
-
-        # game setting
-        self.gameSettingGroup = SettingCardGroup(self.tr("Game"), self.scrollWidget)
-        self.gameSettingCard = ControlsSettingCard(
-            FIF.GAME,
-            self.tr("Keybindings"),
-            self.tr("Please use the same keybindings as in-game"),
             parent=self.personalGroup
         )
 
@@ -377,7 +555,8 @@ class SettingInterface(ScrollArea):
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
 
-        self.gameSettingGroup.addSettingCard(self.gameSettingCard)
+        self.gameSettingGroup.addSettingCard(self.gameKeybindingsCard)
+        self.gameSettingGroup.addSettingCard(self.gamePathCard)
 
         self.updateSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
 
@@ -388,8 +567,8 @@ class SettingInterface(ScrollArea):
         # add setting card group to layout
         self.expandLayout.setSpacing(15)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
-        self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.gameSettingGroup)
+        self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.updateSoftwareGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
