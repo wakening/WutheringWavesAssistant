@@ -612,8 +612,8 @@ class ExploreWorkflow(AbstractWorkflow):
         )
         if self.__search_btn(
                 img, Icon.interactionIcon04(), roi,
-                scale_min=0.417,  # 全屏：score=0.9131, scale=0.417，黑边：
-                scale_max=0.417,
+                scale_min=0.318,  # 全屏：score=0.9155, scale=0.318，黑边：
+                scale_max=0.318,
                 scale_step=0.01,
                 early_score=0.85,
                 score_max=0.75,
