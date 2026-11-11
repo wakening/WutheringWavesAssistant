@@ -55,8 +55,8 @@ class Config(QConfig):
 
     # main window
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
-    windowSize = OptionsConfigItem(
-        "MainWindow", "WindowSize", "Default", OptionsValidator(["Default"]), restart=False)
+    # windowSize = OptionsConfigItem(
+    #     "MainWindow", "WindowSize", "Default", OptionsValidator(["Default"]), restart=False)
     dpiScale = OptionsConfigItem(
         "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
     language = OptionsConfigItem(
@@ -209,10 +209,10 @@ class ParamConfig(QConfig):
     shortcutResonanceSkill = ConfigItem("Controls", "ResonanceSkill", None)
     shortcutEchoSkill = ConfigItem("Controls", "EchoSkill", None)
     shortcutResonanceLiberation = ConfigItem("Controls", "ResonanceLiberation", None)
-    shortcutMember1 = ConfigItem("Controls", "Member1", None)
-    shortcutMember2 = ConfigItem("Controls", "Member2", None)
-    shortcutMember3 = ConfigItem("Controls", "Member3", None)
-    shortcutMember4 = ConfigItem("Controls", "Member4", None)
+    shortcutTeamMember1 = ConfigItem("Controls", "TeamMember1", None)
+    shortcutTeamMember2 = ConfigItem("Controls", "TeamMember2", None)
+    shortcutTeamMember3 = ConfigItem("Controls", "TeamMember3", None)
+    shortcutTeamMember4 = ConfigItem("Controls", "TeamMember4", None)
     shortcutJump = ConfigItem("Controls", "Jump", None)
     shortcutPickUp = ConfigItem("Controls", "PickUp", None)
     shortcutUseUtility = ConfigItem("Controls", "UseUtility", None)

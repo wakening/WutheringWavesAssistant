@@ -51,6 +51,16 @@ KEYBOARD_VK_MAPPING: dict[str, int] = {
     "SPACE": win32con.VK_SPACE,
     "F1": win32con.VK_F1,
     "F2": win32con.VK_F2,
+    "F3": win32con.VK_F3,
+    "F4": win32con.VK_F4,
+    "F5": win32con.VK_F5,
+    "F6": win32con.VK_F6,
+    "F7": win32con.VK_F7,
+    "F8": win32con.VK_F8,
+    "F9": win32con.VK_F9,
+    "F10": win32con.VK_F10,
+    "F11": win32con.VK_F11,
+    "F12": win32con.VK_F12,
     "ENTER": win32con.VK_RETURN,
 }
 

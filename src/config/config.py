@@ -125,12 +125,31 @@ class SoarToTheBeatConfig(ConfigBase):
     userTemplate: str | None = None
 
 
+class ControlsConfig(ConfigBase):
+    moveForward: str | None = None
+    moveBackward: str | None = None
+    moveLeft: str | None = None
+    moveRight: str | None = None
+    resonanceSkill: str | None = None
+    echoSkill: str | None = None
+    resonanceLiberation: str | None = None
+    teamMember1: str | None = None
+    teamMember2: str | None = None
+    teamMember3: str | None = None
+    teamMember4: str | None = None
+    jump: str | None = None
+    pickUp: str | None = None
+    useUtility: str | None = None
+    map: str | None = None
+
+
 class Config(ConfigBase):
     bossRush: BossConfig = Field(default_factory=BossConfig)
     daily: DailyConfig = Field(default_factory=DailyConfig)
     explore: ExploreConfig = Field(default_factory=ExploreConfig)
     game: GameConfig = Field(default_factory=GameConfig)
     soarToTheBeat: SoarToTheBeatConfig = Field(default_factory=SoarToTheBeatConfig)
+    controls: ControlsConfig = Field(default_factory=ControlsConfig)
 
     @classmethod
     def load_user_config(cls) -> 'Config':

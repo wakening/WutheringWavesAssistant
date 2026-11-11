@@ -1,9 +1,11 @@
+import json
 import logging
 from enum import Enum
 from functools import cached_property
 from pathlib import Path
 
-from src.config.config import Config, BossConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig
+from src.config.config import (Config, BossConfig, DailyConfig, GameConfig, SoarToTheBeatConfig, ExploreConfig,
+                               ControlsConfig)
 from src.core.enemy import EnemyGroup
 from src.core.i18n import I18nText, Language
 from src.util import winreg_util
@@ -317,6 +319,81 @@ class SoarToTheBeatRuntimeConfig:
         return f"{self.__class__.__name__}({self.__dict__})"
 
 
+class ControlsRuntimeConfig:
+
+    def __init__(self, cfg: ControlsConfig):
+        self._cfg: ControlsConfig = cfg
+        self.moveForward: str | None = self._format(cfg.moveForward)
+        self.moveBackward: str | None = self._format(cfg.moveBackward)
+        self.moveLeft: str | None = self._format(cfg.moveLeft)
+        self.moveRight: str | None = self._format(cfg.moveRight)
+
+        self.resonanceSkill: str | None = self._format(cfg.resonanceSkill)
+        self.echoSkill: str | None = self._format(cfg.echoSkill)
+        self.resonanceLiberation: str | None = self._format(cfg.resonanceLiberation)
+
+        self.teamMember1: str | None = self._format(cfg.teamMember1)
+        self.teamMember2: str | None = self._format(cfg.teamMember2)
+        self.teamMember3: str | None = self._format(cfg.teamMember3)
+        self.teamMember4: str | None = self._format(cfg.teamMember4)
+
+        self.jump: str | None = self._format(cfg.jump)
+        self.pickUp: str | None = self._format(cfg.pickUp)
+        self.useUtility: str | None = self._format(cfg.useUtility)
+        self.map: str | None = self._format(cfg.map)
+
+        self._mapping = {
+            "W": self.moveForward,
+            "A": self.moveBackward,
+            "S": self.moveLeft,
+            "D": self.moveRight,
+            "E": self.resonanceSkill,
+            "Q": self.echoSkill,
+            "R": self.resonanceLiberation,
+            "1": self.teamMember1,
+            "2": self.teamMember2,
+            "3": self.teamMember3,
+            "4": self.teamMember4,
+            "SPACE": self.jump,
+            "F": self.pickUp,
+            "T": self.useUtility,
+            "M": self.map,
+        }
+
+        self._is_print = False
+
+    def get_key(self, key: str, default: str | int):
+        self.keybindings_modified()
+        mkey = self._mapping.get(key) or default
+        # logger.debug(f"Getting key: '{key}' -> {mkey}")
+        return mkey
+
+    def keybindings_modified(self):
+        if self._is_print:
+            return
+        self._is_print = True
+        modified = {k: v for k, v in self._mapping.items() if v}
+        if not modified:
+            return
+        logger.info(f"Keybindings modified: {json.dumps(modified, ensure_ascii=False)}")
+
+    def _format(self, value: str | None) -> str | None:
+        if not value:
+            return None
+        # 配置文件里的值遵循Qt命名规则
+        value = value.upper()
+        # 为一些特殊按键统一名称
+        # keymouse_util.KEYBOARD_VK_MAPPING
+        if value == "SHIFT":
+            return "LSHIFT"
+        if value == "RETURN":
+            return "ENTER"
+        return value
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.__dict__})"
+
+
 class RuntimeConfig:
 
     def __init__(self, cfg):
@@ -326,6 +403,7 @@ class RuntimeConfig:
         self.explore: ExploreRuntimeConfig = ExploreRuntimeConfig(self._cfg.explore)
         self.game: GameRuntimeConfig = GameRuntimeConfig(self._cfg.game)
         self.soarToTheBeat: SoarToTheBeatRuntimeConfig = SoarToTheBeatRuntimeConfig(self._cfg.soarToTheBeat)
+        self.controls: ControlsRuntimeConfig = ControlsRuntimeConfig(self._cfg.controls)
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.__dict__})"

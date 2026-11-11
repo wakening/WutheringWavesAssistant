@@ -355,108 +355,88 @@
 <context>
     <name>ControlsSettingCard</name>
     <message>
-        <location filename="../../view/setting_interface.py" line="68"/>
+        <location filename="../../view/setting_interface.py" line="70"/>
         <source>Move forward</source>
         <translation>向前移动</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="69"/>
+        <location filename="../../view/setting_interface.py" line="71"/>
         <source>Move backward</source>
         <translation>向后移动</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="70"/>
+        <location filename="../../view/setting_interface.py" line="72"/>
         <source>Move left</source>
         <translation>向左移动</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="71"/>
+        <location filename="../../view/setting_interface.py" line="73"/>
         <source>Move right</source>
         <translation>向右移动</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="73"/>
+        <location filename="../../view/setting_interface.py" line="75"/>
         <source>Resonance Skill</source>
         <translation>共鸣技能</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="74"/>
+        <location filename="../../view/setting_interface.py" line="76"/>
         <source>Echo Skill</source>
         <translation>声骸技能</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="75"/>
+        <location filename="../../view/setting_interface.py" line="77"/>
         <source>Resonance Liberation</source>
         <translation>共鸣解放</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="77"/>
-        <source>Team Member 1</source>
-        <translation>切换编队1号队员</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="77"/>
+        <location filename="../../view/setting_interface.py" line="79"/>
         <source>Switch to Team Member 1</source>
         <translation>切换编队1号队员</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="78"/>
-        <source>Team Member 2</source>
-        <translation>切换编队2号队员</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="78"/>
+        <location filename="../../view/setting_interface.py" line="80"/>
         <source>Switch to Team Member 2</source>
         <translation>切换编队2号队员</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="79"/>
-        <source>Team Member 3</source>
-        <translation>切换编队3号队员</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="79"/>
+        <location filename="../../view/setting_interface.py" line="81"/>
         <source>Switch to Team Member 3</source>
         <translation>切换编队3号队员</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="80"/>
-        <source>Team Member 4</source>
-        <translation>切换编队4号队员</translation>
-    </message>
-    <message>
-        <location filename="../../view/setting_interface.py" line="80"/>
+        <location filename="../../view/setting_interface.py" line="82"/>
         <source>Switch to Team Member 4</source>
         <translation>切换编队4号队员</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="82"/>
+        <location filename="../../view/setting_interface.py" line="84"/>
         <source>Jump</source>
         <translation>跳跃</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="83"/>
-        <source>Pick Up/Interact</source>
-        <translation>拾取/交互</translation>
+        <location filename="../../view/setting_interface.py" line="85"/>
+        <source>Pick Up / Interact</source>
+        <translation>拾取 / 交互</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="84"/>
+        <location filename="../../view/setting_interface.py" line="86"/>
         <source>Use Utility</source>
         <translation>探索工具</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="85"/>
+        <location filename="../../view/setting_interface.py" line="87"/>
         <source>Map</source>
         <translation>地图</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="88"/>
-        <location filename="../../view/setting_interface.py" line="201"/>
+        <location filename="../../view/setting_interface.py" line="90"/>
+        <location filename="../../view/setting_interface.py" line="203"/>
         <source>Reset All Keybinds</source>
         <translation>重置所有按键</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="202"/>
+        <location filename="../../view/setting_interface.py" line="204"/>
         <source>Are you sure you want to reset the key bindings to defaults?</source>
         <translation>你确定要将所有按键绑定重置为默认值？</translation>
     </message>
@@ -1829,146 +1809,146 @@
 <context>
     <name>SettingInterface</name>
     <message>
-        <location filename="../../view/setting_interface.py" line="244"/>
+        <location filename="../../view/setting_interface.py" line="246"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="248"/>
+        <location filename="../../view/setting_interface.py" line="250"/>
         <source>Personalization</source>
         <translation>个性化</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="259"/>
+        <location filename="../../view/setting_interface.py" line="261"/>
         <source>Application theme</source>
         <translation>应用主题</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="260"/>
+        <location filename="../../view/setting_interface.py" line="262"/>
         <source>Change the appearance of your application</source>
         <translation>调整你的应用的外观</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="262"/>
+        <location filename="../../view/setting_interface.py" line="264"/>
         <source>Light</source>
         <translation>浅色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="262"/>
+        <location filename="../../view/setting_interface.py" line="264"/>
         <source>Dark</source>
         <translation>深色</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="264"/>
-        <location filename="../../view/setting_interface.py" line="286"/>
-        <location filename="../../view/setting_interface.py" line="294"/>
+        <location filename="../../view/setting_interface.py" line="266"/>
+        <location filename="../../view/setting_interface.py" line="288"/>
+        <location filename="../../view/setting_interface.py" line="296"/>
         <source>Use system setting</source>
         <translation>跟随系统设置</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="299"/>
+        <location filename="../../view/setting_interface.py" line="301"/>
         <source>Game</source>
         <translation>游戏</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="333"/>
+        <location filename="../../view/setting_interface.py" line="335"/>
         <source>Help us improve Wuthering Waves Assistant by providing feedback</source>
         <translation>欢迎反馈建议，帮我们将软件做得更好。</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="397"/>
+        <location filename="../../view/setting_interface.py" line="399"/>
         <source>Restart Required</source>
         <translation>重启生效</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="398"/>
+        <location filename="../../view/setting_interface.py" line="400"/>
         <source>This change requires a restart. Restart now?</source>
         <translation>此更改需要重启软件后才能生效。是否立即重启？</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="423"/>
+        <location filename="../../view/setting_interface.py" line="425"/>
         <source>Failed to check for updates</source>
         <translation>检查更新失败</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="426"/>
+        <location filename="../../view/setting_interface.py" line="428"/>
         <source>You&apos;re up to date</source>
         <translation>已经是最新版了</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="429"/>
+        <location filename="../../view/setting_interface.py" line="431"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="281"/>
+        <location filename="../../view/setting_interface.py" line="283"/>
         <source>Interface zoom</source>
         <translation>界面缩放</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="282"/>
+        <location filename="../../view/setting_interface.py" line="284"/>
         <source>Change the size of widgets and fonts</source>
         <translation>调整小部件和字体的大小</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="292"/>
+        <location filename="../../view/setting_interface.py" line="294"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="293"/>
+        <location filename="../../view/setting_interface.py" line="295"/>
         <source>Set your preferred language for UI</source>
         <translation>选择界面所使用的语言</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="302"/>
+        <location filename="../../view/setting_interface.py" line="304"/>
         <source>Keybindings</source>
         <translation>按键</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="303"/>
+        <location filename="../../view/setting_interface.py" line="305"/>
         <source>Please use the same keybindings as in-game</source>
         <translation>请保持与游戏内按键一致</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="309"/>
+        <location filename="../../view/setting_interface.py" line="311"/>
         <source>Software update</source>
         <translation>软件更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="312"/>
+        <location filename="../../view/setting_interface.py" line="314"/>
         <source>Check for updates when the application starts</source>
         <translation>在应用程序启动时检查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="313"/>
+        <location filename="../../view/setting_interface.py" line="315"/>
         <source>The new version will be more stable and have more features</source>
         <translation>新版本将更加稳定并拥有更多功能（建议启用此选项）</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="319"/>
-        <location filename="../../view/setting_interface.py" line="339"/>
+        <location filename="../../view/setting_interface.py" line="321"/>
+        <location filename="../../view/setting_interface.py" line="341"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="330"/>
         <location filename="../../view/setting_interface.py" line="332"/>
+        <location filename="../../view/setting_interface.py" line="334"/>
         <source>Provide feedback</source>
         <translation>提供反馈</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="337"/>
+        <location filename="../../view/setting_interface.py" line="339"/>
         <source>Check update</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="340"/>
+        <location filename="../../view/setting_interface.py" line="342"/>
         <source>Copyright</source>
         <translation>版权所有</translation>
     </message>
     <message>
-        <location filename="../../view/setting_interface.py" line="341"/>
+        <location filename="../../view/setting_interface.py" line="343"/>
         <source>Version</source>
         <translation>当前版本</translation>
     </message>
@@ -2306,7 +2286,7 @@
     <message>
         <location filename="../../view/home_interface.py" line="111"/>
         <source>CN-Tencent</source>
-        <translation>CN-腾讯云</translation>
+        <translation>CN-腾讯</translation>
     </message>
     <message>
         <location filename="../../view/home_interface.py" line="113"/>

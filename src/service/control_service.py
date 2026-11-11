@@ -4,9 +4,9 @@ import time
 import numpy as np
 import win32con
 
-from src.core.contexts import Context
 from src.core.interface import ControlService, WindowService, PlayerControlService, ExtendedControlService, \
     GameControlService
+from src.core.workflow import NodeContext
 from src.util import keymouse_util
 
 logger = logging.getLogger(__name__)
@@ -14,16 +14,18 @@ logger = logging.getLogger(__name__)
 
 class BaseControlService:
 
-    def __init__(self, context: Context, window_service: WindowService):
+    def __init__(self, context: NodeContext, window_service: WindowService):
         logger.debug("Initializing %s", self.__class__.__name__)
         super().__init__()
-        self._context: Context = context
+        self._context: NodeContext = context
         self._window_service: WindowService = window_service
 
     def _get_mapping_key(self, reset_key: str, src_key: str | int):
-        if self._context is None or not isinstance(self._context, Context):
+        if not isinstance(self._context, NodeContext):
             return src_key
-        return self._context.config.keyboard_mapping.get_mapping_key(reset_key, src_key)
+        if not self._context or not self._context.runtime or not self._context.runtime.cfg:
+            return src_key
+        return self._context.runtime.cfg.controls.get_key(reset_key, src_key)
 
 
 class Win32GameControlServiceImpl(GameControlService, BaseControlService):
@@ -153,7 +155,8 @@ class Win32GameControlServiceImpl(GameControlService, BaseControlService):
         return self
 
     def esc(self):
-        keymouse_util.tap_key(self._window_service.window, win32con.VK_ESCAPE, seconds=0.05)
+        key = self._get_mapping_key("ESC", "ESC")
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
         return self
 
     def team(self):
@@ -236,8 +239,11 @@ class Win32PlayerControlServiceImpl(PlayerControlService, BaseControlService):
 class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService):
 
     def forward_run(self, forward_run_seconds: float, key: str | None = None):
-        if not key:
-            key = "w"
+        if key:
+            key = key.upper()
+        else:
+            key = "W"
+        key = self._get_mapping_key(key, key)
         keymouse_util.key_down(self._window_service.window, key)
         time.sleep(0.1)
         keymouse_util.mouse_right_down(self._window_service.window)
@@ -258,6 +264,8 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
             key = "w"
         elif key not in ["w", "a", "s", "d"]:
             raise KeyError("Unknown key {}".format(key))
+        key = key.upper()
+        key = self._get_mapping_key(key, key)
         for _ in range(forward_walk_times):
             keymouse_util.tap_key(self._window_service.window, key, 0.1)
             time.sleep(0.05 if sleep_seconds is None else sleep_seconds)

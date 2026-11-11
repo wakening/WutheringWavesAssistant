@@ -15,3 +15,8 @@ QLabel#settingLabel {
     color: white;
 }
 
+QLabel#textLabel {
+    font: 14px 'Microsoft YaHei';
+    background-color: transparent;
+    color: white;
+}

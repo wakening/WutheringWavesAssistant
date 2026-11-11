@@ -8,11 +8,11 @@ from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSetti
                             ComboBoxSettingCard, ExpandLayout, Theme, CustomColorSettingCard,
                             setTheme, setThemeColor, RangeSettingCard, isDarkTheme, Dialog, MessageBox,
                             ExpandSettingCard, FluentIconBase, FluentIcon as FIF, InfoBar, RadioButton, qconfig,
-                            TableWidget, ListWidget, PushButton)
+                            TableWidget, ListWidget, PushButton, FluentStyleSheet, PrimaryPushButton)
 from PySide6.QtCore import Qt, Signal, QUrl, QStandardPaths
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence
-from PySide6.QtWidgets import QWidget, QLabel, QFileDialog, QButtonGroup, QTableWidgetItem, QListWidgetItem, \
-    QSizePolicy, QHBoxLayout
+from PySide6.QtWidgets import (QWidget, QLabel, QFileDialog, QButtonGroup, QTableWidgetItem, QListWidgetItem,
+                               QSizePolicy, QHBoxLayout)
 
 from ..common.config import (cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL,
                              VERSION_URLS, paramConfig)
@@ -35,6 +35,8 @@ class ShortcutWidget(MyShortcutPicker):
         self.setBorderRadius(1)
         row = self.layout()
         row.setContentsMargins(25, 8, 25, 8)
+        self.textLabel.setObjectName("textLabel")
+        StyleSheet.SETTING_INTERFACE.apply(self)
 
     def loadKeySequence(self, keySequence):
         if not keySequence:
@@ -66,26 +68,26 @@ class ControlsSettingCard(ExpandSettingCard):
         super().__init__(icon, title, content, parent)
 
         self.moveForwardWidget = ShortcutWidget('W', self.tr('Move forward'), self.tr('Move forward'), self)
-        self.moveBackwardWidget = ShortcutWidget('A', self.tr('Move backward'), self.tr('Move backward'), self)
-        self.moveLeftWidget = ShortcutWidget('S', self.tr('Move left'), self.tr('Move left'), self)
+        self.moveBackwardWidget = ShortcutWidget('S', self.tr('Move backward'), self.tr('Move backward'), self)
+        self.moveLeftWidget = ShortcutWidget('A', self.tr('Move left'), self.tr('Move left'), self)
         self.moveRightWidget = ShortcutWidget('D', self.tr('Move right'), self.tr('Move right'), self)
 
         self.resonanceSkillWidget = ShortcutWidget('E', self.tr('Resonance Skill'), self.tr('Resonance Skill'), self)
         self.echoSkillWidget = ShortcutWidget('Q', self.tr('Echo Skill'), self.tr('Echo Skill'), self)
         self.resonanceLiberationWidget = ShortcutWidget('R', self.tr('Resonance Liberation'), self.tr('Resonance Liberation'), self)
 
-        self.member1Widget = ShortcutWidget('1', self.tr('Team Member 1'), self.tr('Switch to Team Member 1'), self)
-        self.member2Widget = ShortcutWidget('2', self.tr('Team Member 2'), self.tr('Switch to Team Member 2'), self)
-        self.member3Widget = ShortcutWidget('3', self.tr('Team Member 3'), self.tr('Switch to Team Member 3'), self)
-        self.member4Widget = ShortcutWidget('4', self.tr('Team Member 4'), self.tr('Switch to Team Member 4'), self)
+        self.teamMember1Widget = ShortcutWidget('1', self.tr('Switch to Team Member 1'), self.tr('Switch to Team Member 1'), self)
+        self.teamMember2Widget = ShortcutWidget('2', self.tr('Switch to Team Member 2'), self.tr('Switch to Team Member 2'), self)
+        self.teamMember3Widget = ShortcutWidget('3', self.tr('Switch to Team Member 3'), self.tr('Switch to Team Member 3'), self)
+        self.teamMember4Widget = ShortcutWidget('4', self.tr('Switch to Team Member 4'), self.tr('Switch to Team Member 4'), self)
 
         self.jumpWidget = ShortcutWidget('Space', self.tr('Jump'), self.tr('Jump'), self)
-        self.pickUpWidget = ShortcutWidget('F', self.tr('Pick Up/Interact'), self.tr('Pick Up/Interact'), self)
+        self.pickUpWidget = ShortcutWidget('F', self.tr(r'Pick Up / Interact'), self.tr('Pick Up / Interact'), self)
         self.useUtilityWidget = ShortcutWidget('T', self.tr('Use Utility'), self.tr('Use Utility'), self)
         self.mapWidget = ShortcutWidget('M', self.tr('Map'), self.tr('Map'), self)
 
         self.resetLayout = QHBoxLayout()
-        self.resetButton = PushButton(self.tr('Reset All Keybinds'), self)
+        self.resetButton = PrimaryPushButton(self.tr('Reset All Keybinds'), self)
 
         self.__initWidget()
         self._adjustViewSize()
@@ -107,10 +109,10 @@ class ControlsSettingCard(ExpandSettingCard):
         self.resonanceSkillWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.echoSkillWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.resonanceLiberationWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.member1Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.member2Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.member3Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.member4Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.teamMember1Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.teamMember2Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.teamMember3Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.teamMember4Widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.jumpWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.pickUpWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.useUtilityWidget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -129,10 +131,10 @@ class ControlsSettingCard(ExpandSettingCard):
         self.viewLayout.addWidget(self.resonanceSkillWidget)
         self.viewLayout.addWidget(self.echoSkillWidget)
         self.viewLayout.addWidget(self.resonanceLiberationWidget)
-        self.viewLayout.addWidget(self.member1Widget)
-        self.viewLayout.addWidget(self.member2Widget)
-        self.viewLayout.addWidget(self.member3Widget)
-        self.viewLayout.addWidget(self.member4Widget)
+        self.viewLayout.addWidget(self.teamMember1Widget)
+        self.viewLayout.addWidget(self.teamMember2Widget)
+        self.viewLayout.addWidget(self.teamMember3Widget)
+        self.viewLayout.addWidget(self.teamMember4Widget)
         self.viewLayout.addWidget(self.jumpWidget)
         self.viewLayout.addWidget(self.pickUpWidget)
         self.viewLayout.addWidget(self.useUtilityWidget)
@@ -160,14 +162,14 @@ class ControlsSettingCard(ExpandSettingCard):
         self.resonanceLiberationWidget.keySequenceChanged.connect(
             lambda key: self.__onKeySequenceChanged(key, self.resonanceLiberationWidget,
                                                     paramConfig.shortcutResonanceLiberation))
-        self.member1Widget.keySequenceChanged.connect(
-            lambda key: self.__onKeySequenceChanged(key, self.member1Widget, paramConfig.shortcutMember1))
-        self.member2Widget.keySequenceChanged.connect(
-            lambda key: self.__onKeySequenceChanged(key, self.member2Widget, paramConfig.shortcutMember2))
-        self.member3Widget.keySequenceChanged.connect(
-            lambda key: self.__onKeySequenceChanged(key, self.member3Widget, paramConfig.shortcutMember3))
-        self.member4Widget.keySequenceChanged.connect(
-            lambda key: self.__onKeySequenceChanged(key, self.member4Widget, paramConfig.shortcutMember4))
+        self.teamMember1Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.teamMember1Widget, paramConfig.shortcutMember1))
+        self.teamMember2Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.teamMember2Widget, paramConfig.shortcutMember2))
+        self.teamMember3Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.teamMember3Widget, paramConfig.shortcutMember3))
+        self.teamMember4Widget.keySequenceChanged.connect(
+            lambda key: self.__onKeySequenceChanged(key, self.teamMember4Widget, paramConfig.shortcutMember4))
         self.jumpWidget.keySequenceChanged.connect(
             lambda key: self.__onKeySequenceChanged(key, self.jumpWidget, paramConfig.shortcutJump))
         self.pickUpWidget.keySequenceChanged.connect(
@@ -187,10 +189,10 @@ class ControlsSettingCard(ExpandSettingCard):
         self.resonanceSkillWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutResonanceSkill))
         self.echoSkillWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutEchoSkill))
         self.resonanceLiberationWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutResonanceLiberation))
-        self.member1Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember1))
-        self.member2Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember2))
-        self.member3Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember3))
-        self.member4Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutMember4))
+        self.teamMember1Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutTeamMember1))
+        self.teamMember2Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutTeamMember2))
+        self.teamMember3Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutTeamMember3))
+        self.teamMember4Widget.loadKeySequence(paramConfig.get(paramConfig.shortcutTeamMember4))
         self.jumpWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutJump))
         self.pickUpWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutPickUp))
         self.useUtilityWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutUseUtility))
@@ -212,10 +214,10 @@ class ControlsSettingCard(ExpandSettingCard):
         self.resonanceSkillWidget.reset()
         self.echoSkillWidget.reset()
         self.resonanceLiberationWidget.reset()
-        self.member1Widget.reset()
-        self.member2Widget.reset()
-        self.member3Widget.reset()
-        self.member4Widget.reset()
+        self.teamMember1Widget.reset()
+        self.teamMember2Widget.reset()
+        self.teamMember3Widget.reset()
+        self.teamMember4Widget.reset()
         self.jumpWidget.reset()
         self.pickUpWidget.reset()
         self.useUtilityWidget.reset()

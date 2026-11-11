@@ -83,7 +83,7 @@ class GameSettingsWidget(ScrollArea):
         self.otherLabel = QLabel(self.tr('Other:'), self.container)
         self.otherLayout = FlowLayout(isTight=True)
         self.jumpWidget = ShortcutWidget('Space', self.tr('Jump:'), self.tr('Jump'), self.container)
-        self.pickUpWidget = ShortcutWidget('F', self.tr('Pick Up/Interact:'), self.tr('Pick Up/Interact'), self.container)
+        self.pickUpWidget = ShortcutWidget('F', self.tr('Pick Up / Interact:'), self.tr('Pick Up / Interact'), self.container)
         self.useUtilityWidget = ShortcutWidget('T', self.tr('Use Utility:'), self.tr('Use Utility'), self.container)
         self.mapWidget = ShortcutWidget('M', self.tr('Map:'), self.tr('Map'), self.container)
 
