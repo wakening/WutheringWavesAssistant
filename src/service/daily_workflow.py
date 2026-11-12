@@ -34,26 +34,26 @@ class TaskLocal:
 
     def __init__(self):
         ### ------- Guidebook MaterialCollection ForgeryChallenge -------
-        self.wingfallChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WingfallChasm)
-        self.silentChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SilentChasm)
-        self.splitChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SplitChasm)
-        self.erodedChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedChasm)
-        self.ashenChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AshenChasm)
-        self.fallenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FallenSanctum)
-        self.lessonInSunsetFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInSunset)
-        self.strickenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StrickenSanctum)
-        self.lessonInVoidFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInVoid)
-        self.lessonInEmbersFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInEmbers)
-        self.gardenOfSalvationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfSalvation)
-        self.abyssOfInitiationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfInitiation)
-        self.gardenOfAdorationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfAdoration)
-        self.abyssOfSacrificeFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfSacrifice)
-        self.abyssOfConfessionFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfConfession)
-        self.flamingRemnantsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FlamingRemnants)
-        self.mistyForestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MistyForest)
-        self.erodedRuinsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedRuins)
-        self.moonlitGrovesFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MoonlitGroves)
-        self.marigoldWoodsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MarigoldWoods)
+        self.wingfallChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.WingfallChasm, count=6)
+        self.silentChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SilentChasm, count=6)
+        self.splitChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SplitChasm, count=6)
+        self.erodedChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedChasm, count=6)
+        self.ashenChasmFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AshenChasm, count=6)
+        self.fallenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FallenSanctum, count=6)
+        self.lessonInSunsetFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInSunset, count=6)
+        self.strickenSanctumFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.StrickenSanctum, count=6)
+        self.lessonInVoidFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInVoid, count=6)
+        self.lessonInEmbersFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.LessonInEmbers, count=6)
+        self.gardenOfSalvationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfSalvation, count=6)
+        self.abyssOfInitiationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfInitiation, count=6)
+        self.gardenOfAdorationFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.GardenOfAdoration, count=6)
+        self.abyssOfSacrificeFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfSacrifice, count=6)
+        self.abyssOfConfessionFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.AbyssOfConfession, count=6)
+        self.flamingRemnantsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FlamingRemnants, count=6)
+        self.mistyForestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MistyForest, count=6)
+        self.erodedRuinsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ErodedRuins, count=6)
+        self.moonlitGrovesFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MoonlitGroves, count=6)
+        self.marigoldWoodsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.MarigoldWoods, count=6)
 
         ### ------- Guidebook MaterialCollection SimulationChallenge -------
 
@@ -1098,13 +1098,13 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 # 在重新挑战页，关闭连续挑战
                 def _close_blitz_mode(_ui):
-                    if not _ui.search(ctx.tr(I18nText.ForgeryRestart)):
-                        return False
-                    # 关闭连续挑战
-                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
-                        # 判断文字颜色，有白色代表打开了
-                        if is_white_text(_ui.img, blitz_mode[0]):
-                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    # if not _ui.search(ctx.tr(I18nText.ForgeryRestart)):
+                    #     return False
+                    # # 关闭连续挑战
+                    # if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                    #     # 判断文字颜色，有白色代表打开了
+                    #     if is_white_text(_ui.img, blitz_mode[0]):
+                    #         _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
                     return True
 
                 # 检查复苏弹窗
@@ -1158,12 +1158,15 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 # 根据体力选择重新挑战还是离开
                 if ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot().search(ctx.tr([I18nText.ForgeryExit, I18nText.ForgeryRestart]))):
+                    # TODO 开启挑战
                     if cur_waveplate >= cost:
                         _close_blitz_mode(ui)
-                        if ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3):
-                            continue
-                        else:
-                            return _fail()
+                        # if ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3):
+                        #     continue
+                        # else:
+                        #     return _fail()
+                        ui.click_text(ctx.tr(I18nText.ForgeryExit), delay=0.3, times=2, interval=0.3)
+                        return _fail()
                     else:
                         ui.click_text(ctx.tr(I18nText.ForgeryExit), delay=0.3, times=2, interval=0.3)
                 else:
@@ -1358,13 +1361,13 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 # 在重新挑战页，关闭连续挑战
                 def _close_blitz_mode(_ui):
-                    if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
-                        return False
-                    # 关闭连续挑战
-                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
-                        # 判断文字颜色，有白色代表打开了
-                        if is_white_text(_ui.img, blitz_mode[0]):
-                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    # if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
+                    #     return False
+                    # # 关闭连续挑战
+                    # if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                    #     # 判断文字颜色，有白色代表打开了
+                    #     if is_white_text(_ui.img, blitz_mode[0]):
+                    #         _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
                     return True
 
                 # 检查复苏弹窗
@@ -1580,13 +1583,13 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 # 在重新挑战页，关闭连续挑战
                 def _close_blitz_mode(_ui):
-                    if not _ui.search(ctx.tr(I18nText.Restart)):
-                        return False
-                    # 关闭连续挑战
-                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
-                        # 判断文字颜色，有白色代表打开了
-                        if is_white_text(_ui.img, blitz_mode[0]):
-                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    # if not _ui.search(ctx.tr(I18nText.Restart)):
+                    #     return False
+                    # # 关闭连续挑战
+                    # if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                    #     # 判断文字颜色，有白色代表打开了
+                    #     if is_white_text(_ui.img, blitz_mode[0]):
+                    #         _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
                     return True
 
                 # 检查战斗文本
@@ -1919,13 +1922,13 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 # 在重新挑战页，关闭连续挑战
                 def _close_blitz_mode(_ui):
-                    if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
-                        return False
-                    # 关闭连续挑战
-                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
-                        # 判断文字颜色，有白色代表打开了
-                        if is_white_text(_ui.img, blitz_mode[0]):
-                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    # if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
+                    #     return False
+                    # # 关闭连续挑战
+                    # if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                    #     # 判断文字颜色，有白色代表打开了
+                    #     if is_white_text(_ui.img, blitz_mode[0]):
+                    #         _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
                     return True
 
                 # 检查复苏弹窗

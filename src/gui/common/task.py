@@ -52,6 +52,8 @@ class BaseTask(QObject):
             self.start_time = datetime.now()
             # json_string = json.dumps(self.config, ensure_ascii=False, indent=4)
             signalBus.homeMessageSignal.emit(f"{self.tr("Start")} {self.name}")
+            if self.id == TaskId.AutoBossProcessTask:
+                signalBus.homeMessageSignal.emit(f"最近低调一点，别通宵挂")
             globalSignal.executeTaskSignal.emit(self.id, "START")
             return
 

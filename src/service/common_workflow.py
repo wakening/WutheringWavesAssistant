@@ -70,10 +70,18 @@ class RoiEx:
 
     @cached_property
     def hp_bar(self) -> BBox:
-        """血条"""
+        """角色血条"""
         return self.scaler.as_bbox(AnchorBBox(
             AnchorPoint(180, 0, Align.Left | Align.Top),
             AnchorPoint(1280, 612, Align.Right | Align.Bottom),
+        ))
+
+    @cached_property
+    def boss_name_bar(self) -> BBox:
+        """上方boss名区域"""
+        return self.scaler.as_bbox(AnchorBBox(
+            AnchorPoint(300 , 0, Align.Left | Align.Top),
+            AnchorPoint(1280, 110, Align.Right | Align.Top),
         ))
 
 

@@ -478,6 +478,8 @@ class ExploreWorkflow(AbstractWorkflow):
         build = lambda x, y: scaler.as_point(AnchorPoint(x, y, Align.Center | Align.Middle))
 
         # summary
+        # 剧情梗概
+        # 继续观看 跳过剧情
         summary_points = [
             build(335, 518),
             build(346, 513),
@@ -502,7 +504,9 @@ class ExploreWorkflow(AbstractWorkflow):
         summary_cutscene_cr = ColorRule().points(summary_cutscene_points).colors(
             Color.bgr(255, 255, 255), mode=RuleMode.ALL)
 
-        # skip confirm
+        # 全屏模式
+        # 提示 完整观看剧情有助于了解故事发展，是否确认跳过？
+        # 取消 确认
         btn_black_points = [
             build(355, 460),
             build(372, 458),
@@ -513,6 +517,7 @@ class ExploreWorkflow(AbstractWorkflow):
             build(477 + 764 - 355, 445),
             build(489 + 764 - 355, 443),
         ]
+        # 本次登录不再提示
         bg_white_points = [
             build(578, 236),
             build(677, 236),
@@ -521,6 +526,29 @@ class ExploreWorkflow(AbstractWorkflow):
         ]
         btn_black_cr = ColorRule().points(btn_black_points).colors(Color.bgr(21, 21, 21), mode=RuleMode.ALL)
         bg_white_cr = ColorRule().points(bg_white_points).colors(Color.bgr(244, 244, 244), mode=RuleMode.ALL)
+
+        # 黑边模式
+        # 提示 完整观看剧情有助于了解故事发展，是否确认跳过？
+        # 取消 确认
+        cutscene_btn_black_points = [
+            build(419, 435),
+            build(431, 435),
+            build(424, 423),
+            build(431, 429),
+            build(419 + 521 - 419, 435),
+            build(431 + 521 - 419, 435),
+            build(424 + 521 - 419, 423),
+            build(431 + 521 - 419, 429),
+        ]
+        # 本次登录不再提示
+        cutscene_bg_white_points = [
+            build(578, 267),
+            build(677, 267),
+            build(793, 267),
+            build(627, 429),
+        ]
+        cutscene_btn_black_cr = ColorRule().points(cutscene_btn_black_points).colors(Color.bgr(21, 21, 21), mode=RuleMode.ALL)
+        cutscene_bg_white_cr = ColorRule().points(cutscene_bg_white_points).colors(Color.bgr(244, 244, 244), mode=RuleMode.ALL)
 
         def _():
             if not self.async_skip_lock.acquire(blocking=False):
@@ -561,6 +589,11 @@ class ExploreWorkflow(AbstractWorkflow):
                         logger.debug(f"confirm_cr")
                         ui.click_point(build(642, 397), delay=0.3)
                         ui.click_point(build(841, 453), delay=0.1, times=3, interval=0.3)
+                        return True
+                    elif cutscene_btn_black_cr.match(_img) and cutscene_bg_white_cr.match(_img):
+                        logger.debug(f"confirm_cutscene__cr")
+                        ui.click_point(build(643, 389), delay=0.3)
+                        ui.click_point(build(790, 428), delay=0.1, times=3, interval=0.3)
                         return True
                     else:
                         logger.debug(f"cr none")

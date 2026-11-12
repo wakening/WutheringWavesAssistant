@@ -245,6 +245,10 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 logger.debug(f"R{index} - Text: {res_battle_text}")
                 no_text_count = no_text_max
                 continue
+            elif res_battle_text := ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
+                logger.debug(f"R{index} - Text: {res_battle_text}")
+                no_text_count = no_text_max
+                continue
             elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
                 logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
                 pickup.stop()
@@ -425,7 +429,7 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 ctx.tr(I18nText.WeeklyRestart), pk=PointKind.RANDOM, times=3, interval=0.3):
             elements = [ctx.tr(i.name).raw for i in local.enemy.elements]
             logger.info(f"R{index} - {ctx.tr(I18nText.WeeklyRestart).raw}: {enemy_name.raw}{elements or ''}")
-            ui.sleep(1.5).wait_back_home(close_window=True)
+            ui.sleep(1).wait_back_home(close_window=True)
             ui.sleep(0.3)
             continue
         # 未知
