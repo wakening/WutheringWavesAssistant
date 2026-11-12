@@ -1345,6 +1345,10 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             logger.debug("Fight fight!")
                             no_text_count = no_text_max
                             continue
+                        elif ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
+                            logger.debug("Fight fight!")
+                            no_text_count = no_text_max
+                            continue
                         else:
                             logger.debug(f"Text not found: {ctx.tr(I18nText.WeeklyDefeatTheEnemy).raw}")
                         no_text_count -= 1
@@ -1903,6 +1907,10 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             break
                         # 击败敌人
                         if ui.search(ctx.tr(enemy.quick_boss_meta.battle_text)):
+                            logger.debug("Fight fight!")
+                            no_text_count = no_text_max
+                            continue
+                        elif ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
                             logger.debug("Fight fight!")
                             no_text_count = no_text_max
                             continue
