@@ -809,11 +809,11 @@ class DailyWidget(ScrollArea):
             QResonator(
                 id=I18nText.Lily,
                 name=self.tr("Lily"),
-                weeklyChallenge='',
+                weeklyChallenge=self.tr("Sigillum"),
                 tacetSuppression=[self.tr("Heart of Stillness", "Tacet Field")],
                 forgeryChallenge=[self.tr("Ashen Chasm"), self.tr("Lesson in Embers")],
                 bossChallenge=self.tr("Hyvatia"),
-                gather='',
+                gather=self.tr("Reverie Lily"),
                 tacetDiscordNest=[self.tr("Simulacrum Nexus", "Tacet Discord Nest")],
                 nightmarePurification=[],
                 enable=True,

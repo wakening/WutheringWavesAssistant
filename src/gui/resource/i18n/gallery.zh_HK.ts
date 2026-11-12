@@ -313,18 +313,18 @@
         <translation>Validate: </translation>
     </message>
     <message>
-        <location filename="../../view/home_interface.py" line="598"/>
-        <location filename="../../view/home_interface.py" line="600"/>
+        <location filename="../../view/home_interface.py" line="599"/>
+        <location filename="../../view/home_interface.py" line="602"/>
         <source>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;{msg}&lt;/font&gt;&lt;/b&gt;</source>
         <translation>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;{msg}&lt;/font&gt;&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../../view/home_interface.py" line="599"/>
+        <location filename="../../view/home_interface.py" line="600"/>
         <source>Today: Skill Materials Double Drop</source>
         <translation>今日：雙倍養成材料</translation>
     </message>
     <message>
-        <location filename="../../view/home_interface.py" line="601"/>
+        <location filename="../../view/home_interface.py" line="603"/>
         <source>Today: Echo Materials Double Drop</source>
         <translation>今日：雙倍聲骸材料</translation>
     </message>
@@ -626,6 +626,7 @@
     </message>
     <message>
         <location filename="../../view/home/daily.py" line="213"/>
+        <location filename="../../view/home/daily.py" line="812"/>
         <location filename="../../view/home/daily.py" line="946"/>
         <source>Sigillum</source>
         <translation>辛吉勒姆</translation>
@@ -1336,6 +1337,11 @@
         <location filename="../../view/home/daily.py" line="811"/>
         <source>Lily</source>
         <translation>莉莉</translation>
+    </message>
+    <message>
+        <location filename="../../view/home/daily.py" line="816"/>
+        <source>Reverie Lily</source>
+        <translation>綺夢百合</translation>
     </message>
     <message>
         <location filename="../../view/home/daily.py" line="823"/>

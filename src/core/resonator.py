@@ -813,6 +813,7 @@ class Resonator(Enum):
             "T_IconRoleHead150_65_UI.png": I18nText.Sigrika,
             "T_IconRoleHead150_66_UI.png": I18nText.Lucilla,
             "T_IconRoleHead150_67_UI.png": I18nText.Hiyuki,
+            "T_IconRoleHead150_67_Skin1_UI.png": I18nText.Hiyuki,
             "T_IconRoleHead150_68_UI.png": I18nText.Lucy,
             "T_IconRoleHead150_69_UI.png": I18nText.Rebecca,
             "T_IconRoleHead150_70_UI.png": I18nText.YangyangXuanling,
@@ -822,6 +823,7 @@ class Resonator(Enum):
             "T_IconRoleHead150_74_UI.png": I18nText.Jingran,
             "T_IconRoleHead150_75_UI.png": I18nText.Hsin,
             "T_IconRoleHead150_76_UI.png": I18nText.Suoming,
+            "T_IconRoleHead150_77_UI.png": I18nText.Lily,
         }
 
     @staticmethod

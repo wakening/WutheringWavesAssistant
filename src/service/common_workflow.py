@@ -852,6 +852,14 @@ def search_icon_guidebook(ctx: NodeContext, *, icon: np.ndarray) -> tuple[int, i
     return bbox.near
 
 
+def is_white_text(img: np.ndarray, bbox: BBox, *, min_ratio: float = 0.1) -> bool:
+    img = img[bbox.as_slice()]
+    mask = np.all(img > 210, axis=2)
+    ratio = np.count_nonzero(mask) / mask.size
+    # logger.info(f"ratio: {ratio}")
+    return ratio > 0.1
+
+
 class RateLimiter:
     """
     速率控制器

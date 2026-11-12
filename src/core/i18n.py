@@ -359,6 +359,7 @@ class I18nText:
     Note = "Note"
     Confirm = "Confirm"
     Restart = "Restart"
+    BlitzMode = "BlitzMode"
     LeaveNow = "LeaveNow"
     Exit = "Exit"
     Exit2 = "Exit2"
@@ -769,6 +770,7 @@ class I18nText:
     PickFloralCrestJade = "PickFloralCrestJade"
     PickBloomOfHearkening = "PickBloomOfHearkening"
     PickMiasmicBranch = "PickMiasmicBranch"
+    PickReverieLily = "PickReverieLily"
     PickSilverBandedLizard = "PickSilverBandedLizard"
     PickAzureLizard = "PickAzureLizard"
     PickGreenPitLizard = "PickGreenPitLizard"
@@ -1769,6 +1771,10 @@ I18N_TEXT = {
     I18nText.Restart: {
         Language.ZH: RegexStr(r"^.{0,2}重新挑战$", raw="重新挑战"),
         Language.EN: RegexStr(flex_ws(r"^.{0,2}Restart$"), raw="Restart"),
+    },
+    I18nText.BlitzMode: {
+        Language.ZH: RegexStr(r"^连续挑战模式$", raw="连续挑战模式"),
+        Language.EN: RegexStr(flex_ws(r"^Blitz Mode$"), raw="Blitz Mode"),
     },
     I18nText.LeaveNow: {
         Language.ZH: RegexStr(r"^确认离开$", raw="确认离开"),
@@ -3311,10 +3317,6 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"登青云$", raw="登青云"),
         Language.EN: RegexStr(flex_ws(r"Climber Shoots$"), raw="Climber Shoots"),
     },
-    # I18nText.PickJadeHexahedron: {
-    #     Language.ZH: RegexStr(r"六合.?$", raw="六合瑛"),
-    #     Language.EN: RegexStr(flex_ws(r"Jade Hexahedron$"), raw="Jade Hexahedron"),
-    # },
     I18nText.PickWhiteJadeBeauty: {
         Language.ZH: RegexStr(r"白玉美人$", raw="白玉美人"),
         Language.EN: RegexStr(flex_ws(r"White Jade Beauty$"), raw="White Jade Beauty"),
@@ -3340,6 +3342,12 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r".?痕残株$", raw="瘴痕残株"),
         Language.EN: RegexStr(flex_ws(r"Miasmic Branch$"), raw="Miasmic Branch"),
     },
+    # 3.8
+    I18nText.PickReverieLily: {
+        Language.ZH: RegexStr(r"绮梦百合$", raw="绮梦百合"),
+        Language.EN: RegexStr(flex_ws(r"Reverie Lily$"), raw="Reverie Lily"),
+    },
+    # 通用
     I18nText.PickSilverBandedLizard: {
         Language.ZH: RegexStr(r"银环蜥$", raw="银环蜥"),
         Language.EN: RegexStr(flex_ws(r"Silver.?Banded Lizard$"), raw="Silver-Banded Lizard"),

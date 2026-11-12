@@ -21,7 +21,7 @@ from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflo
 from src.service.common_workflow import (
     absorb_around_variant_blind, move_and_scan_dialogue, match_remaining_attempts, linear_spacing,
     query_waveplate_guidebook, query_waveplate_claim_rewards,
-    object_detection, search_icon_guidebook, AsyncPickup, RoiEx, Slider,
+    object_detection, search_icon_guidebook, AsyncPickup, RoiEx, Slider, is_white_text,
 )
 from src.util import img_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -1095,6 +1095,18 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 combat_system.stop(join=True)
 
                 ui.sleep(0.6).snapshot()
+
+                # 在重新挑战页，关闭连续挑战
+                def _close_blitz_mode(_ui):
+                    if not _ui.search(ctx.tr(I18nText.ForgeryRestart)):
+                        return False
+                    # 关闭连续挑战
+                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                        # 判断文字颜色，有白色代表打开了
+                        if is_white_text(_ui.img, blitz_mode[0]):
+                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    return True
+
                 # 检查复苏弹窗
                 if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
                     ui.esc().sleep(0.5)
@@ -1111,8 +1123,9 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     if not object_detection(ctx, search_reward=True, timeout=25):
                         ui.esc()
                         if ui.sleep(0.3).wait().until(
-                                lambda: ui.snapshot().click_text(
-                                    ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                                lambda: ui.snapshot()
+                                        and _close_blitz_mode(ui)
+                                        and ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3)):
                             continue
                         return _fail()
 
@@ -1146,6 +1159,7 @@ def doForgeryChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot().search(ctx.tr([I18nText.ForgeryExit, I18nText.ForgeryRestart]))):
                     if cur_waveplate >= cost:
+                        _close_blitz_mode(ui)
                         if ui.click_text(ctx.tr(I18nText.ForgeryRestart), delay=0.3, times=2, interval=0.3):
                             continue
                         else:
@@ -1342,6 +1356,17 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 notice_keywords = ctx.tr([I18nText.WeeklyConfirm, I18nText.WeeklyExit])
                 ui.sleep(0.5).snapshot()
 
+                # 在重新挑战页，关闭连续挑战
+                def _close_blitz_mode(_ui):
+                    if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
+                        return False
+                    # 关闭连续挑战
+                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                        # 判断文字颜色，有白色代表打开了
+                        if is_white_text(_ui.img, blitz_mode[0]):
+                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    return True
+
                 # 检查复苏弹窗
                 if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
                     ui.esc().sleep(0.5)
@@ -1358,7 +1383,8 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     # 寻找领取奖励交互点
                     if not object_detection(ctx, search_reward=True, timeout=40):
                         if ui.esc().sleep(0.5).wait().until(
-                                lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                                lambda: ui.snapshot().search(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                            _close_blitz_mode(ui)
                             if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
                                 continue
                             ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
@@ -1390,7 +1416,9 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 if cur_waveplate >= cost:
                     if ui.wait().until(
-                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
+                            lambda: ui.snapshot()
+                                    and _close_blitz_mode(ui)
+                                    and ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
                         continue
                     return _fail()
 
@@ -1550,11 +1578,24 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 else:
                     return _fail()
 
+                # 在重新挑战页，关闭连续挑战
+                def _close_blitz_mode(_ui):
+                    if not _ui.search(ctx.tr(I18nText.Restart)):
+                        return False
+                    # 关闭连续挑战
+                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                        # 判断文字颜色，有白色代表打开了
+                        if is_white_text(_ui.img, blitz_mode[0]):
+                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    return True
+
                 # 检查战斗文本
                 keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
                 if not ui.snapshot().search(keyword):
                     if ui.esc().sleep(0.3).wait().until(
-                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                            lambda: ui.snapshot()
+                                    and _close_blitz_mode(ui)
+                                    and ui.click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
                         continue
                     return _fail()
 
@@ -1616,10 +1657,10 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                     # 寻找领取奖励交互点
                     if not object_detection(ctx, search_reward=True, timeout=25):
-                        ui.esc()
-                        if ui.sleep(0.3).wait().until(
-                                lambda: ui.snapshot().click_text(
-                                    ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
+                        if ui.esc().sleep(0.3).wait().until(
+                                lambda: ui.snapshot()
+                                        and _close_blitz_mode(ui)
+                                        and ui.click_text(ctx.tr(I18nText.Restart), delay=0.3, times=2, interval=0.3)):
                             continue
                         return _fail()
 
@@ -1665,6 +1706,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 if ui.sleep(0.3).wait().until(
                         lambda: ui.snapshot().search(ctx.tr([I18nText.TacetFieldExit, I18nText.TacetFieldRestart]))):
                     if cur_waveplate >= cost:
+                        _close_blitz_mode(ui)
                         if ui.click_text(ctx.tr(I18nText.TacetFieldRestart), delay=0.3, times=2, interval=0.3):
                             continue
                         else:
@@ -1875,6 +1917,17 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 notice_keywords = ctx.tr([I18nText.WeeklyConfirm, I18nText.WeeklyExit])
                 ui.sleep(0.5).snapshot()
 
+                # 在重新挑战页，关闭连续挑战
+                def _close_blitz_mode(_ui):
+                    if not _ui.search(ctx.tr(I18nText.WeeklyRestart)):
+                        return False
+                    # 关闭连续挑战
+                    if blitz_mode := _ui.search(ctx.tr(I18nText.BlitzMode)):
+                        # 判断文字颜色，有白色代表打开了
+                        if is_white_text(_ui.img, blitz_mode[0]):
+                            _ui.sleep(0.2).click_bbox(blitz_mode).sleep(0.2)
+                    return True
+
                 # 检查复苏弹窗
                 if ui.search(ctx.tr(I18nText.SelectARevivalItem)):
                     ui.esc().sleep(0.5)
@@ -1891,7 +1944,8 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     # 寻找领取奖励交互点
                     if not object_detection(ctx, search_reward=True, timeout=40):
                         if ui.esc().sleep(0.5).wait().until(
-                                lambda: ui.snapshot().click_text(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                                lambda: ui.snapshot().search(ctx.tr([I18nText.WeeklyRestart, I18nText.WeeklyExit]))):
+                            _close_blitz_mode(ui)
                             if ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2):
                                 continue
                             ui.click_text(ctx.tr(I18nText.WeeklyExit), delay=0.4, times=2, interval=0.2)
@@ -1939,7 +1993,9 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
                 if cur_waveplate >= cost:
                     if ui.wait().until(
-                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
+                            lambda: ui.snapshot()
+                                    and _close_blitz_mode(ui)
+                                    and ui.click_text(ctx.tr(I18nText.WeeklyRestart), delay=0.4, times=2, interval=0.2)):
                         continue
                     return _fail()
 

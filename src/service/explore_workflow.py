@@ -275,6 +275,8 @@ class ExploreWorkflow(AbstractWorkflow):
             I18nText.PickFloralCrestJade,
             I18nText.PickBloomOfHearkening,
             I18nText.PickMiasmicBranch,
+            I18nText.PickReverieLily,
+            # 通用
             I18nText.PickSilverBandedLizard,
             I18nText.PickAzureLizard,
             I18nText.PickGreenPitLizard,
@@ -612,9 +614,9 @@ class ExploreWorkflow(AbstractWorkflow):
         )
         if self.__search_btn(
                 img, Icon.interactionIcon04(), roi,
-                scale_min=0.318,  # 全屏：score=0.9155, scale=0.318，黑边：
-                scale_max=0.318,
-                scale_step=0.01,
+                scale_min=0.318,  # 全屏：score=0.9291, scale=0.438，黑边：score=0.9102, scale=0.318
+                scale_max=0.438,
+                scale_step=0.06,
                 early_score=0.85,
                 score_max=0.75,
         ):
