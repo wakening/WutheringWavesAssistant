@@ -1,4 +1,5 @@
 import logging
+import math
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -8,6 +9,7 @@ from multiprocessing import Process
 from typing import Iterable, Any, TypeVar, Callable, Mapping, Optional
 
 import psutil
+import win32gui
 
 from src.config import logging_config
 from src.core import message
@@ -224,14 +226,54 @@ def create_parent_monitor(event, pid: int):
 
 def create_mouse_reset_monitor(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     def run(**run_kwargs):
-        # mouse_reset_task_run(event, spec, ipc, **run_kwargs)
-        from src.util import cursor_guard_util
-        return cursor_guard_util.run(event, spec=spec, ipc=ipc, **run_kwargs)
+        mouse_reset_task_run(event, spec, ipc, **run_kwargs)
+        # from src.util import cursor_guard_util
+        # return cursor_guard_util.run(event, spec=spec, ipc=ipc, **run_kwargs)
 
     monitor_thread = threading.Thread(target=run, kwargs=kwargs, name="MouseResetMonitorThread")
     monitor_thread.daemon = True
     monitor_thread.start()
     return monitor_thread
+
+
+def mouse_reset_task_run(event, spec, ipc, **kwargs):
+    logging_config.setup_logging(ipc.log_queue)
+    logger.info("鼠标重置任务开始运行")
+    from pynput.mouse import Controller
+    mouse = Controller()
+    last_position = mouse.position
+    hwnd = None
+    try:
+        while event.is_set():
+            time.sleep(0.01)
+            try:
+                if not hwnd or not win32gui.IsWindow(hwnd):
+                    time.sleep(0.5)
+                    hwnd = hwnd_util.get_hwnd()
+                    continue
+            except Exception:
+                logger.warning("MouseReset: 获取窗口句柄时异常")
+                time.sleep(5)
+                continue
+            current_position = mouse.position
+            left, top, right, bottom = win32gui.GetClientRect(hwnd)
+            center_position = (left + right) / 2, (top + bottom) / 2
+            cur_pos_to_center_distance = math.sqrt(
+                (current_position[0] - center_position[0]) ** 2
+                + (current_position[1] - center_position[1]) ** 2
+            )
+            cur_pos_to_last_pos_distance = math.sqrt(
+                (current_position[0] - last_position[0]) ** 2
+                + (current_position[1] - last_position[1]) ** 2
+            )
+            if cur_pos_to_last_pos_distance > 200 and cur_pos_to_center_distance < 50:
+                mouse.position = last_position
+            else:
+                last_position = current_position
+    except KeyboardInterrupt:
+        pass
+    finally:
+        logger.info("鼠标重置任务结束")
 
 
 def auto_boss_task_run(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
