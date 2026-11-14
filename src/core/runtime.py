@@ -182,7 +182,17 @@ class DailyRuntimeConfig:
         self.enemyLampylumenMyriad: bool = self._cfg.bossChallenge == I18nText.EnemyLampylumenMyriad
 
     def __init_nightmarePurification(self):
-        pass
+        _all = "All"
+        self.honamiCityNightmareNest: bool = self._cfg.nightmarePurification in [
+            _all, I18nText.HonamiCityNightmareNest]
+        self.threeHeroesCrestNightmareNest: bool = self._cfg.nightmarePurification in [
+            _all, I18nText.ThreeHeroesCrestNightmareNest]
+        self.tidelineVergeNightmareNest: bool = self._cfg.nightmarePurification in [
+            _all, I18nText.TidelineVergeNightmareNest]
+        self.theWastelandsNightmareNest: bool = self._cfg.nightmarePurification in [
+            _all, I18nText.TheWastelandsNightmareNest]
+        self.fallenGraveNightmareNest: bool = self._cfg.nightmarePurification in [
+            _all, I18nText.FallenGraveNightmareNest]
 
     def __init_tacetDiscordNest(self):
         _all = "All"

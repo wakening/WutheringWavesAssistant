@@ -490,7 +490,8 @@ class ObjectDetector:
         self._save_img = False
         # self._save_img = True
 
-    def absorb_echoes(self, *, timeout: float = 20.0, enemy: EnemyMeta):
+    def absorb_echoes(self, *, timeout: float = 20.0, enemy: EnemyMeta, confidence=0.5,
+                      absorb_mode: Optional[AbsorbMode] = None):
         ui = UIOp(self.ctx)
 
         if self.try_pickup():
@@ -499,10 +500,13 @@ class ObjectDetector:
         ui.activate().sleep(0.1).camera_reset().sleep(0.5)
         enemy_name = I18nTr(Language.ZH)(enemy.id).raw  # 兼容历史
 
+        if absorb_mode is None:
+            absorb_mode = enemy.absorb
+
         # 吸收方式，默认为混合模式
-        if not enemy.absorb or enemy.absorb == AbsorbMode.Hybrid:
+        if not absorb_mode or absorb_mode == AbsorbMode.Hybrid:
             # 粗判一次
-            detected = self.ctx.od_service.search_echo_2(boss_name=enemy_name, confidence=0.5)
+            detected = self.ctx.od_service.search_echo_2(boss_name=enemy_name, confidence=confidence)
             logger.debug(f"detected: {detected}")
             # 若有转两圈
             if detected:
@@ -512,9 +516,9 @@ class ObjectDetector:
                 return True
             ui.camera_reset().sleep(0.5)
             return self._absorb_od(timeout, enemy_name, camera_reset_count=4)
-        elif enemy.absorb == AbsorbMode.Move:
+        elif absorb_mode == AbsorbMode.Move:
             return self._absorb_around_variant(self.ctx)
-        elif enemy.absorb == AbsorbMode.OD:
+        elif absorb_mode == AbsorbMode.OD:
             return self._absorb_od(timeout, enemy_name, camera_reset_count=8)
 
         raise NotImplementedError()
@@ -970,3 +974,9 @@ class Slider:
     def points(cls, img: np.ndarray) -> list[Point]:
         """索拉指南素材获取页，通用右侧滑块移动轨迹点"""
         return cls.__points(img, Point(1245, 100), Point(1245, 633), 0.4)
+
+    @classmethod
+    def guidebook_menu_points(cls, img: np.ndarray) -> list[Point]:
+        """索拉指南素材获取页，通用左侧垂直菜单滑块移动轨迹点"""
+        return cls.__points(img, Point(456, 94), Point(456, 642), 1.0)
+

@@ -457,9 +457,9 @@ class ExploreWorkflow(AbstractWorkflow):
         )
         search_btn = lambda _img: self.__search_btn(
             _img, Icon.plotBtnSkip(), roi,
-            scale_min=0.238,  # 全屏：score=0.9217, scale=0.314；score=0.9398, scale=0.327；黑边；score=0.9108, scale=0.238
+            scale_min=0.246,  # 全屏：score=0.9217, scale=0.314；score=0.9398, scale=0.327；黑边；score=0.9555, scale=0.246
             scale_max=0.314,
-            scale_step=0.314 - 0.238,
+            scale_step=0.034,
             early_score=0.85,
             score_max=0.72,
         )

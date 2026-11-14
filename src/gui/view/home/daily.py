@@ -79,8 +79,6 @@ class QTacetDiscordNest:
 class QNightmarePurification:
     id: str
     name: str
-    region_id: str
-    region: str
     rewards: list[str]
     enable: bool
 
@@ -802,6 +800,36 @@ class DailyWidget(ScrollArea):
 
         # 梦魇聚落
         self.nightmarePurificationList = [
+            QNightmarePurification(
+                id=I18nText.HonamiCityNightmareNest,
+                name=self.tr("Honami City Nightmare Nest", "Nightmare Nest"),
+                rewards=[],
+                enable=True,
+            ),
+            QNightmarePurification(
+                id=I18nText.ThreeHeroesCrestNightmareNest,
+                name=self.tr("Three Heroes' Crest: Nightmare Nest", "Nightmare Nest"),
+                rewards=[],
+                enable=True,
+            ),
+            QNightmarePurification(
+                id=I18nText.TidelineVergeNightmareNest,
+                name=self.tr("Tideline Verge Nightmare Nest", "Nightmare Nest"),
+                rewards=[],
+                enable=True,
+            ),
+            QNightmarePurification(
+                id=I18nText.TheWastelandsNightmareNest,
+                name=self.tr("The Wastelands Nightmare Nest", "Nightmare Nest"),
+                rewards=[],
+                enable=True,
+            ),
+            QNightmarePurification(
+                id=I18nText.FallenGraveNightmareNest,
+                name=self.tr("Fallen Grave Nightmare Nest", "Nightmare Nest"),
+                rewards=[],
+                enable=True,
+            ),
         ]
 
         # 培养目标，保持与游戏内一致
@@ -1556,7 +1584,6 @@ class DailyWidget(ScrollArea):
         self.nightmarePurificationComboBox = ComboBox(self.container)
         self.nightmarePurificationComboBox.addItem(self.tr("Not selected"), userData=None)
         self.nightmarePurificationComboBox.addItem(self.tr("Select all"), userData="All")
-        self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, False)
         for item in self.nightmarePurificationList:
             self.nightmarePurificationComboBox.addItem(item.name, userData=item.id)
             self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, item.enable)

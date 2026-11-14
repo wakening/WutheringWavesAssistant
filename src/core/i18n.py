@@ -451,6 +451,7 @@ class I18nText:
     TacetSuppression = "TacetSuppression"
     WeeklyChallenge = "WeeklyChallenge"
     NightmarePurification = "NightmarePurification"
+    NightmaresEchoes = "NightmaresEchoes"
     TacetDiscordNest = "TacetDiscordNest"
 
     ### ------- Guidebook common -------
@@ -643,6 +644,16 @@ class I18nText:
     RebirthUplandsTacetDiscordNest = "RebirthUplandsTacetDiscordNest"
     StagnantRunTacetDiscordNest = "StagnantRunTacetDiscordNest"
     TacetDiscordDefeated = "TacetDiscordDefeated"
+
+    ### ------- Guidebook MaterialCollection NightmarePurification -------
+    HonamiCityNightmareNest = "HonamiCityNightmareNest"
+    ThreeHeroesCrestNightmareNest = "ThreeHeroesCrestNightmareNest"
+    TidelineVergeNightmareNest = "TidelineVergeNightmareNest"
+    TheWastelandsNightmareNest = "TheWastelandsNightmareNest"
+    FallenGraveNightmareNest = "FallenGraveNightmareNest"
+    DungeonNightmarePurification = "DungeonNightmarePurification"
+    ThisNightmareNestHasBeenPurified = "ThisNightmareNestHasBeenPurified"
+    ThisNightmareNestWillBeRefreshedTomorrow = "ThisNightmareNestWillBeRefreshedTomorrow"
 
     ## ------- Guidebook EnemyTracing -------
     Detect = "Detect"
@@ -1777,7 +1788,7 @@ I18N_TEXT = {
         Language.EN: RegexStr(flex_ws(r"^Blitz Mode$"), raw="Blitz Mode"),
     },
     I18nText.LeaveNow: {
-        Language.ZH: RegexStr(r"^确认离开$", raw="确认离开"),
+        Language.ZH: RegexStr(r"^确认离开.?$", raw="确认离开"),
         Language.EN: RegexStr(flex_ws(r"^Leave now.?$"), raw="Leave now?"),
     },
     I18nText.Exit: {
@@ -2164,6 +2175,11 @@ I18N_TEXT = {
     I18nText.NightmarePurification: {
         Language.ZH: RegexStr(r"^梦.?.?除$", raw="梦魇祓除"),
         Language.EN: RegexStr(flex_ws(r"^Nightmare Purification$"), raw="Nightmare Purification"),
+    },
+    I18nText.NightmaresEchoes: {
+        Language.ZH: RegexStr(r"^产出梦.?声.?$", raw="产出梦魇声骸"),
+        Language.ZH_TW: RegexStr(r"^產出夢.?聲.?$", raw="產出夢魘聲骸"),
+        Language.EN: RegexStr(flex_ws(r"^Nightmares Echoes$"), raw="Nightmares Echoes"),
     },
     # 产出声骸套件
     I18nText.TacetDiscordNest: {
@@ -2895,6 +2911,58 @@ I18N_TEXT = {
     I18nText.TacetDiscordDefeated: {
         Language.ZH: RegexStr(r"^已击败残象.*\d.*", raw=r"已击败残象:0/48"),
         Language.EN: RegexStr(flex_ws(r"^Tacet Discords Defeated.*\d.*"), raw=r"Tacet Discords Defeated: 0/48"),
+    },
+
+    ### ------- Guidebook MaterialCollection NightmarePurification -------
+    I18nText.HonamiCityNightmareNest: {
+        Language.ZH: RegexStr(r"^.?波市梦.?聚落$", raw="穂波市梦魇聚落"),
+        Language.ZH_TW: RegexStr(r"^.?波市夢.?聚落$", raw="穗波市夢魘聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Honami City"), raw="Honami City Nightmare Nest"),
+    },
+    I18nText.ThreeHeroesCrestNightmareNest: {
+        Language.ZH: RegexStr(r"^三王峰梦.?聚落$", raw="三王峰梦魇聚落"),
+        Language.ZH_TW: RegexStr(r"^三王峰夢.?聚落$", raw="三王峰夢魘聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Three Heroes.*?Crest"), raw="Three Heroes' Crest: Nightmare Nest"),
+    },
+    I18nText.TidelineVergeNightmareNest: {
+        Language.ZH: RegexStr(r"^.?痕岩.?梦.?聚落$", raw="潮痕岩滩梦魇聚落"),
+        Language.ZH_TW: RegexStr(r"^.?痕岩.?夢.?聚落$", raw="潮痕岩灘夢魘聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Tideline Verge"), raw="Tideline Verge Nightmare Nest"),
+    },
+    I18nText.TheWastelandsNightmareNest: {
+        Language.ZH: RegexStr(r"^受.?地梦.?聚落$", raw="受蚀地梦魇聚落"),
+        Language.ZH_TW: RegexStr(r"^受.?地夢.?聚落$", raw="受蝕地夢魘聚落"),
+        Language.EN: RegexStr(flex_ws(r"^The Wastelands"), raw="The Wastelands Nightmare Nest"),
+    },
+    I18nText.FallenGraveNightmareNest: {
+        Language.ZH: RegexStr(r"^千.?沉岛梦.?聚落$", raw="千殁沉岛梦魇聚落"),
+        Language.ZH_TW: RegexStr(r"^千.?沉島夢.?聚落$", raw="千歿沉島夢魘聚落"),
+        Language.EN: RegexStr(flex_ws(r"^Fallen Grave"), raw="Fallen Grave Nightmare Nest"),
+    },
+    # 聚落副本文本
+    I18nText.DungeonNightmarePurification: {
+        Language.ZH: RegexStr(r"^.{0,1}梦.?.?除", raw="梦魇祓除"),
+        Language.ZH_TW: RegexStr(r"^.{0,1}夢.?.?除", raw="夢魘祓除"),
+        Language.EN: RegexStr(
+            flex_ws(r"^.{0,2}ightmare Purification"),
+            raw="Nightmare Purification"
+        ),
+    },
+    I18nText.ThisNightmareNestHasBeenPurified: {
+        Language.ZH: RegexStr(r"^.{0,2}聚落梦.?已", raw="该聚落梦魇已祓除"),
+        Language.ZH_TW: RegexStr(r"^.{0,2}聚落夢.?已", raw="該聚落夢魘已祓除"),
+        Language.EN: RegexStr(
+            flex_ws(r"^.{0,2}his Nightmare Nest has"),
+            raw="This Nightmare Nest has been purified"
+        ),
+    },
+    I18nText.ThisNightmareNestWillBeRefreshedTomorrow: {
+        Language.ZH: RegexStr(r"聚落的梦.?将于明日刷新", raw="该聚落的梦魇将于明日刷新"),
+        Language.ZH_TW: RegexStr(r"聚落的夢.?將於明日刷新", raw="該聚落的夢魘將於明日刷新"),
+        Language.EN: RegexStr(
+            flex_ws(r"^This Nightmare Nest will be ref"),
+            raw="This Nightmare Nest will be refreshed tomorrow"
+        ),
     },
 
     ## ------- Guidebook EnemyTracing -------

@@ -8,7 +8,7 @@ from src.core.color import ColorRule, Color
 from src.core.combat.combat_core import Morph
 from src.core.combat.combat_system import CombatSystem
 from src.core.dungeon import Dungeon
-from src.core.enemy import Enemy
+from src.core.enemy import Enemy, AbsorbMode
 from src.core.exceptions import StopError
 from src.core.geometry import AnchorBBox, Align, AnchorPoint, PointKind, Point
 from src.core.i18n import I18nText
@@ -21,7 +21,7 @@ from src.core.workflow import node, WorkflowEngine, NodeContext, AbstractWorkflo
 from src.service.common_workflow import (
     absorb_around_variant_blind, move_and_scan_dialogue, match_remaining_attempts, linear_spacing,
     query_waveplate_guidebook, query_waveplate_claim_rewards,
-    object_detection, search_icon_guidebook, AsyncPickup, RoiEx, Slider, is_white_text,
+    object_detection, search_icon_guidebook, AsyncPickup, RoiEx, Slider, is_white_text, ObjectDetector,
 )
 from src.util import img_util
 from src.util.img_sift_util import SIFTFeatureMatcher
@@ -119,6 +119,11 @@ class TaskLocal:
         self.bellOfArchaicChantsFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.BellOfArchaicChants)
 
         ### ------- Guidebook MaterialCollection NightmarePurification -------
+        self.honamiCityNightmareNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.HonamiCityNightmareNest)
+        self.threeHeroesCrestNightmareNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.ThreeHeroesCrestNightmareNest)
+        self.tidelineVergeNightmareNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TidelineVergeNightmareNest)
+        self.theWastelandsNightmareNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.TheWastelandsNightmareNest)
+        self.fallenGraveNightmareNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.FallenGraveNightmareNest)
 
         ### ------- Guidebook MaterialCollection TacetDiscordNest -------
         self.simulacrumNexusTacetDiscordNestFSM: LatchTaskFSM = LatchTaskFSM(name=I18nText.SimulacrumNexusTacetDiscordNest)
@@ -222,7 +227,14 @@ class TaskLocal:
             self.bellOfArchaicChantsFSM,
             name=I18nText.WeeklyChallenge
         )
-        self.nightmarePurificationFSM: TaskFSMGroup = TaskFSMGroup(name=I18nText.NightmarePurification)
+        self.nightmarePurificationFSM: TaskFSMGroup = TaskFSMGroup(
+            self.honamiCityNightmareNestFSM,
+            self.threeHeroesCrestNightmareNestFSM,
+            self.tidelineVergeNightmareNestFSM,
+            self.theWastelandsNightmareNestFSM,
+            self.fallenGraveNightmareNestFSM,
+            name=I18nText.NightmarePurification
+        )
         self.tacetDiscordNestFSM: TaskFSMGroup = TaskFSMGroup(
             self.simulacrumNexusTacetDiscordNestFSM,
             self.southernYuanHillsTacetDiscordNestFSM,
@@ -893,12 +905,10 @@ def doMaterialCollection(ctx: NodeContext, local: TaskLocal, **kwargs) -> Option
         return I18nText.BossChallenge
     if local.tacetSuppressionFSM.is_active:
         return I18nText.TacetSuppression
-    # if local.weeklyChallengeFSM.is_active:
-    #     return I18nText.WeeklyChallenge
-    if local.nightmarePurificationFSM.is_active:
-        return I18nText.NightmarePurification
     if local.tacetDiscordNestFSM.is_active:
         return I18nText.TacetDiscordNest
+    if local.nightmarePurificationFSM.is_active:
+        return I18nText.NightmarePurification
     return None
 
 
@@ -2036,8 +2046,224 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
 
 @node(NodeName.doNightmarePurification)
 def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
-    raise NotImplementedError
+    if local.nightmarePurificationFSM.is_terminal:
+        return True
 
+    ui = UIOp(ctx)
+    roiex = RoiEx(ctx)
+
+    ui.sleep(0.3).snapshot()
+
+    if not ui.search(ctx.tr(I18nText.NightmarePurification), roiex.guidebook_menu):
+        # 滑动寻找入口
+        nightmare_purification_text = None
+        slider_points = Slider.guidebook_menu_points(ui.grap())
+        logger.debug(f"Slider points: {slider_points}")
+        for i, p in enumerate(slider_points):
+            if i > 0:
+                logger.debug(f"Scroll point: {p}")
+                ui.click_point(p, times=2, interval=0.2)
+                ui.sleep(0.2).snapshot()
+            else:
+                ui.snapshot()
+            if not (menu_text := ui.search(ctx.tr(I18nText.NightmarePurification), roiex.guidebook_menu)):
+                continue
+            if not ui.search(ctx.tr(I18nText.NightmaresEchoes), roiex.guidebook_menu):
+                continue
+            nightmare_purification_text = menu_text
+
+        # 没找到梦魇祓除
+        if not nightmare_purification_text:
+            logger.warning(f"Text not found: {ctx.tr(I18nText.NightmarePurification).raw}")
+            return False
+
+    # 点击梦魇祓除
+    if not ui.wait().until(
+            lambda: ui.snapshot().click_text(ctx.tr(I18nText.NightmarePurification), roiex.guidebook_menu,
+                                             pk=PointKind.RANDOM, times=2, interval=0.2)
+                    and ui.search(ctx.tr(I18nText.SonataSetFilter), roiex.guidebook_content)):
+        ui.esc().sleep(1.2)
+        return False
+
+    ui.sleep(0.3)
+    slider_points = Slider.points(ui.grap())
+
+    # fsm的name = 副本id
+    for fsm in local.nightmarePurificationFSM.children:
+        # 检查当前副本状态
+        if fsm.is_terminal:
+            continue
+        logger.info(f"{ctx.tr(fsm.name).raw}")
+        if not fsm.start():
+            fsm.fail()
+            continue
+        dungeon = Dungeon.NightmarePurification.get(fsm.name)
+        if not dungeon:
+            logger.warning(f"Dungeon '{ctx.tr(fsm.name).raw}' not configured")
+            fsm.fail()
+            continue
+        dungeon_name = ctx.tr(dungeon.id)
+
+        def _fail():
+            ui.esc().sleep(1.2)
+            if fsm.is_terminal:
+                return True
+            if fsm.count == 0:
+                fsm.fail()
+                return True
+            return False
+
+        try:
+            # 滑动寻找入口
+            is_start_challenge = False
+            for i, p in enumerate(slider_points):
+                logger.debug(f"Scroll point: {p}")
+                ui.click_point(p, times=2, interval=0.2)
+                ui.sleep(0.2).snapshot()
+
+                # 找副本名
+                if not (dungeon_text := ui.search(dungeon_name, roiex.guidebook_content)):
+                    continue
+                # 找直接挑战
+                challenge_list = ui.search(ctx.tr([I18nText.Challenge, I18nText.Go]), roiex.guidebook_content)
+                if not challenge_list:
+                    continue
+                challenge_list.sort(key=lambda x: x.y1)
+                if dungeon_text[0].y1 > challenge_list[-1].y2:
+                    continue
+                if not (challenge_text := next((cl for cl in challenge_list if dungeon_text[0].y1 < cl.y2), None)):
+                    return _fail()
+                # 当前页面最底下，按钮可能只有一半无法点击，再翻一页
+                if challenge_text.y2 == challenge_list[-1].y2 and i < len(slider_points) - 1:
+                    continue
+
+                # 检查数量进度
+                progress_pattern = r"(\d{1,2}).*?(\d{1,2})"
+                if not (progress_list := ui.search(progress_pattern, roiex.guidebook_content)):
+                    return _fail()
+                progress_list.sort(key=lambda x: x.y1)
+                if not (progress_text := next((pl for pl in progress_list if dungeon_text[0].y1 < pl.y2), None)):
+                    return _fail()
+                match = re.search(progress_pattern, progress_text.text, re.I)
+                logger.debug(f"match: {match}")
+                try:
+                    # 进度已刷满
+                    if int(match.group(1)) == int(match.group(2)):
+                        logger.info(f"{fsm.name}: ⏭️ skip because: {match.group(0)}")
+                        fsm.complete()
+                        break
+                except Exception:
+                    pass
+                logger.info(f"{fsm.name}: {match.group(0)}")
+
+                # 点击直接挑战
+                ui.sleep(0.2)
+                for _ in range(2):
+                    # 若ui太卡，点快了没跳转，再试一次
+                    ui.click_bbox(challenge_text, delay=0.3, times=2, interval=0.1)
+                    if ui.sleep(1).wait(3).until(
+                            lambda: ui.snapshot().click_text(ctx.tr(I18nText.StartChallenge), pk=PointKind.NEAR,
+                                                             delay=0.3, times=3, interval=0.2)):
+                        is_start_challenge = True
+                        break
+                break
+
+            # 进度已刷满，刷下一个
+            if fsm.is_terminal:
+                continue
+
+            # 没找到副本
+            if not is_start_challenge:
+                logger.warning(f"Dungeon not found: {dungeon_name.raw}")
+                return _fail()
+
+            if ui.sleep(2).wait_back_home():
+                ui.sleep(1.0)
+            else:
+                return False
+
+            # 开始战斗
+            combat_system = CombatSystem(ctx.control_service, ctx.img_service)
+            combat_system.set_resonators(local.members, is_print=False)
+            combat_system.is_async = True
+            combat_system.check_boss_hp = False
+            combat_system.auto_pickup = False
+
+            # 打
+            timeout = 10 * 60
+            no_text_count = 3
+            no_text_max = no_text_count
+            deadline = time.monotonic() + timeout
+
+            while ui.is_set() or time.monotonic() < deadline:
+                logger.debug(f"no_text_count: {no_text_count}")
+                if no_text_count < 0:
+                    break
+                combat_system.start(3.5)
+                ui.sleep(1.5)
+                ui.snapshot()
+                if ui.is_on_homepage():
+                    # 结束文本：该聚落梦魇已祓除
+                    logger.debug(f"result: {ui.bbox_result}")
+                    if ui.search(ctx.tr([
+                        I18nText.ThisNightmareNestHasBeenPurified,
+                        I18nText.ThisNightmareNestWillBeRefreshedTomorrow])):
+                        break
+                    # 战斗文本：梦魇祓除
+                    if ui.search(ctx.tr(I18nText.DungeonNightmarePurification)):
+                        logger.debug("Fight fight!")
+                        no_text_count = no_text_max
+                        continue
+                    else:
+                        logger.debug(f"Text not found: {ctx.tr(I18nText.ThisNightmareNestHasBeenPurified).raw}")
+                    no_text_count -= 1
+
+                if page_key := GlobalPage(ctx).action(ui=ui):
+                    if page_key == GlobalPage.InternetDisconnecting:
+                        combat_system.stop(join=True)
+                        return False
+
+            combat_system.stop(join=True)
+            logger.info("Challenge Complete")
+
+            ui.sleep(0.5).snapshot()
+
+            # 检查弹窗
+            if ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(ctx.tr([I18nText.Restart, I18nText.Confirm])):
+                logger.debug(f"Found text: {ctx.tr(I18nText.LeaveNow).raw}")
+                ui.sleep(0.3)
+            else:
+                combat_system.exit_special_state(Morph.Prefer)
+                ui.sleep(0.3)
+
+                # 吸收声骸
+                absorbed = False
+                if ui.search(ctx.tr(I18nText.Absorb)):
+                    absorbed = ObjectDetector(ctx).try_pickup()
+                if not absorbed:
+                    absorbed = ObjectDetector(ctx).absorb_echoes(
+                        timeout=30, enemy=Enemy.ImpermanenceHeron, confidence=0.3, absorb_mode=AbsorbMode.OD)
+                    logger.warning(f"Absorbed: {absorbed}")
+                # 防漏
+                absorb_around_variant_blind(ctx)
+
+            # 不管怎样都结束掉
+            fsm.complete()
+            return True
+
+        except (KeyboardInterrupt, StopError) as e:
+            raise e
+        except Exception as e:
+            logger.exception(e)
+
+    # 未知异常兜底，标记失败
+    for fsm in local.nightmarePurificationFSM.children:
+        if fsm.status == TaskStatus.PENDING:
+            fsm.start()
+            fsm.fail()
+        elif fsm.status in [TaskStatus.IN_PROGRESS, TaskStatus.WAITING]:
+            fsm.fail()
+    return False
 
 @node(NodeName.doTacetDiscordNest)
 def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
@@ -2676,10 +2902,13 @@ class DailyWorkflow(AbstractWorkflow):
         self.local.bellOfArchaicChantsFSM.set_enabled(cfg.bellOfArchaicChants)
 
         ### ------- Guidebook MaterialCollection NightmarePurification -------
+        self.local.honamiCityNightmareNestFSM.set_enabled(cfg.honamiCityNightmareNest)
+        self.local.threeHeroesCrestNightmareNestFSM.set_enabled(cfg.threeHeroesCrestNightmareNest)
+        self.local.tidelineVergeNightmareNestFSM.set_enabled(cfg.tidelineVergeNightmareNest)
+        self.local.theWastelandsNightmareNestFSM.set_enabled(cfg.theWastelandsNightmareNest)
+        self.local.fallenGraveNightmareNestFSM.set_enabled(cfg.fallenGraveNightmareNest)
 
         ### ------- Guidebook MaterialCollection TacetDiscordNest -------
-
-        ### ------- Guidebook MaterialCollection tacetDiscordNest -------
         self.local.simulacrumNexusTacetDiscordNestFSM.set_enabled(cfg.simulacrumNexusTacetDiscordNest)
         self.local.southernYuanHillsTacetDiscordNestFSM.set_enabled(cfg.southernYuanHillsTacetDiscordNest)
         self.local.starblindCrashsiteTacetDiscordNestFSM.set_enabled(cfg.starblindCrashsiteTacetDiscordNest)

@@ -22,7 +22,7 @@ class DungeonMeta:
     menu: str
     register: List[dict[str, "DungeonMeta"]]
     icon: DungeonIcon
-    region: str
+    region: Optional[str]
     waveplate: Optional[int]
     enemy_id: Optional[str]
     rewards: Optional[List[str]]
@@ -1149,21 +1149,74 @@ class DungeonTacetDiscordNest:
     )
 
 
-# class DungeonNightmarePurification:
-#     # ------- NightmarePurification -------
-#
-#     CourtOfShackledSouls = DungeonMeta(
-#         id=I18nText.CourtOfShackledSouls,
-#         localized_name=I18nTr.l10n(I18nText.CourtOfShackledSouls),
-#         menu=I18nText.NightmarePurification,
-#         register=[Dungeon.NightmarePurification],
-#         icon=DungeonIcon.Icon1,
-#         region=I18nText.GuidebookMengzhou,
-#         waveplate=60,
-#         enemy_id=I18nText.EnemyThousandPuppetPavilion,
-#         rewards=[I18nText.SkywardGlazedHeart],
-#         camera_reset=False,
-#     )
+class DungeonNightmarePurification:
+    # ------- NightmareNest -------
+
+    HonamiCityNightmareNest = DungeonMeta(
+        id=I18nText.HonamiCityNightmareNest,
+        localized_name=I18nTr.l10n(I18nText.HonamiCityNightmareNest),
+        menu=I18nText.NightmarePurification,
+        register=[Dungeon.NightmarePurification],
+        icon=DungeonIcon.Icon1,
+        region=None,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        camera_reset=False,
+    )
+
+    ThreeHeroesCrestNightmareNest = DungeonMeta(
+        id=I18nText.ThreeHeroesCrestNightmareNest,
+        localized_name=I18nTr.l10n(I18nText.ThreeHeroesCrestNightmareNest),
+        menu=I18nText.NightmarePurification,
+        register=[Dungeon.NightmarePurification],
+        icon=DungeonIcon.Icon1,
+        region=None,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        camera_reset=False,
+    )
+
+    TidelineVergeNightmareNest = DungeonMeta(
+        id=I18nText.TidelineVergeNightmareNest,
+        localized_name=I18nTr.l10n(I18nText.TidelineVergeNightmareNest),
+        menu=I18nText.NightmarePurification,
+        register=[Dungeon.NightmarePurification],
+        icon=DungeonIcon.Icon1,
+        region=None,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        camera_reset=False,
+    )
+
+    TheWastelandsNightmareNest = DungeonMeta(
+        id=I18nText.TheWastelandsNightmareNest,
+        localized_name=I18nTr.l10n(I18nText.TheWastelandsNightmareNest),
+        menu=I18nText.NightmarePurification,
+        register=[Dungeon.NightmarePurification],
+        icon=DungeonIcon.Icon1,
+        region=None,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        camera_reset=False,
+    )
+
+    FallenGraveNightmareNest = DungeonMeta(
+        id=I18nText.FallenGraveNightmareNest,
+        localized_name=I18nTr.l10n(I18nText.FallenGraveNightmareNest),
+        menu=I18nText.NightmarePurification,
+        register=[Dungeon.NightmarePurification],
+        icon=DungeonIcon.Icon1,
+        region=None,
+        waveplate=None,
+        enemy_id=None,
+        rewards=None,
+        camera_reset=False,
+    )
+
 
 if __name__ == '__main__':
     print(Dungeon.ForgeryChallenge)
