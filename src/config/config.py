@@ -92,7 +92,7 @@ class DailyConfig(ConfigBase):
     simulationChallengeOpen: bool | None = None
     bossChallenge: str | None = None
     bossChallengeOpen: bool | None = None
-    nightmarePurification: str | None = None
+    nightmarePurification: str | list[str] | None = None
     nightmarePurificationOpen: bool | None = None
     tacetDiscordNest: str | None = None
     tacetDiscordNestOpen: bool | None = None

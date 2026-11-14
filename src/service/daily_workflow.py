@@ -2229,9 +2229,12 @@ def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> boo
             ui.sleep(0.5).snapshot()
 
             # 检查弹窗
-            if ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(ctx.tr([I18nText.Restart, I18nText.Confirm])):
+            if (ui.search(ctx.tr(I18nText.LeaveNow)) and ui.search(ctx.tr(I18nText.Restart))
+                    and ui.click_text(ctx.tr(I18nText.Confirm))):
                 logger.debug(f"Found text: {ctx.tr(I18nText.LeaveNow).raw}")
                 ui.sleep(0.3)
+            elif ui.search(ctx.tr(I18nText.SelectARevivalItem)):
+                ui.esc().sleep(0.5)
             else:
                 combat_system.exit_special_state(Morph.Prefer)
                 ui.sleep(0.3)
@@ -2242,10 +2245,16 @@ def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> boo
                     absorbed = ObjectDetector(ctx).try_pickup()
                 if not absorbed:
                     absorbed = ObjectDetector(ctx).absorb_echoes(
-                        timeout=30, enemy=Enemy.ImpermanenceHeron, confidence=0.3, absorb_mode=AbsorbMode.OD)
-                    logger.warning(f"Absorbed: {absorbed}")
+                        timeout=30, enemy=Enemy.ImpermanenceHeron, confidence=0.4, absorb_mode=AbsorbMode.OD)
+                    logger.debug(f"NightmarePurification absorbed: {absorbed}")
                 # 防漏
                 absorb_around_variant_blind(ctx)
+
+                # 离开副本
+                ui.sleep(0.2).esc().sleep(0.4).wait().until(
+                    lambda: ui.snapshot().search(ctx.tr(I18nText.LeaveNow))
+                            and ui.search(ctx.tr(I18nText.Restart))
+                            and ui.click_text(ctx.tr(I18nText.Confirm), delay=0.3, times=3, interval=0.2))
 
             # 不管怎样都结束掉
             fsm.complete()

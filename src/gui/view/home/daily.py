@@ -22,6 +22,7 @@ from src.gui.common.config import paramConfig
 from src.gui.common.globals import globalParam, globalSignal
 from src.gui.common.style_sheet import StyleSheet
 from src.gui.common.task import TaskId, BaseTask, ValidationResult
+from src.gui.components.widgets.combo_box import MultiSelectionComboBox
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,35 @@ class QResonator:
     tacetDiscordNest: list[str]
     nightmarePurification: list[str]
     enable: bool
+
+
+class ElidedMultiSelectionComboBox(MultiSelectionComboBox):
+
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        # 关键：让布局忽略按钮的 sizeHint，宽度完全由外部布局决定。
+        # 这样 setText 再长也不会把按钮撑开；动态宽度由父布局控制。
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+
+    def _updateDisplayText(self):
+        """文本模式下按当前宽度做省略显示"""
+        if not self._selectedIndices:
+            self._updateTextState(True)
+            self.setText(self._placeholderText or "")
+            return
+
+        self._updateTextState(False)
+        full = ", ".join(self.selectedTexts())
+
+        fm = self.fontMetrics()
+        # 右侧箭头画在 width()-22 处、宽 10，留 30 左右空间即可
+        avail = max(0, self.width() - 50)
+        self.setText(fm.elidedText(full, Qt.ElideRight, avail))
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if hasattr(self, "_selectedIndices"):
+            self._updateDisplay()
 
 
 class DailyTask(BaseTask):
@@ -1581,12 +1611,10 @@ class DailyWidget(ScrollArea):
             self.tacetDiscordNestComboBox.setItemEnabled(self.tacetDiscordNestComboBox.count() - 1, item.enable)
 
         self.nightmarePurificationCheckBox = CheckBox(self.tr("Nightmare Nest:"), self.container)
-        self.nightmarePurificationComboBox = ComboBox(self.container)
-        self.nightmarePurificationComboBox.addItem(self.tr("Not selected"), userData=None)
-        self.nightmarePurificationComboBox.addItem(self.tr("Select all"), userData="All")
+        self.nightmarePurificationComboBox = ElidedMultiSelectionComboBox(self.container)
+        self.nightmarePurificationComboBox.setPlaceholderText(self.tr("Not selected"))
         for item in self.nightmarePurificationList:
             self.nightmarePurificationComboBox.addItem(item.name, userData=item.id)
-            self.nightmarePurificationComboBox.setItemEnabled(self.nightmarePurificationComboBox.count() - 1, item.enable)
 
         self.activityCheckBox = CheckBox(self.tr("Activity:"), self.container)
         self.activityComboBox = ComboBox(self.container)
@@ -1820,9 +1848,7 @@ class DailyWidget(ScrollArea):
             lambda _: paramConfig.set(paramConfig.forgeryChallenge, self.forgeryChallengeComboBox.currentData()))
         self.bossChallengeComboBox.currentIndexChanged.connect(
             lambda _: paramConfig.set(paramConfig.bossChallenge, self.bossChallengeComboBox.currentData()))
-        self.nightmarePurificationComboBox.currentIndexChanged.connect(
-            lambda _: paramConfig.set(paramConfig.nightmarePurification,
-                                      self.nightmarePurificationComboBox.currentData()))
+        self.nightmarePurificationComboBox.selectionChanged.connect(self.__onNightmarePurificationSelectionChanged)
         self.tacetDiscordNestComboBox.currentIndexChanged.connect(
             lambda _: paramConfig.set(paramConfig.tacetDiscordNest, self.tacetDiscordNestComboBox.currentData()))
         self.activityComboBox.currentIndexChanged.connect(
@@ -1858,8 +1884,17 @@ class DailyWidget(ScrollArea):
             self.forgeryChallengeComboBox.findData(paramConfig.get(paramConfig.forgeryChallenge)))
         self.bossChallengeComboBox.setCurrentIndex(
             self.bossChallengeComboBox.findData(paramConfig.get(paramConfig.bossChallenge)))
-        self.nightmarePurificationComboBox.setCurrentIndex(
-            self.nightmarePurificationComboBox.findData(paramConfig.get(paramConfig.nightmarePurification)))
+
+        if nests := paramConfig.get(paramConfig.nightmarePurification):
+            if isinstance(nests, str):
+                nests = [nests]
+            elif isinstance(nests, list):
+                pass
+            else:
+                nests = []
+            indices = {i for i, item in enumerate(self.nightmarePurificationComboBox.items) if item.userData in nests}
+            self.nightmarePurificationComboBox.setSelectedIndices(indices)
+
         self.tacetDiscordNestComboBox.setCurrentIndex(
             self.tacetDiscordNestComboBox.findData(paramConfig.get(paramConfig.tacetDiscordNest)))
         self.activityComboBox.setCurrentIndex(
@@ -1886,7 +1921,7 @@ class DailyWidget(ScrollArea):
         self.bossChallengeComboBox.setCurrentIndex(0)
         self.bossChallengeCheckBox.setChecked(False)
 
-        self.nightmarePurificationComboBox.setCurrentIndex(0)
+        self.nightmarePurificationComboBox.setSelectedIndices(set())
         self.nightmarePurificationCheckBox.setChecked(False)
 
         self.tacetDiscordNestComboBox.setCurrentIndex(0)
@@ -1917,6 +1952,10 @@ class DailyWidget(ScrollArea):
             else:
                 self.buttonGroupComboBox[i].setEnabled(True)
                 paramConfig.set(self.buttonGroupOpen[i], False)
+
+    def __onNightmarePurificationSelectionChanged(self, indices: set[int]):
+        selected = [self.nightmarePurificationComboBox.items[i].userData for i in sorted(indices)]
+        paramConfig.set(paramConfig.nightmarePurification, selected)
 
     def __updateFocusResonatorInfo(self, resonator_id: str | None):
         for resonator in self.resonatorList:

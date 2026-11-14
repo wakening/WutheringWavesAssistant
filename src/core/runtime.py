@@ -182,17 +182,19 @@ class DailyRuntimeConfig:
         self.enemyLampylumenMyriad: bool = self._cfg.bossChallenge == I18nText.EnemyLampylumenMyriad
 
     def __init_nightmarePurification(self):
-        _all = "All"
-        self.honamiCityNightmareNest: bool = self._cfg.nightmarePurification in [
-            _all, I18nText.HonamiCityNightmareNest]
-        self.threeHeroesCrestNightmareNest: bool = self._cfg.nightmarePurification in [
-            _all, I18nText.ThreeHeroesCrestNightmareNest]
-        self.tidelineVergeNightmareNest: bool = self._cfg.nightmarePurification in [
-            _all, I18nText.TidelineVergeNightmareNest]
-        self.theWastelandsNightmareNest: bool = self._cfg.nightmarePurification in [
-            _all, I18nText.TheWastelandsNightmareNest]
-        self.fallenGraveNightmareNest: bool = self._cfg.nightmarePurification in [
-            _all, I18nText.FallenGraveNightmareNest]
+        nests = self._cfg.nightmarePurification or []
+        if isinstance(nests, list):
+            pass
+        elif isinstance(nests, str):
+            nests = [nests]
+        else:
+            nests = []
+        _all = "All" in nests
+        self.honamiCityNightmareNest: bool = _all or I18nText.HonamiCityNightmareNest in nests
+        self.threeHeroesCrestNightmareNest: bool = _all or I18nText.ThreeHeroesCrestNightmareNest in nests
+        self.tidelineVergeNightmareNest: bool = _all or I18nText.TidelineVergeNightmareNest in nests
+        self.theWastelandsNightmareNest: bool = _all or I18nText.TheWastelandsNightmareNest in nests
+        self.fallenGraveNightmareNest: bool = _all or I18nText.FallenGraveNightmareNest in nests
 
     def __init_tacetDiscordNest(self):
         _all = "All"
