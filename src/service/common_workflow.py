@@ -971,12 +971,12 @@ class Slider:
         return points
 
     @classmethod
-    def points(cls, img: np.ndarray) -> list[Point]:
+    def points(cls, img: np.ndarray, *, rate: float = 0.4) -> list[Point]:
         """索拉指南素材获取页，通用右侧滑块移动轨迹点"""
-        return cls.__points(img, Point(1245, 100), Point(1245, 633), 0.4)
+        return cls.__points(img, Point(1245, 100), Point(1245, 633), rate=rate)
 
     @classmethod
-    def guidebook_menu_points(cls, img: np.ndarray) -> list[Point]:
+    def guidebook_menu_points(cls, img: np.ndarray, *, rate: float = 1.0) -> list[Point]:
         """索拉指南素材获取页，通用左侧垂直菜单滑块移动轨迹点"""
-        return cls.__points(img, Point(456, 94), Point(456, 642), 1.0)
+        return cls.__points(img, Point(456, 94), Point(456, 642), rate=rate)
 

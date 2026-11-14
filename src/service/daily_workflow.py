@@ -2086,7 +2086,7 @@ def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> boo
         return False
 
     ui.sleep(0.3)
-    slider_points = Slider.points(ui.grap())
+    slider_points = Slider.points(ui.grap(), rate=0.2)
 
     # fsm的name = 副本id
     for fsm in local.nightmarePurificationFSM.children:
