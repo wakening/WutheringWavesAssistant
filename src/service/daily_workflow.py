@@ -2245,7 +2245,7 @@ def doNightmarePurification(ctx: NodeContext, local: TaskLocal, **kwargs) -> boo
                     absorbed = ObjectDetector(ctx).try_pickup()
                 if not absorbed:
                     absorbed = ObjectDetector(ctx).absorb_echoes(
-                        timeout=30, enemy=Enemy.ImpermanenceHeron, confidence=0.4, absorb_mode=AbsorbMode.OD)
+                        timeout=40, enemy=Enemy.ImpermanenceHeron, confidence=0.4, absorb_mode=AbsorbMode.OD)
                     logger.debug(f"NightmarePurification absorbed: {absorbed}")
                 # 防漏
                 absorb_around_variant_blind(ctx)
