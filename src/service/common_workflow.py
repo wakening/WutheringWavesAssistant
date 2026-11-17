@@ -189,15 +189,16 @@ class AsyncPickup:
 def absorb_around_variant_blind(ctx: NodeContext):
     """
     路线为：环绕吸收变体
-    识别：只有执行前会识别一次，防止刚好就在脚下，及时结束。后续不识别吸收盲捡
+    不识别吸收盲捡
     :param ctx:
     :return:
     """
-    roi = RoiEx(ctx).dialogue
-    ui = UIOp(ctx)
 
-    if ui.snapshot(roi=roi).search(ctx.tr(I18nText.Absorb)):
-        return absorb_and_claim_rewards(ctx)
+    # 因为移动惯性和对话框延迟，可能被虚晃一枪
+    # roi = RoiEx(ctx).dialogue
+    # ui = UIOp(ctx)
+    # if ui.snapshot(roi=roi).search(ctx.tr(I18nText.Absorb)):
+    #     return absorb_and_claim_rewards(ctx)
 
     route = [
         Run.forward(0.32), Run.forward(0.33), Run.left(0.32), Run.backward(0.37), Run.backward(0.37),

@@ -2539,7 +2539,6 @@ def doTacetDiscordNest(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                         combat_system.start(3.5)
                         ui.sleep(1.5)
                         ui.snapshot()
-                        img = ui.img
                         if ui.is_on_homepage():
                             # 残象聚落已清理
                             logger.debug(f"result: {ui.bbox_result}")
