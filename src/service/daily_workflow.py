@@ -1356,6 +1356,7 @@ def doBossChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             no_text_count = no_text_max
                             continue
                         elif ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
+                            # 连战模式，第二次开始左侧没有文字提示，检查boss名字解决
                             logger.debug("Fight fight!")
                             no_text_count = no_text_max
                             continue
@@ -1584,7 +1585,7 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                 return _fail()
 
             # 循环刷
-            max_challenge = 9
+            max_challenge = 12
             for i in range(max_challenge):
                 if i == max_challenge - 1:
                     return _fail()
@@ -1607,7 +1608,9 @@ def doTacetSuppression(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     return True
 
                 # 检查战斗文本
-                keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
+                # keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField, I18nText.TacetField])
+                # 连战模式，第二次开始左侧没有文字提示，无法判断战斗是否打完，esc重新加载解决
+                keyword = ctx.tr([I18nText.DefeatTheTdsInTheTacetField])
                 if not ui.snapshot().search(keyword):
                     if ui.esc().sleep(0.3).wait().until(
                             lambda: ui.snapshot()
@@ -1921,6 +1924,7 @@ def doWeeklyChallenge(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                             no_text_count = no_text_max
                             continue
                         elif ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
+                            # 连战模式，第二次开始左侧没有文字提示，检查boss名字解决
                             logger.debug("Fight fight!")
                             no_text_count = no_text_max
                             continue

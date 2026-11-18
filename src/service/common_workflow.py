@@ -164,6 +164,7 @@ class AsyncPickup:
         self._deadline = time.monotonic() + self.timeout
 
     def start(self):
+        logger.debug(f"Pickup start", stacklevel=2)
         self.event.set()
         self._refresh_deadline()
         if not self._lock.acquire(blocking=False):
@@ -176,7 +177,7 @@ class AsyncPickup:
     def stop(self):
         self.event.clear()
         with self._lock:
-            logger.debug(f"Stop async pickup", stacklevel=2)
+            logger.debug(f"Pickup stop", stacklevel=2)
 
     def __enter__(self):
         self.start()

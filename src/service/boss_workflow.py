@@ -208,7 +208,9 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             else:
                 # 血量低不拾取，防止一直误点领取奖励
                 if enemy_hp and enemy_hp > 0.20:
-                    pickup.start()
+                    # 会导致过早拾取声骸，影响计数、吸收等，改为识别到战斗文本才开启
+                    # pickup.start()
+                    pass
                 else:
                     pickup.stop()
 
@@ -230,7 +232,8 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
                     ui.sleep(1)
                     continue
             else:
-                if ui.search(stop_keyword) or enemy.is_dungeon and ui.search(ctx.tr(I18nText.Absorb), roiex.dialogue):
+                # 连战模式可能有上次遗落的声骸，吸收不再算做停战条件
+                if ui.search(stop_keyword):
                     # 结束战斗
                     logger.info(f"R{index} - Combat ended")
                     pickup.stop()
@@ -244,10 +247,12 @@ def doCombat(ctx: NodeContext, local: TaskLocal, **kwargs) -> bool:
             if res_battle_text := ui.search(ctx.tr(enemy.battle_text)):
                 logger.debug(f"R{index} - Text: {res_battle_text}")
                 no_text_count = no_text_max
+                pickup.start()
                 continue
             elif res_battle_text := ui.search(re.sub(r"[\^$]", "", ctx.tr(enemy.id)), roiex.boss_name_bar):
                 logger.debug(f"R{index} - Text: {res_battle_text}")
                 no_text_count = no_text_max
+                pickup.start()
                 continue
             elif ui.search(ctx.tr(I18nText.PleaseDontForgetToTakeABreak)):
                 logger.debug(f"R{index} - {ctx.tr(I18nText.PleaseDontForgetToTakeABreak).raw}")
