@@ -201,8 +201,8 @@ class ControlsSettingCard(ExpandSettingCard):
         self.mapWidget.loadKeySequence(paramConfig.get(paramConfig.shortcutMap))
 
     def __showResetDialog(self):
-        title = self.tr('Reset All Keybinds')
-        content = self.tr('Are you sure you want to reset the key bindings to defaults?')
+        title = self.tr('Reset key bindings to defaults?')
+        content = self.tr('This will reset all key bindings to their defaults.')
         w = MessageBox(title, content, self.window())
         # w.setTitleBarVisible(False)
         # w.setContentCopyable(True)
@@ -483,6 +483,14 @@ class SettingInterface(ScrollArea):
             texts=['简体中文', '繁體中文', 'English', self.tr('Use system setting')],
             parent=self.personalGroup
         )
+        self.closeBehaviorCard = ComboBoxSettingCard(
+            cfg.closeBehavior,
+            FIF.BACK_TO_WINDOW,
+            self.tr('Close Behavior'),
+            self.tr('Choose what happens when closing the window'),
+            texts=[self.tr('Exit Application'), self.tr('Minimize to Tray')],
+            parent=self.personalGroup
+        )
 
         # update software
         self.updateSoftwareGroup = SettingCardGroup(
@@ -554,6 +562,7 @@ class SettingInterface(ScrollArea):
         # self.personalGroup.addSettingCard(self.windowSizeCard)
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
+        self.personalGroup.addSettingCard(self.closeBehaviorCard)
 
         self.gameSettingGroup.addSettingCard(self.gameKeybindingsCard)
         self.gameSettingGroup.addSettingCard(self.gamePathCard)

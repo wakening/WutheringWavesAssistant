@@ -385,7 +385,8 @@ class TaskMonitor:
                 quality = qualities[0]
 
             # 极致uhd，高清hd，流畅sd
-            return LaunchInfo(game_path, [game_path, f"-krqlv={quality.lower()}"])
+            # -SkipSplash -krqlv=hd -dx11
+            return LaunchInfo(game_path, [game_path, f"-krqlv={quality.lower()}", "-SkipSplash"])
         if len(hwnds) == 1:
             hwnd = hwnds[0]  # 运行中的最优先，不管配置
         else:  # 多个游戏同时运行，优先选自定义配置的

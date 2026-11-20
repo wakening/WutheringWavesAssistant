@@ -61,6 +61,8 @@ class Config(QConfig):
         "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
     language = OptionsConfigItem(
         "MainWindow", "Language", Language.AUTO, OptionsValidator(Language), LanguageSerializer(), restart=True)
+    closeBehavior = OptionsConfigItem(
+        "MainWindow", "CloseBehavior", None, OptionsValidator([None, "Tray"]))
 
     # # Material
     # blurRadius  = RangeConfigItem("Material", "AcrylicBlurRadius", 15, RangeValidator(0, 40))
@@ -187,6 +189,7 @@ class ParamConfig(QConfig):
     mailOpen = ConfigItem("Daily", "MailOpen", False, BoolValidator())
     pioneerPodcast = ConfigItem("Daily", "PioneerPodcast", "Auto")
     pioneerPodcastOpen = ConfigItem("Daily", "PioneerPodcastOpen", False, BoolValidator())
+    startGameOpen = ConfigItem("Daily", "StartGameOpen", False, BoolValidator())
     # 培养目标
     focusResonator = ConfigItem("Daily", "FocusResonator", None)
 

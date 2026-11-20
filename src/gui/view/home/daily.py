@@ -13,7 +13,9 @@ from qfluentwidgets import (FluentIcon as FIF, OptionsSettingCard, SwitchSetting
                             OptionsConfigItem, CheckBox, ExpandGroupSettingCard, RadioButton, MaskDialogBase,
                             SingleDirectionScrollArea, PrimaryPushButton, FluentStyleSheet,
                             LineEdit, SettingCard, ComboBox, ConfigItem,
-                            PushButton, ToolButton, MessageBox, ToggleToolButton)
+                            PushButton, ToolButton, MessageBox, ToggleToolButton, ToolTipFilter,
+                            TransparentTogglePushButton, PrimarySplitToolButton, TransparentToggleToolButton,
+                            TransparentToolButton)
 
 from src.core.i18n import I18nText
 from src.core.resonator import Resonator
@@ -159,6 +161,34 @@ class DailyTask(BaseTask):
             parent=self.widget.parent()
         )
 
+#
+# class CheckWidget(QWidget):
+#
+#     def __init__(self, text: str, tooltip: str, parent: QWidget = None):
+#         super().__init__(parent)
+#         self.checkbox = CheckBox(text, self)
+#         # size = self.checkbox.minimumSizeHint()
+#         # self.checkbox.setFixedSize(size)
+#         # self.checkbox.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+#         self.checkbox.installEventFilter(ToolTipFilter(self.checkbox))
+#         self.checkbox.setToolTip(tooltip)
+#
+#         self.info = TransparentToolButton(FIF.INFO, self)
+#         # self.info.installEventFilter(ToolTipFilter(self.info))
+#         # self.info.setToolTip(tooltip)
+#         self.info.setFixedWidth(self.info.iconSize().width() + 4)
+#
+#         self.layout = QHBoxLayout(self)
+#         self.layout.addWidget(self.checkbox)
+#         self.layout.addSpacing(2)
+#         self.layout.addWidget(self.info)
+#         self.layout.addStretch()
+#         self.layout.setSpacing(0)
+#         self.layout.setContentsMargins(0, 0, 0, 0)
+#
+#         # self.setStyleSheet("border: 2px solid red;")
+#         # self.checkbox.setStyleSheet("border: 2px solid red;")
+
 
 class DailyWidget(ScrollArea):
 
@@ -174,6 +204,7 @@ class DailyWidget(ScrollArea):
         self.waveplateLabel = QLabel(self.tr("Waveplates:"), self.container)
         self.nestLabel = QLabel(self.tr("Nest:"), self.container)
         self.claimRewardsLabel = QLabel(self.tr("Claim Rewards:"), self.container)
+        self.additionalLabel = QLabel(self.tr("Additional:"), self.container)
 
         self.upLabels = []
         self.bountifulCrescendo = []
@@ -1628,6 +1659,10 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox = ComboBox(self.container)
         self.pioneerPodcastComboBox.addItem(self.tr("Auto"), userData="Auto")
 
+        self.startGameCheckBox = CheckBox(self.tr("Start Game"), self.container)
+        self.startGameCheckBox.installEventFilter(ToolTipFilter(self.startGameCheckBox))
+        self.startGameCheckBox.setToolTip(self.tr("The game path can be adjusted in the settings"))
+
         # 培养目标
         self.focusWeeklyChallenge = QLabel(self.container)
         self.focusTacetSuppression = QLabel(self.container)
@@ -1695,6 +1730,7 @@ class DailyWidget(ScrollArea):
         self.setWidget(self.container)
         self.setWidgetResizable(True)
         # self.setObjectName('paramInterface')
+        # self.scrollDelagate.vScrollBar.setFixedWidth(40)
 
         # self.resetButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
 
@@ -1710,6 +1746,7 @@ class DailyWidget(ScrollArea):
         self.tacetDiscordNestCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         self.activityCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         self.mailCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        self.startGameCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
         # self.focusWeeklyChallenge.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
 
@@ -1802,7 +1839,14 @@ class DailyWidget(ScrollArea):
         # self.gridLayout.addWidget(self.pioneerPodcastSettingButton, row, 2)
 
         row += 1
+        self.gridLayout.addWidget(self.additionalLabel, row, 0, 1, 2)
+
+        row += 1
+        self.gridLayout.addWidget(self.startGameCheckBox, row, 1)
         self.gridLayout.addLayout(self.contentBottomLayout, row, 2)
+
+        # row += 1
+        # self.gridLayout.addLayout(self.contentBottomLayout, row, 2)
 
         # # 参数：row=0（从第0行开始）, column=2（第3列）, rowSpan=3（跨3行）, columnSpan=1（占1列）
         # self.gridLayout.addLayout(self.focusResonatorLayout, 0, 3, row, 1)
@@ -1839,6 +1883,8 @@ class DailyWidget(ScrollArea):
             lambda checked: paramConfig.set(paramConfig.mailOpen, checked))
         self.pioneerPodcastCheckBox.toggled.connect(
             lambda checked: paramConfig.set(paramConfig.pioneerPodcastOpen, checked))
+        self.startGameCheckBox.toggled.connect(
+            lambda checked: paramConfig.set(paramConfig.startGameOpen, checked))
 
         self.weeklyChallengeComboBox.currentIndexChanged.connect(
             lambda _: paramConfig.set(paramConfig.weeklyChallenge, self.weeklyChallengeComboBox.currentData()))
@@ -1909,6 +1955,15 @@ class DailyWidget(ScrollArea):
             self.focusResonatorComboBox.setCurrentIndex(index)
 
     def __onResetButtonClicked(self):
+        # 弹窗确认
+        w = MessageBox(
+            self.tr('Reset to defaults?'),
+            self.tr('This will reset all settings to their defaults.'),
+            self.window()
+        )
+        if not w.exec():
+            return
+
         self.weeklyChallengeComboBox.setCurrentIndex(0)
         self.weeklyChallengeCheckBox.setChecked(False)
 
@@ -1935,6 +1990,8 @@ class DailyWidget(ScrollArea):
 
         self.pioneerPodcastComboBox.setCurrentIndex(0)
         self.pioneerPodcastCheckBox.setChecked(False)
+
+        self.startGameCheckBox.setChecked(False)
 
     def __onCheckboxGroupChanged(self, cb, idx, checked):
         # logger.info(f"onCheckboxGroupChanged: {cb.text()} {checked}")

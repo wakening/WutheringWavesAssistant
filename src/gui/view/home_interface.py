@@ -29,7 +29,6 @@ from src.gui.common.style_sheet import StyleSheet
 from src.gui.view.home.echo import EchoWidget
 from src.gui.view.home.events import EventsWidget
 from src.gui.view.home.explore import ExploreWidget
-# from src.gui.view.home.game_settings import GameSettingsWidget
 
 logger = logging.getLogger(__name__)
 
@@ -692,8 +691,9 @@ class HomeV2Interface(ScrollArea):
         # self.topLayout.addStretch()
         self.topLayout.addWidget(self.toolbarWidget)
 
-        self.middleLayout.addWidget(self.contentWidget, 3)
-        self.middleLayout.addWidget(self.basicSettingWidget, 1)
+        self.middleLayout.addWidget(self.contentWidget, 16)
+        self.middleLayout.addSpacing(6)
+        self.middleLayout.addWidget(self.basicSettingWidget, 5)
         self.middleLayout.setContentsMargins(6, 0, 0, 0)
 
         self.mainLayout.addLayout(self.topLayout)

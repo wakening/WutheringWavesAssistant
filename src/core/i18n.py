@@ -851,6 +851,27 @@ class I18nText:
     PdrResume = "PdrResume"
     PdrConfirmProgressAndLeaveNow = "PdrConfirmProgressAndLeaveNow"
 
+    # ------- Second Coming of Solaris: Unwritten Dreams -------
+    SecondComingOfSolarisUnwrittenDreams = "SecondComingOfSolarisUnwrittenDreams"
+    ScosUdNewSemester = "ScosUdNewSemester"
+    ScosUdContinue = "ScosUdContinue"
+    ScosUdGallery = "ScosUdGallery"
+    ScosUdLoadProgress = "ScosUdLoadProgress"
+    ScosUdHoldToFastForward = "ScosUdHoldToFastForward"
+    ScosUdTab = "ScosUdTab"
+    ScosUdEsc = "ScosUdEsc"
+    ScosUdMon = "ScosUdMon"
+    ScosUdTue = "ScosUdTue"
+    ScosUdWed = "ScosUdWed"
+    ScosUdThu = "ScosUdThu"
+    ScosUdFri = "ScosUdFri"
+    ScosUdIntimacyIncreased = "ScosUdIntimacyIncreased"
+    ScosUdConfirm = "ScosUdConfirm"
+    ScosUdSorryKidIKnowIPromisedTo = "ScosUdSorryKidIKnowIPromisedTo"
+    ScosUdFinish = "ScosUdFinish"
+    ScosUdNextPage = "ScosUdNextPage"
+    ScosUdHeadOutAndPick = "ScosUdHeadOutAndPick"
+
 
 I18N_TEXT = {
     # ------- Game -------
@@ -2655,8 +2676,8 @@ I18N_TEXT = {
     },
     # 下面是进入无音区内的文本
     I18nText.DefeatTheTdsInTheTacetField: {
-        Language.ZH: RegexStr(r"清?理无音区中涌现的", raw="清理无音区中涌现的残象"),
-        Language.EN: RegexStr(flex_ws(r"D?efeat the TDs in the"), raw=r"Defeat the TDs in the Tacet Field"),
+        Language.ZH: RegexStr(r"理无音区中涌现的", raw="清理无音区中涌现的残象"),
+        Language.EN: RegexStr(flex_ws(r"efeat the TDs in the"), raw=r"Defeat the TDs in the Tacet Field"),
     },
     I18nText.TacetFieldChallengeComplete: {
         Language.ZH: RegexStr(r"挑战达成", raw="挑战达成"),
@@ -3682,6 +3703,88 @@ I18N_TEXT = {
         Language.ZH: RegexStr(r"^是否确认立刻结算并退出.?$", raw="是否确认立刻结算并退出？"),
         Language.EN: RegexStr(flex_ws(r"^Confirm progress and leave now.?$"), raw="Confirm progress and leave now?"),
     },
+
+    # ------- 第二索拉：未名之梦 -------
+    I18nText.SecondComingOfSolarisUnwrittenDreams: {
+        Language.ZH: RegexStr(r"第二索拉.*?未名之梦", raw="第二索拉：未名之梦"),
+        Language.EN: RegexStr(flex_ws(r"Second Coming of Solaris.*?Unwritten Dreams"), raw="Second Coming of Solaris: Unwritten Dreams"),
+    },
+    I18nText.ScosUdNewSemester: {
+        Language.ZH: RegexStr(r"^开始新学期.?$", raw="开始新学期"),
+        Language.EN: RegexStr(flex_ws(r"^New Semester.?$"), raw="New Semester"),
+    },
+    I18nText.ScosUdContinue: {
+        Language.ZH: RegexStr(r"^继续旅程.?$", raw="继续旅程"),
+        Language.EN: RegexStr(flex_ws(r"^Continue.?$"), raw="Continue"),
+    },
+    I18nText.ScosUdGallery: {
+        Language.ZH: RegexStr(r"^学院画廊$", raw="学院画廊"),
+        Language.EN: RegexStr(flex_ws(r"^Gallery$"), raw="Gallery"),
+    },
+    I18nText.ScosUdLoadProgress: {
+        Language.ZH: RegexStr(r"^档案读取$", raw="档案读取"),
+        Language.EN: RegexStr(flex_ws(r"^Load Progress$"), raw="Load Progress"),
+    },
+    I18nText.ScosUdHoldToFastForward: {
+        Language.ZH: RegexStr(r"^长按加速$", raw="长按加速"),
+        Language.EN: RegexStr(flex_ws(r"^Hold to Fast.?Forward$"), raw="Hold to Fast-Forward"),
+    },
+    I18nText.ScosUdTab: {
+        Language.ZH: RegexStr(r"^Tab$", raw="Tab"),
+        Language.EN: RegexStr(flex_ws(r"^Tab$"), raw="Tab"),
+    },
+    I18nText.ScosUdEsc: {
+        Language.ZH: RegexStr(r"^Esc$", raw="Esc"),
+        Language.EN: RegexStr(flex_ws(r"^Esc$"), raw="Esc"),
+    },
+    I18nText.ScosUdMon: {
+        Language.ZH: RegexStr(r"^周一$", raw="周一"),
+        Language.EN: RegexStr(flex_ws(r"^Mon$"), raw="Mon"),
+    },
+    I18nText.ScosUdTue: {
+        Language.ZH: RegexStr(r"^周二$", raw="周二"),
+        Language.EN: RegexStr(flex_ws(r"^Tue$"), raw="Tue"),
+    },
+    I18nText.ScosUdWed: {
+        Language.ZH: RegexStr(r"^周三$", raw="周三"),
+        Language.EN: RegexStr(flex_ws(r"^Wed$"), raw="Wed"),
+    },
+    I18nText.ScosUdThu: {
+        Language.ZH: RegexStr(r"^周四$", raw="周四"),
+        Language.EN: RegexStr(flex_ws(r"^Thu$"), raw="Thu"),
+    },
+    I18nText.ScosUdFri: {
+        Language.ZH: RegexStr(r"^周五$", raw="周五"),
+        Language.EN: RegexStr(flex_ws(r"^Fri$"), raw="Fri"),
+    },
+    I18nText.ScosUdIntimacyIncreased: {
+        Language.ZH: RegexStr(r"^好感度提升.?$", raw="好感度提升.?"),
+        Language.EN: RegexStr(flex_ws(r"^Intimacy Increased.?$"), raw="Intimacy Increased.?"),
+    },
+    I18nText.ScosUdConfirm: {
+        Language.ZH: RegexStr(r"^确定$", raw="确定"),
+        Language.EN: RegexStr(flex_ws(r"^Confirm$"), raw="Confirm"),
+    },
+    I18nText.ScosUdSorryKidIKnowIPromisedTo: {
+        Language.ZH: RegexStr(r"^抱歉.*?本来说好了要", raw="抱歉啦，本来说好了要"),
+        Language.EN: RegexStr(flex_ws(r"^Sorry.*?kid.*?I know I promised to"), raw="Sorry, kid! I know I promised to"),
+    },
+    I18nText.ScosUdFinish: {
+        Language.ZH: RegexStr(r"^结束$", raw="结束"),
+        Language.EN: RegexStr(flex_ws(r"^Finish$"), raw="Finish"),
+    },
+    I18nText.ScosUdNextPage: {
+        Language.ZH: RegexStr(r"^下一页$", raw="下一页"),
+        Language.EN: RegexStr(flex_ws(r"^Next.?Page$"), raw="Next Page"),
+    },
+    I18nText.ScosUdHeadOutAndPick: {
+        Language.ZH: RegexStr(r"^点击.?外出.?即可打开地图.?选择地点探索小镇", raw="点击【外出】即可打开地图，选择地点探索小镇"),
+        Language.EN: RegexStr(
+            flex_ws(r"^Head Out and pick a town location to visit on the map"),
+            raw="Head Out and pick a town location to visit on the map."
+        ),
+    },
+    # 06:01
 
 
 }

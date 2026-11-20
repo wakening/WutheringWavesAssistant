@@ -42,7 +42,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.menu.addActions([
             Action(self.tr('  Show Window  '), triggered=self.showNormal),
             Action(self.tr('  Open Folder  '), triggered=self.openExplorer),
-            Action(self.tr('  Exit  '), triggered=parent.close),
+            Action(self.tr('  Exit  '), triggered=self.onTrayQuit),
         ])
         self.setContextMenu(self.menu)
         # 双击显示主窗口
@@ -59,6 +59,10 @@ class SystemTrayIcon(QSystemTrayIcon):
     def onTrayActivated(self, reason: QSystemTrayIcon.ActivationReason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.showNormal()
+
+    def onTrayQuit(self):
+        self.parent.systemTrayQuit = True
+        self.parent.close()
 
 
 class MainWindow(FluentWindow):
@@ -128,6 +132,7 @@ class MainWindow(FluentWindow):
         self.setWindowIcon(QIcon(str(Path(__file__).resolve().parent.parent / 'resource/images/logo.ico')))
         self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
 
+        self.systemTrayQuit = False  # 从托盘菜单退出
         self.systemTrayIcon = SystemTrayIcon(self)
         self.systemTrayIcon.show()
 
@@ -172,6 +177,17 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
 
     def closeEvent(self, e):
+        if not self.systemTrayQuit and cfg.get(cfg.closeBehavior) == "Tray":
+            e.ignore()
+            self.hide()
+            self.systemTrayIcon.showMessage(
+                "WWA",
+                self.tr("The application has been minimized to the system tray"),
+                self.windowIcon(),
+                3000
+            )
+            return
+
         globalSignal.closeMainWindowSignal.emit()
         self.themeListener.terminate()
         self.themeListener.deleteLater()
