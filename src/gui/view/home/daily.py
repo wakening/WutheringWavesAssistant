@@ -1884,7 +1884,7 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastCheckBox.toggled.connect(
             lambda checked: paramConfig.set(paramConfig.pioneerPodcastOpen, checked))
         self.startGameCheckBox.toggled.connect(
-            lambda checked: paramConfig.set(paramConfig.startGameOpen, checked))
+            lambda checked: paramConfig.set(paramConfig.startGame, checked))
 
         self.weeklyChallengeComboBox.currentIndexChanged.connect(
             lambda _: paramConfig.set(paramConfig.weeklyChallenge, self.weeklyChallengeComboBox.currentData()))
@@ -1921,6 +1921,7 @@ class DailyWidget(ScrollArea):
         self.activityCheckBox.setChecked(paramConfig.get(paramConfig.activityOpen))
         self.mailCheckBox.setChecked(paramConfig.get(paramConfig.mailOpen))
         self.pioneerPodcastCheckBox.setChecked(paramConfig.get(paramConfig.pioneerPodcastOpen))
+        self.startGameCheckBox.setChecked(paramConfig.get(paramConfig.startGame))
 
         self.weeklyChallengeComboBox.setCurrentIndex(
             self.weeklyChallengeComboBox.findData(paramConfig.get(paramConfig.weeklyChallenge)))

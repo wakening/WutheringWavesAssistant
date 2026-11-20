@@ -1,5 +1,6 @@
 import logging
 import math
+import subprocess
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -14,7 +15,7 @@ import win32gui
 from src.config import logging_config
 from src.core import message
 from src.core.contexts import Context
-from src.core.exceptions import ScreenshotError
+from src.core.exceptions import ScreenshotError, StopError
 from src.core.geometry import AnchorPoint, Align
 from src.core.interface import ImgService, OCRService, ControlService, PageEventService, WindowService
 from src.core.message import MsgSource, MsgTaskStatus, MsgType
@@ -529,12 +530,85 @@ def macro_point_scaler(ctx):
     return points
 
 
+class PrepareTask:
+
+    def __init__(self, event, spec: TaskSpec, ipc: IPCManager, **kwargs):
+        self.event = event
+        self.spec: TaskSpec = spec
+        self.ipc: IPCManager = ipc
+
+    def start_game(self):
+        """ 启动游戏 """
+        try:
+            if hwnd_util.get_hwnd(self.spec.game_path, force=True):
+                return True
+
+            logger.info("Starting the game now")
+            popen_args = [self.spec.game_path]
+            if self.spec.launch_info.cmdline and len(self.spec.launch_info.cmdline) > 1:
+                popen_args.extend(self.spec.launch_info.cmdline[1:])
+            logger.debug(f"subprocess: {popen_args}")
+
+            subprocess.Popen(
+                popen_args,
+                creationflags=subprocess.DETACHED_PROCESS
+            )
+
+            self._sleep(20)
+            for i in range(10):
+                try:
+                    hwnd = hwnd_util.get_hwnd(self.spec.game_path, force=True)
+                    if hwnd:
+                        logger.info("The game has restarted")
+                        self._sleep(10)
+                        return True
+                except KeyboardInterrupt:
+                    logger.warning("KeyboardInterrupt")
+                    raise
+                except StopError:
+                    raise
+                except Exception as e2:
+                    logger.exception(e2)
+                self._sleep(5)
+        except Exception as e:
+            logger.exception(e)
+        return False
+
+
+    def _sleep(self, sleep_seconds: float) -> None:
+        if sleep_seconds <= 0:
+            return
+        while sleep_seconds > 0:
+            if not self.event.is_set():
+                raise StopError()
+            if sleep_seconds <= 1.0:
+                time.sleep(sleep_seconds)
+            else:
+                time.sleep(1)
+            sleep_seconds -= 1
+
+
 def daily_task(event, spec: TaskSpec, ipc: IPCManager, **kwargs):
     try:
 
         ctx, container = task_init(event, spec, ipc, source=MsgSource.DAILY_TASK, **kwargs)
         logger.info(f"每日任务开始运行, task_id: {spec.task_id}")
         ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.RUNNING)
+
+        if ctx.runtime.cfg.daily.startGame:
+            res = PrepareTask(event, spec, ipc, **kwargs).start_game()
+            if not res:
+                logger.warning(f"Failed to start the game")
+                ctx.runtime.send(MsgType.TASK_STATUS, status=MsgTaskStatus.FAILED)
+
+                ctx.ipc.event_queue.put({
+                    "task": {"DailyTask": ["failed"]}
+                }, block=True)
+                time.sleep(0.1)
+                return
+
+            # 刷新游戏窗口句柄
+            ctx.window_service.refresh()
 
         # 1. 先获取当前鼠标位置
         original_x, original_y = keymouse_util.get_mouse_position()

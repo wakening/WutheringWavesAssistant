@@ -103,6 +103,7 @@ class DailyConfig(ConfigBase):
     mailOpen: bool | None = None
     pioneerPodcast: str | None = None
     pioneerPodcastOpen: bool | None = None
+    startGame: bool | None = None
 
 
 class ExploreConfig(ConfigBase):

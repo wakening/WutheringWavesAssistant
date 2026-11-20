@@ -238,12 +238,28 @@ class MainWindow(FluentWindow):
 
     def showTaskInfoBar(self, title, content, duration):
         logger.debug(f"showTaskInfoBar title:{title}, content:{content}, duration:{duration}")
-        InfoBar.success(
-            title=title,
-            content=content,
-            orient=Qt.Horizontal,
-            isClosable=True,
-            position=InfoBarPosition.BOTTOM_RIGHT,
-            duration=duration,
-            parent=InfoBar.desktopView()
-        )
+        if title in ["DailyTask", "EchoMergeProcessTask"]:
+            name = {
+                "DailyTask": self.tr("Daily Task"),
+                "EchoMergeProcessTask": self.tr("Data Merge Task"),
+            }
+            status = {
+                "finished": self.tr("Finished"),
+                "failed": self.tr("Failed"),
+            }
+            self.systemTrayIcon.showMessage(
+                "WWA",
+                self.tr("{name} {status}").format(name=name.get(title, ""), status=status.get(content, "")),
+                self.windowIcon(),
+                duration
+            )
+        else:
+            InfoBar.success(
+                title=title,
+                content=content,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.BOTTOM_RIGHT,
+                duration=duration,
+                parent=InfoBar.desktopView()
+            )

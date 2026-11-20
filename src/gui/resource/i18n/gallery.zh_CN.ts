@@ -1774,22 +1774,22 @@
         <translation>培养目标: </translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1960"/>
+        <location filename="../../view/home/daily.py" line="1961"/>
         <source>Reset to defaults?</source>
         <translation>重置为默认？</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="1961"/>
+        <location filename="../../view/home/daily.py" line="1962"/>
         <source>This will reset all settings to their defaults.</source>
         <translation>这将把所有设置重置为默认值。</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="2067"/>
+        <location filename="../../view/home/daily.py" line="2047"/>
         <source>About:</source>
         <translation>关于:</translation>
     </message>
     <message>
-        <location filename="../../view/home/daily.py" line="2068"/>
+        <location filename="../../view/home/daily.py" line="2048"/>
         <source>If you encounter any issues, please report them in our group chat. Before using this feature, we recommend disabling mods and similar modifications to avoid interfering with recognition.</source>
         <translation>有问题及时在群里反馈。使用前建议关闭Mod等，避免影响识别。</translation>
     </message>
@@ -1962,6 +1962,31 @@
         <location filename="../../view/main_window.py" line="229"/>
         <source> * New version available {version}</source>
         <translation> *有新版本 {version}</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="243"/>
+        <source>Daily Task</source>
+        <translation>每日任务</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="244"/>
+        <source>Data Merge Task</source>
+        <translation>声骸融合任务</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="247"/>
+        <source>Finished</source>
+        <translation>完成</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="248"/>
+        <source>Failed</source>
+        <translation>失败</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="252"/>
+        <source>{name} {status}</source>
+        <translation>{name}{status}</translation>
     </message>
 </context>
 <context>

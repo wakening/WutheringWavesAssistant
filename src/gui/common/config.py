@@ -189,7 +189,7 @@ class ParamConfig(QConfig):
     mailOpen = ConfigItem("Daily", "MailOpen", False, BoolValidator())
     pioneerPodcast = ConfigItem("Daily", "PioneerPodcast", "Auto")
     pioneerPodcastOpen = ConfigItem("Daily", "PioneerPodcastOpen", False, BoolValidator())
-    startGameOpen = ConfigItem("Daily", "StartGameOpen", False, BoolValidator())
+    startGame = ConfigItem("Daily", "StartGame", False, BoolValidator())
     # 培养目标
     focusResonator = ConfigItem("Daily", "FocusResonator", None)
 

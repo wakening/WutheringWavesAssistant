@@ -140,10 +140,10 @@ class TaskMonitor:
 
     def _run_EchoMergeProcessTask(self, task_name: str):
         logger.info("任务监控线程开始运行")
-        notice = {
-            "DailyTask": "Daily Task",
-            "EchoMergeProcessTask": "Data Merge",
-        }
+        # notice = {
+        #     "DailyTask": "Daily Task",
+        #     "EchoMergeProcessTask": "Data Merge",
+        # }
         try:
             sleep_seconds = 3
             from src.gui.common.globals import globalSignal
@@ -157,7 +157,7 @@ class TaskMonitor:
                     task_msg = msg.get("task", {}).get(task_name)
                     if task_msg in ["finished", "failed"]:
                         self.parent.stop_task_in_monitor(task_name)
-                        globalSignal.taskInfoBarSignal.emit(f"{notice.get(task_name)}: ", task_msg, 3000)
+                        globalSignal.taskInfoBarSignal.emit(task_name, task_msg, 3000)
                         break
                 except queue.Empty:
                     pass
@@ -282,8 +282,10 @@ class TaskMonitor:
             if self.launch_info.cmdline and len(self.launch_info.cmdline) > 1:
                 popen_args.extend(self.launch_info.cmdline[1:])
             logger.debug(f"subprocess: {popen_args}")
-            subprocess.Popen(popen_args,
-                             creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
+            subprocess.Popen(
+                popen_args,
+                creationflags=subprocess.DETACHED_PROCESS
+            )
             self._sleep(20)
             for i in range(10):
                 try:
