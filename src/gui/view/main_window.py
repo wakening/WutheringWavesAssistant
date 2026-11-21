@@ -2,6 +2,7 @@
 import logging
 import re
 import sys
+import time
 from pathlib import Path
 from typing import List
 from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer, QObject
@@ -45,7 +46,7 @@ class SystemTrayIcon(QSystemTrayIcon):
             Action(self.tr('  Exit  '), triggered=self.onTrayQuit),
         ])
         self.setContextMenu(self.menu)
-        # 双击显示主窗口
+        # 点击显示主窗口
         self.activated.connect(self.onTrayActivated)
 
     def showNormal(self):
@@ -63,6 +64,7 @@ class SystemTrayIcon(QSystemTrayIcon):
     def onTrayQuit(self):
         self.parent.systemTrayQuit = True
         self.parent.close()
+        QApplication.instance().quit()
 
 
 class MainWindow(FluentWindow):
@@ -135,6 +137,7 @@ class MainWindow(FluentWindow):
         self.systemTrayQuit = False  # 从托盘菜单退出
         self.systemTrayIcon = SystemTrayIcon(self)
         self.systemTrayIcon.show()
+        self.showHideMessageTime = None
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -180,12 +183,15 @@ class MainWindow(FluentWindow):
         if not self.systemTrayQuit and cfg.get(cfg.closeBehavior) == "Tray":
             e.ignore()
             self.hide()
-            self.systemTrayIcon.showMessage(
-                "WWA",
-                self.tr("The application has been minimized to the system tray"),
-                self.windowIcon(),
-                3000
-            )
+            cur_time = time.monotonic()
+            if self.showHideMessageTime is None or cur_time - self.showHideMessageTime > 1 * 60 * 60:
+                self.showHideMessageTime = cur_time
+                self.systemTrayIcon.showMessage(
+                    "WWA",
+                    self.tr("The application has been minimized to the system tray"),
+                    self.windowIcon(),
+                    3000
+                )
             return
 
         globalSignal.closeMainWindowSignal.emit()
