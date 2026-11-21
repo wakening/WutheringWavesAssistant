@@ -1992,7 +1992,7 @@ class DailyWidget(ScrollArea):
         self.pioneerPodcastComboBox.setCurrentIndex(0)
         self.pioneerPodcastCheckBox.setChecked(False)
 
-        self.startGameCheckBox.setChecked(False)
+        self.startGameCheckBox.setChecked(True)
 
     def __onCheckboxGroupChanged(self, cb, idx, checked):
         # logger.info(f"onCheckboxGroupChanged: {cb.text()} {checked}")
