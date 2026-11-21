@@ -134,6 +134,7 @@ class MainWindow(FluentWindow):
         self.setWindowIcon(QIcon(str(Path(__file__).resolve().parent.parent / 'resource/images/logo.ico')))
         self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
 
+        self.quit = False  # 退出
         self.systemTrayQuit = False  # 从托盘菜单退出
         self.systemTrayIcon = SystemTrayIcon(self)
         self.systemTrayIcon.show()
@@ -180,7 +181,7 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
 
     def closeEvent(self, e):
-        if not self.systemTrayQuit and cfg.get(cfg.closeBehavior) == "Tray":
+        if not self.quit and not self.systemTrayQuit and cfg.get(cfg.closeBehavior) == "Tray":
             e.ignore()
             self.hide()
             cur_time = time.monotonic()
@@ -201,6 +202,7 @@ class MainWindow(FluentWindow):
         super().closeEvent(e)
 
     def __onCloseEvent(self, exit_code: int):
+        self.quit = True
         self.close()
         sys.exit(exit_code)
 
