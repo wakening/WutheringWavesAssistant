@@ -181,31 +181,29 @@ jobs:
           $fixedDownloadText = @"
           
           #### 📦 下载说明：
-          - `wwa-dml-${{ env.VERSION }}.7z` - 通用DirectML加速，适合所有显卡，如AMD、NVIDIA  
+          - `wwa-dml-${{ env.VERSION }}.7z` - 通用DirectML加速，适合所有显卡，如AMD、NVIDIA、INTEL  
           - `wwa-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，适合旧N卡  
           - `wwa-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，40系列显卡  
           - `wwa-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属CUDA加速，50系列显卡  
             - wwa-cu129压缩包已分割为001、002两个文件，都要下载，放在同一个目录，对001进行解压即可  
-            - N卡建议使用专版，5090太新还不支持，请使用通用版  
-            - 仅支持windows系统  
+            - N卡可使用专版，5090请使用通用版  
+          - 仅支持windows系统  
           
           #### ▶️ 使用说明：
           **脚本免安装解压即可运行**  
-          - 下载后解压，剪切到一个**路径没有中文的目录**。若无法解压，[点击下载7z](https://www.7-zip.org/)  
-          - 双击**WWA一键更新.bat**并选择合适的更新渠道（无梯子建议选国内加速）升级到最新，双击**WWA.exe**启动脚本  
-          - Windows系统设置：关闭HDR（默认关闭），关闭英伟达显卡滤镜（默认关闭），关闭微星小飞机（不认识这个就不用管）  
+          - 下载后解压，剪切到一个**路径没有中文的目录**。若无法解压，[点击下载7z解压](https://www.7-zip.org/)  
+          - 双击**WWA.exe**启动脚本  
+          - Windows系统设置：关闭HDR，关闭显卡滤镜  
           - 游戏内设置：
-            - **简体中文，重置按键，重置滤镜，重置亮度**  
+            - **简体中文/English，重置滤镜**  
             - 控制 镜头设置：  
               - 镜头重置：开  
               - 移动镜头修正：开  
               - 战斗镜头修正：开  
-          - MOD在刷boss时需要关闭，在游戏内按F6，F6在下面就Fn + F6  
-          - 脚本不用每次都重新下载，直接点目录内的一键更新即可  
           
           "@
 
-          $fullContent = $fixedText + "`n`n" + $result + "`n`n" + $fixedDownloadText + "`n`n" + "感谢使用！如有问题请提交 Issue。" + "`n`n" + "不用每次都重新下载，直接点目录内的一键更新！"
+          $fullContent = $fixedText + "`n`n" + $result + "`n`n" + $fixedDownloadText + "`n`n" + "感谢使用！如有问题请提交 Issue。"
     
           # 保存到文件
           $fullContent | Out-File -FilePath "release_body.txt"
